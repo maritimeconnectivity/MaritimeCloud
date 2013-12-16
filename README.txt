@@ -1,7 +1,7 @@
 MaritimeCloud - A communication framework enabling efficient, secure, reliable and seamless electronic information exchange 
                 between all authorized maritime stakeholders across available communication systems.
 
-Last updated 12. December 2013, Copyright 2012 Danish Maritime Authority
+Last updated 16. December 2013, Copyright 2012 Danish Maritime Authority
 
 
 Links
@@ -29,21 +29,21 @@ The build procedure produces a number of distributions.
             
 distribution/        
   mc-client-android     A client that can be used on android
-  mc-client-jsr356      A client that can be used in any JSR 356 enabled container
-  mc-client=standalone  A client that can be used without dependencies
-  mc-server             The cloud server
+  mc-client-jsr356      A client for any JSR 356 enabled container
+  mc-client=standalone  A client that can be used without any dependencies
+  mc-server             The standalone cloud server
 
 Source Code Organization
 -------------------------------------------------------------------------------
 The repository is organized into the following components.
 
-mc-core/                The core classes includes definition of Maritime Cloud concepts such as ID
+mc-core/                The core classes for the Maritime Cloud
 
-mc-util/                Various utility classes that are used throughout the project.
+mc-util/                Various utility classes commonly used.
 
 mc-net/    
-  mc-net-api            The client API for communicating between different actors
-  mc-net-impl           The default client implementation
-  mc-net-messages       The different messages that are send between the clients and servers 
-  mc-net-server         The MaritimeCloud server that facilitates communication between actors
+  mc-net-client-api     The client API for communicating
+  mc-net-client-impl    The default client implementation
+  mc-net-messages       The messages that are send between clients and servers 
+  mc-net-server         The MaritimeCloud server implementation
   mc-net-server-tck     Contains various end-to-end tests
