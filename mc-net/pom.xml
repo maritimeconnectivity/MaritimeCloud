@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>net.maritimecloud</groupId>
+    <artifactId>mc-parent</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>mc-net-parent</artifactId>
+  <packaging>pom</packaging>
+  <name>MaritimeCloud Net Parent</name>
+
+  <modules>
+    <module>mc-net-client-api</module>
+    <module>mc-net-messages</module>
+    <module>mc-net-client-impl</module>
+    <module>mc-net-server</module>
+    <module>mc-net-server-tck</module>
+  </modules>
+</project>
