@@ -30,7 +30,7 @@ The build procedure produces a number of distributions.
 distribution/        
   mc-client-android     A client that can be used on android
   mc-client-jsr356      A client for any JSR 356 enabled container
-  mc-client=standalone  A client that can be used without any dependencies
+  mc-client-standalone  A client that can be used without any dependencies
   mc-server             The standalone cloud server
 
 Source Code Organization
