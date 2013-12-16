@@ -13,7 +13,7 @@ Source        : https://github.com/MaritimeCloud/MaritimeCloud
 Issues        : https://github.com/MaritimeCloud/MaritimeCloud/issues
 Mailing Lists : http://groups.google.com/group/maritimecloud
 
-Build CI      : https://dma.ci.cloudbees.com/
+Build CI      : https://dma.ci.cloudbees.com/job/MaritimeCloud/
 
 License       : http://www.apache.org/licenses/LICENSE-2.0.html
 
