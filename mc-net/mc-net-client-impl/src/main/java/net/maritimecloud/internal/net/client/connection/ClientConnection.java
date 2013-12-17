@@ -56,7 +56,7 @@ public final class ClientConnection {
         connectionManager.lock.lock();
         try {
             if (transport == null && connectingFuture == null) {
-                LOG.info("Trying to connect");
+                LOG.info("Trying to connect to " + connectionManager.uri);
                 connectingFuture = new ClientConnectFuture(this, -1);
                 Thread t = new Thread(connectingFuture);
                 t.setDaemon(true);

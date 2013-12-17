@@ -74,8 +74,6 @@ public class ServerMessageBus {
         RequestProcessor rp = processors.get(message.getClass());
         if (rp == null) {
             System.out.println("No processors for: " + message.getClass() + "[" + message.toJSON() + "]");
-        } else {
-            System.out.println("sending to " + rp);
         }
 
         try {

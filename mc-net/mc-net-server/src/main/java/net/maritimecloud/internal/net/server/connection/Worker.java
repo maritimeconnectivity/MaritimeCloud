@@ -44,7 +44,7 @@ public class Worker implements Runnable {
     }
 
     public OutstandingMessage messageSend(ConnectionMessage message) {
-        System.out.println("Prep to send1 " + message.toJSON());
+        // System.out.println("Prep to send1 " + message.toJSON());
         sendLock.lock();
         try {
             if (isShutdown) {

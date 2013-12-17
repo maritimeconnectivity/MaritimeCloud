@@ -46,8 +46,6 @@ class ServerConnectFuture {
 
 
     public void onMessage(HelloMessage hm) {
-        System.out.println("HELLLO " + hm.getLastReceivedMessageId());
-
         TargetManager tm = serverTransport.cm.targetManager;
         Target target = tm.getTarget(hm.getClientId());
 

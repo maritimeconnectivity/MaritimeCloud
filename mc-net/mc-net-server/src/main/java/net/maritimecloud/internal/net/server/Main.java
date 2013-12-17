@@ -40,8 +40,11 @@ public class Main {
                 for (int i = 0; i < 30; i++) {
                     if (!server.awaitTerminated(1, TimeUnit.SECONDS)) {
                         System.out.println("Awaiting shutdown " + i + " / 30 seconds");
+                    } else {
+                        return;
                     }
                 }
+
                 throw new IllegalStateException("Could not shutdown server properly");
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);

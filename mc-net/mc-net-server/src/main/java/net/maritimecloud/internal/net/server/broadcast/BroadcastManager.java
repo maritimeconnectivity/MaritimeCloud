@@ -49,7 +49,6 @@ public class BroadcastManager implements Startable {
 
     BroadcastSendAck broadcast(final ServerConnection source, final BroadcastSend send) throws RequestException {
         final BroadcastMessage bm;
-        System.err.println("READ BROADCAST");
 
         final Target target = source.getTarget();
         final PositionTime sourcePositionTime = send.getPositionTime();

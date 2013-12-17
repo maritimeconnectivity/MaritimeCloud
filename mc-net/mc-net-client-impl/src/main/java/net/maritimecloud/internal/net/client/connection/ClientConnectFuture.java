@@ -77,11 +77,11 @@ class ClientConnectFuture implements Runnable {
                 LOG.error("A serious internal error", e);
             } catch (IOException e) {
                 if (cancelled.getCount() > 0) {// Only log the error if we are not cancelled
-                    LOG.error("A serious internal error", e);
+                    LOG.error("Could not connect to " + cm.uri + ", will try again later");
                 }
             }
             try {
-                cancelled.await(1, TimeUnit.SECONDS); // exponential backoff?
+                cancelled.await(2, TimeUnit.SECONDS); // exponential backoff?
             } catch (InterruptedException ignore) {}
         }
     }

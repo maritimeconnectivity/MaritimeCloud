@@ -105,7 +105,7 @@ public class WorkerInner {
 
     private void processReceived() {
         ConnectionMessage cm = received.poll();
-        System.out.println("GOT MSG with " + cm.getLatestReceivedId() + " " + cm.toJSON());
+        // System.out.println("GOT MSG with " + cm.getLatestReceivedId() + " " + cm.toJSON());
         latestReceivedMessageId = cm.getMessageId();
         latestAck = cm.getLatestReceivedId();
         worker.connection.getBus().onMsg(cm);

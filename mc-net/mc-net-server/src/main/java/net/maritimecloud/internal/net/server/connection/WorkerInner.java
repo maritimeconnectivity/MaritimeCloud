@@ -110,7 +110,7 @@ public class WorkerInner {
 
     private void processReceived() {
         ConnectionMessage cm = received.poll();
-        System.out.println("GOT MSG with " + cm.getLatestReceivedId() + " " + cm.toJSON());
+        // System.out.println("GOT MSG with " + cm.getLatestReceivedId() + " " + cm.toJSON());
         latestReceivedMessageId = cm.getMessageId();
         latestAck = cm.getLatestReceivedId();
         worker.connection.bus.onMessage(worker.connection, cm);
@@ -125,7 +125,7 @@ public class WorkerInner {
     }
 
     private void processWritten() {
-        System.out.println("Prep to send");
+        // System.out.println("Prep to send");
         ServerTransport transport = worker.connection.transport;
         if (transport != null && transport == this.transport) {
             OutstandingMessage om = unwritten.poll();
