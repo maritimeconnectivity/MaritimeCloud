@@ -1,16 +1,17 @@
-/* Copyright (c) 2011 Danish Maritime Authority.
+/* Copyright (c) 2011 Danish Maritime Authority
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.maritimecloud.util.geometry.grid;
 
@@ -41,7 +42,7 @@ public final class Grid {
 
     private final double resolution;
 
-    private final double multiplier;
+    final double multiplier;
 
     private Grid(double resolution) {
         this.resolution = resolution;
@@ -50,6 +51,10 @@ public final class Grid {
 
     public double getResolution() {
         return resolution;
+    }
+
+    public double getSize() {
+        return 40075000.0 * resolution / 360.0;
     }
 
     public Cell getCell(long cellId) {
@@ -75,7 +80,9 @@ public final class Grid {
 
     /**
      * Compute south-west corner of cell.
-     * @param cell the cell.
+     * 
+     * @param cell
+     *            the cell.
      * @return Position of south-west corner of cell.
      */
     public Position getGeoPosOfCell(Cell cell) {
@@ -100,14 +107,14 @@ public final class Grid {
     }
 
     public Cell getCellWestOf(Cell cell) {
-        if (cell.getCellId() % multiplier == 1) {
+        if (cell.getCellId() % multiplier == 0) {
             return new Cell((long) (cell.getCellId() + multiplier - 1));
         }
         return new Cell(cell.getCellId() - 1);
     }
 
     public Cell getCellEastOf(Cell cell) {
-        if (cell.getCellId() % multiplier == 0) {
+        if (cell.getCellId() % multiplier == multiplier - 1) {
             return new Cell((long) (cell.getCellId() - multiplier + 1));
         }
         return new Cell(cell.getCellId() + 1);
@@ -115,12 +122,15 @@ public final class Grid {
 
     /**
      * Compute the geographical bounding box of a cell.
-     * @param cell the cell to have its bounding box computed.
+     * 
+     * @param cell
+     *            the cell to have its bounding box computed.
      * @return the bounding box of the given cell.
      */
     public BoundingBox getBoundingBoxOfCell(Cell cell) {
         final Position southWestCorner = getGeoPosOfCell(cell);
-        final Position northEastCorner = Position.create(southWestCorner.getLatitude() + resolution, southWestCorner.getLongitude() + resolution);
+        final Position northEastCorner = Position.create(southWestCorner.getLatitude() + resolution,
+                southWestCorner.getLongitude() + resolution);
         return BoundingBox.create(southWestCorner, northEastCorner, CoordinateSystem.GEODETIC);
     }
 
