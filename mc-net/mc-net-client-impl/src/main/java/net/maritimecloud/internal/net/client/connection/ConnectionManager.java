@@ -72,6 +72,7 @@ public class ConnectionManager implements MaritimeCloudConnection, Startable {
         }
         try {
             String remote = "ws://" + b.getHost();
+            // Tomcat does not automatically append a '/' to the host address
             if (!remote.endsWith("/")) {
                 remote += "/";
             }
