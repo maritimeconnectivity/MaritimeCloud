@@ -71,7 +71,11 @@ public class ConnectionManager implements MaritimeCloudConnection, Startable {
             addListener(listener);
         }
         try {
-            this.uri = new URI("ws://" + b.getHost());
+            String remote = "ws://" + b.getHost();
+            if (!remote.endsWith("/")) {
+                remote += "/";
+            }
+            this.uri = new URI(remote);
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException(e);
         }
