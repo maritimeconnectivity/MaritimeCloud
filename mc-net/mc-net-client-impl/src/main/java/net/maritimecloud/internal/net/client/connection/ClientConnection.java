@@ -97,7 +97,6 @@ public final class ClientConnection {
         connectionManager.lock.lock();
         try {
             if (transport != null && disconnectingFuture == null) {
-                System.out.println("A");
                 LOG.info("Starting Disconnecting");
                 disconnectingFuture = new ClientDisconnectFuture(this, transport);
                 connectionManager.threadManager.startDisconnectingThread(disconnectingFuture);
