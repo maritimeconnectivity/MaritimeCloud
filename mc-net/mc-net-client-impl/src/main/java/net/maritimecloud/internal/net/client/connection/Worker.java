@@ -35,6 +35,8 @@ public class Worker implements Runnable {
 
     private volatile boolean isShutdown;
 
+    final static Object WAKE_UP = new Object();
+
     final ClientConnection connection;
 
     final WorkerInner wi = new WorkerInner(this);
@@ -95,10 +97,12 @@ public class Worker implements Runnable {
                 o = q.poll();
             }
 
-            if (o != null) {
+            if (o != null && o != WAKE_UP) {
                 wi.fromQueue(o);
-                while ((o = q.poll()) != null) {
+                o = q.poll();
+                while (o != null && o != WAKE_UP) {
                     wi.fromQueue(o);
+                    o = q.poll();
                 }
             }
 
@@ -117,6 +121,7 @@ public class Worker implements Runnable {
         workLock.lock();
         try {
             isShutdown = true;
+            q.offer(WAKE_UP);
         } finally {
             workLock.unlock();
             receiveLock.unlock();

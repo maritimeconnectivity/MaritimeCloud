@@ -105,6 +105,7 @@ public final class ClientConnection {
                 connectingFuture.cancelConnectUnderLock(); // In the process of connecting, just cancel the connect
                 connectingFuture = null;
                 connectionManager.connection = null;
+                worker.shutdown();
                 return true;
             }
             connectionManager.stateChange.signalAll();
@@ -120,6 +121,7 @@ public final class ClientConnection {
             if (future == disconnectingFuture && connectingFuture == null && transport == null) {
                 this.disconnectingFuture = null;
             }
+            worker.shutdown();
             connectionManager.connection = null;
             connectionManager.stateChange.signalAll();
         } finally {
