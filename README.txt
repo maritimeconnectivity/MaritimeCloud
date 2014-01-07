@@ -22,7 +22,7 @@ Build Instructions
 -------------------------------------------------------------------------------
 Prerequisites: Java 1.7 + Maven 3.x.x
 > git clone https://github.com/MaritimeCloud/MaritimeCloud.git
-> cd cake
+> cd MaritimeCloud
 > mvn install
 
 The build procedure produces a number of distributions.
