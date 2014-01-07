@@ -24,6 +24,7 @@ import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.net.client.broadcast.BroadcastManager;
 import net.maritimecloud.internal.net.client.connection.ConnectionManager;
 import net.maritimecloud.internal.net.client.connection.ConnectionMessageBus;
+import net.maritimecloud.internal.net.client.connection.ConnectionTransportManager;
 import net.maritimecloud.internal.net.client.service.ClientServiceManager;
 import net.maritimecloud.internal.net.client.service.PositionManager;
 import net.maritimecloud.internal.net.client.util.ThreadManager;
@@ -71,6 +72,8 @@ public class ClientContainer extends ReentrantLock {
     /** A latch that is released when the client has been terminated. */
     private final CountDownLatch terminated = new CountDownLatch(1);
 
+    private final ThreadManager threadManager;
+
     /**
      * Creates a new instance of this class.
      * 
@@ -89,8 +92,10 @@ public class ClientContainer extends ReentrantLock {
         picoContainer.addComponent(ConnectionMessageBus.class);
         picoContainer.addComponent(ThreadManager.class);
         picoContainer.addComponent(ConnectionManager.class);
+        picoContainer.addComponent(ConnectionTransportManager.create());
 
         picoContainer.addComponent(new ImmutablePicoContainer(picoContainer));
+        threadManager = picoContainer.getComponent(ThreadManager.class);
     }
 
     public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
@@ -102,13 +107,11 @@ public class ClientContainer extends ReentrantLock {
         try {
             if (state < S_SHUTDOWN) {
                 state = S_SHUTDOWN;
-                Runnable r = new Runnable() {
-
+                threadManager.startCloseThread(new Runnable() {
                     public void run() {
                         close0();
                     }
-                };
-                new Thread(r).start();
+                });
             }
         } finally {
             unlock();
@@ -116,18 +119,16 @@ public class ClientContainer extends ReentrantLock {
     }
 
     void close0() {
-        lock();
         try {
-            if (state == S_SHUTDOWN) {
-                try {
-                    picoContainer.stop();
-                } finally {
-                    state = S_TERMINATED;
-                    terminated.countDown();
-                }
-            }
+            picoContainer.stop();
         } finally {
-            unlock();
+            lock();
+            try {
+                state = S_TERMINATED;
+                terminated.countDown();
+            } finally {
+                unlock();
+            }
         }
     }
 

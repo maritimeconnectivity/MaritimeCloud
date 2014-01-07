@@ -49,7 +49,7 @@ class ClientConnectFuture implements Runnable {
 
     private final CountDownLatch cancelled = new CountDownLatch(1);
 
-    private final ClientTransport transport;
+    private final ConnectionTransport transport;
 
     private boolean receivedHelloMessage /* = false */;
 
@@ -61,7 +61,8 @@ class ClientConnectFuture implements Runnable {
     ClientConnectFuture(ClientConnection connection, long reconnectId) {
         this.connection = requireNonNull(connection);
         this.reconnectId = reconnectId;
-        transport = new JavaxWebsocketTransport(this, connection);
+        transport = connection.connectionManager.ctm.create(connection, this);
+        // transport = new ConnectionTransportJsr356(this, connection);
     }
 
     /** {@inheritDoc} */
@@ -142,7 +143,11 @@ class ClientConnectFuture implements Runnable {
         if (t != null) {
             t.interrupt();
             transport.doClose(ClosingCode.CONNECT_CANCELLED.withMessage("connect cancelled"));
-            t = null; // only invoke once
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

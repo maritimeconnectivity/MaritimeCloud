@@ -54,7 +54,7 @@ public class Main {
 
     /** {@inheritDoc} */
     protected void run(String[] args) throws Exception {
-        JCommander jc = new JCommander(this, args);
+        new JCommander(this, args);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {

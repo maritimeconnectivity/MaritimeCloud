@@ -14,6 +14,8 @@
  */
 package net.maritimecloud.internal.net.client.connection;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.concurrent.locks.ReentrantLock;
 
 import net.maritimecloud.internal.net.messages.ConnectionMessage;
@@ -43,24 +45,24 @@ public final class ClientConnection {
 
     final ReentrantLock sendLock = new ReentrantLock();
 
-    /* State managed objects */
-    volatile ClientTransport transport;
+    /** We are connected when this is non-null. */
+    volatile ConnectionTransport transport;
 
     final Worker worker = new Worker(this);
 
     private ClientConnection(ConnectionManager connectionManager) {
-        this.connectionManager = connectionManager;
+        this.connectionManager = requireNonNull(connectionManager);
     }
 
     void connect() {
         connectionManager.lock.lock();
         try {
+            // only connect if are not already connected (transport==null)
+            // And another thread is not already trying to connect (connectionFuture==null)
             if (transport == null && connectingFuture == null) {
                 LOG.info("Trying to connect to " + connectionManager.uri);
                 connectingFuture = new ClientConnectFuture(this, -1);
-                Thread t = new Thread(connectingFuture);
-                t.setDaemon(true);
-                t.start();
+                connectionManager.threadManager.startConnectingThread(connectingFuture);
             }
         } finally {
             connectionManager.lock.unlock();
@@ -72,7 +74,7 @@ public final class ClientConnection {
      * 
      * @param transport
      */
-    void connected(ClientConnectFuture future, ClientTransport transport) {
+    void connected(ClientConnectFuture future, ConnectionTransport transport) {
         connectionManager.lock.lock();
         try {
             if (future == connectingFuture) {
@@ -87,28 +89,30 @@ public final class ClientConnection {
 
     static ClientConnection create(ConnectionManager cm) {
         ClientConnection cc = new ClientConnection(cm);
-        new Thread(cc.worker).start();
+        cm.threadManager.startWorkerThread(cc.worker);
         return cc;
     }
 
-    void disconnect() {
+    boolean disconnect() {
         connectionManager.lock.lock();
         try {
-            if (transport != null) {
-                LOG.info("Trying to disconnect");
+            if (transport != null && disconnectingFuture == null) {
+                System.out.println("A");
+                LOG.info("Starting Disconnecting");
                 disconnectingFuture = new ClientDisconnectFuture(this, transport);
-                Thread t = new Thread(disconnectingFuture);
-                t.setDaemon(true);
-                t.start();
+                connectionManager.threadManager.startDisconnectingThread(disconnectingFuture);
             } else if (connectingFuture != null) {
-                LOG.info("Trying to disconnect");
-                // We are in the process of connecting, just cancel the connect
-                connectingFuture.cancelConnectUnderLock();
+                LOG.info("Cancelling connect");
+                connectingFuture.cancelConnectUnderLock(); // In the process of connecting, just cancel the connect
+                connectingFuture = null;
+                connectionManager.connection = null;
+                return true;
             }
             connectionManager.stateChange.signalAll();
         } finally {
             connectionManager.lock.unlock();
         }
+        return false;
     }
 
     void disconnected(ClientDisconnectFuture future) {
@@ -117,6 +121,8 @@ public final class ClientConnection {
             if (future == disconnectingFuture && connectingFuture == null && transport == null) {
                 this.disconnectingFuture = null;
             }
+            connectionManager.connection = null;
+            connectionManager.stateChange.signalAll();
         } finally {
             connectionManager.lock.unlock();
         }
@@ -125,7 +131,7 @@ public final class ClientConnection {
     /**
      * @return the transport
      */
-    public ClientTransport getTransport() {
+    public ConnectionTransport getTransport() {
         return transport;
     }
 
@@ -138,7 +144,7 @@ public final class ClientConnection {
         }
     }
 
-    void messageReceive(ClientTransport transport, ConnectionMessage m) {
+    void messageReceive(ConnectionTransport transport, ConnectionMessage m) {
         retrieveLock.lock();
         try {
             worker.messageReceived(m);
@@ -177,7 +183,7 @@ public final class ClientConnection {
         // }
     }
 
-    void transportDisconnected(ClientTransport transport, ClosingCode cr) {
+    void transportDisconnected(ConnectionTransport transport, ClosingCode cr) {
         connectionManager.lock.lock();
         try {
             this.transport = null;

@@ -57,7 +57,7 @@ public class Worker implements Runnable {
         }
     }
 
-    public void onConnect(ClientTransport transport, long id, boolean isReconnected) {
+    public void onConnect(ConnectionTransport transport, long id, boolean isReconnected) {
         sendLock.lock();
         receiveLock.lock();
         workLock.lock();

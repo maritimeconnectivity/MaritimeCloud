@@ -14,7 +14,6 @@
  */
 package net.maritimecloud.internal.net.client;
 
-import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.MaritimeCloudClientConfiguration;
 
 /**
@@ -25,7 +24,7 @@ public class BroadcastReceiver {
     public static void main(String[] args) throws Exception {
         MaritimeCloudClientConfiguration conf = MaritimeCloudClientConfiguration.create("mmsi://45287");
         // conf.setHost("service.e-navigation.net:43234");
-        MaritimeCloudClient cc = conf.build();
+        // MaritimeCloudClient cc = conf.build();
 
         // cc.broadcastListen(Message.class, new BroadcastListener<Message>() {
         // public void onMessage(BroadcastMessageHeader header, Message broadcast) {
@@ -33,6 +32,6 @@ public class BroadcastReceiver {
         // }
         // });
 
-        for (;;) {}
+        // for (;;) {}
     }
 }

@@ -25,9 +25,9 @@ class ClientDisconnectFuture implements Runnable {
 
     final ClientConnection connection;
 
-    private final ClientTransport transport;
+    private final ConnectionTransport transport;
 
-    ClientDisconnectFuture(ClientConnection connection, ClientTransport transport) {
+    ClientDisconnectFuture(ClientConnection connection, ConnectionTransport transport) {
         this.connection = requireNonNull(connection);
         this.transport = transport;
     }
@@ -37,6 +37,7 @@ class ClientDisconnectFuture implements Runnable {
     public void run() {
         // TODO send poison pill
         transport.doClose(ClosingCode.NORMAL);
+        connection.disconnected(this);
         // ClientTransport transport = new ClientTransport(connection, reconnectId);
         // ConnectionManager cm = connection.connectionManager;
         // cm.getWebsocketContainer().connectToServer(transport, cm.uri);

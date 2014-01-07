@@ -27,13 +27,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * The client implementation of a transport. Every time the client connects to a server a new transport is created.
+ * Unlike {@link ClientConnection} which will persist over multiple connects, and provide smooth reconnect.
  * 
  * @author Kasper Nielsen
  */
-public abstract class ClientTransport {
+abstract class ConnectionTransport {
 
     /** The logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(ClientTransport.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ConnectionTransport.class);
 
     /** The connection that is using the transport. */
     final ClientConnection connection;
@@ -41,7 +43,7 @@ public abstract class ClientTransport {
     /** non-null while connecting. */
     ClientConnectFuture connectFuture;
 
-    ClientTransport(ClientConnectFuture connectFuture, ClientConnection connection) {
+    ConnectionTransport(ClientConnectFuture connectFuture, ClientConnection connection) {
         this.connectFuture = requireNonNull(connectFuture);
         this.connection = requireNonNull(connection);
     }

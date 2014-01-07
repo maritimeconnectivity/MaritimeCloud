@@ -46,9 +46,9 @@ public class WorkerInner {
         this.worker = requireNonNull(worker);
     }
 
-    ClientTransport transport;
+    ConnectionTransport transport;
 
-    public void onConnect(ClientTransport transport, long id, boolean isReconnected) {
+    public void onConnect(ConnectionTransport transport, long id, boolean isReconnected) {
         LinkedList<Long> idsToResend = new LinkedList<>();
         while (!written.isEmpty()) {
             OutstandingMessage om = written.pollLast();
@@ -120,7 +120,7 @@ public class WorkerInner {
     }
 
     private void processWritten() {
-        ClientTransport transport = worker.connection.getTransport();
+        ConnectionTransport transport = worker.connection.getTransport();
         if (transport != null && transport == this.transport) {
             OutstandingMessage om = unwritten.poll();
             ConnectionMessage cm = om.cm;

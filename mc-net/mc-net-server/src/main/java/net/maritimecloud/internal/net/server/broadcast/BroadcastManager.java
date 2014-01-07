@@ -27,7 +27,6 @@ import net.maritimecloud.internal.net.server.requests.RequestProcessor;
 import net.maritimecloud.internal.net.server.requests.ServerMessageBus;
 import net.maritimecloud.internal.net.server.targets.Target;
 import net.maritimecloud.internal.net.server.targets.TargetManager;
-import net.maritimecloud.net.broadcast.BroadcastMessage;
 import net.maritimecloud.util.function.Consumer;
 import net.maritimecloud.util.geometry.PositionTime;
 
@@ -47,8 +46,7 @@ public class BroadcastManager implements Startable {
         this.bus = requireNonNull(bus);
     }
 
-    BroadcastSendAck broadcast(final ServerConnection source, final BroadcastSend send) throws RequestException {
-        final BroadcastMessage bm;
+    BroadcastSendAck broadcast(final ServerConnection source, final BroadcastSend send) {
 
         final Target target = source.getTarget();
         final PositionTime sourcePositionTime = send.getPositionTime();
