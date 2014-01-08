@@ -134,4 +134,29 @@ public class Circle extends Area {
     public Circle withRadius(double radius) {
         return new Circle(center, radius, cs);
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public Position getRandomPosition() {
+        BoundingBox bb = getBoundingBox();
+        for (int i = 0; i < 10000; i++) {
+            Position p = bb.getRandomPosition();
+            if (contains(p)) {
+                return p;
+            }
+        }
+        throw new RuntimeException("Inifinite loop");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public BoundingBox getBoundingBox() {
+        double right = cs.pointOnBearing(center, radius, 0).latitude;
+        double left = cs.pointOnBearing(center, radius, 180).latitude;
+        double top = cs.pointOnBearing(center, radius, 90).longitude;
+        double buttom = cs.pointOnBearing(center, radius, 270).longitude;
+        Position topLeft = Position.create(left, top);
+        Position buttomRight = Position.create(right, buttom);
+        return BoundingBox.create(topLeft, buttomRight, cs);
+    }
 }

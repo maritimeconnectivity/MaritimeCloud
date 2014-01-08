@@ -21,8 +21,11 @@ public final class BoundingBox extends Polygon {
     private static final long serialVersionUID = 1L;
 
     private final double maxLatitude;
+
     private final double maxLongitude;
+
     private final double minLatitude;
+
     private final double minLongitude;
 
     private BoundingBox(double minLatitude, double maxLatitude, double minLongitude, double maxLongitude,
@@ -38,11 +41,11 @@ public final class BoundingBox extends Polygon {
         return point.getLatitude() >= minLatitude && point.getLongitude() >= minLongitude
                 && point.getLatitude() <= maxLatitude && point.getLongitude() <= maxLongitude;
     }
-    
+
     @Override
     public boolean contains(Element element) {
         if (element instanceof Position) {
-            return contains((Position)element);
+            return contains((Position) element);
         } else {
             return super.contains(element);
         }
@@ -67,9 +70,9 @@ public final class BoundingBox extends Polygon {
      * 
      * @return a random position within the box
      */
+    @Deprecated
     public Position getRandom() {
-        ThreadLocalRandom r = ThreadLocalRandom.current();
-        return Position.create(r.nextDouble(minLatitude, maxLatitude), r.nextDouble(minLongitude, maxLongitude));
+        return getRandomPosition();
     }
 
     public Position getCenterPoint() {
@@ -171,5 +174,18 @@ public final class BoundingBox extends Polygon {
     private static int hashCode(double x) {
         long f = Double.doubleToLongBits(x);
         return (int) (f ^ f >>> 32);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Position getRandomPosition() {
+        ThreadLocalRandom r = ThreadLocalRandom.current();
+        return Position.create(r.nextDouble(minLatitude, maxLatitude), r.nextDouble(minLongitude, maxLongitude));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public BoundingBox getBoundingBox() {
+        return this;
     }
 }

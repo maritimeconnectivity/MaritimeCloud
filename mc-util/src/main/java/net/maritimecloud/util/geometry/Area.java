@@ -30,6 +30,14 @@ public abstract class Area implements Element {
         this.cs = requireNonNull(cs);
     }
 
+
+    /**
+     * Returns a random position within the area.
+     * 
+     * @return a random position within the area
+     */
+    public abstract Position getRandomPosition();
+
     public final Predicate<Element> contains() {
         return new Predicate<Element>() {
             public boolean test(Element element) {
@@ -37,6 +45,13 @@ public abstract class Area implements Element {
             }
         };
     }
+
+    /**
+     * Returns a bounding box of the area.
+     * 
+     * @return a bounding box of the area
+     */
+    public abstract BoundingBox getBoundingBox();
 
     /**
      * Returns <tt>true</tt> if the specified element is fully contained in the shape, otherwise <tt>false</tt>.

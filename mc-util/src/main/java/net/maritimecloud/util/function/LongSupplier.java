@@ -12,15 +12,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.util.geometry;
+package net.maritimecloud.util.function;
 
-public abstract class Polygon extends Area {
-    /** serialVersionUID. */
-    private static final long serialVersionUID = 1L;
+/**
+ * A supplier of longs.
+ * 
+ * @author Kasper Nielsen
+ */
+public interface LongSupplier {
 
-    public Polygon(CoordinateSystem cs) {
-        super(cs);
-        // TODO Auto-generated constructor stub
-    }
-
+    /**
+     * Gets a result.
+     * 
+     * @return a result
+     */
+    long getAsLong();
 }

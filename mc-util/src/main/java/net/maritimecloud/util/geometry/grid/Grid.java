@@ -192,7 +192,7 @@ public final class Grid {
         // TODO fix it to be fast
         for (;;) {
             for (int i = 0; i < steps; i++) {
-                cells.add(box.getRandom().getCell(resolution));
+                cells.add(box.getRandomPosition().getCell(resolution));
             }
             if (cells.size() == prev) {
                 break;
