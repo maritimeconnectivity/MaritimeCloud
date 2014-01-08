@@ -15,7 +15,6 @@
 package net.maritimecloud.util.geometry;
 
 import static java.util.Objects.requireNonNull;
-import net.maritimecloud.util.PositionReaderSimulator;
 
 /**
  * A interface describing a way to get the current position (and timestamp of the reading) for an object.

@@ -234,6 +234,10 @@ public class Position implements Element {
 
     @Override
     public String toString() {
+        return "(" + getLatitude() + ", " + getLongitude() + ")";
+    }
+
+    public String toStringDegrees() {
         return "(" + getLatitudeAsString() + ", " + getLongitudeAsString() + ")";
     }
 
