@@ -240,7 +240,7 @@ public final class Grid {
                 CoordinateSystem.CARTESIAN);
         Set<Long> cells = new TreeSet<>();
         for (int i = 0; i < 100000; i++) {
-            cells.add(bb.getRandom().getCell(1));
+            cells.add(bb.getRandomPosition().getCell(1));
         }
         System.out.println(cells.size());
         System.out.println(cells);

@@ -28,6 +28,7 @@ import net.maritimecloud.internal.net.messages.auxiliary.HelloMessage;
 import net.maritimecloud.internal.net.messages.auxiliary.WelcomeMessage;
 import net.maritimecloud.net.ClosingCode;
 import net.maritimecloud.net.MaritimeCloudConnection.Listener;
+import net.maritimecloud.util.function.Consumer;
 import net.maritimecloud.util.geometry.PositionTime;
 
 import org.slf4j.Logger;
@@ -68,7 +69,13 @@ class ClientConnectFuture implements Runnable {
     /** {@inheritDoc} */
     @Override
     public void run() {
-        ConnectionManager cm = connection.connectionManager;
+        final ConnectionManager cm = connection.connectionManager;
+        cm.forEachListener(new Consumer<Listener>() {
+            public void accept(Listener t) {
+                t.connecting(cm.uri);
+            }
+        });
+        LOG.info("Trying to connect to " + cm.uri);
         thread = Thread.currentThread();
         while (cancelled.getCount() > 0) {
             try {
@@ -126,9 +133,12 @@ class ClientConnectFuture implements Runnable {
                 connection.worker.onConnect(transport, cm.getLastReceivedMessageId(), isReconnected);
                 // We need to retransmit messages
                 transport.connectFuture = null; // make sure we do not get any more messages
-                for (Listener l : connection.connectionManager.listeners) {
-                    l.connected();
-                }
+
+                connection.connectionManager.forEachListener(new Consumer<Listener>() {
+                    public void accept(Listener t) {
+                        t.connected();
+                    }
+                });
             } else {
                 String err = "Expected a connected message, but was: " + m.getClass().getSimpleName();
                 LOG.error(err);

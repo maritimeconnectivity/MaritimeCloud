@@ -98,4 +98,8 @@ public final class ClosingCode implements Serializable {
     public static ClosingCode create(int id, String message) {
         return new ClosingCode(id, message);
     }
+
+    public String toString() {
+        return getId() + ":" + getMessage();
+    }
 }

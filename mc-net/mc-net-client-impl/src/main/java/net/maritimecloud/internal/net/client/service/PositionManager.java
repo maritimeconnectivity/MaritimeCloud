@@ -22,7 +22,7 @@ import net.maritimecloud.internal.net.client.connection.ConnectionMessageBus;
 import net.maritimecloud.internal.net.client.util.ThreadManager;
 import net.maritimecloud.internal.net.messages.auxiliary.PositionReportMessage;
 import net.maritimecloud.net.MaritimeCloudClientConfiguration;
-import net.maritimecloud.util.function.Supplier;
+import net.maritimecloud.util.geometry.PositionReader;
 import net.maritimecloud.util.geometry.PositionTime;
 
 import org.picocontainer.Startable;
@@ -43,7 +43,7 @@ public class PositionManager implements Startable {
     static long minimumSignalDuration;
 
     /** Responsible for creating a current position and time. */
-    private final Supplier<PositionTime> positionSupplier;
+    private final PositionReader positionReader;
 
     /** The connection to the server. */
     private final ConnectionMessageBus connection;
@@ -60,7 +60,7 @@ public class PositionManager implements Startable {
     public PositionManager(ConnectionMessageBus connection, MaritimeCloudClientConfiguration builder,
             ThreadManager threadManager) {
         this.connection = requireNonNull(connection);
-        this.positionSupplier = requireNonNull(builder.getPositionSupplier());
+        this.positionReader = requireNonNull(builder.getPositionReader());
         this.threadManager = threadManager;
         minimumSignalDuration = builder.getKeepAlive(TimeUnit.NANOSECONDS);
         latestTime = System.nanoTime();// -minimumSignalDuration;
@@ -86,7 +86,7 @@ public class PositionManager implements Startable {
     }
 
     public PositionTime getPositionTime() {
-        PositionTime pt = positionSupplier == null ? null : positionSupplier.get();
+        PositionTime pt = positionReader == null ? null : positionReader.getCurrentPosition();
         if (pt == null) {
             // We just send a dummy position
             // We should probably just send ", ," instead of "0,0," as the position

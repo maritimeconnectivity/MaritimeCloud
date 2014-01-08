@@ -20,6 +20,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import net.maritimecloud.internal.net.messages.ConnectionMessage;
 import net.maritimecloud.net.ClosingCode;
+import net.maritimecloud.net.MaritimeCloudConnection;
+import net.maritimecloud.net.MaritimeCloudConnection.Listener;
+import net.maritimecloud.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +63,6 @@ public final class ClientConnection {
             // only connect if are not already connected (transport==null)
             // And another thread is not already trying to connect (connectionFuture==null)
             if (transport == null && connectingFuture == null) {
-                LOG.info("Trying to connect to " + connectionManager.uri);
                 connectingFuture = new ClientConnectFuture(this, -1);
                 connectionManager.threadManager.startConnectingThread(connectingFuture);
             }
@@ -184,7 +186,7 @@ public final class ClientConnection {
         // }
     }
 
-    void transportDisconnected(ConnectionTransport transport, ClosingCode cr) {
+    void transportDisconnected(ConnectionTransport transport, final ClosingCode cr) {
         connectionManager.lock.lock();
         try {
             this.transport = null;
@@ -195,10 +197,16 @@ public final class ClientConnection {
                 System.out.println("Dublicate connect detected, will not reconnect");
                 connectionManager.state = ConnectionManager.State.SHOULD_STAY_DISCONNECTED;
             } else {
-                System.out.println(cr.getMessage());
-                System.out.println("OOPS, lets reconnect");
+                LOG.error("Connection to MaritimeCloud was lost: '" + cr.getMessage() + "' will try and reconnected");
                 connectingFuture = null;// need to clear it if we are already connecting
             }
+            connectionManager.forEachListener(new Consumer<MaritimeCloudConnection.Listener>() {
+
+                @Override
+                public void accept(Listener t) {
+                    t.disconnected(cr);
+                }
+            });
             connectionManager.stateChange.signalAll();
         } finally {
             connectionManager.lock.unlock();

@@ -32,7 +32,7 @@ import net.maritimecloud.internal.net.server.InternalServer;
 import net.maritimecloud.internal.net.server.ServerConfiguration;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.MaritimeCloudClientConfiguration;
-import net.maritimecloud.util.function.Supplier;
+import net.maritimecloud.util.geometry.PositionReader;
 import net.maritimecloud.util.geometry.PositionTime;
 
 import org.junit.After;
@@ -115,7 +115,7 @@ public abstract class AbstractNetworkTest {
     protected MaritimeCloudClient newClient(MaritimeId id, double lat, double lon) throws Exception {
         MaritimeCloudClientConfiguration b = newBuilder(id);
         LocationSup ls = new LocationSup();
-        b.setPositionSupplier(ls);
+        b.setPositionReader(ls);
         locs.put(id, ls);
         setPosition(id, lat, lon);
         MaritimeCloudClient c = b.build();
@@ -209,14 +209,14 @@ public abstract class AbstractNetworkTest {
         System.out.println("bye");
     }
 
-    static class LocationSup extends Supplier<PositionTime> {
+    static class LocationSup extends PositionReader {
         double lat;
 
         double lon;
 
         /** {@inheritDoc} */
         @Override
-        public PositionTime get() {
+        public PositionTime getCurrentPosition() {
             return PositionTime.create(lat, lon, System.currentTimeMillis());
         }
 

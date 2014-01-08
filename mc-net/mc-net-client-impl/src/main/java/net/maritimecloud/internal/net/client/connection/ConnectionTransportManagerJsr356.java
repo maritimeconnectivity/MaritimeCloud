@@ -18,6 +18,8 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
@@ -127,6 +129,8 @@ class ConnectionTransportManagerJsr356 extends ConnectionTransportManager {
             super.onTextMessage(textMessage);
         }
 
+        Executor e = Executors.newSingleThreadExecutor();
+
         public void sendText(String text) {
             Session session = this.session;
             if (session != null) {
@@ -135,6 +139,17 @@ class ConnectionTransportManagerJsr356 extends ConnectionTransportManager {
                     // System.out.println("Sending " + this + " " + text);
                 }
                 session.getAsyncRemote().sendText(text);
+                // final Future<?> f = session.getAsyncRemote().sendText(text);
+                // e.execute(new Runnable() {
+                // public void run() {
+                // try {
+                // f.get();
+                // System.out.println("Ok");
+                // } catch (InterruptedException | ExecutionException e) {
+                // e.printStackTrace();
+                // }
+                // }
+                // });
             }
         }
     }

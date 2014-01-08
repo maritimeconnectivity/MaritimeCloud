@@ -29,7 +29,7 @@ import net.maritimecloud.internal.net.client.service.ClientServiceManager;
 import net.maritimecloud.internal.net.client.service.PositionManager;
 import net.maritimecloud.internal.net.client.util.ThreadManager;
 import net.maritimecloud.net.MaritimeCloudClientConfiguration;
-import net.maritimecloud.util.function.Supplier;
+import net.maritimecloud.util.geometry.PositionReader;
 import net.maritimecloud.util.geometry.PositionTime;
 
 import org.picocontainer.DefaultPicoContainer;
@@ -64,7 +64,7 @@ public class ClientContainer extends ReentrantLock {
     private final DefaultPicoContainer picoContainer = new DefaultPicoContainer(new Caching());
 
     /** Supplies the current position. */
-    private final Supplier<PositionTime> positionSupplier;
+    private final PositionReader positionSupplier;
 
     /** The current state of the client. Only set while holding lock, can be read at any time. */
     private volatile int state /* = 0 */;
@@ -82,7 +82,7 @@ public class ClientContainer extends ReentrantLock {
      */
     ClientContainer(MaritimeCloudClientConfiguration builder) {
         clientId = requireNonNull(builder.getId());
-        positionSupplier = requireNonNull(builder.getPositionSupplier());
+        positionSupplier = requireNonNull(builder.getPositionReader());
 
         picoContainer.addComponent(builder);
         picoContainer.addComponent(this);
@@ -166,7 +166,7 @@ public class ClientContainer extends ReentrantLock {
      * @return the current position
      */
     public PositionTime readCurrentPosition() {
-        return positionSupplier.get();
+        return positionSupplier.getCurrentPosition();
     }
 
     static PicoContainer create(MaritimeCloudClientConfiguration builder) {

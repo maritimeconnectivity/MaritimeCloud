@@ -27,6 +27,7 @@ import net.maritimecloud.internal.net.client.ClientContainer;
 import net.maritimecloud.internal.net.client.util.ThreadManager;
 import net.maritimecloud.net.MaritimeCloudClientConfiguration;
 import net.maritimecloud.net.MaritimeCloudConnection;
+import net.maritimecloud.util.function.Consumer;
 
 import org.picocontainer.Startable;
 import org.slf4j.Logger;
@@ -72,10 +73,15 @@ public class ConnectionManager implements MaritimeCloudConnection, Startable {
         this.client = client;
         this.threadManager = threadManager;
         for (MaritimeCloudConnection.Listener listener : b.getListeners()) {
-            addListener(listener);
+            listeners.add(requireNonNull(listener));
         }
         try {
-            String remote = "ws://" + b.getHost();
+            String remote = b.getHost();
+            if (!remote.contains(":")) {
+                remote += ":43234";
+            }
+            remote = "ws://" + remote;
+
             // Tomcat does not automatically append a '/' to the host address
             if (!remote.endsWith("/")) {
                 remote += "/";
@@ -86,10 +92,21 @@ public class ConnectionManager implements MaritimeCloudConnection, Startable {
         }
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public final void addListener(MaritimeCloudConnection.Listener listener) {
-        listeners.add(requireNonNull(listener));
+    // /** {@inheritDoc} */
+    // @Override
+    // public final void addListener(MaritimeCloudConnection.Listener listener) {
+    // listeners.add(requireNonNull(listener));
+    // }
+
+
+    void forEachListener(Consumer<MaritimeCloudConnection.Listener> consumer) {
+        for (MaritimeCloudConnection.Listener l : listeners) {
+            try {
+                consumer.accept(l);
+            } catch (RuntimeException e) {
+                LOG.error("Could not execute listener", e);
+            }
+        }
     }
 
     /** {@inheritDoc} */

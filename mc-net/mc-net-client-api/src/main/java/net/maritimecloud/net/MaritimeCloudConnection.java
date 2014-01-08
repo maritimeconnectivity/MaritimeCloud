@@ -14,6 +14,7 @@
  */
 package net.maritimecloud.net;
 
+import java.net.URI;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -23,13 +24,13 @@ import java.util.concurrent.TimeUnit;
  */
 public interface MaritimeCloudConnection {
 
-    /**
-     * Adds a connection listener that can be notified whenever the client connects or disconnects.
-     * 
-     * @param listener
-     *            the listener
-     */
-    void addListener(MaritimeCloudConnection.Listener listener);
+    // /**
+    // * Adds a connection listener that can be notified whenever the client connects or disconnects.
+    // *
+    // * @param listener
+    // * the listener
+    // */
+    // void addListener(MaritimeCloudConnection.Listener listener);
 
     /**
      * Blocks until there is a valid connection to the maritime cloud, or the client is closed, or the timeout occurs,
@@ -94,7 +95,7 @@ public interface MaritimeCloudConnection {
     abstract class Listener {
 
         /** Invoked whenever the client is trying to connect/reconnect. */
-        public void connecting() {}
+        public void connecting(URI host) {}
 
         /** Invoked when the client has fully connected to the server. */
         public void connected() {}

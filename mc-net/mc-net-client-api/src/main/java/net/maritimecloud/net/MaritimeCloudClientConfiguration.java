@@ -26,6 +26,10 @@ import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.net.broadcast.BroadcastOptions;
 import net.maritimecloud.util.function.Consumer;
 import net.maritimecloud.util.function.Supplier;
+import net.maritimecloud.util.geometry.Circle;
+import net.maritimecloud.util.geometry.CoordinateSystem;
+import net.maritimecloud.util.geometry.PositionReader;
+import net.maritimecloud.util.geometry.PositionReaderSimulator;
 import net.maritimecloud.util.geometry.PositionTime;
 
 /**
@@ -48,11 +52,8 @@ public class MaritimeCloudClientConfiguration {
 
     private String nodes = "localhost:43234";
 
-    private Supplier<PositionTime> positionSupplier = new Supplier<PositionTime>() {
-        public PositionTime get() {
-            return PositionTime.create(0, 0, 0);
-        }
-    };
+    private PositionReader positionReader = new PositionReaderSimulator().forArea(new Circle(0, 0, 50000,
+            CoordinateSystem.CARTESIAN));
 
     MaritimeCloudClientConfiguration(MaritimeId id) {
         this.id = id;
@@ -149,8 +150,8 @@ public class MaritimeCloudClientConfiguration {
     /**
      * @return the positionSupplier
      */
-    public Supplier<PositionTime> getPositionSupplier() {
-        return positionSupplier;
+    public PositionReader getPositionReader() {
+        return positionReader;
     }
 
     /**
@@ -192,8 +193,23 @@ public class MaritimeCloudClientConfiguration {
         return this;
     }
 
-    public MaritimeCloudClientConfiguration setPositionSupplier(Supplier<PositionTime> positionSupplier) {
-        this.positionSupplier = requireNonNull(positionSupplier);
+    /**
+     * @deprecated use {@link #setPositionReader(PositionReader)}
+     */
+    @Deprecated
+    public MaritimeCloudClientConfiguration setPositionSupplier(final Supplier<PositionTime> positionSupplier) {
+        requireNonNull(positionSupplier);
+        return setPositionReader(new PositionReader() {
+
+            @Override
+            public PositionTime getCurrentPosition() {
+                return positionSupplier.get();
+            }
+        });
+    }
+
+    public MaritimeCloudClientConfiguration setPositionReader(PositionReader positionReader) {
+        this.positionReader = requireNonNull(positionReader);
         return this;
     }
 
