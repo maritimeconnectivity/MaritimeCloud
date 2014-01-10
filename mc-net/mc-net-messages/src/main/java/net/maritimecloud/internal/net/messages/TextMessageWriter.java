@@ -17,6 +17,11 @@ package net.maritimecloud.internal.net.messages;
 import java.util.Arrays;
 import java.util.Iterator;
 
+import net.maritimecloud.util.geometry.Area;
+import net.maritimecloud.util.geometry.BoundingBox;
+import net.maritimecloud.util.geometry.Circle;
+import net.maritimecloud.util.geometry.Position;
+
 /**
  * 
  * @author Kasper Nielsen
@@ -35,6 +40,23 @@ public class TextMessageWriter {
             sb.append(", ");
         }
         notFirst = true;
+    }
+
+    public TextMessageWriter writeArea(Area area) {
+        if (area instanceof Circle) {
+            Circle c = (Circle) area;
+            writeInt(0);
+            writePosition(c.getCenter());
+            writeDouble(c.getRadius());
+        } else if (area instanceof BoundingBox) {
+            BoundingBox bb = (BoundingBox) area;
+            writeInt(1);
+            writePosition(bb.getUpperLeft());
+            writePosition(bb.getLowerRight());
+        } else {
+            throw new UnsupportedOperationException("Only circles and bounding boxes supported, was " + area.getClass());
+        }
+        return this;
     }
 
     public TextMessageWriter writeInt(int i) {
@@ -74,6 +96,11 @@ public class TextMessageWriter {
         // TODO quote string
         sb.append(d);
         return this;
+    }
+
+    public TextMessageWriter writePosition(Position p) {
+        writeDouble(p.getLatitude());
+        return writeDouble(p.getLongitude());
     }
 
     public TextMessageWriter writeString(String s) {

@@ -27,6 +27,7 @@ import net.maritimecloud.net.service.invocation.InvocationCallback;
 import net.maritimecloud.net.service.registration.ServiceRegistration;
 import net.maritimecloud.net.service.spi.ServiceInitiationPoint;
 import net.maritimecloud.net.service.spi.ServiceMessage;
+import net.maritimecloud.util.geometry.Area;
 
 /**
  * A client that can be used to access the e-navigation network.
@@ -84,14 +85,30 @@ public interface MaritimeCloudClient extends AutoCloseable {
      *            the type of message to listen for
      * @param consumer
      *            the consumer of messages
-     * @return a subscription that can be used to cancel the subscription
+     * @return a subscription that can be used to stop listening for broadcasts of the specified type
      * @throws NullPointerException
-     *             if the message type of consumer is null
+     *             if the message type or consumer is null
      * @throws ConnectionClosedException
      *             if the connection has been permanently closed
      */
     <T extends BroadcastMessage> BroadcastSubscription broadcastListen(Class<T> messageType,
             BroadcastListener<T> consumer);
+
+    /**
+     * Subscribes to the the specified type of broadcast messages in the specified area.
+     * 
+     * @param messageType
+     *            the type of message to listen for
+     * @param consumer
+     *            the consumer of messages
+     * @return a subscription that can be used to stop listening for broadcasts of the specified type
+     * @throws NullPointerException
+     *             if the message type, consumer or area is null
+     * @throws ConnectionClosedException
+     *             if the connection has been permanently closed
+     */
+    <T extends BroadcastMessage> BroadcastSubscription broadcastListen(Class<T> messageType,
+            BroadcastListener<T> consumer, Area area);
 
     /**
      * Asynchronously shutdowns this client. use {@link #awaitTermination(long, TimeUnit)} to await complete termination

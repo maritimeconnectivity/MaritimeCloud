@@ -238,11 +238,6 @@ public final class Grid {
     public static void main(String[] args) {
         BoundingBox bb = BoundingBox.create(Position.create(-40, 15), Position.create(12, 77),
                 CoordinateSystem.CARTESIAN);
-        Set<Long> cells = new TreeSet<>();
-        for (int i = 0; i < 100000; i++) {
-            cells.add(bb.getRandomPosition().getCell(1));
-        }
-        System.out.println(cells.size());
-        System.out.println(cells);
+        System.out.println(GRID_1_DEGREE.getCells(bb).size());
     }
 }

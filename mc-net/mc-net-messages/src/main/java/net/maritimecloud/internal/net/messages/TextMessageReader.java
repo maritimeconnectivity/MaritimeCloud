@@ -19,6 +19,12 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import net.maritimecloud.util.geometry.Area;
+import net.maritimecloud.util.geometry.BoundingBox;
+import net.maritimecloud.util.geometry.Circle;
+import net.maritimecloud.util.geometry.CoordinateSystem;
+import net.maritimecloud.util.geometry.Position;
+
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -64,9 +70,31 @@ public class TextMessageReader {
 
     public double takeDouble() throws IOException {
         if (jp.nextToken() != JsonToken.VALUE_NUMBER_FLOAT) {
-            throw new IOException("Expected an integer, but was '" + jp.getText() + "'");
+            throw new IOException("Expected an double, but was '" + jp.getText() + "'");
         }
         return jp.getDoubleValue();
+    }
+
+    public Position takePosition() throws IOException {
+        double lat = takeDouble();
+        double lon = takeDouble();
+        return Position.create(lat, lon);
+    }
+
+    public Area takeArea() throws IOException {
+        int type = takeInt();
+        if (type == 0) {
+            Position center = takePosition();
+            double radius = takeDouble();
+            return new Circle(center, radius, CoordinateSystem.CARTESIAN);
+        } else if (type == 1) {
+            Position topLeft = takePosition();
+            Position buttomRight = takePosition();
+            return BoundingBox.create(topLeft, buttomRight, CoordinateSystem.CARTESIAN);
+        } else {
+            throw new UnsupportedOperationException("Only type 0 (circles) and type 1 (bounding boxes) supported, was "
+                    + type);
+        }
     }
 
     public String takeString() throws IOException {

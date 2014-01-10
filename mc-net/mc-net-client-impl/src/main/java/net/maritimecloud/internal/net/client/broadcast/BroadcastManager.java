@@ -40,6 +40,7 @@ import net.maritimecloud.net.broadcast.BroadcastMessageHeader;
 import net.maritimecloud.net.broadcast.BroadcastOptions;
 import net.maritimecloud.net.broadcast.BroadcastSubscription;
 import net.maritimecloud.util.function.BiConsumer;
+import net.maritimecloud.util.geometry.Area;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -182,5 +183,21 @@ public class BroadcastManager {
             }
         });
         return dbf;
+    }
+
+
+    public <T extends BroadcastMessage> BroadcastSubscription broadcastListen(Class<T> messageType,
+            BroadcastListener<T> consumer, Area area) {
+        throw new UnsupportedOperationException();
+        // String channelName = messageType.getCanonicalName();
+        // final DefaultConnectionFuture<BroadcastListenAck> f = connection.sendMessage(new BroadcastListen(channelName,
+        // area));
+
+        // f.thenAcceptAsync(new DefaultConnectionFuture.Action<RegisterServiceResult>() {
+        // public void accept(RegisterServiceResult ack) {
+        // reg.replied.countDown();
+        // }
+        // });
+        // return reg;
     }
 }

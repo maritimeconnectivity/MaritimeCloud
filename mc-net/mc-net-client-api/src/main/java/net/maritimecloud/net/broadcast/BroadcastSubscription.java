@@ -15,10 +15,15 @@
 package net.maritimecloud.net.broadcast;
 
 import net.maritimecloud.net.MaritimeCloudClient;
+import net.maritimecloud.net.service.invocation.ServiceUnavailableException;
+import net.maritimecloud.util.geometry.Area;
 
 /**
  * A broadcast subscription is created every time a {@link BroadcastListener} is registered via
- * {@link MaritimeCloudClient#broadcastListen(Class, BroadcastListener)}.
+ * {@link MaritimeCloudClient#broadcastListen(Class, BroadcastListener)} or
+ * {@link MaritimeCloudClient#broadcastListen(Class, BroadcastListener, net.maritimecloud.util.geometry.Area)}.
+ * <p>
+ * Sometimes registering a
  * 
  * @author Kasper Nielsen
  */
@@ -28,6 +33,15 @@ public interface BroadcastSubscription {
     void cancel();
 
     /**
+     * Returns the area for which the client is listening for broadcast. Or <code>null</code> if the current position is
+     * used.
+     * 
+     * @return the area for which the client is listening for broadcast. Or <code>null</code> if the current position is
+     *         used
+     */
+    Area getArea();
+
+    /**
      * Returns the channel we are listening on.
      * 
      * @return the channel we are listening on
@@ -35,9 +49,29 @@ public interface BroadcastSubscription {
     String getChannel();
 
     /**
-     * Returns the number of messages received for the registered listener.
+     * Returns the number of messages received by the listener.
      * 
      * @return the number of messages received
      */
     long getNumberOfReceivedMessages();
+
+
+    /** The current state of the subscription. */
+    enum State {
+
+        /**
+         * The initial state of this registration. When created at the client but before the server has registered the
+         * service registration.
+         */
+        INITIATED,
+
+        /** The service has been registered with server. And remote clients may now invoke the service */
+        REGISTERED,
+
+        /**
+         * The client no longer offers the service. Remote clients attempting to invoke the service will fail with a
+         * {@link ServiceUnavailableException}.
+         */
+        CANCELLED;
+    }
 }

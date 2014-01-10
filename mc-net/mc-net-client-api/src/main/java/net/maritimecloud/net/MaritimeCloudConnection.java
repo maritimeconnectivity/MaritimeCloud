@@ -24,14 +24,6 @@ import java.util.concurrent.TimeUnit;
  */
 public interface MaritimeCloudConnection {
 
-    // /**
-    // * Adds a connection listener that can be notified whenever the client connects or disconnects.
-    // *
-    // * @param listener
-    // * the listener
-    // */
-    // void addListener(MaritimeCloudConnection.Listener listener);
-
     /**
      * Blocks until there is a valid connection to the maritime cloud, or the client is closed, or the timeout occurs,
      * or the current thread is interrupted, whichever happens first.
@@ -76,14 +68,6 @@ public interface MaritimeCloudConnection {
      */
     void disconnect();
 
-    // /**
-    // * Returns an unique connection id after the connection has been made. Returns <code>null</code> until connected.
-    // *
-    // * @return an unique connection id
-    // */
-    // String getId();
-
-    // boolean isConnecting()
     /**
      * Returns whether or not we are currently connected to the cloud.
      * 
@@ -94,7 +78,12 @@ public interface MaritimeCloudConnection {
     /** A listener that can used to listen for updates to the connection status to the maritime network. */
     abstract class Listener {
 
-        /** Invoked whenever the client is trying to connect/reconnect. */
+        /**
+         * Invoked whenever the client is trying to connect/reconnect.
+         * 
+         * @param host
+         *            The host we are connecting to
+         */
         public void connecting(URI host) {}
 
         /** Invoked when the client has fully connected to the server. */

@@ -25,12 +25,14 @@ import net.maritimecloud.internal.net.server.broadcast.BroadcastManager;
 import net.maritimecloud.internal.net.server.connection.ConnectionManager;
 import net.maritimecloud.internal.net.server.connection.WebSocketServer;
 import net.maritimecloud.internal.net.server.requests.ServerMessageBus;
+import net.maritimecloud.internal.net.server.rest.WebServer;
 import net.maritimecloud.internal.net.server.services.ServiceManager;
 import net.maritimecloud.internal.net.server.targets.TargetManager;
 import net.maritimecloud.internal.net.server.util.ThreadManager;
 
 import org.picocontainer.DefaultPicoContainer;
 import org.picocontainer.behaviors.Caching;
+import org.picocontainer.containers.ImmutablePicoContainer;
 
 /**
  * 
@@ -90,7 +92,10 @@ public class InternalServer {
         picoContainer.addComponent(ServerMessageBus.class);
         picoContainer.addComponent(BroadcastManager.class);
         picoContainer.addComponent(ServiceManager.class);
-
+        if (configuration.getWebserverPort() > 0) {
+            picoContainer.addComponent(WebServer.class);
+        }
+        picoContainer.addComponent(new ImmutablePicoContainer(picoContainer));
         info = picoContainer.getComponent(ServerInfo.class);
     }
 

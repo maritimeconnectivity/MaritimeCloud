@@ -57,6 +57,8 @@ public class ClientContainer extends ReentrantLock {
     /** The container has been fully terminated. */
     static final int S_TERMINATED = 3;
 
+    private final String clientConnectString;
+
     /** The id of this client */
     private final MaritimeId clientId;
 
@@ -77,14 +79,14 @@ public class ClientContainer extends ReentrantLock {
     /**
      * Creates a new instance of this class.
      * 
-     * @param builder
+     * @param configuration
      *            the configuration
      */
-    ClientContainer(MaritimeCloudClientConfiguration builder) {
-        clientId = requireNonNull(builder.getId());
-        positionSupplier = requireNonNull(builder.getPositionReader());
+    ClientContainer(MaritimeCloudClientConfiguration configuration) {
+        clientId = requireNonNull(configuration.getId());
+        positionSupplier = requireNonNull(configuration.getPositionReader());
 
-        picoContainer.addComponent(builder);
+        picoContainer.addComponent(configuration);
         picoContainer.addComponent(this);
         picoContainer.addComponent(PositionManager.class);
         picoContainer.addComponent(BroadcastManager.class);
@@ -96,6 +98,18 @@ public class ClientContainer extends ReentrantLock {
 
         picoContainer.addComponent(new ImmutablePicoContainer(picoContainer));
         threadManager = picoContainer.getComponent(ThreadManager.class);
+
+        String s = "version=0.1";
+        if (configuration.properties().getName() != null) {
+            s += ",name=" + configuration.properties().getName();
+        }
+        if (configuration.properties().getDescription() != null) {
+            s += ",description=" + configuration.properties().getDescription();
+        }
+        if (configuration.properties().getOrganization() != null) {
+            s += ",organization=" + configuration.properties().getOrganization();
+        }
+        clientConnectString = s;
     }
 
     public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
@@ -134,6 +148,13 @@ public class ClientContainer extends ReentrantLock {
 
     protected void finalize() {
         close();
+    }
+
+    /**
+     * @return the clientConnectString
+     */
+    public String getClientConnectString() {
+        return clientConnectString;
     }
 
     /**

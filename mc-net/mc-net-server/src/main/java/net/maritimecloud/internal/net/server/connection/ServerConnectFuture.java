@@ -20,6 +20,7 @@ import net.maritimecloud.internal.net.messages.auxiliary.ConnectedMessage;
 import net.maritimecloud.internal.net.messages.auxiliary.HelloMessage;
 import net.maritimecloud.internal.net.server.targets.Target;
 import net.maritimecloud.internal.net.server.targets.TargetManager;
+import net.maritimecloud.internal.net.server.targets.TargetProperties;
 import net.maritimecloud.net.ClosingCode;
 import net.maritimecloud.util.geometry.PositionTime;
 
@@ -67,6 +68,9 @@ class ServerConnectFuture {
                 target.setLatestPosition(PositionTime.create(hm.getLat(), hm.getLon(), System.currentTimeMillis()));
                 target.setConnection(connection);
             }
+            target.setProperties(TargetProperties.createFrom(hm.getClientInfo()));
+
+
             connection.transport = serverTransport;
 
             long id = connection.worker.getLatestReceivedId();

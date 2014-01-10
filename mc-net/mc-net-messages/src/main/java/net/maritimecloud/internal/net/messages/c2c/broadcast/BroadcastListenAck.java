@@ -12,29 +12,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.net;
+package net.maritimecloud.internal.net.messages.c2c.broadcast;
+
+import java.io.IOException;
+
+import net.maritimecloud.internal.net.messages.MessageType;
+import net.maritimecloud.internal.net.messages.TextMessageReader;
+import net.maritimecloud.internal.net.messages.s2c.ServerResponseMessage;
 
 /**
  * 
  * @author Kasper Nielsen
  */
-public class ConnectionException extends RuntimeException {
+public class BroadcastListenAck extends ServerResponseMessage {
 
-    /** serialVersionUID. */
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * @param message
-     * @param cause
-     */
-    public ConnectionException(String message, Throwable cause) {
-        super(message, cause);
+    // Area
+    public BroadcastListenAck(TextMessageReader pr) throws IOException {
+        super(MessageType.REGISTER_SERVICE_RESULT, pr);
     }
 
     /**
-     * @param message
+     * @param messageType
      */
-    public ConnectionException(String message) {
-        super(message);
+    public BroadcastListenAck(long id) {
+        super(MessageType.REGISTER_SERVICE_RESULT, id);
     }
+
 }

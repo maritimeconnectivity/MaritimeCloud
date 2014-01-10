@@ -28,7 +28,7 @@ public class ServerConfiguration {
     public static final int DEFAULT_PORT = 43234;
 
     /** The default port the web server is running on. */
-    public static final int DEFAULT_WEBSERVER_PORT = 8080;
+    public static final int DEFAULT_WEBSERVER_PORT = 9090;
 
     /** The id of the server, hard coded for now */
     ServerId id = new ServerId(1);
@@ -36,8 +36,8 @@ public class ServerConfiguration {
     @Parameter(names = "-port", description = "The port to listen on")
     int port = ServerConfiguration.DEFAULT_PORT;
 
-    @Parameter(names = "-adminport", description = "The webserver port for the administrative interface")
-    int webserverport = ServerConfiguration.DEFAULT_WEBSERVER_PORT;
+    @Parameter(names = "-rest", description = "The webserver port for the administrative interface")
+    int webserverport = -1;
 
     /**
      * @return the id

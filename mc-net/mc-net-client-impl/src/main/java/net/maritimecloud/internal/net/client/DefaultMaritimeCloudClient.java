@@ -33,6 +33,7 @@ import net.maritimecloud.net.service.invocation.InvocationCallback;
 import net.maritimecloud.net.service.registration.ServiceRegistration;
 import net.maritimecloud.net.service.spi.ServiceInitiationPoint;
 import net.maritimecloud.net.service.spi.ServiceMessage;
+import net.maritimecloud.util.geometry.Area;
 
 import org.picocontainer.PicoContainer;
 
@@ -145,5 +146,12 @@ public class DefaultMaritimeCloudClient implements MaritimeCloudClient {
     public <T, E extends ServiceMessage<T>> ServiceRegistration serviceRegister(ServiceInitiationPoint<E> sip,
             InvocationCallback<E, T> callback) {
         return services.serviceRegister(sip, callback);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <T extends BroadcastMessage> BroadcastSubscription broadcastListen(Class<T> messageType,
+            BroadcastListener<T> consumer, Area area) {
+        return null;
     }
 }

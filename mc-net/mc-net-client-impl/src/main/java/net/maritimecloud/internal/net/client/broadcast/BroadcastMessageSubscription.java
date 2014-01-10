@@ -22,6 +22,7 @@ import net.maritimecloud.net.broadcast.BroadcastListener;
 import net.maritimecloud.net.broadcast.BroadcastMessage;
 import net.maritimecloud.net.broadcast.BroadcastMessageHeader;
 import net.maritimecloud.net.broadcast.BroadcastSubscription;
+import net.maritimecloud.util.geometry.Area;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,5 +83,11 @@ class BroadcastMessageSubscription implements BroadcastSubscription {
     @Override
     public long getNumberOfReceivedMessages() {
         return count.get();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Area getArea() {
+        return null;
     }
 }

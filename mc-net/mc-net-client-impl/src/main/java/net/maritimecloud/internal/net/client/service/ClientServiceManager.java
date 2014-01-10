@@ -132,8 +132,6 @@ public class ClientServiceManager {
     /** {@inheritDoc} */
     public <T, E extends ServiceMessage<T>> ServiceRegistration serviceRegister(ServiceInitiationPoint<E> sip,
             InvocationCallback<E, T> callback) {
-        requireNonNull(sip, "ServiceInitiationPoint is null");
-        requireNonNull(callback, "callback is null");
         final DefaultLocalServiceRegistration reg = new DefaultLocalServiceRegistration(connection, sip, callback);
         if (localServices.putIfAbsent(sip.getName(), reg) != null) {
             throw new IllegalArgumentException(

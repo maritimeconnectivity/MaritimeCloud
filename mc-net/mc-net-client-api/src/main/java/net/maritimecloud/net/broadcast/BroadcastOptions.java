@@ -32,6 +32,18 @@ public class BroadcastOptions {
     // int keepAliveSeconds;
 
     // ack of id, time, position
+
+
+    // Targets
+    // Actors within a defined area, for example, Denmark.
+    // Actors within a defined group? For example, ships under danish flag
+    // Specific type, for example, ships, VTS center
+
+    // Broadcast policy.
+    // VTS centers can only broadcast in the country they are registered
+    //
+
+
     boolean receiverAck;
 
     public BroadcastOptions() {}
@@ -45,18 +57,15 @@ public class BroadcastOptions {
         return distance;
     }
 
+    /**
+     * Returns a new immutable copy of these options. Trying to invoke any of the setter methods on the returned object
+     * will result in {@link UnsupportedOperationException}.
+     * 
+     * @return a new immutable copy of these options
+     */
     public BroadcastOptions immutable() {
         return new Immutable(this);
     }
-
-    // Targets
-    // Actors within a defined area, for example, Denmark.
-    // Actors within a defined group? For example, ships under danish flag
-    // Specific type, for example, ships, VTS center
-
-    // Broadcast policy.
-    // VTS centers can only broadcast in the country they are registered
-    //
 
     /**
      * @return the receiverAck
@@ -88,7 +97,14 @@ public class BroadcastOptions {
         return this;
     }
 
+    /** An immutable version of BroadcastOptions. */
     static class Immutable extends BroadcastOptions {
+        /**
+         * Creates a new immutable copy of the specified broadcast options.
+         * 
+         * @param options
+         *            the options to create an immutable copy of
+         */
         Immutable(BroadcastOptions options) {
             super(options);
         }

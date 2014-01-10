@@ -29,11 +29,11 @@
   <name>MaritimeCloud server</name>
 
   <dependencies>
-        <dependency>
+    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>${dependencies.guava.version}</version>
-    </dependency> 
+    </dependency>
     <dependency>
       <groupId>dk.dma.3rdparty</groupId>
       <artifactId>jsr166e</artifactId>
@@ -69,7 +69,7 @@
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>mc-net-messages</artifactId>
@@ -90,6 +90,27 @@
       <groupId>org.picocontainer</groupId>
       <artifactId>picocontainer</artifactId>
       <version>2.14.3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.maritimecloud.3rdparty</groupId>
+      <artifactId>jersey-servlet</artifactId>
+      <version>${dependencies.jersey.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>javax.ws.rs-api</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+      <version>1</version>
+    </dependency>
+        <dependency>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
+      <version>1.1.0.Final</version>
     </dependency>
   </dependencies>
 

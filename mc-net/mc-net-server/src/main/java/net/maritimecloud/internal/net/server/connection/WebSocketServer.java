@@ -102,7 +102,6 @@ public class WebSocketServer implements Startable {
         } catch (DeploymentException e) {
             throw new RuntimeException("Could not start server", e);
         }
-
         try {
             server.start();
             LOG.info("System is ready accept client connections on " + sa);

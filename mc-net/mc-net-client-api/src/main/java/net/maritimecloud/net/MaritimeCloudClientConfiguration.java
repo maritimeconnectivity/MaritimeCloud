@@ -193,6 +193,11 @@ public class MaritimeCloudClientConfiguration {
         return this;
     }
 
+    public MaritimeCloudClientConfiguration setPositionReader(PositionReader positionReader) {
+        this.positionReader = requireNonNull(positionReader);
+        return this;
+    }
+
     /**
      * @deprecated use {@link #setPositionReader(PositionReader)}
      */
@@ -208,11 +213,6 @@ public class MaritimeCloudClientConfiguration {
         });
     }
 
-    public MaritimeCloudClientConfiguration setPositionReader(PositionReader positionReader) {
-        this.positionReader = requireNonNull(positionReader);
-        return this;
-    }
-
     public static MaritimeCloudClientConfiguration create() {
         return new MaritimeCloudClientConfiguration(null);
     }
@@ -223,5 +223,77 @@ public class MaritimeCloudClientConfiguration {
 
     public static MaritimeCloudClientConfiguration create(String id) {
         return new MaritimeCloudClientConfiguration(MaritimeId.create(id));
+    }
+
+    final Properties properties = new Properties();
+
+    public Properties properties() {
+        return properties;
+    }
+
+    public static class Properties {
+        private String description;
+
+        private String name;
+
+        private String organization;
+
+        /**
+         * @return the description
+         */
+        public String getDescription() {
+            return description;
+        }
+
+        /**
+         * @return the name
+         */
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * @return the organization
+         */
+        public String getOrganization() {
+            return organization;
+        }
+
+        /**
+         * @param description
+         *            the description to set
+         * @return
+         */
+        public Properties setDescription(String description) {
+            this.description = checkComma(description);
+            return this;
+        }
+
+        /**
+         * @param name
+         *            the name to set
+         */
+        public Properties setName(String name) {
+            this.name = checkComma(name);
+            return this;
+        }
+
+        /**
+         * @param organization
+         *            the organization to set
+         * @return
+         */
+        public Properties setOrganization(String organization) {
+            this.organization = checkComma(organization);
+            return this;
+        }
+
+        private static String checkComma(String comma) {
+            if (comma != null && comma.contains(",")) {
+                throw new IllegalArgumentException(
+                        "Sorry cannot use ',' at the moment it is used as an internal separator, was " + comma);
+            }
+            return comma;
+        }
     }
 }

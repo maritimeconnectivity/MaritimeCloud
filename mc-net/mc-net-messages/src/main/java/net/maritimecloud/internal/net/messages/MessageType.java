@@ -25,6 +25,8 @@ import net.maritimecloud.internal.net.messages.auxiliary.PositionReportMessage;
 import net.maritimecloud.internal.net.messages.auxiliary.WelcomeMessage;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastAck;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastDeliver;
+import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastListen;
+import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastListenAck;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSend;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSendAck;
 import net.maritimecloud.internal.net.messages.c2c.service.InvokeService;
@@ -89,6 +91,10 @@ public enum MessageType {
 
     /** Acknowledgment of successful broadcast for each client (server->client). */
     BROADCAST_DELIVER_ACK(153, BroadcastAck.class),
+
+    /** Registers a service with server. (client->server) */
+    BROADCAST_LISTEN(160, BroadcastListen.class), // throws ServiceRegisterException
+    BROADCAST_LISTEN_RESULT(161, BroadcastListenAck.class), // just an ack of the service???
 
     /** The standard error message sent for an invalid request from the client */
     REQUEST_ERROR(199, ServerRequestError.class), // <- requestId, int error_code, String message

@@ -42,7 +42,7 @@ public abstract class PositionReader {
      *             if invoked on a non-android platform
      */
     public static PositionReader androidReader() {
-        throw new UnsupportedOperationException("This method is only supported on android platforms");
+        throw new UnsupportedOperationException("This method is only supported on the android platforms");
     }
 
     /**

@@ -46,11 +46,11 @@ public interface BroadcastFuture {
      */
     void onAck(Consumer<? super BroadcastMessage.Ack> consumer);
 
-    /**
-     * Invoked whenever the broadcast has finished being delivered to remote parties. Either because the broadcast has
-     * been delivered to all available parties. Or because a timeout occurred.
-     * <p>
-     * {@link #onAck(Consumer)} will not be invoked anymore after this method has been invoked.
-     */
-    void onFinish();
+    // /**
+    // * Invoked whenever the broadcast has finished being delivered to remote parties. Either because the broadcast has
+    // * been delivered to all available parties. Or because a timeout occurred.
+    // * <p>
+    // * {@link #onAck(Consumer)} will not be invoked anymore after this method has been invoked.
+    // */
+    // void onFinish();
 }

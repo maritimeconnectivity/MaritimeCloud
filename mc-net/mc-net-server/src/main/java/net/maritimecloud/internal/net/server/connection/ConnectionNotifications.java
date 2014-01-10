@@ -12,29 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.net;
+package net.maritimecloud.internal.net.server.connection;
+
+import javax.websocket.server.ServerEndpoint;
 
 /**
  * 
  * @author Kasper Nielsen
  */
-public class ConnectionException extends RuntimeException {
+@ServerEndpoint("/connections")
+public class ConnectionNotifications {
 
-    /** serialVersionUID. */
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * @param message
-     * @param cause
-     */
-    public ConnectionException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    /**
-     * @param message
-     */
-    public ConnectionException(String message) {
-        super(message);
-    }
 }

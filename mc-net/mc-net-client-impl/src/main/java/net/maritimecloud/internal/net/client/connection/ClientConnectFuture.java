@@ -106,8 +106,9 @@ class ClientConnectFuture implements Runnable {
                 ClientContainer client = connection.connectionManager.client;
                 PositionTime pt = client.readCurrentPosition();
                 String connectName = connection.connectionId == null ? "" : connection.connectionId;
-                transport.sendText(new HelloMessage(client.getLocalId(), "enavClient/1.0", connectName, reconnectId, pt
-                        .getLatitude(), pt.getLongitude()).toJSON());
+                transport.sendText(new HelloMessage(client.getLocalId(), connection.connectionManager.client
+                        .getClientConnectString(), connectName, reconnectId, pt.getLatitude(), pt.getLongitude())
+                        .toJSON());
                 receivedHelloMessage = true;
             } else {
                 String err = "Expected a welcome message, but was: " + m.getClass().getSimpleName();

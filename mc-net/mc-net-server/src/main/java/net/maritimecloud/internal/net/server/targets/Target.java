@@ -14,6 +14,8 @@
  */
 package net.maritimecloud.internal.net.server.targets;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.concurrent.locks.ReentrantLock;
 
 import net.maritimecloud.core.id.MaritimeId;
@@ -42,6 +44,23 @@ public class Target {
     final TargetServiceManager serviceManager;
 
     final TargetManager tm;
+
+    private volatile TargetProperties properties = new TargetProperties(null, null, null);
+
+    /**
+     * @return the properties
+     */
+    public TargetProperties getProperties() {
+        return properties;
+    }
+
+    /**
+     * @param properties
+     *            the properties to set
+     */
+    public void setProperties(TargetProperties properties) {
+        this.properties = requireNonNull(properties);
+    }
 
     public Target(TargetManager tm, MaritimeId id) {
         this.id = id;
