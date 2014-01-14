@@ -33,6 +33,9 @@ import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
 import net.maritimecloud.net.ClosingCode;
+import net.maritimecloud.net.MaritimeCloudConnection;
+import net.maritimecloud.net.MaritimeCloudConnection.Listener;
+import net.maritimecloud.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,13 +134,14 @@ class ConnectionTransportManagerJsr356 extends ConnectionTransportManager {
 
         Executor e = Executors.newSingleThreadExecutor();
 
-        public void sendText(String text) {
+        public void sendText(final String text) {
             Session session = this.session;
             if (session != null) {
-                if (text.length() < 1000) {
-                    System.out.println("Sending : " + text);
-                    // System.out.println("Sending " + this + " " + text);
-                }
+                connection.connectionManager.forEachListener(new Consumer<MaritimeCloudConnection.Listener>() {
+                    public void accept(Listener t) {
+                        t.messageSend(text);
+                    }
+                });
                 session.getAsyncRemote().sendText(text);
                 // final Future<?> f = session.getAsyncRemote().sendText(text);
                 // e.execute(new Runnable() {

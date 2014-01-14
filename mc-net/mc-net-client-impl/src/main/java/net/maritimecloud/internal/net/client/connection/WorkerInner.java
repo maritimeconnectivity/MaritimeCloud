@@ -20,11 +20,16 @@ import java.util.LinkedList;
 
 import net.maritimecloud.internal.net.messages.ConnectionMessage;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * 
  * @author Kasper Nielsen
  */
 public class WorkerInner {
+    /** The logger. */
+    static final Logger LOG = LoggerFactory.getLogger(WorkerInner.class);
 
     private boolean nextIsReceived /* = false */;
 
@@ -62,7 +67,7 @@ public class WorkerInner {
             if (!unwritten.isEmpty()) {}
         }
         if (idsToResend.size() > 0) {
-            System.out.println("Resending messages with id(s): " + idsToResend);
+            LOG.debug("Resending messages with id(s): " + idsToResend);
         }
         this.transport = transport;
         while (processNext()) {}

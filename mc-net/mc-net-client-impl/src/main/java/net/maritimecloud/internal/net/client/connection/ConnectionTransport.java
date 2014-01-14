@@ -22,6 +22,9 @@ import java.net.URI;
 import net.maritimecloud.internal.net.messages.ConnectionMessage;
 import net.maritimecloud.internal.net.messages.TransportMessage;
 import net.maritimecloud.net.ClosingCode;
+import net.maritimecloud.net.MaritimeCloudConnection;
+import net.maritimecloud.net.MaritimeCloudConnection.Listener;
+import net.maritimecloud.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,9 +53,13 @@ abstract class ConnectionTransport {
 
     abstract void doClose(final ClosingCode reason);
 
-    public void onTextMessage(String textMessage) {
+    public void onTextMessage(final String textMessage) {
         TransportMessage msg;
-        System.out.println("Received: " + textMessage);
+        connection.connectionManager.forEachListener(new Consumer<MaritimeCloudConnection.Listener>() {
+            public void accept(Listener t) {
+                t.messageReceived(textMessage);
+            }
+        });
         try {
             msg = TransportMessage.parseMessage(textMessage);
         } catch (Exception e) {

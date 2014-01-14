@@ -194,7 +194,7 @@ public final class ClientConnection {
                 connectionManager.connection = null;
                 worker.shutdown();
             } else if (cr.getId() == ClosingCode.DUPLICATE_CONNECT.getId()) {
-                System.out.println("Dublicate connect detected, will not reconnect");
+                LOG.error("Dublicate connect detected, will not reconnect");
                 connectionManager.state = ConnectionManager.State.SHOULD_STAY_DISCONNECTED;
             } else {
                 LOG.error("Connection to MaritimeCloud was lost: '" + cr.getMessage() + "' will try and reconnected");

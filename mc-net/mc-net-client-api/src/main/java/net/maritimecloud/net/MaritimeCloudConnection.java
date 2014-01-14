@@ -89,6 +89,10 @@ public interface MaritimeCloudConnection {
         /** Invoked when the client has fully connected to the server. */
         public void connected() {}
 
+        public void messageReceived(String message) {}
+
+        public void messageSend(String message) {}
+
         /**
          * Invoked when the client has been disconnected from the cloud server
          * 
