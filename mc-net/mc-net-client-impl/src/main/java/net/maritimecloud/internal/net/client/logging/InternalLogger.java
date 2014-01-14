@@ -14,10 +14,19 @@
  */
 package net.maritimecloud.internal.net.client.logging;
 
+import org.slf4j.Logger;
+
 /**
- *
+ * 
  * @author Kasper Nielsen
  */
 public class InternalLogger {
+    final Logger logger;
 
+    /**
+     * @param logger
+     */
+    InternalLogger(Logger logger) {
+        this.logger = logger;
+    }
 }
