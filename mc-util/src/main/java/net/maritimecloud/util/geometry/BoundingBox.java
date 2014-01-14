@@ -17,6 +17,14 @@ package net.maritimecloud.util.geometry;
 import java.util.concurrent.ThreadLocalRandom;
 
 public final class BoundingBox extends Polygon {
+
+    /** A bounding box encompassing all coordinates. */
+    public static final BoundingBox ALL = create(-90, 90, -180, 180, CoordinateSystem.GEODETIC);
+
+    public static void main(String[] args) {
+        System.out.println(ALL);
+    }
+
     /** serialVersionUID */
     private static final long serialVersionUID = 1L;
 
@@ -31,10 +39,10 @@ public final class BoundingBox extends Polygon {
     private BoundingBox(double minLatitude, double maxLatitude, double minLongitude, double maxLongitude,
             CoordinateSystem cs) {
         super(cs);
-        this.minLatitude = minLatitude;
-        this.maxLatitude = maxLatitude;
-        this.minLongitude = minLongitude;
-        this.maxLongitude = maxLongitude;
+        this.minLatitude = Position.verifyLatitude(minLatitude);
+        this.maxLatitude = Position.verifyLatitude(maxLatitude);
+        this.minLongitude = Position.verifyLongitude(minLongitude);
+        this.maxLongitude = Position.verifyLongitude(maxLongitude);
     }
 
     public boolean contains(Position point) {

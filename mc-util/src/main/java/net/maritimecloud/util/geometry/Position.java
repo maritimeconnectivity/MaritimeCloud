@@ -47,13 +47,8 @@ public class Position implements Element {
      */
 
     Position(double latitude, double longitude) {
-        verifyLatitude(latitude);
-        verifyLongitude(longitude);
-        // We want simple equals and hashCode implementation. So we make sure
-        // that
-        // positions are never constructed with -0.0 as latitude or longitude.
-        this.latitude = latitude == -0.0 ? 0.0 : latitude;
-        this.longitude = longitude == -0.0 ? 0.0 : longitude;
+        this.latitude = verifyLatitude(latitude);
+        this.longitude = verifyLongitude(longitude);
     }
 
     public double distanceTo(Element other, CoordinateSystem system) {
@@ -285,10 +280,13 @@ public class Position implements Element {
      * @throws IllegalArgumentException
      *             When latitude is invalid
      */
-    public static void verifyLatitude(double latitude) {
+    public static double verifyLatitude(double latitude) {
         if (latitude > 90 || latitude < -90) {
             throw new IllegalArgumentException("Illegal latitude must be between -90 and 90, was " + latitude);
         }
+        // We want simple equals and hashCode implementation. So we make sure
+        // that positions are never constructed with -0.0 as latitude or longitude.
+        return latitude == -0.0 ? 0.0 : latitude;
     }
 
     /**
@@ -298,9 +296,10 @@ public class Position implements Element {
      * @throws IllegalArgumentException
      *             When longitude is invalid
      */
-    public static void verifyLongitude(double longitude) {
+    public static double verifyLongitude(double longitude) {
         if (longitude > 180 || longitude < -180) {
             throw new IllegalArgumentException("Longitude must be between -180 and 180, was " + longitude);
         }
+        return longitude == -0.0 ? 0.0 : longitude;
     }
 }
