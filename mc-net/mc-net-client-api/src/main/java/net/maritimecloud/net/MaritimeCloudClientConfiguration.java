@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import net.maritimecloud.core.id.MaritimeId;
+import net.maritimecloud.net.MaritimeCloudConnection.Listener;
 import net.maritimecloud.net.broadcast.BroadcastOptions;
 import net.maritimecloud.util.function.Consumer;
 import net.maritimecloud.util.function.Supplier;
@@ -57,6 +58,20 @@ public class MaritimeCloudClientConfiguration {
 
     MaritimeCloudClientConfiguration(MaritimeId id) {
         this.id = id;
+        String p = System.getProperty("maritimecloud.printmessages");
+        if ("true".equalsIgnoreCase(p)) {
+            addListener(new Listener() {
+                @Override
+                public void messageReceived(String message) {
+                    System.out.println("Received:" + message);
+                }
+
+                @Override
+                public void messageSend(String message) {
+                    System.out.println("Sending :" + message);
+                }
+            });
+        }
     }
 
     /**
