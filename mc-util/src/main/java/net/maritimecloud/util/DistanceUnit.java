@@ -15,7 +15,6 @@
  */
 package net.maritimecloud.util;
 
-
 /**
  * A distance of unit.
  * 
