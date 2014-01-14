@@ -165,7 +165,6 @@ public class DefaultConnectionFuture<T> implements ConnectionFuture<T> {
         return cf;
     }
 
-
     public interface Action<A> {
         void accept(A paramA);
     }
