@@ -18,8 +18,9 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicLong;
 
 import net.maritimecloud.util.SpeedUnit;
 import net.maritimecloud.util.function.DoubleSupplier;
@@ -33,16 +34,30 @@ import net.maritimecloud.util.function.Supplier;
  */
 public final class PositionReaderSimulator {
 
-    private DoubleSupplier speedSource;
+    final Random random;
 
-    private LongSupplier timeSource = new LongSupplier() {
+    DoubleSupplier speedSource;
+
+    LongSupplier timeSource = new LongSupplier() {
         public long getAsLong() {
             return System.currentTimeMillis();
         }
     };
 
-    /** Creates a new PositionReaderSimulator */
+    /** Creates a new PositionReaderSimulator. With a non-deterministic random source */
     public PositionReaderSimulator() {
+        this(new Random());
+        setSpeedVariable(1, 40, SpeedUnit.KNOTS);
+    }
+
+    /**
+     * Creates a new PositionReaderSimulator.
+     * 
+     * @param random
+     *            the random source of data
+     */
+    public PositionReaderSimulator(Random random) {
+        this.random = requireNonNull(random);
         setSpeedVariable(1, 40, SpeedUnit.KNOTS);
     }
 
@@ -60,7 +75,7 @@ public final class PositionReaderSimulator {
 
 
     PositionReader forA(CoordinateSystem cs, Supplier<Position> supplier) {
-        return new AbtractSimulatedReader(cs, timeSource, speedSource, supplier);
+        return new AbtractSimulatedReader(this, cs, supplier);
     }
 
     /**
@@ -75,9 +90,10 @@ public final class PositionReaderSimulator {
      *             if the specified area is null
      */
     public PositionReader forArea(final Area area) {
+        final Random r = random;
         return forA(area.getCoordinateSystem(), new Supplier<Position>() {
             public Position get() {
-                return area.getRandomPosition();
+                return r == null ? area.getRandomPosition() : area.getRandomPosition(r);
             }
         });
     }
@@ -86,9 +102,9 @@ public final class PositionReaderSimulator {
      * Creates a new simulated reader with the specified route. When the vessel reaches the last of the specified
      * positions. It will sail the same route back. Continuing indefinitely.
      * <p>
-     * If the first position and the last position is equivalent the positions will be delivered as of the vessel is
-     * sailing in a circle. When the the reaches the final position it sail to position number 2 instead of sailing the
-     * same route back.
+     * If the first position and the last position is equivalent the positions will be delivered as if the vessel is
+     * sailing in a circle. When the ship reaches the final position it will sail to position number 2 instead of
+     * sailing the same route back.
      * 
      * @param positions
      *            each position for route
@@ -181,12 +197,11 @@ public final class PositionReaderSimulator {
         final double metersPerSecondMax = speedUnit.toMetersPerSecond(maxSpeed);
         speedSource = new DoubleSupplier() {
             public double getAsDouble() {
-                return ThreadLocalRandom.current().nextDouble(metersPerSecondMin, metersPerSecondMax);
+                return Area.nextDouble(random, metersPerSecondMin, metersPerSecondMax);
             }
         };
         return this;
     }
-
 
     /**
      * Sets the time source that is used to determine how long duration has passed between succint invocations of
@@ -204,6 +219,26 @@ public final class PositionReaderSimulator {
         return this;
     }
 
+    /**
+     * Sets a deterministic time source that increment the time with the specified amount of milliseconds every time.
+     * 
+     * @param milliesIncrement
+     *            the number of milliseconds that the ship will sail every time
+     *            {@link PositionReader#getCurrentPosition()} is invoked
+     * @return this builder
+     */
+    public PositionReaderSimulator setTimeSourceFixedSlice(final long milliesIncrement) {
+        if (milliesIncrement <= 0) {
+            throw new IllegalArgumentException();
+        }
+        return setTimeSource(new LongSupplier() {
+            final AtomicLong al = new AtomicLong();
+
+            public long getAsLong() {
+                return al.incrementAndGet() * milliesIncrement;
+            }
+        });
+    }
 
     static class AbtractSimulatedReader extends PositionReader {
         final CoordinateSystem cs;
@@ -224,14 +259,13 @@ public final class PositionReaderSimulator {
         /** The time source. */
         final LongSupplier timeSource;
 
-        AbtractSimulatedReader(CoordinateSystem cs, LongSupplier timeSource, DoubleSupplier distanceSupplier,
-                Supplier<Position> positionSupplier) {
+        AbtractSimulatedReader(PositionReaderSimulator prs, CoordinateSystem cs, Supplier<Position> positionSupplier) {
             this.cs = requireNonNull(cs);
-            this.timeSource = requireNonNull(timeSource);
+            this.timeSource = requireNonNull(prs.timeSource);
             this.positionSupplier = requireNonNull(positionSupplier);
             this.currentPosition = positionSupplier.get().withTime(timeSource.getAsLong());
             this.target = positionSupplier.get();
-            this.distanceSupplier = distanceSupplier;
+            this.distanceSupplier = prs.speedSource;
             this.currentSpeed = distanceSupplier.getAsDouble();
             // System.out.println("Going to target " + target);
         }

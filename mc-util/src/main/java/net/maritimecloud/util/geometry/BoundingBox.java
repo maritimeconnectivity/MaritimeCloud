@@ -14,16 +14,13 @@
  */
 package net.maritimecloud.util.geometry;
 
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.Random;
 
 public final class BoundingBox extends Polygon {
 
     /** A bounding box encompassing all coordinates. */
     public static final BoundingBox ALL = create(-90, 90, -180, 180, CoordinateSystem.GEODETIC);
 
-    public static void main(String[] args) {
-        System.out.println(ALL);
-    }
 
     /** serialVersionUID */
     private static final long serialVersionUID = 1L;
@@ -45,11 +42,6 @@ public final class BoundingBox extends Polygon {
         this.maxLongitude = Position.verifyLongitude(maxLongitude);
     }
 
-    public boolean contains(Position point) {
-        return point.getLatitude() >= minLatitude && point.getLongitude() >= minLongitude
-                && point.getLatitude() <= maxLatitude && point.getLongitude() <= maxLongitude;
-    }
-
     @Override
     public boolean contains(Element element) {
         if (element instanceof Position) {
@@ -57,6 +49,11 @@ public final class BoundingBox extends Polygon {
         } else {
             return super.contains(element);
         }
+    }
+
+    public boolean contains(Position point) {
+        return point.getLatitude() >= minLatitude && point.getLongitude() >= minLongitude
+                && point.getLatitude() <= maxLatitude && point.getLongitude() <= maxLongitude;
     }
 
     @Override
@@ -73,14 +70,10 @@ public final class BoundingBox extends Polygon {
         }
     }
 
-    /**
-     * Returns a random position within the box.
-     * 
-     * @return a random position within the box
-     */
-    @Deprecated
-    public Position getRandom() {
-        return getRandomPosition();
+    /** {@inheritDoc} */
+    @Override
+    public BoundingBox getBoundingBox() {
+        return this;
     }
 
     public Position getCenterPoint() {
@@ -115,9 +108,26 @@ public final class BoundingBox extends Polygon {
         return minLongitude;
     }
 
+    /**
+     * Returns a random position within the box.
+     * 
+     * @return a random position within the box
+     */
+    @Deprecated
+    public Position getRandom() {
+        return getRandomPosition();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Position getRandomPosition(Random r) {
+        return Position.create(nextDouble(r, minLatitude, maxLatitude), nextDouble(r, minLongitude, maxLongitude));
+    }
+
     public Position getUpperLeft() {
         return Position.create(maxLatitude, minLongitude);
     }
+
 
     @Override
     public int hashCode() {
@@ -128,6 +138,7 @@ public final class BoundingBox extends Polygon {
         result = 37 * result + hashCode(maxLongitude);
         return result;
     }
+
 
     /**
      * Returns a new bounding box that includes the specified bounding box.
@@ -161,9 +172,39 @@ public final class BoundingBox extends Polygon {
         return changed ? new BoundingBox(minLat, maxLat, minLon, maxLon, cs) : this;
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public boolean intersects(Area other) {
+        if (other instanceof Circle) {
+            return intersects((Circle) other);
+        } else if (other instanceof BoundingBox) {
+            return intersects((BoundingBox) other);
+        } else {
+            throw new UnsupportedOperationException("Only circles and BoundingBoxes supported");
+        }
+    }
+
     public boolean intersects(BoundingBox other) {
-        return !(other.minLongitude > maxLongitude || other.maxLongitude < minLongitude
-                || other.minLatitude > maxLatitude || other.maxLatitude < minLatitude);
+        // If the bounding box of this and other is shorter than the sum of the heights AND skinnier than the sum of the
+        // widths, they must intersect
+        BoundingBox common = include(other);
+        return common.getLatitudeSize() < getLatitudeSize() + other.getLatitudeSize()
+                && common.getLongitudeSize() < getLongitudeSize() + other.getLongitudeSize();
+    }
+
+    public boolean intersects(Circle other) {
+        // Either the circle's centre lies inside the rectangle, or
+        // One of the edges of the rectangle intersects the circle.
+        // See more here http://stackoverflow.com/questions/401847/circle-rectangle-collision-detection-intersection
+        if (contains(other.getCenter())) {
+            return true;
+        }
+        Position topLeft = Position.create(minLatitude, minLongitude);
+        Position topRight = Position.create(minLatitude, maxLongitude);
+        Position buttomLeft = Position.create(maxLatitude, minLongitude);
+        Position buttomRight = Position.create(maxLatitude, maxLongitude);
+        return other.intersects(topLeft, topRight) || other.intersects(topRight, buttomLeft)
+                || other.intersects(topLeft, buttomLeft) || other.intersects(buttomLeft, buttomRight);
     }
 
     @Override
@@ -184,16 +225,12 @@ public final class BoundingBox extends Polygon {
         return (int) (f ^ f >>> 32);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Position getRandomPosition() {
-        ThreadLocalRandom r = ThreadLocalRandom.current();
-        return Position.create(r.nextDouble(minLatitude, maxLatitude), r.nextDouble(minLongitude, maxLongitude));
-    }
+    public static void main(String[] args) {
+        Circle c = new Circle(0, 0, 1, CoordinateSystem.CARTESIAN);
 
-    /** {@inheritDoc} */
-    @Override
-    public BoundingBox getBoundingBox() {
-        return this;
+        BoundingBox c2 = BoundingBox.create(Position.create(1, 1), Position.create(2, 2), CoordinateSystem.CARTESIAN);
+
+        System.out.println(c.intersects(c2));
+
     }
 }
