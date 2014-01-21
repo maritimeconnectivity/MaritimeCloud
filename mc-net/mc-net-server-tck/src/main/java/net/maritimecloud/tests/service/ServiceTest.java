@@ -72,11 +72,15 @@ public class ServiceTest extends AbstractNetworkTest {
         c1.serviceRegister(HelloService.GET_NAME, HelloService.create("foo123")).awaitRegistered(4, TimeUnit.SECONDS);
 
         MaritimeCloudClient c2 = newClient(ID6);
+
+
         ServiceEndpoint<GetName, Reply> end = c2.serviceLocate(HelloService.GET_NAME).nearest()
                 .get(6, TimeUnit.SECONDS);
+
         assertEquals(ID1, end.getId());
         ConnectionFuture<Reply> f = end.invoke(new HelloService.GetName());
         final CountDownLatch cdl = new CountDownLatch(1);
+
         f.handle(new BiConsumer<HelloService.Reply, Throwable>() {
             public void accept(Reply l, Throwable r) {
                 assertNull(r);

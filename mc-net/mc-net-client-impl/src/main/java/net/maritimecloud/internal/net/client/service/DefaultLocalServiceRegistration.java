@@ -56,21 +56,25 @@ public class DefaultLocalServiceRegistration implements ServiceRegistration {
             e.printStackTrace();
         }
 
+        // OLD code
+        // DefaultLocalServiceInvocationContext<Object> context = new DefaultLocalServiceInvocationContext<>(
+        // message.getSourceId());
+        // c.process(o, context);
+        //
+        // if (context.done) {
+        // if (context.errorCode == 0) {
+        // bus.sendConnectionMessage(message.createReply(context.message));
+        // } else {
+        // // send fail message
+        // }
+        // } else {
+        // // Log error
+        // // send failed internal error message
+        // }
 
-        DefaultLocalServiceInvocationContext<Object> context = new DefaultLocalServiceInvocationContext<>(
-                message.getSourceId());
-        c.process(o, context);
-
-        if (context.done) {
-            if (context.errorCode == 0) {
-                bus.sendConnectionMessage(message.createReply(context.message));
-            } else {
-                // send fail message
-            }
-        } else {
-            // Log error
-            // send failed internal error message
-        }
+        DefaultLocalServiceInvocationContext2<Object> context2 = new DefaultLocalServiceInvocationContext2<>(message,
+                bus, message.getSourceId());
+        c.process(o, context2);
     }
 
     /** {@inheritDoc} */

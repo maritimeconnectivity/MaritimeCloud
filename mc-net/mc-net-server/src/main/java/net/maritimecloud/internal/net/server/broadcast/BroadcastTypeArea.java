@@ -20,9 +20,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import net.maritimecloud.internal.net.client.util.CustomConcurrentHashMap;
-import net.maritimecloud.internal.net.client.util.CustomConcurrentHashMap.Strength;
 import net.maritimecloud.internal.net.server.connection.ServerConnection;
+import net.maritimecloud.internal.net.server.util.CustomConcurrentHashMap;
+import net.maritimecloud.internal.net.server.util.CustomConcurrentHashMap.Strength;
 import net.maritimecloud.util.geometry.Area;
 import net.maritimecloud.util.geometry.Element;
 
