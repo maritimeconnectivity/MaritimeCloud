@@ -28,7 +28,7 @@ public class BroadcastOptions {
     private Area area;
 
     /** The distance in meters that the broadcast should be delivered. */
-    private int distance = 10000;
+    private int distance = 50000;
 
     // boolean fastAck;
 
