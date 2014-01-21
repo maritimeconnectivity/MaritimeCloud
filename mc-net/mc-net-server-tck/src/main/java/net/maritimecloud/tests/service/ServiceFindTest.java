@@ -119,6 +119,7 @@ public class ServiceFindTest extends AbstractServiceTest {
 
         e = newClient(4.4, 4.4).serviceLocate(HelloService.GET_NAME).withinDistanceOf(62678).nearest(2)
                 .get(6, TimeUnit.SECONDS);
+
         assertEquals(0, e.size());
 
         e = newClient(4.4, 4.4).serviceLocate(HelloService.GET_NAME).withinDistanceOf(62679).nearest(2)

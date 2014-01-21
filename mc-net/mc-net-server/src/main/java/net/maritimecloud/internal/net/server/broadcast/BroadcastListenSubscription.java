@@ -12,13 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.net.service;
+package net.maritimecloud.internal.net.server.broadcast;
+
+import static java.util.Objects.requireNonNull;
+import net.maritimecloud.util.geometry.Area;
 
 /**
- * A conversation context is created every time a service chit chat is started.
  * 
  * @author Kasper Nielsen
  */
-interface ConversationContext {
+class BroadcastListenSubscription {
+    final Area area;
+
+    BroadcastListenSubscription(Area area) {
+        this.area = requireNonNull(area);
+    }
 
 }

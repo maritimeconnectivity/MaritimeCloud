@@ -22,7 +22,6 @@ import net.maritimecloud.internal.net.messages.MessageType;
 import net.maritimecloud.internal.net.messages.TextMessageReader;
 import net.maritimecloud.internal.net.messages.TextMessageWriter;
 import net.maritimecloud.internal.net.messages.s2c.ServerRequestMessage;
-import net.maritimecloud.internal.net.messages.s2c.service.RegisterServiceResult;
 import net.maritimecloud.util.geometry.Area;
 
 /**
@@ -51,8 +50,8 @@ public class BroadcastListen extends ServerRequestMessage<BroadcastListenAck> {
         this.area = requireNonNull(pr.takeArea());
     }
 
-    public RegisterServiceResult createReply() {
-        return new RegisterServiceResult(getReplyTo());
+    public BroadcastListenAck createReply() {
+        return new BroadcastListenAck(getReplyTo());
     }
 
     /**

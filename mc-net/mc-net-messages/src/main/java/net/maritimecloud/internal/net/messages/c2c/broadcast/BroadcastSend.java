@@ -24,8 +24,10 @@ import net.maritimecloud.internal.net.messages.PositionTimeMessage;
 import net.maritimecloud.internal.net.messages.TextMessageReader;
 import net.maritimecloud.internal.net.messages.TextMessageWriter;
 import net.maritimecloud.internal.net.messages.s2c.ServerRequestMessage;
+import net.maritimecloud.internal.net.util.RelativeCircularArea;
 import net.maritimecloud.net.broadcast.BroadcastMessage;
 import net.maritimecloud.net.broadcast.BroadcastOptions;
+import net.maritimecloud.util.geometry.Area;
 import net.maritimecloud.util.geometry.PositionTime;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,7 +42,7 @@ public class BroadcastSend extends ServerRequestMessage<BroadcastSendAck> implem
 
     final String channel;
 
-    final int distance;
+    final Area area;
 
     final MaritimeId id;
 
@@ -60,14 +62,14 @@ public class BroadcastSend extends ServerRequestMessage<BroadcastSendAck> implem
     /**
      * @param messageType
      */
-    public BroadcastSend(MaritimeId id, PositionTime position, String channel, String message, int distance,
+    public BroadcastSend(MaritimeId id, PositionTime position, String channel, String message, Area area,
             boolean receiverAck) {
         super(MessageType.BROADCAST_SEND);
         this.id = requireNonNull(id);
         this.positionTime = requireNonNull(position);
         this.channel = requireNonNull(channel);
         this.message = requireNonNull(message);
-        this.distance = distance;
+        this.area = area;
         this.receiverAck = receiverAck;
     }
 
@@ -81,7 +83,7 @@ public class BroadcastSend extends ServerRequestMessage<BroadcastSendAck> implem
         this.positionTime = requireNonNull(PositionTime.create(pr.takeDouble(), pr.takeDouble(), pr.takeLong()));
         this.channel = requireNonNull(pr.takeString());
         this.message = requireNonNull(pr.takeString());
-        this.distance = pr.takeInt();
+        this.area = pr.takeArea();
         this.receiverAck = pr.takeBoolean();
     }
 
@@ -105,8 +107,8 @@ public class BroadcastSend extends ServerRequestMessage<BroadcastSendAck> implem
     /**
      * @return the distance
      */
-    public int getDistance() {
-        return distance;
+    public Area getArea() {
+        return area;
     }
 
     /**
@@ -149,14 +151,18 @@ public class BroadcastSend extends ServerRequestMessage<BroadcastSendAck> implem
         w.writeLong(positionTime.getTime());
         w.writeString(channel);
         w.writeString(message);
-        w.writeInt(distance);
+        w.writeArea(area);
         w.writeBoolean(receiverAck);
     }
 
     public static BroadcastSend create(MaritimeId sender, PositionTime position, BroadcastMessage message,
             BroadcastOptions options) {
-        return new BroadcastSend(sender, position, message.channel(), persistAndEscape(message),
-                options.getBroadcastRadius(), options.isReceiverAckEnabled());
+        Area broadcastArea = options.getBroadcastArea();
+        if (broadcastArea == null) {
+            broadcastArea = new RelativeCircularArea(options.getBroadcastRadius());
+        }
+        return new BroadcastSend(sender, position, message.channel(), persistAndEscape(message), broadcastArea,
+                options.isReceiverAckEnabled());
     }
 
     public BroadcastSendAck createReply() {

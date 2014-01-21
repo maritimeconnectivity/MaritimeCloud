@@ -15,6 +15,7 @@
 package net.maritimecloud.net.broadcast;
 
 import net.maritimecloud.net.MaritimeCloudClient;
+import net.maritimecloud.util.geometry.Area;
 
 /**
  * Various options that can be used when broadcasting messages via
@@ -23,6 +24,8 @@ import net.maritimecloud.net.MaritimeCloudClient;
  * @author Kasper Nielsen
  */
 public class BroadcastOptions {
+
+    private Area area;
 
     /** The distance in meters that the broadcast should be delivered. */
     private int distance = 10000;
@@ -33,7 +36,6 @@ public class BroadcastOptions {
 
     // ack of id, time, position
 
-
     // Targets
     // Actors within a defined area, for example, Denmark.
     // Actors within a defined group? For example, ships under danish flag
@@ -43,7 +45,6 @@ public class BroadcastOptions {
     // VTS centers can only broadcast in the country they are registered
     //
 
-
     boolean receiverAck;
 
     public BroadcastOptions() {}
@@ -51,6 +52,14 @@ public class BroadcastOptions {
     BroadcastOptions(BroadcastOptions options) {
         this.distance = options.distance;
         this.receiverAck = options.receiverAck;
+        this.area = options.area;
+    }
+
+    /**
+     * @return the area
+     */
+    public Area getBroadcastArea() {
+        return area;
     }
 
     public final int getBroadcastRadius() {
@@ -75,7 +84,23 @@ public class BroadcastOptions {
     }
 
     /**
-     * Sets the radius (in meters) for which the broadcast will be visible to other actors.
+     * Sets the area for which the broadcast will be visible to other actors. The area is not relative to the current
+     * position of the client. Any area set by this method will override any radius set by
+     * {@link #setBroadcastRadius(int)}.
+     * 
+     * @param area
+     *            the area to broadcast to
+     * @return this option object
+     */
+    public BroadcastOptions setBroadcastArea(Area area) {
+        this.area = area;
+        return this;
+    }
+
+    /**
+     * Sets the radius (in meters) for which the broadcast will be visible to other actors. The radius is relative to
+     * the current position of the client. If an area is set via {@link #setBroadcastArea(Area)} this will override any
+     * radius set by this method.
      * 
      * @param radius
      *            the radius in meters
@@ -85,6 +110,7 @@ public class BroadcastOptions {
         this.distance = radius;
         return this;
     }
+
 
     /**
      * Sets whether or not each actor that receives the broadcast will send an ack back to the broadcaster.
@@ -118,6 +144,12 @@ public class BroadcastOptions {
         /** {@inheritDoc} */
         @Override
         public BroadcastOptions setBroadcastRadius(int radius) {
+            throw new UnsupportedOperationException("options are immutable");
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public BroadcastOptions setBroadcastArea(Area area) {
             throw new UnsupportedOperationException("options are immutable");
         }
 

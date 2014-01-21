@@ -17,6 +17,7 @@ package net.maritimecloud.internal.net.messages;
 import java.util.Arrays;
 import java.util.Iterator;
 
+import net.maritimecloud.internal.net.util.RelativeCircularArea;
 import net.maritimecloud.util.geometry.Area;
 import net.maritimecloud.util.geometry.BoundingBox;
 import net.maritimecloud.util.geometry.Circle;
@@ -43,14 +44,18 @@ public class TextMessageWriter {
     }
 
     public TextMessageWriter writeArea(Area area) {
-        if (area instanceof Circle) {
-            Circle c = (Circle) area;
+        if (area instanceof RelativeCircularArea) {
+            RelativeCircularArea rca = (RelativeCircularArea) area;
             writeInt(0);
+            writeDouble(rca.getRadius());
+        } else if (area instanceof Circle) {
+            Circle c = (Circle) area;
+            writeInt(1);
             writePosition(c.getCenter());
             writeDouble(c.getRadius());
         } else if (area instanceof BoundingBox) {
             BoundingBox bb = (BoundingBox) area;
-            writeInt(1);
+            writeInt(2);
             writePosition(bb.getUpperLeft());
             writePosition(bb.getLowerRight());
         } else {

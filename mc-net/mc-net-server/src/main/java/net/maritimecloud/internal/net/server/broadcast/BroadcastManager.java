@@ -17,8 +17,11 @@ package net.maritimecloud.internal.net.server.broadcast;
 import static java.util.Objects.requireNonNull;
 import jsr166e.CompletableFuture;
 import jsr166e.CompletableFuture.Action;
+import jsr166e.ConcurrentHashMapV8;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastAck;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastDeliver;
+import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastListen;
+import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastListenAck;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSend;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSendAck;
 import net.maritimecloud.internal.net.server.connection.ServerConnection;
@@ -27,7 +30,9 @@ import net.maritimecloud.internal.net.server.requests.RequestProcessor;
 import net.maritimecloud.internal.net.server.requests.ServerMessageBus;
 import net.maritimecloud.internal.net.server.targets.Target;
 import net.maritimecloud.internal.net.server.targets.TargetManager;
+import net.maritimecloud.internal.net.util.RelativeCircularArea;
 import net.maritimecloud.util.function.Consumer;
+import net.maritimecloud.util.geometry.Area;
 import net.maritimecloud.util.geometry.PositionTime;
 
 import org.picocontainer.Startable;
@@ -40,6 +45,8 @@ public class BroadcastManager implements Startable {
     private final TargetManager tm;
 
     private final ServerMessageBus bus;
+
+    final ConcurrentHashMapV8<String, BroadcastTypeArea> listeners = new ConcurrentHashMapV8<>();
 
     public BroadcastManager(TargetManager tm, ServerMessageBus bus) {
         this.tm = requireNonNull(tm);
@@ -57,12 +64,18 @@ public class BroadcastManager implements Startable {
                 if (t != target && t.isConnected()) { // do not broadcast to self
                     PositionTime latest = t.getLatestPosition();
                     if (latest != null) {
-                        double distance = sourcePositionTime.geodesicDistanceTo(latest);
-                        if (distance < send.getDistance()) {
-
+                        boolean doSend = false;
+                        Area area = send.getArea();
+                        if (area instanceof RelativeCircularArea) {
+                            double distance = sourcePositionTime.geodesicDistanceTo(latest);
+                            RelativeCircularArea c = (RelativeCircularArea) area;
+                            doSend = distance < c.getRadius();
+                        } else {
+                            doSend = area.contains(latest);
+                        }
+                        if (doSend) {
                             BroadcastDeliver bd = BroadcastDeliver.create(send.getId(), send.getPositionTime(),
                                     send.getChannel(), send.getMessage());
-
 
                             final ServerConnection connection = t.getConnection();
                             CompletableFuture<Void> f = connection.messageSend(bd).protocolAcked();
@@ -85,8 +98,9 @@ public class BroadcastManager implements Startable {
         return send.createReply();
     }
 
-    void broadCastTo(BroadcastSend bs, Target target, BroadcastDeliver bd) {
+    BroadcastListenAck broadcastListen(final ServerConnection connection, final BroadcastListen listen) {
 
+        return listen.createReply();
     }
 
     /** {@inheritDoc} */
@@ -95,6 +109,12 @@ public class BroadcastManager implements Startable {
         bus.subscribe(BroadcastSend.class, new RequestProcessor<BroadcastSend, BroadcastSendAck>() {
             public BroadcastSendAck process(ServerConnection connection, BroadcastSend message) throws RequestException {
                 return broadcast(connection, message);
+            }
+        });
+        bus.subscribe(BroadcastListen.class, new RequestProcessor<BroadcastListen, BroadcastListenAck>() {
+            public BroadcastListenAck process(ServerConnection connection, BroadcastListen message)
+                    throws RequestException {
+                return broadcastListen(connection, message);
             }
         });
     }

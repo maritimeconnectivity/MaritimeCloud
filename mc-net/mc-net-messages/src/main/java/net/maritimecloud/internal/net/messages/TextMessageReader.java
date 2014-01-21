@@ -19,6 +19,7 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import net.maritimecloud.internal.net.util.RelativeCircularArea;
 import net.maritimecloud.util.geometry.Area;
 import net.maritimecloud.util.geometry.BoundingBox;
 import net.maritimecloud.util.geometry.Circle;
@@ -84,15 +85,18 @@ public class TextMessageReader {
     public Area takeArea() throws IOException {
         int type = takeInt();
         if (type == 0) {
+            double radius = takeDouble();
+            return new RelativeCircularArea(radius);
+        } else if (type == 1) {
             Position center = takePosition();
             double radius = takeDouble();
             return new Circle(center, radius, CoordinateSystem.CARTESIAN);
-        } else if (type == 1) {
+        } else if (type == 2) {
             Position topLeft = takePosition();
             Position buttomRight = takePosition();
             return BoundingBox.create(topLeft, buttomRight, CoordinateSystem.CARTESIAN);
         } else {
-            throw new UnsupportedOperationException("Only type 0 (circles) and type 1 (bounding boxes) supported, was "
+            throw new UnsupportedOperationException("Only type 1 (circles) and type 2 (bounding boxes) supported, was "
                     + type);
         }
     }
