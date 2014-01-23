@@ -36,12 +36,31 @@
           <groupId>org.picocontainer</groupId>
           <artifactId>picocontainer</artifactId>
         </exclusion>
+
+        <exclusion>
+          <groupId>org.eclipse.jetty.websocket</groupId>
+          <artifactId>javax-websocket-client-impl</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.eclipse.jetty</groupId>
+          <artifactId>jetty-servlet</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.eclipse.jetty.websocket</groupId>
+          <artifactId>javax-websocket-server-impl</artifactId>
+        </exclusion>
       </exclusions>
+
     </dependency>
     <dependency>
       <groupId>dk.dma.3rdparty</groupId>
       <artifactId>picocontainer-repackaged</artifactId>
       <version>2.14.4.1</version>
+    </dependency>
+    <dependency>
+      <groupId>dk.dma.3rdparty</groupId>
+      <artifactId>autobahn</artifactId>
+      <version>0.5.0</version>
     </dependency>
   </dependencies>
 
@@ -71,6 +90,8 @@
                     <filter>
                       <artifact>*:*</artifact>
                       <excludes>
+                        <exclude>net/maritimecloud/internal/net/client/connection/ConnectionTransportManagerJetty*</exclude>
+                        <exclude>net/maritimecloud/internal/net/client/connection/ConnectionTransportManagerJsr356*</exclude>
                         <exclude>META-INF/**/pom.xml</exclude>
                         <exclude>META-INF/**/pom.properties</exclude>
                         <exclude>META-INF/*.SF</exclude>
@@ -115,6 +136,8 @@
                     <filter>
                       <artifact>*:*</artifact>
                       <excludes>
+                        <exclude>net/maritimecloud/internal/net/client/connection/ConnectionTransportManagerJetty*</exclude>
+                        <exclude>net/maritimecloud/internal/net/client/connection/ConnectionTransportManagerJsr356*</exclude>
                         <exclude>META-INF/**/pom.xml</exclude>
                         <exclude>META-INF/**/pom.properties</exclude>
                       </excludes>
