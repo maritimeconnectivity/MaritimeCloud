@@ -45,8 +45,8 @@ public class ThreadManager implements Startable {
     static final String THREAD_PREFIX = "MaritimeCloud";
 
     /** An {@link ExecutorService} for running various tasks. */
-    final ThreadPoolExecutor es = new ThreadPoolExecutor(0, 3, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(),
-            new DefaultThreadFactory("GeneralPool", Executors.defaultThreadFactory()));
+    final ThreadPoolExecutor es = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS,
+            new SynchronousQueue<Runnable>(), new DefaultThreadFactory("GeneralPool", Executors.defaultThreadFactory()));
 
     /** A list of all outstanding futures. Is used to cancel each future in case of shutdown. */
     final Set<DefaultConnectionFuture<?>> futures = Collections
