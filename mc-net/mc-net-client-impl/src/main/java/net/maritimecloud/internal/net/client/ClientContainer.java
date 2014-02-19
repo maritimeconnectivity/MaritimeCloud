@@ -48,11 +48,11 @@ public class ClientContainer extends ReentrantLock {
     /** The container is is normal running mode. (certain pre-start hooks may still be running. */
     static final int S_RUNNING = 0;
 
-    /** The container has been shutdown, for example, by calling shutdown(). */
-    static final int S_SHUTDOWN = 2;
-
     /** The container has been started either by a preStart() or by invoking a lazy-starting method. */
     static final int S_STARTING = 1;
+
+    /** The container has been shutdown, for example, by calling shutdown(). */
+    static final int S_SHUTDOWN = 2;
 
     /** The container has been fully terminated. */
     static final int S_TERMINATED = 3;
