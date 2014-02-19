@@ -265,6 +265,10 @@ public class Position implements Element {
         return new Position(latitude, longitude);
     }
 
+    public static Position createFromPacked(int latitude, int longitude) {
+        return new Position(latitude / 10_000_000, longitude / 10_000_000);
+    }
+
     public static Position fromPackedLong(long l) {
         return new Position(Float.intBitsToFloat((int) (l >> 32)), Float.intBitsToFloat((int) l));
     }

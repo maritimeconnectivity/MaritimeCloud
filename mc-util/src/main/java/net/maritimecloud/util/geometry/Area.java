@@ -97,4 +97,8 @@ public abstract class Area implements Element {
     public double rhumbLineDistanceTo(Element other) {
         throw new UnsupportedOperationException();
     }
+
+    public Area unionWith(Area other) {
+        throw new UnsupportedOperationException();
+    }
 }
