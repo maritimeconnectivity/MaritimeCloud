@@ -87,7 +87,7 @@ public class ClientServiceManager {
             }
         });
         OutstandingMessage om = connection.sendConnectionMessage(is);
-        DefaultConnectionFuture<?> fffClient = new DefaultConnectionFuture<>(threadManager, om.acked());
+        DefaultConnectionFuture<Object> fffClient = new DefaultConnectionFuture<>(threadManager, om.acked());
         DefaultServiceInvocationFuture<T> sif = new DefaultServiceInvocationFuture<>(f, fffClient, fffClient);
         return sif;
     }

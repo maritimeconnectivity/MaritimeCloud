@@ -23,7 +23,7 @@ import net.maritimecloud.internal.net.messages.ConnectionMessage;
  */
 public class OutstandingMessage {
 
-    private final CompletableFuture<?> acked = new CompletableFuture<>();
+    private final CompletableFuture<Object> acked = new CompletableFuture<>();
 
     volatile boolean isSent;
 
@@ -35,7 +35,7 @@ public class OutstandingMessage {
         this.cm = cm;
     }
 
-    public CompletableFuture<?> acked() {
+    public CompletableFuture<Object> acked() {
         return acked;
     }
 

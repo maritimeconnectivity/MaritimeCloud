@@ -22,7 +22,7 @@ import net.maritimecloud.net.ConnectionFuture;
  */
 public interface ServiceInvocationFuture<T> extends ConnectionFuture<T> {
 
-    ConnectionFuture<?> receivedOnServer();
+    ConnectionFuture<Object> receivedByCloud();
 
-    ConnectionFuture<?> receivedByClient();
+    // ConnectionFuture<Object> receivedByClient();
 }

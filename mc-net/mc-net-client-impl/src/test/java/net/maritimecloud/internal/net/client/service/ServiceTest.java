@@ -80,13 +80,13 @@ public class ServiceTest extends AbstractClientConnectionTest {
 
 
         ServiceInvocationFuture<Reply> invoke = se.invoke(new GetName());
-        assertFalse(invoke.receivedByClient().isDone());
+        assertFalse(invoke.receivedByCloud().isDone());
         InvokeService is = t.take(InvokeService.class);
         InvokeServiceResult isr = is.createReply(new Reply("okfoo"));
         isr.setLatestReceivedId(2);
         t.send(isr);
-        invoke.receivedByClient().get(1, TimeUnit.SECONDS);
-        assertTrue(invoke.receivedByClient().isDone());
+        invoke.receivedByCloud().get(1, TimeUnit.SECONDS);
+        assertTrue(invoke.receivedByCloud().isDone());
         assertEquals("okfoo", invoke.get().getName());
     }
 }

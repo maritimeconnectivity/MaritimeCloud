@@ -32,15 +32,15 @@ public class DefaultServiceInvocationFuture<T> implements ServiceInvocationFutur
 
     final ConnectionFuture<T> delegate;
 
-    final ConnectionFuture<?> receivedOnClient;
+    final ConnectionFuture<Object> receivedOnClient;
 
-    final ConnectionFuture<?> receivedOnServer;
+    final ConnectionFuture<Object> receivedOnServer;
 
     /**
      * @param tm
      */
-    protected DefaultServiceInvocationFuture(ConnectionFuture<T> f, ConnectionFuture<?> receivedOnClient,
-            ConnectionFuture<?> receivedOnServer) {
+    protected DefaultServiceInvocationFuture(ConnectionFuture<T> f, ConnectionFuture<Object> receivedOnClient,
+            ConnectionFuture<Object> receivedOnServer) {
         this.delegate = requireNonNull(f);
         this.receivedOnClient = requireNonNull(receivedOnClient);
         this.receivedOnServer = requireNonNull(receivedOnServer);
@@ -83,13 +83,7 @@ public class DefaultServiceInvocationFuture<T> implements ServiceInvocationFutur
 
     /** {@inheritDoc} */
     @Override
-    public ConnectionFuture<?> receivedByClient() {
-        return receivedOnClient;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public ConnectionFuture<?> receivedOnServer() {
+    public ConnectionFuture<Object> receivedByCloud() {
         return receivedOnServer;
     }
 
