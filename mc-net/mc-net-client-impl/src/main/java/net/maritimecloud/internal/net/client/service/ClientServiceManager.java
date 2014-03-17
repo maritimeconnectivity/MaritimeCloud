@@ -23,6 +23,7 @@ import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.net.client.ClientContainer;
 import net.maritimecloud.internal.net.client.connection.ConnectionMessageBus;
 import net.maritimecloud.internal.net.client.connection.OnMessage;
+import net.maritimecloud.internal.net.client.connection.OutstandingMessage;
 import net.maritimecloud.internal.net.client.util.DefaultConnectionFuture;
 import net.maritimecloud.internal.net.client.util.ThreadManager;
 import net.maritimecloud.internal.net.messages.c2c.service.InvokeService;
@@ -71,7 +72,7 @@ public class ClientServiceManager {
     }
 
     /** {@inheritDoc} */
-    public <T, S extends ServiceMessage<T>> DefaultConnectionFuture<T> invokeService(MaritimeId id, S msg) {
+    public <T, S extends ServiceMessage<T>> DefaultServiceInvocationFuture<T> invokeService(MaritimeId id, S msg) {
         InvokeService is = new InvokeService(1, UUID.randomUUID().toString(), msg.getClass().getName(),
                 msg.messageName(), msg);
         is.setDestination(id.toString());
@@ -85,8 +86,10 @@ public class ClientServiceManager {
                 f.complete((T) ack);
             }
         });
-        connection.sendConnectionMessage(is);
-        return f;
+        OutstandingMessage om = connection.sendConnectionMessage(is);
+        DefaultConnectionFuture<?> fffClient = new DefaultConnectionFuture<>(threadManager, om.acked());
+        DefaultServiceInvocationFuture<T> sif = new DefaultServiceInvocationFuture<>(f, fffClient, fffClient);
+        return sif;
     }
 
     @OnMessage

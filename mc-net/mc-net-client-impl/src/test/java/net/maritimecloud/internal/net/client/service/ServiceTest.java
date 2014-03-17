@@ -15,17 +15,21 @@
 package net.maritimecloud.internal.net.client.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.concurrent.TimeUnit;
 
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.net.client.AbstractClientConnectionTest;
 import net.maritimecloud.internal.net.messages.c2c.service.InvokeService;
+import net.maritimecloud.internal.net.messages.c2c.service.InvokeServiceResult;
 import net.maritimecloud.internal.net.messages.s2c.service.FindService;
 import net.maritimecloud.internal.net.messages.s2c.service.RegisterService;
 import net.maritimecloud.net.ConnectionFuture;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.service.ServiceEndpoint;
+import net.maritimecloud.net.service.ServiceInvocationFuture;
 import net.maritimecloud.net.service.registration.ServiceRegistration;
 
 import org.junit.Test;
@@ -75,11 +79,14 @@ public class ServiceTest extends AbstractClientConnectionTest {
         assertEquals(MaritimeId.create("mmsi://4321"), se.getId());
 
 
-        ConnectionFuture<Reply> invoke = se.invoke(new GetName());
+        ServiceInvocationFuture<Reply> invoke = se.invoke(new GetName());
+        assertFalse(invoke.receivedByClient().isDone());
         InvokeService is = t.take(InvokeService.class);
-        t.send(is.createReply(new Reply("okfoo")));
-
-
+        InvokeServiceResult isr = is.createReply(new Reply("okfoo"));
+        isr.setLatestReceivedId(2);
+        t.send(isr);
+        invoke.receivedByClient().get(1, TimeUnit.SECONDS);
+        assertTrue(invoke.receivedByClient().isDone());
         assertEquals("okfoo", invoke.get().getName());
     }
 }

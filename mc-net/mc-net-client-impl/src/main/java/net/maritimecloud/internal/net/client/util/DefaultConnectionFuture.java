@@ -37,13 +37,18 @@ public class DefaultConnectionFuture<T> implements ConnectionFuture<T> {
 
     final String requestId;
 
-
     final ThreadManager tm;
 
-    DefaultConnectionFuture(ThreadManager tm) {
+    protected DefaultConnectionFuture(ThreadManager tm) {
         this.tm = tm;
         this.requestId = "fixme";
         delegate = new CompletableFuture<>();
+    }
+
+    public DefaultConnectionFuture(ThreadManager tm, CompletableFuture<T> f) {
+        this.tm = requireNonNull(tm);
+        this.requestId = "fixme";
+        this.delegate = requireNonNull(f);
     }
 
     /**

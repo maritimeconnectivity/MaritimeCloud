@@ -14,20 +14,15 @@
  */
 package net.maritimecloud.net.service;
 
-import net.maritimecloud.core.id.MaritimeId;
+import net.maritimecloud.net.ConnectionFuture;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
-public interface ServiceEndpoint<E, T> {
+public interface ServiceInvocationFuture<T> extends ConnectionFuture<T> {
 
-    /**
-     * Returns the id of the end point
-     * 
-     * @return the id of the end point
-     */
-    MaritimeId getId();
+    ConnectionFuture<?> receivedOnServer();
 
-    ServiceInvocationFuture<T> invoke(E message);
+    ConnectionFuture<?> receivedByClient();
 }

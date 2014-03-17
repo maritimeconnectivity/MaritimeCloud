@@ -16,8 +16,8 @@ package net.maritimecloud.internal.net.client.service;
 
 import static java.util.Objects.requireNonNull;
 import net.maritimecloud.core.id.MaritimeId;
-import net.maritimecloud.net.ConnectionFuture;
 import net.maritimecloud.net.service.ServiceEndpoint;
+import net.maritimecloud.net.service.ServiceInvocationFuture;
 import net.maritimecloud.net.service.spi.ServiceInitiationPoint;
 import net.maritimecloud.net.service.spi.ServiceMessage;
 
@@ -47,7 +47,7 @@ public class DefaultRemoteServiceEndpoint<T, E extends ServiceMessage<T>> implem
     /** {@inheritDoc} */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    public ConnectionFuture<T> invoke(E message) {
+    public ServiceInvocationFuture<T> invoke(E message) {
         return csm.invokeService(id, (ServiceMessage) message);
     }
 
