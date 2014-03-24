@@ -19,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.net.client.broadcast.BroadcastManager;
 import net.maritimecloud.internal.net.client.service.ClientServiceManager;
-import net.maritimecloud.net.ConnectionFuture;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.MaritimeCloudClientConfiguration;
 import net.maritimecloud.net.MaritimeCloudConnection;
@@ -28,6 +27,7 @@ import net.maritimecloud.net.broadcast.BroadcastListener;
 import net.maritimecloud.net.broadcast.BroadcastMessage;
 import net.maritimecloud.net.broadcast.BroadcastOptions;
 import net.maritimecloud.net.broadcast.BroadcastSubscription;
+import net.maritimecloud.net.service.ServiceInvocationFuture;
 import net.maritimecloud.net.service.ServiceLocator;
 import net.maritimecloud.net.service.invocation.InvocationCallback;
 import net.maritimecloud.net.service.registration.ServiceRegistration;
@@ -40,7 +40,7 @@ import org.picocontainer.PicoContainer;
 /**
  * An implementation of {@link MaritimeCloudClient} using WebSockets and JSON. This class delegates all work to other
  * services.
- * 
+ *
  * @author Kasper Nielsen
  */
 public class DefaultMaritimeCloudClient implements MaritimeCloudClient {
@@ -61,7 +61,7 @@ public class DefaultMaritimeCloudClient implements MaritimeCloudClient {
 
     /**
      * Creates a new instance of this class.
-     * 
+     *
      * @param builder
      *            the configuration of the connection
      */
@@ -137,7 +137,8 @@ public class DefaultMaritimeCloudClient implements MaritimeCloudClient {
 
     /** {@inheritDoc} */
     @Override
-    public <T, S extends ServiceMessage<T>> ConnectionFuture<T> serviceInvoke(MaritimeId id, S initiatingServiceMessage) {
+    public <T, S extends ServiceMessage<T>> ServiceInvocationFuture<T> serviceInvoke(MaritimeId id,
+            S initiatingServiceMessage) {
         return services.invokeService(id, initiatingServiceMessage);
     }
 
