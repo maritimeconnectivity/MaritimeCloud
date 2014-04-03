@@ -1,7 +1,7 @@
 MaritimeCloud - A communication framework enabling efficient, secure, reliable and seamless electronic information exchange 
                 between all authorized maritime stakeholders across available communication systems.
 
-Last updated 16. December 2013, Copyright 2012 Danish Maritime Authority
+Last updated 3. April 2014, Copyright 2012 Danish Maritime Authority
 
 
 Links
