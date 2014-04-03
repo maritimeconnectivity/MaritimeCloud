@@ -17,33 +17,25 @@ package net.maritimecloud.net.service.invocation;
 import net.maritimecloud.core.id.MaritimeId;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public interface InvocationCallback<E, T> {
 
-    /**
-     * Processes the specified event.
-     * 
-     * @param e
-     *            the message that was received
-     * @param context
-     *            the context that should be used to provide the result of the operation
-     */
     void process(E message, Context<T> context);
 
     interface Context<T> {
 
         /**
          * Returns the caller id.
-         * 
+         *
          * @return the id of the caller
          */
         MaritimeId getCaller();
 
         /**
          * Invoked if the operation completed successfully.
-         * 
+         *
          * @param replyMessage
          *            the reply message to the caller, if T is Void null is the only valid parameter to this method
          */
@@ -51,7 +43,7 @@ public interface InvocationCallback<E, T> {
 
         /**
          * The caller did not have sufficient permissions to invoke the specified service.
-         * 
+         *
          * @param message
          *            a helper message that will be provided to the client
          */

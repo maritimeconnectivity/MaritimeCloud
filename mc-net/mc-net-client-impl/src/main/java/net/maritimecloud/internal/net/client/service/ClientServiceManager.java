@@ -42,7 +42,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Manages local and remote services.
- * 
+ *
  * @author Kasper Nielsen
  */
 public class ClientServiceManager {
@@ -59,12 +59,6 @@ public class ClientServiceManager {
 
     private final ThreadManager threadManager;
 
-    /**
-     * Creates a new instance of this class.
-     * 
-     * @param network
-     *            the network
-     */
     public ClientServiceManager(ClientContainer container, ConnectionMessageBus connection, ThreadManager threadManager) {
         this.container = requireNonNull(container);
         this.connection = requireNonNull(connection);

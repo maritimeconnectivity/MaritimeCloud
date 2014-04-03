@@ -19,7 +19,7 @@ import net.maritimecloud.core.id.ServerId;
 import com.beust.jcommander.Parameter;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class ServerConfiguration {
@@ -69,19 +69,11 @@ public class ServerConfiguration {
         return this;
     }
 
-    /**
-     * @param serverPort
-     *            the serverPort to set
-     */
     public ServerConfiguration setServerPort(int port) {
         this.port = port;
         return this;
     }
 
-    /**
-     * @param webserverPort
-     *            the webserverPort to set
-     */
     public ServerConfiguration setWebserverPort(int webserverport) {
         this.webserverport = webserverport;
         return this;

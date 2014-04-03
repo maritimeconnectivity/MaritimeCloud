@@ -35,7 +35,7 @@ import org.picocontainer.behaviors.Caching;
 import org.picocontainer.containers.ImmutablePicoContainer;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class InternalServer {
@@ -72,12 +72,6 @@ public class InternalServer {
         this(new ServerConfiguration().setServerPort(port));
     }
 
-    /**
-     * Creates a new instance of this class.
-     * 
-     * @param builder
-     *            the configuration
-     */
     public InternalServer(ServerConfiguration configuration) {
         serverId = requireNonNull(configuration.getId());
 

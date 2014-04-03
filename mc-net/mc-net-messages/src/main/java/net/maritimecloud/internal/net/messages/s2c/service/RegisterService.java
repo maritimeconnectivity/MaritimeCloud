@@ -24,7 +24,7 @@ import net.maritimecloud.internal.net.messages.TextMessageWriter;
 import net.maritimecloud.internal.net.messages.s2c.ServerRequestMessage;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class RegisterService extends ServerRequestMessage<RegisterServiceResult> {
@@ -37,9 +37,6 @@ public class RegisterService extends ServerRequestMessage<RegisterServiceResult>
         this.serviceName = requireNonNull(pr.takeString());
     }
 
-    /**
-     * @param messageType
-     */
     public RegisterService(String serviceName) {
         super(MessageType.REGISTER_SERVICE);
         this.serviceName = requireNonNull(serviceName);

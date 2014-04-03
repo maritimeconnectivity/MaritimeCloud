@@ -21,7 +21,7 @@ import net.maritimecloud.internal.net.messages.TextMessageReader;
 import net.maritimecloud.internal.net.messages.s2c.ServerResponseMessage;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class RegisterServiceResult extends ServerResponseMessage {
@@ -31,9 +31,6 @@ public class RegisterServiceResult extends ServerResponseMessage {
         super(MessageType.REGISTER_SERVICE_RESULT, pr);
     }
 
-    /**
-     * @param messageType
-     */
     public RegisterServiceResult(long id) {
         super(MessageType.REGISTER_SERVICE_RESULT, id);
     }

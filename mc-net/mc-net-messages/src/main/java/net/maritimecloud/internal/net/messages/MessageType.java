@@ -39,7 +39,7 @@ import net.maritimecloud.internal.net.messages.s2c.service.RegisterServiceResult
 
 /**
  * The type of messages that can be sent around in the system.
- * 
+ *
  * @author Kasper Nielsen
  */
 public enum MessageType {
@@ -58,16 +58,7 @@ public enum MessageType {
     /** A keep alive message sent periodically. Contains current position/time. */
     POSITION_REPORT(9, PositionReportMessage.class),
 
-    // Channel Switched + men er jo naesten det samme som reconnect
-    // nej lige saa snart man er connected, starter man med at sende beskeder der
-    // Client maa saa vente til den har receivet faerdigt paa den anden hvorefter den
-    // lukker den gamle kanal
-    // Man kunne ogsaa receive beskeder over begge kanaller.
-    // Hvis de har et fortloebende id kan man jo bare smide dublikater vaek
 
-    /* ******************** Communication client<->server ******************* */
-
-    /** Registers a service with server. (client->server) */
     REGISTER_SERVICE(100, RegisterService.class), // throws ServiceRegisterException
     REGISTER_SERVICE_RESULT(101, RegisterServiceResult.class), // just an ack of the service???
 
@@ -80,19 +71,14 @@ public enum MessageType {
 
     /* Broadcast */
 
-    /** Broadcasts a message (client->server). */
     BROADCAST_SEND(150, BroadcastSend.class), // client->server
 
-    /** Acknowledgment of broadcast message (server->client). */
     BROADCAST_SEND_ACK(151, BroadcastSendAck.class),
 
-    /** Relay of broadcast from server (server->client). */
     BROADCAST_DELIVER(152, BroadcastDeliver.class),
 
-    /** Acknowledgment of successful broadcast for each client (server->client). */
     BROADCAST_DELIVER_ACK(153, BroadcastAck.class),
 
-    /** Registers a service with server. (client->server) */
     BROADCAST_LISTEN(160, BroadcastListen.class), // throws ServiceRegisterException
     BROADCAST_LISTEN_RESULT(161, BroadcastListenAck.class), // just an ack of the service???
 

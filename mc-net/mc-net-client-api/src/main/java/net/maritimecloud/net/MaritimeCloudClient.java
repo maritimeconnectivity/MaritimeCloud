@@ -67,16 +67,6 @@ public interface MaritimeCloudClient extends AutoCloseable {
      */
     BroadcastFuture broadcast(BroadcastMessage message);
 
-    /**
-     * Broadcasts the specified message. No guarantees are made to the delivery of the specified message.
-     *
-     * @param message
-     *            the message to broadcast
-     * @throws NullPointerException
-     *             if the specified message is null
-     * @throws ConnectionClosedException
-     *             if the connection has been permanently closed
-     */
     BroadcastFuture broadcast(BroadcastMessage message, BroadcastOptions options);
 
     /**
@@ -172,19 +162,6 @@ public interface MaritimeCloudClient extends AutoCloseable {
      */
     <T, S extends ServiceMessage<T>> ServiceLocator<T, S> serviceLocate(ServiceInitiationPoint<S> sip);
 
-    /**
-     * Registers the specified service with the maritime cloud. If a client is closed via
-     * {@link MaritimeCloudClient#close()} the server will automatically disregister all services.
-     *
-     * @param sip
-     *            the type of service
-     * @param callback
-     *            the callback that will be invoked by remote clients
-     * @return a service registration object
-     *
-     * @throws ConnectionClosedException
-     *             if the connection has been permanently closed
-     */
     <T, S extends ServiceMessage<T>> ServiceRegistration serviceRegister(ServiceInitiationPoint<S> sip,
             InvocationCallback<S, T> callback);
 }

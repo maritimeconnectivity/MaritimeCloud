@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A runnable that will keep sending a keep alive signal.
- * 
+ *
  * @author Kasper Nielsen
  */
 public class PositionManager implements Startable {
@@ -53,10 +53,6 @@ public class PositionManager implements Startable {
 
     private final ThreadManager threadManager;
 
-    /**
-     * @param transport
-     * @param positionSupplier
-     */
     public PositionManager(ConnectionMessageBus connection, MaritimeCloudClientConfiguration builder,
             ThreadManager threadManager) {
         this.connection = requireNonNull(connection);

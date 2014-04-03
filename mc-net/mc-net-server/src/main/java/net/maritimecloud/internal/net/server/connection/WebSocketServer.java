@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A factory used to create transports from connections by remote clients.
- * 
+ *
  * @author Kasper Nielsen
  */
 public class WebSocketServer implements Startable {
@@ -67,13 +67,6 @@ public class WebSocketServer implements Startable {
         connector.setReuseAddress(true);
     }
 
-    /**
-     * Invoked whenever a client has connected.
-     * 
-     * @param supplier
-     *            a supplier used for creating new transports
-     * @throws IOException
-     */
     public void start() {
 
         // New handler
@@ -110,11 +103,6 @@ public class WebSocketServer implements Startable {
         }
     }
 
-    /**
-     * Stops accepting any more connections
-     * 
-     * @throws IOException
-     */
     public void stop() {
         try {
             server.stop();

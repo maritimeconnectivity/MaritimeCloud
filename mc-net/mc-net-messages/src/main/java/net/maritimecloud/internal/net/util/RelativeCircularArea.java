@@ -23,7 +23,7 @@ import net.maritimecloud.util.geometry.Position;
 
 /**
  * A "fake" relative area.
- * 
+ *
  * @author Kasper Nielsen
  */
 public class RelativeCircularArea extends Area {
@@ -33,9 +33,6 @@ public class RelativeCircularArea extends Area {
     /** The radius. */
     private final double radius;
 
-    /**
-     * @param cs
-     */
     public RelativeCircularArea(double radius) {
         super(CoordinateSystem.CARTESIAN);
         this.radius = radius;

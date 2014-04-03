@@ -40,85 +40,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import sun.misc.Unsafe;
 
-/**
- * A {@link java.util.ConcurrentMap} supporting user-defined equivalence comparisons, soft, weak, or strong keys and
- * values, and user-supplied computational methods for setting and updating values. In particular:
- * <ul>
- * 
- * <li>Identity-based, Equality-based or User-definable {@link Equivalence}-based comparisons controlling membership.
- * 
- * <li> {@linkplain SoftReference Soft}, {@linkplain WeakReference weak} or strong (regular) keys and values.
- * 
- * <li>User-definable {@code MappingFunctions} that may be used in method
- * {@link CustomConcurrentHashMap#computeIfAbsent} to atomically establish a computed value, along with
- * {@code RemappingFunctions} that can be used in method {@link CustomConcurrentHashMap#compute} to atomically replace
- * values.
- * 
- * <li>Factory methods returning specialized forms for {@code int} keys and/or values, that may be more space-efficient
- * 
- * </ul>
- * 
- * Per-map settings are established in constructors, as in the following usages (that assume static imports to simplify
- * expression of configuration parameters):
- * 
- * <pre>
- * {@code
- * identityMap = new CustomConcurrentHashMap<Person,Salary>
- *     (STRONG, IDENTITY, STRONG, EQUALS, 0);
- * weakKeyMap = new CustomConcurrentHashMap<Person,Salary>
- *     (WEAK, IDENTITY, STRONG, EQUALS, 0);
- *     .weakKeys());
- * byNameMap = new CustomConcurrentHashMap<Person,Salary>
- *     (STRONG,
- *      new Equivalence<Person>() {
- *          public boolean equal(Person k, Object x) {
- *            return x instanceof Person && k.name.equals(((Person)x).name);
- *          }
- *          public int hash(Object x) {
- *             return (x instanceof Person) ? ((Person)x).name.hashCode() : 0;
- *          }
- *        },
- *      STRONG, EQUALS, 0);
- * }
- * </pre>
- * 
- * The first usage above provides a replacement for {@link java.util.IdentityHashMap}, and the second a replacement for
- * {@link java.util.WeakHashMap}, adding concurrency, asynchronous cleanup, and identity-based equality for keys. The
- * third usage illustrates a map with a custom Equivalence that looks only at the name field of a (fictional) Person
- * class.
- * 
- * <p>
- * This class also includes nested class {@link KeySet} that provides space-efficient Set views of maps, also supporting
- * method {@code intern}, which may be of use in canonicalizing elements.
- * 
- * <p>
- * When used with (Weak or Soft) Reference keys and/or values, elements that have asynchronously become {@code null} are
- * treated as absent from the map and (eventually) removed from maps via a background thread common across all maps.
- * Because of the potential for asynchronous clearing of References, methods such as {@code containsValue} have weaker
- * guarantees than you might expect even in the absence of other explicitly concurrent operations. For example
- * {@code containsValue(value)} may return true even if {@code value} is no longer available upon return from the
- * method.
- * 
- * <p>
- * When Equivalences other than equality are used, the returned collections may violate the specifications of
- * {@code Map} and/or {@code Set} interfaces, which mandate the use of the {@code equals} method when comparing objects.
- * The methods of this class otherwise have properties similar to those of {@link java.util.ConcurrentHashMap} under its
- * default settings. To adaptively maintain semantics and performance under varying conditions, this class does
- * <em>not</em> support load factor or concurrency level parameters. This class does not permit null keys or values.
- * This class is serializable; however, serializing a map that uses soft or weak references can give unpredictable
- * results. This class supports all optional operations of the {@code ConcurrentMap} interface. It supports have
- * <i>weakly consistent iteration</i>: an iterator over one of the map's view collections may reflect some, all or none
- * of the changes made to the collection after the iterator was created.
- * 
- * <p>
- * This class is a member of the <a href="{@docRoot}/../technotes/guides/collections/index.html"> Java Collections
- * Framework</a>.
- * 
- * @param <K>
- *            the type of keys maintained by this map
- * @param <V>
- *            the type of mapped values
- */
 // CHECKSTYLE:OFF
 @SuppressWarnings({ "rawtypes", "unchecked", "unused", "serial" })
 public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V>, Serializable {
@@ -255,7 +176,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
 
     /**
      * Creates a new CustomConcurrentHashMap with the given parameters.
-     * 
+     *
      * @param keyStrength
      *            the strength for keys
      * @param keyEquivalence
@@ -330,7 +251,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
 
     /**
      * Updates the mapping for the given key with the result of the given remappingFunction. This is equivalent to
-     * 
+     *
      * <pre>
      *   value = remappingFunction.remap(key, get(key));
      *   if (value != null)
@@ -338,13 +259,13 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
      *   else
      *     return remove(key);
      * </pre>
-     * 
+     *
      * except that the action is performed atomically. Some attempted operations on this map by other threads may be
      * blocked while computation is in progress.
-     * 
+     *
      * <p>
      * Sample Usage. A remapping function can be used to perform frequency counting of words using code such as:
-     * 
+     *
      * <pre>
      * map.compute(word, new RemappingFunction&lt;String, Integer&gt;() {
      *     public Integer remap(String k, Integer v) {
@@ -352,8 +273,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
      *     }
      * });
      * </pre>
-     * 
-     * @SuppressWarnings("unchecked")
+     *
      * @param key
      *            key with which the specified value is to be associated
      * @param remappingFunction
@@ -415,7 +335,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
     /**
      * If the specified key is not already associated with a value, computes its value using the given mappingFunction,
      * and if non-null, enters it into the map. This is equivalent to
-     * 
+     *
      * <pre>
      * if (map.containsKey(key))
      *     return map.get(key);
@@ -425,12 +345,12 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
      * else
      *     return null;
      * </pre>
-     * 
+     *
      * except that the action is performed atomically. Some attempted operations on this map by other threads may be
      * blocked while computation is in progress. Because this function is invoked within atomicity control, the
      * computation should be short and simple. The most common usage is to construct a new object serving as an initial
      * mapped value, or memoized result.
-     * 
+     *
      * @param key
      *            key with which the specified value is to be associated
      * @param mappingFunction
@@ -487,7 +407,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
     /**
      * Returns {@code true} if this map contains a key equivalent to the given key with respect to this map's key
      * Equivalence.
-     * 
+     *
      * @param key
      *            possible key
      * @return {@code true} if this map contains the specified key
@@ -508,7 +428,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
      * Returns {@code true} if this map maps one or more keys to a value equivalent to the given value with respect to
      * this map's value Equivalence. Note: This method requires a full internal traversal of the hash table, and so is
      * much slower than method {@code containsKey}.
-     * 
+     *
      * @param value
      *            value whose presence in this map is to be tested
      * @return {@code true} if this map maps one or more keys to the specified value
@@ -575,7 +495,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
      * map are reflected in the set, and vice-versa. The set supports element removal, which removes the corresponding
      * mapping from the map, via the {@code Iterator.remove}, {@code Set.remove}, {@code removeAll}, {@code retainAll},
      * and {@code clear} operations. It does not support the {@code add} or {@code addAll} operations.
-     * 
+     *
      * <p>
      * The view's {@code iterator} is a "weakly consistent" iterator that will never throw
      * {@link ConcurrentModificationException}, and guarantees to traverse elements as they existed upon construction of
@@ -590,7 +510,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
      * Compares the specified object with this map for equality. Returns {@code true} if the given object is also a map
      * of the same size, holding keys that are equal using this Map's key Equivalence, and which map to values that are
      * equal according to this Map's value equivalence.
-     * 
+     *
      * @param o
      *            object to be compared for equality with this map
      * @return {@code true} if the specified object is equal to this map
@@ -656,7 +576,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
     /**
      * Returns the value associated with a key equivalent to the given key with respect to this map's key Equivalence,
      * or {@code null} if no such mapping exists.
-     * 
+     *
      * @param key
      *            possible key
      * @return the value associated with the key, or {@code null} if there is no mapping
@@ -679,7 +599,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
     /**
      * Returns the segment for possibly inserting into the table associated with given hash, constructing it if
      * necessary.
-     * 
+     *
      * @param hash
      *            the hash code for the key
      * @return the segment
@@ -704,7 +624,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
 
     /**
      * Returns the segment for traversing table for key with given hash.
-     * 
+     *
      * @param hash
      *            the hash code for the key
      * @return the segment, or null if not yet initialized
@@ -716,7 +636,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
     /**
      * Returns the sum of the hash codes of each entry in this map's {@code entrySet()} view, which in turn are the hash
      * codes computed using key and value Equivalences for this Map.
-     * 
+     *
      * @return the hash code
      */
     public int hashCode() {
@@ -730,7 +650,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
 
     /**
      * Returns {@code true} if this map contains no key-value mappings.
-     * 
+     *
      * @return {@code true} if this map contains no key-value mappings
      */
     public boolean isEmpty() {
@@ -753,7 +673,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
      * are reflected in the set, and vice-versa. The set supports element removal, which removes the corresponding
      * mapping from this map, via the {@code Iterator.remove}, {@code Set.remove}, {@code removeAll}, {@code retainAll},
      * and {@code clear} operations. It does not support the {@code add} or {@code addAll} operations.
-     * 
+     *
      * <p>
      * The view's {@code iterator} is a "weakly consistent" iterator that will never throw
      * {@link ConcurrentModificationException}, and guarantees to traverse elements as they existed upon construction of
@@ -766,7 +686,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
 
     /**
      * Maps the specified key to the specified value in this map.
-     * 
+     *
      * @param key
      *            key with which the specified value is to be associated
      * @param value
@@ -782,7 +702,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
     /**
      * Copies all of the mappings from the specified map to this one. These mappings replace any mappings that this map
      * had for any of the keys currently in the specified map.
-     * 
+     *
      * @param m
      *            mappings to be stored in this map
      */
@@ -794,7 +714,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @return the previous value associated with the specified key, or {@code null} if there was no mapping for the key
      * @throws NullPointerException
      *             if the specified key or value is null
@@ -805,7 +725,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
 
     /**
      * Reconstitutes the instance from a stream (that is, deserializes it).
-     * 
+     *
      * @param s
      *            the stream
      */
@@ -824,7 +744,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
 
     /**
      * Removes the mapping for the specified key.
-     * 
+     *
      * @param key
      *            the key to remove
      * @return the previous value associated with {@code key}, or {@code null} if there was no mapping for {@code key}
@@ -872,7 +792,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws NullPointerException
      *             if the specified key is null
      */
@@ -960,7 +880,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws NullPointerException
      *             if any of the arguments are null
      */
@@ -988,7 +908,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @return the previous value associated with the specified key, or {@code null} if there was no mapping for the key
      * @throws NullPointerException
      *             if the specified key or value is null
@@ -1021,7 +941,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
     /**
      * Returns the number of key-value mappings in this map. If the map contains more than {@code Integer.MAX_VALUE}
      * elements, returns {@code Integer.MAX_VALUE}.
-     * 
+     *
      * @return the number of key-value mappings in this map
      */
     public int size() {
@@ -1042,7 +962,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
      * which removes the corresponding mapping from this map, via the {@code Iterator.remove}, {@code Collection.remove}
      * , {@code removeAll}, {@code retainAll}, and {@code clear} operations. It does not support the {@code add} or
      * {@code addAll} operations.
-     * 
+     *
      * <p>
      * The view's {@code iterator} is a "weakly consistent" iterator that will never throw
      * {@link ConcurrentModificationException}, and guarantees to traverse elements as they existed upon construction of
@@ -1055,7 +975,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
 
     /**
      * Saves the state of the instance to a stream (i.e., serializes it).
-     * 
+     *
      * @param s
      *            the stream
      * @serialData the key (Object) and value (Object) for each key-value mapping, followed by a null pair. The
@@ -1074,7 +994,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
     /**
      * Returns a queue that may be used as the ReferenceQueue argument to {@link java.lang.ref.Reference} constructors
      * to arrange removal of reclaimed nodes from maps via a background thread.
-     * 
+     *
      * @return the reference queue associated with the background cleanup thread
      */
     static ReferenceQueue<Object> getReclamationQueue() {
@@ -1089,7 +1009,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
     /**
      * Returns a sun.misc.Unsafe. Suitable for use in a 3rd party package. Replace with a simple call to
      * Unsafe.getUnsafe when integrating into a jdk.
-     * 
+     *
      * @return a sun.misc.Unsafe
      */
     private static sun.misc.Unsafe getUnsafe() {
@@ -1118,7 +1038,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
 
     /**
      * Returns a new map using Integer keys and values.
-     * 
+     *
      * @param expectedSize
      *            an estimate of the number of elements that will be held in the map. If no estimate is known, zero is
      *            an acceptable value.
@@ -1130,7 +1050,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
 
     /**
      * Returns a new map using Integer keys and the given value parameters.
-     * 
+     *
      * @param valueStrength
      *            the strength for values
      * @param valueEquivalence
@@ -1148,7 +1068,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
 
     /**
      * Returns a new map using the given key parameters and Integer values.
-     * 
+     *
      * @param keyStrength
      *            the strength for keys
      * @param keyEquivalence
@@ -1282,7 +1202,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
          * Returns true if the given objects are considered equal. This function must obey an equivalence relation:
          * equal(a, a) is always true, equal(a, b) implies equal(b, a), and (equal(a, b) &amp;&amp; equal(b, c) implies
          * equal(a, c). Note that the second argument need not be known to have the same declared type as the first.
-         * 
+         *
          * @param key
          *            a key in, or being placed in, the map
          * @param x
@@ -1293,7 +1213,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
 
         /**
          * Returns a hash value such that equal(a, b) implies hash(a)==hash(b).
-         * 
+         *
          * @param x
          *            an object queried for membership
          * @return a hash value
@@ -1631,7 +1551,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
 
         /**
          * Creates a set with the given parameters.
-         * 
+         *
          * @param strength
          *            the strength of elements
          * @param equivalence
@@ -1648,7 +1568,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
         /**
          * Adds the specified element to this set if there is not already an element equivalent to the given element
          * with respect to this set's Equivalence.
-         * 
+         *
          * @param e
          *            element to be added to this set
          * @return {@code true} if this set did not already contain the specified element
@@ -1667,7 +1587,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
         /**
          * Returns {@code true} if this set contains an element equivalent to the given element with respect to this
          * set's Equivalence.
-         * 
+         *
          * @param o
          *            element whose presence in this set is to be tested
          * @return {@code true} if this set contains the specified element
@@ -1678,7 +1598,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
 
         /**
          * Returns the sum of the hash codes of each element, as computed by this set's Equivalence.
-         * 
+         *
          * @return the hash code
          */
         public int hashCode() {
@@ -1693,7 +1613,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
         /**
          * Returns an element equivalent to the given element with respect to this set's Equivalence, if such an element
          * exists, else adds and returns the given element.
-         * 
+         *
          * @param e
          *            the element
          * @return e, or an element equivalent to e
@@ -1705,7 +1625,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
 
         /**
          * Returns {@code true} if this set contains no elements.
-         * 
+         *
          * @return {@code true} if this set contains no elements
          */
         public boolean isEmpty() {
@@ -1715,7 +1635,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
         /**
          * Returns a <i>weakly consistent iterator</i> over the elements in this set, that may reflect some, all or none
          * of the changes made to the set after the iterator was created.
-         * 
+         *
          * @return an Iterator over the elements in this set
          */
         public Iterator<K> iterator() {
@@ -1724,7 +1644,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
 
         /**
          * Removes an element equivalent to the given element with respect to this set's Equivalence, if one is present.
-         * 
+         *
          * @param o
          *            object to be removed from this set, if present
          * @return {@code true} if the set contained the specified element
@@ -1735,7 +1655,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
 
         /**
          * Returns the number of elements in this set (its cardinality).
-         * 
+         *
          * @return the number of elements in this set (its cardinality)
          */
         public int size() {
@@ -2124,7 +2044,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
          * exception, the exception is rethrown to its caller, and no mapping is recorded. Because this function is
          * invoked within atomicity control, the computation should be short and simple. The most common usage is to
          * construct a new object serving as an initial mapped value.
-         * 
+         *
          * @param key
          *            the (non-null) key
          * @return a value, or null if none
@@ -2137,7 +2057,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
      * map creating the node. This includes methods used solely for internal bookkeeping by maps, that must be treating
      * opaquely by implementation classes. (This requirement stems from the fact that concrete implementations may be
      * required to subclass {@link java.lang.ref.Reference} or other classes, so a base class cannot be established.)
-     * 
+     *
      * This interface uses raw types as the lesser of evils. Otherwise we'd encounter almost as many unchecked casts
      * when nodes are used across sets, etc.
      */
@@ -2145,7 +2065,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
         /**
          * Returns the key established during the creation of this node. Note: This method is named "get" rather than
          * "getKey" to simplify usage of Reference keys.
-         * 
+         *
          * @return the key
          */
         Object get();
@@ -2153,14 +2073,14 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
         /**
          * Returns the linkage established during the creation of this node or, if since updated, the linkage set by the
          * most recent call to setLinkage.
-         * 
+         *
          * @return the linkage
          */
         Node getLinkage();
 
         /**
          * Returns the locator established during the creation of this node.
-         * 
+         *
          * @return the locator
          */
         int getLocator();
@@ -2168,7 +2088,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
         /**
          * Returns the value established during the creation of this node or, if since updated, the value set by the
          * most recent call to setValue, or throws an exception if value could not be computed.
-         * 
+         *
          * @return the value
          * @throws RuntimeException
          *             or Error if computeValue failed
@@ -2177,7 +2097,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
 
         /**
          * Records the linkage to be returned by the next call to getLinkage.
-         * 
+         *
          * @param linkage
          *            the linkage
          */
@@ -2185,7 +2105,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
 
         /**
          * Nodes the value to be returned by the next call to getValue.
-         * 
+         *
          * @param value
          *            the value
          */
@@ -2198,7 +2118,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
     interface NodeFactory extends Serializable {
         /**
          * Creates and returns a Node using the given parameters.
-         * 
+         *
          * @param locator
          *            an opaque immutable locator for this node
          * @param key
@@ -2253,7 +2173,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
     public interface RemappingFunction<K, V> {
         /**
          * Returns a new value for the given key and its current, or null if there is no mapping.
-         * 
+         *
          * @param key
          *            the key
          * @param value

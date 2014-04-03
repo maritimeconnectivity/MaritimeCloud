@@ -39,7 +39,7 @@ public class Position implements Element {
 
     /**
      * Constructor given position and timezone
-     * 
+     *
      * @param latitude
      *            Negative south of equator
      * @param longitude
@@ -72,9 +72,7 @@ public class Position implements Element {
 
     /**
      * Get great circle distance to location
-     * 
-     * @param location
-     * @return distance in meters
+     *
      */
     public double geodesicDistanceTo(Element other) {
         if (other instanceof Position) {
@@ -83,25 +81,11 @@ public class Position implements Element {
         return other.geodesicDistanceTo(this);
     }
 
-    /**
-     * Calculate final bearing for great circle route to location using Thaddeus Vincenty's</a> inverse formula.
-     * 
-     * @param the
-     *            second location
-     * @return bearing in degrees
-     */
     public double geodesicFinalBearingTo(Position location) {
         return CoordinateSystem.vincentyFormula(getLatitude(), getLongitude(), location.getLatitude(),
                 location.getLongitude(), VincentyCalculationType.FINAL_BEARING);
     }
 
-    /**
-     * Calculate initial bearing for great circle route to location using Thaddeus Vincenty's</a> inverse formula.
-     * 
-     * @param the
-     *            second location
-     * @return bearing in degrees
-     */
     public double geodesicInitialBearingTo(Position location) {
         return CoordinateSystem.vincentyFormula(getLatitude(), getLongitude(), location.getLatitude(),
                 location.getLongitude(), VincentyCalculationType.INITIAL_BEARING);
@@ -127,7 +111,7 @@ public class Position implements Element {
 
     /**
      * Returns the latitude part of this position.
-     * 
+     *
      * @return the latitude part of this position
      */
     public double getLatitude() {
@@ -153,7 +137,7 @@ public class Position implements Element {
 
     /**
      * Returns the longitude part of this position.
-     * 
+     *
      * @return the longitude part of this position
      */
     public double getLongitude() {
@@ -191,7 +175,7 @@ public class Position implements Element {
 
     /**
      * Calculates the rhumb line bearing to the specified position
-     * 
+     *
      * @param position
      *            the position
      * @return the rhumb line bearing in degrees
@@ -218,7 +202,7 @@ public class Position implements Element {
 
     /**
      * Packs the position into a long (losing some precision). Can be read later by {@link #fromPackedLong(long)}
-     * 
+     *
      * @return the packet long
      */
     public long toPackedLong() {
@@ -252,7 +236,7 @@ public class Position implements Element {
 
     /**
      * Creates a new position from the specified latitude and longitude.
-     * 
+     *
      * @param latitude
      *            the latitude
      * @param longitude
@@ -279,7 +263,7 @@ public class Position implements Element {
 
     /**
      * Verify that latitude is within the interval [-90:90].
-     * 
+     *
      * @param latitude
      * @throws IllegalArgumentException
      *             When latitude is invalid
@@ -295,7 +279,7 @@ public class Position implements Element {
 
     /**
      * Verify that longitude is within the interval [-180:180].
-     * 
+     *
      * @param longitude
      * @throws IllegalArgumentException
      *             When longitude is invalid

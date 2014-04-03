@@ -22,14 +22,14 @@ import java.util.concurrent.TimeoutException;
 import net.maritimecloud.util.function.BiConsumer;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public interface ConnectionFuture<T> {
 
     /**
      * Waits if necessary for the computation to complete, and then retrieves its result.
-     * 
+     *
      * @return the computed result
      * @throws CancellationException
      *             if the computation was cancelled
@@ -42,7 +42,7 @@ public interface ConnectionFuture<T> {
 
     /**
      * Waits if necessary for at most the given time for completion, and then retrieves its result, if available.
-     * 
+     *
      * @param timeout
      *            the maximum time to wait
      * @param unit
@@ -62,7 +62,7 @@ public interface ConnectionFuture<T> {
     /**
      * Returns the result value (or throws any encountered exception) if completed, else returns the given
      * valueIfAbsent.
-     * 
+     *
      * @param valueIfAbsent
      *            the value to return if not completed
      * @return the result value, if completed, else the given valueIfAbsent
@@ -74,15 +74,15 @@ public interface ConnectionFuture<T> {
     /**
      * The given function is invoked with the result (or {@code null} if none) and the exception (or {@code null} if
      * none) of this NetworkFuture when complete.
-     * 
-     * @param fn
+     *
+     * @param consumer
      *            the composer used for processing the result
      */
     void handle(BiConsumer<T, Throwable> consumer);
 
     /**
      * Returns {@code true} if completed in any fashion: normally, exceptionally, or via cancellation.
-     * 
+     *
      * @return {@code true} if completed
      */
     boolean isDone();
@@ -90,7 +90,7 @@ public interface ConnectionFuture<T> {
     /**
      * Creates a new NetworkFuture that will time out via {@link TimeoutException} if this task has not completed within
      * the specified time.
-     * 
+     *
      * @param timeout
      *            the maximum time to wait
      * @param unit

@@ -16,7 +16,7 @@ package net.maritimecloud.core.id;
 
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class MmsiId extends MaritimeId {
@@ -26,9 +26,6 @@ public class MmsiId extends MaritimeId {
 
     private final int mmsi;
 
-    /**
-     * @param scheme
-     */
     public MmsiId(int mmsi) {
         super("mmsi");
         this.mmsi = mmsi;

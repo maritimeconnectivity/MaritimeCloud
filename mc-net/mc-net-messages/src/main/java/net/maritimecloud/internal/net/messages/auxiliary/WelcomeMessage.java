@@ -26,7 +26,7 @@ import net.maritimecloud.internal.net.messages.TextMessageWriter;
 import net.maritimecloud.internal.net.messages.TransportMessage;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class WelcomeMessage extends TransportMessage {
@@ -42,9 +42,6 @@ public class WelcomeMessage extends TransportMessage {
         this(pr.takeInt(), new ServerId(pr.takeString()), pr.takeString());
     }
 
-    /**
-     * @param messageType
-     */
     public WelcomeMessage(int protocolVersion, MaritimeId serverId, String serverInfo) {
         super(MessageType.WELCOME);
         this.protocolVersion = 1;

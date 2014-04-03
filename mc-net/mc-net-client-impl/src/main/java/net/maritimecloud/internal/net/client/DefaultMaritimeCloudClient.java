@@ -59,12 +59,6 @@ public class DefaultMaritimeCloudClient implements MaritimeCloudClient {
 
     private final BroadcastOptions broadcastDefaultOptions;
 
-    /**
-     * Creates a new instance of this class.
-     *
-     * @param builder
-     *            the configuration of the connection
-     */
     public DefaultMaritimeCloudClient(MaritimeCloudClientConfiguration configuration) {
         PicoContainer pc = ClientContainer.create(configuration);
         broadcaster = pc.getComponent(BroadcastManager.class);

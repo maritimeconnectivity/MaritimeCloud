@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Manages sending and receiving of broadcasts.
- * 
+ *
  * @author Kasper Nielsen
  */
 public class BroadcastManager {
@@ -75,12 +75,6 @@ public class BroadcastManager {
     /** Thread manager takes care of asynchronous processing. */
     private final ThreadManager threadManager;
 
-    /**
-     * Creates a new instance of this class.
-     * 
-     * @param network
-     *            the network
-     */
     public BroadcastManager(PositionManager positionManager, ThreadManager threadManager, ClientContainer client,
             ConnectionMessageBus connection) {
         this.connection = requireNonNull(connection);
@@ -91,7 +85,7 @@ public class BroadcastManager {
 
     /**
      * Sets up listeners for incoming broadcast messages.
-     * 
+     *
      * @param messageType
      *            the type of message to receive
      * @param listener
@@ -126,7 +120,7 @@ public class BroadcastManager {
 
     /**
      * Invoked whenever a broadcast message is received from a remote actor.
-     * 
+     *
      * @param broadcast
      *            the broadcast that was received
      */

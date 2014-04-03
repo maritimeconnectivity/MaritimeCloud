@@ -24,7 +24,7 @@ import net.maritimecloud.internal.net.messages.TextMessageWriter;
 import net.maritimecloud.internal.net.messages.c2c.ClientRelayedMessage;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class InvokeServiceResult extends ClientRelayedMessage {
@@ -42,9 +42,6 @@ public class InvokeServiceResult extends ClientRelayedMessage {
         this.replyType = requireNonNull(pr.takeString());
     }
 
-    /**
-     * @param messageType
-     */
     public InvokeServiceResult(String uuid, String message, String replyType) {
         super(MessageType.SERVICE_INVOKE_RESULT);
         this.uuid = uuid;

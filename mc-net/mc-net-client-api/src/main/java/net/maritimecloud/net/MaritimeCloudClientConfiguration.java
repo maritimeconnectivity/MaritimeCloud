@@ -24,7 +24,6 @@ import java.util.concurrent.TimeUnit;
 
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.net.broadcast.BroadcastOptions;
-import net.maritimecloud.util.function.Consumer;
 import net.maritimecloud.util.function.Supplier;
 import net.maritimecloud.util.geometry.Circle;
 import net.maritimecloud.util.geometry.CoordinateSystem;
@@ -33,7 +32,7 @@ import net.maritimecloud.util.geometry.PositionReaderSimulator;
 import net.maritimecloud.util.geometry.PositionTime;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class MaritimeCloudClientConfiguration {
@@ -73,15 +72,6 @@ public class MaritimeCloudClientConfiguration {
         }
     }
 
-    /**
-     * Adds a state listener that will be invoked whenever the state of the connection changes.
-     * 
-     * @param stateListener
-     *            the state listener
-     * @throws NullPointerException
-     *             if the specified listener is null
-     * @see #removeStateListener(Consumer)
-     */
     public MaritimeCloudClientConfiguration addListener(MaritimeCloudConnection.Listener listener) {
         listeners.add(requireNonNull(listener, "listener is null"));
         return this;
@@ -146,17 +136,11 @@ public class MaritimeCloudClientConfiguration {
         return id;
     }
 
-    /**
-     * @return the keepAliveNanos
-     */
     public long getKeepAlive(TimeUnit unit) {
         return unit.convert(keepAliveNanos, TimeUnit.NANOSECONDS);
     }
 
 
-    /**
-     * @return the listeners
-     */
     public List<MaritimeCloudConnection.Listener> getListeners() {
         return listeners;
     }
@@ -183,10 +167,6 @@ public class MaritimeCloudClientConfiguration {
         this.autoConnect = autoConnect;
     }
 
-    /**
-     * @param broadcastDefaults
-     *            the broadcastDefaults to set
-     */
     public MaritimeCloudClientConfiguration setDefaultBroadcastOptions(BroadcastOptions defaults) {
         this.broadcastDefaults = requireNonNull(defaults);
         return this;
@@ -212,9 +192,6 @@ public class MaritimeCloudClientConfiguration {
         return this;
     }
 
-    /**
-     * @deprecated use {@link #setPositionReader(PositionReader)}
-     */
     @Deprecated
     public MaritimeCloudClientConfiguration setPositionSupplier(final Supplier<PositionTime> positionSupplier) {
         requireNonNull(positionSupplier);
@@ -273,30 +250,16 @@ public class MaritimeCloudClientConfiguration {
             return organization;
         }
 
-        /**
-         * @param description
-         *            the description to set
-         * @return
-         */
         public Properties setDescription(String description) {
             this.description = checkComma(description);
             return this;
         }
 
-        /**
-         * @param name
-         *            the name to set
-         */
         public Properties setName(String name) {
             this.name = checkComma(name);
             return this;
         }
 
-        /**
-         * @param organization
-         *            the organization to set
-         * @return
-         */
         public Properties setOrganization(String organization) {
             this.organization = checkComma(organization);
             return this;

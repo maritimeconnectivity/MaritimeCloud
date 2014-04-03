@@ -35,7 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * This message is send from the client to server. Unlike {@link BroadcastDeliver} which is the relay message from the
  * server to the clients that need to receive the broadcast.
- * 
+ *
  * @author Kasper Nielsen
  */
 public class BroadcastSend extends ServerRequestMessage<BroadcastSendAck> implements PositionTimeMessage {
@@ -59,9 +59,6 @@ public class BroadcastSend extends ServerRequestMessage<BroadcastSendAck> implem
         return receiverAck;
     }
 
-    /**
-     * @param messageType
-     */
     public BroadcastSend(MaritimeId id, PositionTime position, String channel, String message, Area area,
             boolean receiverAck) {
         super(MessageType.BROADCAST_SEND);
@@ -73,10 +70,6 @@ public class BroadcastSend extends ServerRequestMessage<BroadcastSendAck> implem
         this.receiverAck = receiverAck;
     }
 
-    /**
-     * @param messageType
-     * @throws IOException
-     */
     public BroadcastSend(TextMessageReader pr) throws IOException {
         super(MessageType.BROADCAST_SEND, pr);
         this.id = requireNonNull(MaritimeId.create(pr.takeString()));

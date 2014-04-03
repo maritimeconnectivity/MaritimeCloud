@@ -19,16 +19,11 @@ import java.util.concurrent.TimeUnit;
 import net.maritimecloud.net.service.invocation.ServiceUnavailableException;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public interface ServiceRegistration {
 
-    /**
-     * Returns the current state of this registration
-     * 
-     * @return
-     */
     State getState();
 
     /**
