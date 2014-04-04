@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * A connection to the cloud.
- *
+ * 
  * @author Kasper Nielsen
  */
 public interface MaritimeCloudConnection {
@@ -27,7 +27,7 @@ public interface MaritimeCloudConnection {
     /**
      * Blocks until there is a valid connection to the maritime cloud, or the client is closed, or the timeout occurs,
      * or the current thread is interrupted, whichever happens first.
-     *
+     * 
      * @param timeout
      *            the maximum time to wait
      * @param unit
@@ -42,7 +42,7 @@ public interface MaritimeCloudConnection {
     /**
      * Blocks until there is a valid connection to the maritime cloud, or the client is closed, or the timeout occurs,
      * or the current thread is interrupted, whichever happens first.
-     *
+     * 
      * @param timeout
      *            the maximum time to wait
      * @param unit
@@ -56,17 +56,21 @@ public interface MaritimeCloudConnection {
 
     /**
      * Connects to the cloud. If the client is already connected to the cloud this call is ignored.
-     *
+     * 
      * @throws ConnectionClosedException
      *             if the client has been shutdown
      */
     void connect();
 
+    /**
+     * Disconnects from the cloud. Unlike {@link #close()} invoking this method allows for connecting again later via
+     * {@link #connect()}.
+     */
     void disconnect();
 
     /**
      * Returns whether or not we are currently connected to the cloud.
-     *
+     * 
      * @return whether or not we are currently connected to the cloud
      */
     boolean isConnected();
@@ -76,7 +80,7 @@ public interface MaritimeCloudConnection {
 
         /**
          * Invoked whenever the client is trying to connect/reconnect.
-         *
+         * 
          * @param host
          *            The host we are connecting to
          */
@@ -91,7 +95,7 @@ public interface MaritimeCloudConnection {
 
         /**
          * Invoked when the client has been disconnected from the cloud server
-         *
+         * 
          * @param closeReason
          *            the reason for the closing
          */

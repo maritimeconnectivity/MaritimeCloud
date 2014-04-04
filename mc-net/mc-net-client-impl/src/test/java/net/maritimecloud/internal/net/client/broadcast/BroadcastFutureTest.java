@@ -31,7 +31,7 @@ import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.broadcast.BroadcastFuture;
 import net.maritimecloud.net.broadcast.BroadcastMessage;
 import net.maritimecloud.net.broadcast.BroadcastMessage.Ack;
-import net.maritimecloud.net.broadcast.BroadcastOptions;
+import net.maritimecloud.net.broadcast.BroadcastSendOptions;
 import net.maritimecloud.util.function.Consumer;
 import net.maritimecloud.util.geometry.PositionTime;
 
@@ -39,7 +39,7 @@ import org.junit.Test;
 
 /**
  * Tests the future returned by {@link MaritimeCloudClient#broadcast(BroadcastMessage)} and
- * {@link MaritimeCloudClient#broadcast(BroadcastMessage, BroadcastOptions)}.
+ * {@link MaritimeCloudClient#broadcast(BroadcastMessage, BroadcastSendOptions)}.
  * 
  * @author Kasper Nielsen
  */
@@ -70,7 +70,7 @@ public class BroadcastFutureTest extends AbstractClientConnectionTest {
     public void broadcastClientAcks() throws Exception {
         MaritimeCloudClient c = createAndConnect();
 
-        BroadcastOptions options = new BroadcastOptions();
+        BroadcastSendOptions options = new BroadcastSendOptions();
         options.setReceiverAckEnabled(true);
 
         BroadcastFuture bf = c.broadcast(new HelloWorld("hello"), options);

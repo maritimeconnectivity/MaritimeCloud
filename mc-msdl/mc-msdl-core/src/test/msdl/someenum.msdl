@@ -1,0 +1,54 @@
+namespace imo.route.intendedroute;
+
+// Version history
+/*
+versions {
+  2012-12-01: Initial version
+
+
+}
+*/
+
+
+
+enum HeadingType {
+    RhumbLine = 1;
+    GreatCircle = 2;
+}
+
+message DateTime {
+  1: float speed;
+}
+
+message Leg {
+    /** The speed of the xxx in meters/second */
+    1: float speed;
+    
+    2: float xtdStarboard;
+
+    3: float xtdPort;
+
+    4: int32 /*HeadingType*/ headingType;
+}
+
+message Waypoint {
+    1: required Position start;
+    2: required DateTime eta;
+    3: float rot;
+    4: float turnRadius;
+    5: Leg outLeg;
+}
+
+message IntendedRoute {
+    1: int32 activeWaypointIndex;
+    2: list<DateTime> plannedEtas;
+    3: list<Waypoint> waypoints;
+}
+
+/*
+service IntendedRouteService {
+   1: broadcast IntendedRouteBroadcast {
+      1: IntendedRoute indendedRoute;
+   };
+} 
+*/

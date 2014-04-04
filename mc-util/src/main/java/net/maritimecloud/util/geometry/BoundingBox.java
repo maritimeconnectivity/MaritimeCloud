@@ -14,7 +14,12 @@
  */
 package net.maritimecloud.util.geometry;
 
+import java.io.IOException;
 import java.util.Random;
+
+import net.maritimecloud.core.message.MessageParser;
+import net.maritimecloud.core.message.MessageReader;
+import net.maritimecloud.core.message.MessageWriter;
 
 public final class BoundingBox extends Polygon {
 
@@ -32,6 +37,15 @@ public final class BoundingBox extends Polygon {
     private final double minLatitude;
 
     private final double minLongitude;
+
+    public static final MessageParser<BoundingBox> PARSER = new MessageParser<BoundingBox>() {
+
+        /** {@inheritDoc} */
+        @Override
+        public BoundingBox parse(MessageReader reader) throws IOException {
+            return readFrom(reader);
+        }
+    };
 
     private BoundingBox(double minLatitude, double maxLatitude, double minLongitude, double maxLongitude,
             CoordinateSystem cs) {
@@ -226,11 +240,24 @@ public final class BoundingBox extends Polygon {
     }
 
     public static void main(String[] args) {
-        Circle c = new Circle(0, 0, 1, CoordinateSystem.CARTESIAN);
+        Circle c = Circle.create(Position.create(0, 0), 1);
 
         BoundingBox c2 = BoundingBox.create(Position.create(1, 1), Position.create(2, 2), CoordinateSystem.CARTESIAN);
 
         System.out.println(c.intersects(c2));
 
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void writeTo(MessageWriter w) throws IOException {
+        w.writeInt32(1, "topLeftLatitude", (int) (getUpperLeft().getLatitude() * 10_000_000d));
+        w.writeInt32(2, "topLeftLongitude", (int) (getUpperLeft().getLongitude() * 10_000_000d));
+        w.writeInt32(3, "topLeftLatitude", (int) (getUpperLeft().getLatitude() * 10_000_000d));
+        w.writeInt32(4, "topLeftLatitude", (int) (getUpperLeft().getLatitude() * 10_000_000d));
+    }
+
+    public static BoundingBox readFrom(MessageReader r) {
+        return null;
     }
 }

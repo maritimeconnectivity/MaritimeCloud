@@ -35,14 +35,15 @@ public abstract class PositionReader {
     public abstract PositionTime getCurrentPosition();
 
     /**
-     * Returns a position reader that will return the current position on android devices.
+     * Returns a position reader that will return the current position on a native devices.
      * 
-     * @return a position reader that will return the current position on android devices
+     * @return a position reader that will return the current position on a native devices
      * @throws UnsupportedOperationException
-     *             if invoked on a non-android platform
+     *             if a native position reader is not available
      */
-    public static PositionReader androidReader() {
-        throw new UnsupportedOperationException("This method is only supported on the android platforms");
+    public static PositionReader nativeReader() {
+        // Taenker man saetter en System property, og saa cacher vi den
+        throw new UnsupportedOperationException("This method is not supported on the current platform");
     }
 
     /**

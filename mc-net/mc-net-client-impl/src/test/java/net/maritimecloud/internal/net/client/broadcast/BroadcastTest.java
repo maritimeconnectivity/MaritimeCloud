@@ -57,7 +57,7 @@ public class BroadcastTest extends AbstractClientConnectionTest {
 
         final CountDownLatch cdl = new CountDownLatch(1);
         c.broadcastListen(HelloWorld.class, new BroadcastListener<HelloWorld>() {
-            public void onMessage(BroadcastMessageHeader header, HelloWorld broadcast) {
+            public void onMessage(HelloWorld broadcast, BroadcastMessageHeader header) {
                 assertEquals(ID2, header.getId());
                 assertEquals(PositionTime.create(1, 1, 1), header.getPosition());
                 assertEquals("foo$\\\n", broadcast.getMessage());
@@ -87,7 +87,7 @@ public class BroadcastTest extends AbstractClientConnectionTest {
 
         final CountDownLatch cdl = new CountDownLatch(2);
         c.broadcastListen(BroadcastMessage.class, new BroadcastListener<BroadcastMessage>() {
-            public void onMessage(BroadcastMessageHeader header, BroadcastMessage broadcast) {
+            public void onMessage(BroadcastMessage broadcast, BroadcastMessageHeader header) {
                 if (cdl.getCount() == 2) {
                     HelloWorld2 hw = (HelloWorld2) broadcast;
                     assertEquals(ID3, header.getId());

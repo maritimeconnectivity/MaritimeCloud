@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A factory used to create transports from connections by remote clients.
- *
+ * 
  * @author Kasper Nielsen
  */
 public class TestWebSocketServer {
@@ -91,6 +91,13 @@ public class TestWebSocketServer {
         }
     }
 
+    /**
+     * Invoked whenever a client has connected.
+     * 
+     * @param supplier
+     *            a supplier used for creating new transports
+     * @throws IOException
+     */
     public void start() {
 
         // New handler
@@ -128,7 +135,7 @@ public class TestWebSocketServer {
 
         @Override
         protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-        IOException {
+                IOException {
             response.setContentType("text/html");
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().println("<h1>DumpServlet</h1><pre>");

@@ -14,13 +14,68 @@
  */
 package net.maritimecloud.util.geometry;
 
-public abstract class Polygon extends Area {
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+
+import net.maritimecloud.core.message.MessageParser;
+import net.maritimecloud.core.message.MessageReader;
+import net.maritimecloud.core.message.MessageWriter;
+
+public class Polygon extends Area {
+    public static final MessageParser<Polygon> PARSER = new MessageParser<Polygon>() {
+
+        /** {@inheritDoc} */
+        @Override
+        public Polygon parse(MessageReader reader) throws IOException {
+            return readPolygonFrom(reader);
+        }
+    };
+
     /** serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
-    public Polygon(CoordinateSystem cs) {
-        super(cs);
-        // TODO Auto-generated constructor stub
+    private Position[] positions;
+
+    public Polygon(CoordinateSystem cs, Position... positions) {}
+
+    /** {@inheritDoc} */
+    @Override
+    public BoundingBox getBoundingBox() {
+        throw new UnsupportedOperationException();
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public Position getRandomPosition(Random random) {
+        throw new UnsupportedOperationException();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean intersects(Area other) {
+        throw new UnsupportedOperationException();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void writeTo(MessageWriter w) throws IOException {
+        w.writeList(1, "points", Arrays.asList(positions));
+    }
+
+    public static Polygon from(Position... positions) {
+        return new Polygon(CoordinateSystem.CARTESIAN, positions);
+    }
+
+    static Polygon readPolygonFrom(MessageReader r) {
+        List<Position> positions = r.readList(1, "points", Position.PARSER);
+        return Polygon.from(positions.toArray(new Position[positions.size()]));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean contains(Position position) {
+        throw new UnsupportedOperationException();
+    }
 }

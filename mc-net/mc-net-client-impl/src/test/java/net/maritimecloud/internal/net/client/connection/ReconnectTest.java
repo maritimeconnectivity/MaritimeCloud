@@ -75,7 +75,7 @@ public class ReconnectTest extends AbstractClientConnectionTest {
         final CountDownLatch cdl1 = new CountDownLatch(1);
         final CountDownLatch cdl3 = new CountDownLatch(3);
         c.broadcastListen(HelloWorld.class, new BroadcastListener<HelloWorld>() {
-            public void onMessage(BroadcastMessageHeader header, HelloWorld broadcast) {
+            public void onMessage(HelloWorld broadcast, BroadcastMessageHeader header) {
                 cdl1.countDown();
                 cdl3.countDown();
             }

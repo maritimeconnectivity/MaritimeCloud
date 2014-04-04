@@ -16,6 +16,7 @@ package net.maritimecloud.util.geometry;
 
 import java.io.Serializable;
 
+//This is an interface to 
 public interface Element extends Serializable {
     // We should only need 1 or 2 of these
 
@@ -31,20 +32,21 @@ public interface Element extends Serializable {
     double geodesicDistanceTo(Element other);
 
     double rhumbLineDistanceTo(Element other);
-
-    /**
-     * Describe the relationship between the two shapes. For example
-     * <ul>
-     * <li>this is WITHIN other</li>
-     * <li>this CONTAINS other</li>
-     * <li>this is DISJOINT other</li>
-     * <li>this INTERSECTS other</li>
-     * </ul>
-     * Note that a Shape implementation may choose to return INTERSECTS when the true answer is WITHIN or CONTAINS for
-     * performance reasons. If a shape does this then it <i>must</i> document when it does. Ideally the shape will not
-     * do this approximation in all circumstances, just sometimes.
-     * <p />
-     * If the shapes are equal then the result is CONTAINS (preferred) or WITHIN.
-     */
-    // SpatialRelation relationTo(Element otherShape);
 }
+
+
+/**
+ * Describe the relationship between the two shapes. For example
+ * <ul>
+ * <li>this is WITHIN other</li>
+ * <li>this CONTAINS other</li>
+ * <li>this is DISJOINT other</li>
+ * <li>this INTERSECTS other</li>
+ * </ul>
+ * Note that a Shape implementation may choose to return INTERSECTS when the true answer is WITHIN or CONTAINS for
+ * performance reasons. If a shape does this then it <i>must</i> document when it does. Ideally the shape will not do
+ * this approximation in all circumstances, just sometimes.
+ * <p />
+ * If the shapes are equal then the result is CONTAINS (preferred) or WITHIN.
+ */
+// SpatialRelation relationTo(Element otherShape);

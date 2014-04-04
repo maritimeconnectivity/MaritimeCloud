@@ -31,7 +31,7 @@ public class Main {
         MaritimeCloudClient cc = conf.build();
 
 
-        BroadcastOptions options = new BroadcastOptions();
+        BroadcastSendOptions options = new BroadcastSendOptions();
         options.setReceiverAckEnabled(true);
         options.setBroadcastRadius(10000);
         BroadcastFuture f = cc.broadcast(null, options);

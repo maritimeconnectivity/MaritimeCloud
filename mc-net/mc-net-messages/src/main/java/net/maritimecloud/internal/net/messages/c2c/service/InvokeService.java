@@ -24,7 +24,7 @@ import net.maritimecloud.internal.net.messages.c2c.ClientRelayedMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- *
+ * 
  * @author Kasper Nielsen
  */
 public class InvokeService extends ClientRelayedMessage {
@@ -43,6 +43,13 @@ public class InvokeService extends ClientRelayedMessage {
         this(status, conversationId, serviceType, messageType, persistAndEscape(o));
     }
 
+    /**
+     * @param isInitialMessage
+     * @param conversationId
+     * @param serviceType
+     * @param messageType
+     * @param message
+     */
     public InvokeService(int status, String conversationId, String serviceType, String messageType, String message) {
         super(MessageType.SERVICE_INVOKE);
         this.status = status;
@@ -52,6 +59,10 @@ public class InvokeService extends ClientRelayedMessage {
         this.message = message;
     }
 
+    /**
+     * @param messageType
+     * @throws IOException
+     */
     public InvokeService(TextMessageReader pr) throws IOException {
         super(MessageType.SERVICE_INVOKE, pr);
         status = pr.takeInt();

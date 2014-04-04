@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * This message is send from the server to the client because the client was in proximity of broadcast that was sent to
  * the server.
- *
+ * 
  * @author Kasper Nielsen
  * @see BroadcastSend
  */
@@ -45,6 +45,9 @@ public class BroadcastDeliver extends ConnectionMessage {
 
     final PositionTime positionTime;
 
+    /**
+     * @param messageType
+     */
     public BroadcastDeliver(MaritimeId id, PositionTime position, String channel, String message) {
         super(MessageType.BROADCAST_DELIVER);
         this.id = requireNonNull(id);
@@ -53,6 +56,10 @@ public class BroadcastDeliver extends ConnectionMessage {
         this.message = requireNonNull(message);
     }
 
+    /**
+     * @param messageType
+     * @throws IOException
+     */
     public BroadcastDeliver(TextMessageReader pr) throws IOException {
         super(MessageType.BROADCAST_DELIVER, pr);
         this.id = requireNonNull(MaritimeId.create(pr.takeString()));

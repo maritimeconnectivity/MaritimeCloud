@@ -24,7 +24,7 @@ import net.maritimecloud.internal.net.messages.TextMessageWriter;
 import net.maritimecloud.internal.net.messages.TransportMessage;
 
 /**
- *
+ * 
  * @author Kasper Nielsen
  */
 public class ConnectedMessage extends TransportMessage {
@@ -33,6 +33,9 @@ public class ConnectedMessage extends TransportMessage {
 
     public final long lastReceivedMessageId;
 
+    /**
+     * @param messageType
+     */
     public ConnectedMessage(String connectionId, long lastReceivedMessageId) {
         super(MessageType.CONNECTED);
         this.connectionId = requireNonNull(connectionId);

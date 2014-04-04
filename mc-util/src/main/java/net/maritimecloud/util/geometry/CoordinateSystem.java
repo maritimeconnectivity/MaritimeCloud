@@ -14,15 +14,17 @@
  */
 package net.maritimecloud.util.geometry;
 
+/**
+ * A coordinate system.
+ * 
+ * @author Kasper Nielsen
+ */
 public enum CoordinateSystem {
 
+    /** A Cartesian coordinate system. */
     CARTESIAN {
 
-        @Override
-        double areaCircle(double latitude, double longitude, double radius) {
-            throw new UnsupportedOperationException();
-        }
-
+        /** {@inheritDoc} */
         @Override
         double distanceBetween(double latitude1, double longitude1, double latitude2, double longitude2) {
             double lat1 = Math.toRadians(latitude1);
@@ -38,8 +40,10 @@ public enum CoordinateSystem {
             return Math.sqrt(dLat * dLat + q * q * dLon * dLon) * EARTH_MEAN_RADIUS_KM * 1000;
         }
 
+        /** {@inheritDoc} */
         @Override
-        Position pointOnBearing0(double startLatDegrees, double startLonDegrees, double distanceMeters, double bearingDegrees) {
+        Position pointOnBearing0(double startLatDegrees, double startLonDegrees, double distanceMeters,
+                double bearingDegrees) {
             // Convert to radians
             startLatDegrees = Math.toRadians(startLatDegrees);
             startLonDegrees = Math.toRadians(startLonDegrees);
@@ -47,48 +51,64 @@ public enum CoordinateSystem {
             // the earth's radius in meters
             final double earthRadius = EARTH_MEAN_RADIUS_KM * 1000.0;
 
-            double endLat = Math.asin(Math.sin(startLatDegrees)
-                    * Math.cos(distanceMeters / earthRadius) + Math.cos(startLatDegrees)
-                    * Math.sin(distanceMeters / earthRadius) * Math.cos(bearingDegrees));
+            double endLat = Math.asin(Math.sin(startLatDegrees) * Math.cos(distanceMeters / earthRadius)
+                    + Math.cos(startLatDegrees) * Math.sin(distanceMeters / earthRadius) * Math.cos(bearingDegrees));
             double endLon = startLonDegrees
                     + Math.atan2(
                             Math.sin(bearingDegrees) * Math.sin(distanceMeters / earthRadius)
                                     * Math.cos(startLatDegrees),
-                            Math.cos(distanceMeters / earthRadius) - Math.sin(startLatDegrees)
-                                    * Math.sin(endLat));
+                            Math.cos(distanceMeters / earthRadius) - Math.sin(startLatDegrees) * Math.sin(endLat));
             return Position.create(Math.toDegrees(endLat), Math.toDegrees(endLon));
         }
     },
+
+    /** A Geodetic coordinate system. */
     GEODETIC {
 
-        @Override
-        double areaCircle(double latitude, double longitude, double radius) {
-            throw new UnsupportedOperationException();
-            // double lat = toRadians(90 - circle.getRadius());
-            // return 2 * Math.PI * radiusDEG * radiusDEG * (1 - Math.sin(lat));
-        }
-
+        /** {@inheritDoc} */
         @Override
         double distanceBetween(double latitude1, double longitude1, double latitude2, double longitude2) {
             return vincentyFormula(latitude1, longitude1, latitude2, longitude2, VincentyCalculationType.DISTANCE);
         }
 
+        /** {@inheritDoc} */
         @Override
         Position pointOnBearing0(double latitude, double longitude, double distance, double bearing) {
             throw new UnsupportedOperationException();
         }
 
     };
+
+    /** The equatorial radius of the Earth in kilometers. */
     public static final double EARTH_EQUATORIAL_RADIUS_KM = 6378.1370;
-    /**
-     * Earth's mean radius in KM according to The International Union of Geodesy and Gephysics.
-     */
+
+    /** Earth's mean radius in KM according to The International Union of Geodesy and Gephysics. */
     public static final double EARTH_MEAN_RADIUS_KM = 6371.0087714;
 
-    abstract double areaCircle(double latitude, double longitude, double radius);
-
+    /**
+     * Returns the distance between the two positions in the given coordinate system.
+     * 
+     * @param latitude1
+     *            the latitude of the first position
+     * @param longitude1
+     *            the longitude of the first position
+     * @param latitude2
+     *            the latitude of the second position
+     * @param longitude2
+     *            the longitude of the second position
+     * @return the distance between the two positions in the given coordinate system
+     */
     abstract double distanceBetween(double latitude1, double longitude1, double latitude2, double longitude2);
 
+    /**
+     * Returns the distance between the two positions in the given coordinate system.
+     * 
+     * @param p1
+     *            the first position
+     * @param p2
+     *            the second position
+     * @return the distance between the two positions in the given coordinate system
+     */
     public double distanceBetween(Position p1, Position p2) {
         return distanceBetween(p1.getLatitude(), p1.getLongitude(), p2.getLatitude(), p2.getLongitude());
     }
@@ -134,8 +154,8 @@ public enum CoordinateSystem {
         while (Math.abs(lambda - lambdaP) > 1e-12 && --iterLimit > 0) {
             sinLambda = Math.sin(lambda);
             cosLambda = Math.cos(lambda);
-            sinSigma = Math.sqrt((cosU2 * sinLambda) * (cosU2 * sinLambda)
-                    + (cosU1 * sinU2 - sinU1 * cosU2 * cosLambda) * (cosU1 * sinU2 - sinU1 * cosU2 * cosLambda));
+            sinSigma = Math.sqrt(cosU2 * sinLambda * (cosU2 * sinLambda) + (cosU1 * sinU2 - sinU1 * cosU2 * cosLambda)
+                    * (cosU1 * sinU2 - sinU1 * cosU2 * cosLambda));
             if (sinSigma == 0) {
                 return 0; // co-incident points
             }
@@ -178,6 +198,7 @@ public enum CoordinateSystem {
         return Math.toDegrees(Math.atan2(cosU1 * sinLambda, -sinU1 * cosU2 + cosU1 * sinU2 * cosLambda));
     }
 
+    /** What kind of calculation type we are performing. */
     static enum VincentyCalculationType {
         DISTANCE, FINAL_BEARING, INITIAL_BEARING;
     }

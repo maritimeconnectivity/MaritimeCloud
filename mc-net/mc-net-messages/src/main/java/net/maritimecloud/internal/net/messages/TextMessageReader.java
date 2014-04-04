@@ -90,7 +90,7 @@ public class TextMessageReader {
         } else if (type == 1) {
             Position center = takePosition();
             double radius = takeDouble();
-            return new Circle(center, radius, CoordinateSystem.CARTESIAN);
+            return Circle.create(center, radius);
         } else if (type == 2) {
             Position topLeft = takePosition();
             Position buttomRight = takePosition();

@@ -22,13 +22,16 @@ import net.maritimecloud.internal.net.messages.TextMessageReader;
 import net.maritimecloud.internal.net.messages.TextMessageWriter;
 
 /**
- *
+ * 
  * @author Kasper Nielsen
  */
 public abstract class ServerResponseMessage extends ConnectionMessage {
 
     final long messageAck;
 
+    /**
+     * @param messageType
+     */
     public ServerResponseMessage(MessageType type, long messageAck) {
         super(type);
         this.messageAck = messageAck;

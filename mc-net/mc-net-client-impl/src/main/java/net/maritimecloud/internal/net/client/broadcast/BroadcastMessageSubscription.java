@@ -66,7 +66,7 @@ class BroadcastMessageSubscription implements BroadcastSubscription {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     void deliver(BroadcastMessageHeader broadcastHeader, BroadcastMessage message) {
         try {
-            ((BroadcastListener) listener).onMessage(broadcastHeader, message);
+            ((BroadcastListener) listener).onMessage(message, broadcastHeader);
             count.incrementAndGet();
         } catch (Exception e) {
             LOG.error("Exception while handling an incoming broadcast message of type " + message.getClass(), e);

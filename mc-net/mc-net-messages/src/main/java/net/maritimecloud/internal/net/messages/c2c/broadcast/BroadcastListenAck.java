@@ -21,7 +21,7 @@ import net.maritimecloud.internal.net.messages.TextMessageReader;
 import net.maritimecloud.internal.net.messages.s2c.ServerResponseMessage;
 
 /**
- *
+ * 
  * @author Kasper Nielsen
  */
 public class BroadcastListenAck extends ServerResponseMessage {
@@ -31,6 +31,9 @@ public class BroadcastListenAck extends ServerResponseMessage {
         super(MessageType.REGISTER_SERVICE_RESULT, pr);
     }
 
+    /**
+     * @param messageType
+     */
     public BroadcastListenAck(long id) {
         super(MessageType.REGISTER_SERVICE_RESULT, id);
     }

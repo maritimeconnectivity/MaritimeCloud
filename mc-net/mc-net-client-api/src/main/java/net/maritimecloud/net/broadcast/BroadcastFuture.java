@@ -21,7 +21,7 @@ import net.maritimecloud.util.function.Consumer;
 
 /**
  * A broad future is created every time a broadcast is sent via {@link MaritimeCloudClient#broadcast(BroadcastMessage)}
- * or {@link MaritimeCloudClient#broadcast(BroadcastMessage, BroadcastOptions)}.
+ * or {@link MaritimeCloudClient#broadcast(BroadcastMessage, BroadcastSendOptions)}.
  * 
  * @author Kasper Nielsen
  */
@@ -36,7 +36,7 @@ public interface BroadcastFuture {
     ConnectionFuture<Void> receivedOnServer();
 
     /**
-     * If {@link BroadcastOptions#isReceiverAckEnabled()} is enabled. The specified consumer will be invoked every time
+     * If {@link BroadcastSendOptions#isReceiverAckEnabled()} is enabled. The specified consumer will be invoked every time
      * a remote actor has received the broadcast message.
      * 
      * @param consumer

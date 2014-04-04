@@ -29,7 +29,7 @@ import net.maritimecloud.net.ConnectionFuture;
 import net.maritimecloud.net.broadcast.BroadcastFuture;
 import net.maritimecloud.net.broadcast.BroadcastMessage;
 import net.maritimecloud.net.broadcast.BroadcastMessage.Ack;
-import net.maritimecloud.net.broadcast.BroadcastOptions;
+import net.maritimecloud.net.broadcast.BroadcastSendOptions;
 import net.maritimecloud.util.function.Consumer;
 import net.maritimecloud.util.geometry.PositionTime;
 
@@ -56,12 +56,12 @@ class DefaultOutstandingBroadcast implements BroadcastFuture {
     private final ReentrantLock lock = new ReentrantLock();
 
     /** The options for this broadcast. */
-    private final BroadcastOptions options;
+    private final BroadcastSendOptions options;
 
     /** A connection future used to determined if the broadcast message has been received on the server */
     final DefaultConnectionFuture<Void> receivedOnServer;
 
-    DefaultOutstandingBroadcast(ThreadManager tm, BroadcastOptions options) {
+    DefaultOutstandingBroadcast(ThreadManager tm, BroadcastSendOptions options) {
         this.receivedOnServer = tm.create();
         this.options = requireNonNull(options);
     }

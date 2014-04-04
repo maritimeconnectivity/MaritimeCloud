@@ -26,7 +26,7 @@ import net.maritimecloud.internal.net.messages.TextMessageWriter;
 import net.maritimecloud.util.geometry.PositionTime;
 
 /**
- *
+ * 
  * @author Kasper Nielsen
  */
 public class BroadcastAck extends ConnectionMessage {
@@ -44,6 +44,10 @@ public class BroadcastAck extends ConnectionMessage {
         this.positionTime = requireNonNull(position);
     }
 
+    /**
+     * @param messageType
+     * @throws IOException
+     */
     public BroadcastAck(TextMessageReader pr) throws IOException {
         super(MessageType.BROADCAST_DELIVER_ACK, pr);
         this.broadcastId = pr.takeLong();

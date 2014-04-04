@@ -15,7 +15,7 @@
 package net.maritimecloud.net;
 
 /**
- *
+ * 
  * @author Kasper Nielsen
  */
 public class ConnectionException extends RuntimeException {
@@ -23,10 +23,17 @@ public class ConnectionException extends RuntimeException {
     /** serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
+    /**
+     * @param message
+     * @param cause
+     */
     public ConnectionException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * @param message
+     */
     public ConnectionException(String message) {
         super(message);
     }

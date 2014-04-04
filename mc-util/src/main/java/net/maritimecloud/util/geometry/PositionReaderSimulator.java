@@ -22,10 +22,10 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
-import net.maritimecloud.util.SpeedUnit;
 import net.maritimecloud.util.function.DoubleSupplier;
 import net.maritimecloud.util.function.LongSupplier;
 import net.maritimecloud.util.function.Supplier;
+import net.maritimecloud.util.units.SpeedUnit;
 
 /**
  * A simple builder for creating position readers that simulate simple sailing patterns.

@@ -24,7 +24,7 @@ import net.maritimecloud.internal.net.messages.TextMessageWriter;
 import net.maritimecloud.internal.net.messages.s2c.ServerResponseMessage;
 
 /**
- *
+ * 
  * @author Kasper Nielsen
  */
 public class FindServiceResult extends ServerResponseMessage {
@@ -36,6 +36,9 @@ public class FindServiceResult extends ServerResponseMessage {
         this.maritimeIds = requireNonNull(pr.takeStringArray());
     }
 
+    /**
+     * @param messageType
+     */
     public FindServiceResult(long id, String[] ids) {
         super(MessageType.FIND_SERVICE_ACK, id);
         this.maritimeIds = requireNonNull(ids);

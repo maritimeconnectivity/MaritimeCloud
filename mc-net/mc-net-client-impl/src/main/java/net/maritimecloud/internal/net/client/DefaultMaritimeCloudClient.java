@@ -25,7 +25,7 @@ import net.maritimecloud.net.MaritimeCloudConnection;
 import net.maritimecloud.net.broadcast.BroadcastFuture;
 import net.maritimecloud.net.broadcast.BroadcastListener;
 import net.maritimecloud.net.broadcast.BroadcastMessage;
-import net.maritimecloud.net.broadcast.BroadcastOptions;
+import net.maritimecloud.net.broadcast.BroadcastSendOptions;
 import net.maritimecloud.net.broadcast.BroadcastSubscription;
 import net.maritimecloud.net.service.ServiceInvocationFuture;
 import net.maritimecloud.net.service.ServiceLocator;
@@ -57,8 +57,14 @@ public class DefaultMaritimeCloudClient implements MaritimeCloudClient {
     /** Manages registration of services. */
     private final ClientServiceManager services;
 
-    private final BroadcastOptions broadcastDefaultOptions;
+    private final BroadcastSendOptions broadcastDefaultOptions;
 
+    /**
+     * Creates a new instance of this class.
+     *
+     * @param builder
+     *            the configuration of the connection
+     */
     public DefaultMaritimeCloudClient(MaritimeCloudClientConfiguration configuration) {
         PicoContainer pc = ClientContainer.create(configuration);
         broadcaster = pc.getComponent(BroadcastManager.class);
@@ -82,7 +88,7 @@ public class DefaultMaritimeCloudClient implements MaritimeCloudClient {
 
     /** {@inheritDoc} */
     @Override
-    public BroadcastFuture broadcast(BroadcastMessage message, BroadcastOptions options) {
+    public BroadcastFuture broadcast(BroadcastMessage message, BroadcastSendOptions options) {
         return broadcaster.sendBroadcastMessage(message, options);
     }
 

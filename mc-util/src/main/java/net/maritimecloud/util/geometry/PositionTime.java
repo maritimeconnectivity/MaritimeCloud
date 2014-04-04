@@ -15,9 +15,10 @@
 package net.maritimecloud.util.geometry;
 
 /**
- *
+ * 
  * @author Kasper Nielsen
  */
+// TODO make it serializable
 public class PositionTime extends Position {
 
     /** serialVersionUID */
@@ -25,6 +26,11 @@ public class PositionTime extends Position {
 
     private final long time;
 
+    /**
+     * @param latitude
+     * @param longitude
+     * @param time
+     */
     public PositionTime(double latitude, double longitude, long time) {
         super(latitude, longitude);
         this.time = time;
@@ -71,6 +77,17 @@ public class PositionTime extends Position {
         return create(position.latitude, position.longitude, time);
     }
 
+    /**
+     * Creates a new position from the specified latitude and longitude.
+     * 
+     * @param latitude
+     *            the latitude
+     * @param longitude
+     *            the longitude
+     * @return the new position
+     * @throws IllegalArgumentException
+     *             if the
+     */
     public static PositionTime create(double latitude, double longitude, long time) {
         return new PositionTime(latitude, longitude, time);
     }

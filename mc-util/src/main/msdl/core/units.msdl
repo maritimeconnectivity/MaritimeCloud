@@ -1,0 +1,12 @@
+namespace core.units;
+
+
+@JavaImplementation("net.maritimecloud.util.units.Distance")
+message Distance {
+   1: float meters;
+}
+
+@JavaImplementation("net.maritimecloud.util.units.Temperature")
+message Temperatur {
+   1: float kelvin;
+}

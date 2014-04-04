@@ -59,6 +59,12 @@ public class ClientServiceManager {
 
     private final ThreadManager threadManager;
 
+    /**
+     * Creates a new instance of this class.
+     *
+     * @param network
+     *            the network
+     */
     public ClientServiceManager(ClientContainer container, ConnectionMessageBus connection, ThreadManager threadManager) {
         this.container = requireNonNull(container);
         this.connection = requireNonNull(connection);

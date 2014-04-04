@@ -19,10 +19,14 @@ import net.maritimecloud.internal.net.messages.MessageType;
 import net.maritimecloud.internal.net.messages.TextMessageWriter;
 
 /**
- *
+ * 
  * @author Kasper Nielsen
  */
 public class ServerRequestError extends ConnectionMessage {
+
+    /**
+     * @param messageType
+     */
     public ServerRequestError() {
         super(MessageType.REQUEST_ERROR);
     }

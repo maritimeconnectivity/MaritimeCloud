@@ -1,0 +1,27 @@
+// Annotations <- saa vi kan specificere package
+
+//Imports + Reference lookup + inner classes
+Tir <-Resolved messages
+Ons imports
+Tor
+Fre
+
+Ugen efter
+services + broadcast messages
+
+
+JSON
+Javagen + Parser - endpoints
+15.4
+
+1.5 incld 
+
+
+1.6 foerste prototype
+
+rewrite prototype to use internal messages
+
+1.7 release
+
+---
+Units ryger nok ned sammen med id'er til 0.3

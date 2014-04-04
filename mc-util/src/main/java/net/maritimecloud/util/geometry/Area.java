@@ -16,23 +16,33 @@ package net.maritimecloud.util.geometry;
 
 import static java.util.Objects.requireNonNull;
 
+import java.io.IOException;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
+import net.maritimecloud.core.message.MessageParser;
+import net.maritimecloud.core.message.MessageReader;
+import net.maritimecloud.core.message.MessageSerializable;
+import net.maritimecloud.core.message.MessageWriter;
 import net.maritimecloud.util.function.Predicate;
 
 /**
  * A shape has an area
  **/
-public abstract class Area implements Element {
+public abstract class Area implements Element, MessageSerializable {
     /** serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
-    final CoordinateSystem cs;
+    public static final MessageParser<Area> PARSER = new MessageParser<Area>() {
 
-    public Area(CoordinateSystem cs) {
-        this.cs = requireNonNull(cs);
-    }
+        /** {@inheritDoc} */
+        @Override
+        public Area parse(MessageReader reader) throws IOException {
+            return readFrom(reader);
+        }
+    };
+
+    final CoordinateSystem cs = CoordinateSystem.CARTESIAN;
 
     static double nextDouble(Random r, double least, double bound) {
         return r.nextDouble() * (bound - least) + least;
@@ -76,6 +86,8 @@ public abstract class Area implements Element {
         throw new UnsupportedOperationException();
     }
 
+    public abstract boolean contains(Position position);
+
     public abstract boolean intersects(Area other);
 
     @Override
@@ -100,5 +112,50 @@ public abstract class Area implements Element {
 
     public Area unionWith(Area other) {
         throw new UnsupportedOperationException();
+    }
+
+    public final MessageSerializable areaWriter() {
+        return new Writer();
+    }
+
+
+    public static Area createUnion(Area... areas) {
+        Area[] a = areas.clone();
+        return new AreaUnion(a);
+    }
+
+
+    class Writer implements MessageSerializable {
+
+        /** {@inheritDoc} */
+        @Override
+        public void writeTo(MessageWriter w) throws IOException {
+            Area a = Area.this;
+            if (a instanceof Circle) {
+                w.writeMessage(1, "circle", a);
+            } else if (a instanceof BoundingBox) {
+
+            } else if (a instanceof Polygon) {
+
+            } else {
+                w.writeMessage(4, "areas", a);
+            }
+        }
+    }
+
+    public static Area readFrom(MessageReader r) throws IOException {
+        // Circle = 1;
+        // Box = 2;
+        // Polygon = 3;
+        // Union = 4;
+        if (r.isNext(1, "circle")) {
+            return r.readMessage(1, "circle", Circle.PARSER);
+        } else if (r.isNext(2, "box")) {
+            return r.readMessage(2, "box", BoundingBox.PARSER);
+        } else if (r.isNext(3, "polygon")) {
+            return r.readMessage(3, "polygon", BoundingBox.PARSER);
+        } else {
+            return r.readMessage(4, "areas", AreaUnion.PARSER);
+        }
     }
 }

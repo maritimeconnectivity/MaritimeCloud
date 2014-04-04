@@ -25,7 +25,7 @@ import net.maritimecloud.internal.net.messages.s2c.ServerRequestMessage;
 import net.maritimecloud.util.geometry.Area;
 
 /**
- *
+ * 
  * @author Kasper Nielsen
  */
 public class BroadcastListen extends ServerRequestMessage<BroadcastListenAck> {
@@ -34,6 +34,9 @@ public class BroadcastListen extends ServerRequestMessage<BroadcastListenAck> {
 
     final String channel;
 
+    /**
+     * @param messageType
+     */
     public BroadcastListen(String channel, Area area) {
         super(MessageType.BROADCAST_LISTEN);
         this.channel = requireNonNull(channel);

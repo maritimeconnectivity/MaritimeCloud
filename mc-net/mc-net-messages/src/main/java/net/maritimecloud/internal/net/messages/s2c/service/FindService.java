@@ -24,7 +24,7 @@ import net.maritimecloud.internal.net.messages.TextMessageWriter;
 import net.maritimecloud.internal.net.messages.s2c.ServerRequestMessage;
 
 /**
- *
+ * 
  * @author Kasper Nielsen
  */
 public class FindService extends ServerRequestMessage<FindServiceResult> {
@@ -49,6 +49,9 @@ public class FindService extends ServerRequestMessage<FindServiceResult> {
         this.max = pr.takeInt();
     }
 
+    /**
+     * @param messageType
+     */
     public FindService(String serviceName, int meters, int max) {
         super(MessageType.FIND_SERVICE);
         this.serviceName = requireNonNull(serviceName);

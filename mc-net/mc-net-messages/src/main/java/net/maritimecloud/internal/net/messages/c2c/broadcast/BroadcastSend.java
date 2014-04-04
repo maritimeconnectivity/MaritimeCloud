@@ -26,7 +26,7 @@ import net.maritimecloud.internal.net.messages.TextMessageWriter;
 import net.maritimecloud.internal.net.messages.s2c.ServerRequestMessage;
 import net.maritimecloud.internal.net.util.RelativeCircularArea;
 import net.maritimecloud.net.broadcast.BroadcastMessage;
-import net.maritimecloud.net.broadcast.BroadcastOptions;
+import net.maritimecloud.net.broadcast.BroadcastSendOptions;
 import net.maritimecloud.util.geometry.Area;
 import net.maritimecloud.util.geometry.PositionTime;
 
@@ -35,7 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * This message is send from the client to server. Unlike {@link BroadcastDeliver} which is the relay message from the
  * server to the clients that need to receive the broadcast.
- *
+ * 
  * @author Kasper Nielsen
  */
 public class BroadcastSend extends ServerRequestMessage<BroadcastSendAck> implements PositionTimeMessage {
@@ -59,6 +59,9 @@ public class BroadcastSend extends ServerRequestMessage<BroadcastSendAck> implem
         return receiverAck;
     }
 
+    /**
+     * @param messageType
+     */
     public BroadcastSend(MaritimeId id, PositionTime position, String channel, String message, Area area,
             boolean receiverAck) {
         super(MessageType.BROADCAST_SEND);
@@ -70,6 +73,10 @@ public class BroadcastSend extends ServerRequestMessage<BroadcastSendAck> implem
         this.receiverAck = receiverAck;
     }
 
+    /**
+     * @param messageType
+     * @throws IOException
+     */
     public BroadcastSend(TextMessageReader pr) throws IOException {
         super(MessageType.BROADCAST_SEND, pr);
         this.id = requireNonNull(MaritimeId.create(pr.takeString()));
@@ -149,7 +156,7 @@ public class BroadcastSend extends ServerRequestMessage<BroadcastSendAck> implem
     }
 
     public static BroadcastSend create(MaritimeId sender, PositionTime position, BroadcastMessage message,
-            BroadcastOptions options) {
+            BroadcastSendOptions options) {
         Area broadcastArea = options.getBroadcastArea();
         if (broadcastArea == null) {
             broadcastArea = new RelativeCircularArea(options.getBroadcastRadius());

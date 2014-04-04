@@ -1,0 +1,5 @@
+enum SameId {
+  Foo = 1;
+  Voo = 2;
+  Voo = 2;
+}

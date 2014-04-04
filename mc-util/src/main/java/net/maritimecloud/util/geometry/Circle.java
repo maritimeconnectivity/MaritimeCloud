@@ -16,13 +16,27 @@ package net.maritimecloud.util.geometry;
 
 import static java.util.Objects.requireNonNull;
 
+import java.io.IOException;
 import java.util.Random;
+
+import net.maritimecloud.core.message.MessageParser;
+import net.maritimecloud.core.message.MessageReader;
+import net.maritimecloud.core.message.MessageWriter;
 
 /**
  * A circle
  * 
  */
 public class Circle extends Area {
+
+    public static final MessageParser<Circle> PARSER = new MessageParser<Circle>() {
+
+        /** {@inheritDoc} */
+        @Override
+        public Circle parse(MessageReader reader) throws IOException {
+            return readCircleFrom(reader);
+        }
+    };
 
     /** serialVersionUID. */
     private static final long serialVersionUID = 1L;
@@ -33,22 +47,36 @@ public class Circle extends Area {
     /** The radius of the circle. */
     private final double radius;
 
-    public Circle(double latitude, double longitude, double radius, CoordinateSystem cs) {
-        this(Position.create(latitude, longitude), radius, cs);
-    }
-
-    public Circle(Position center, double radius, CoordinateSystem cs) {
-        super(cs);
+    private Circle(Position center, double radius) {
         this.center = requireNonNull(center, "center is null");
-
-        // circles with no radius??
-        // check radious nan, we could use the radius of the earth
         if (radius <= 0) {
             throw new IllegalArgumentException("Radius must be positive, was " + radius);
         }
         this.radius = radius;
     }
 
+    /**
+     * Creates a new circle with the specified center and radius.
+     * 
+     * @param center
+     *            the center of the circle
+     * @param radius
+     *            the radius in meters of the circle
+     * @return the new circle
+     * @throws NullPointerException
+     *             if the specified center is null
+     * @throws IllegalArgumentException
+     *             if the specified is not a positive number
+     */
+    public static Circle create(Position center, double radius) {
+        return new Circle(center, radius);
+    }
+
+    public static Circle create(double latitude, double longitude, double radius) {
+        return new Circle(Position.create(latitude, longitude), radius);
+    }
+
+    /** {@inheritDoc} */
     @Override
     public boolean contains(Element element) {
         if (element instanceof Position) {
@@ -63,6 +91,12 @@ public class Circle extends Area {
         return super.contains(element);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public boolean contains(Position position) {
+        return center.distanceTo(position, cs) <= radius;
+    }
+
     public boolean equals(Circle other) {
         return other == this || other != null && center.equals(other.center) && radius == other.radius;
     }
@@ -75,12 +109,25 @@ public class Circle extends Area {
         return other instanceof Circle && equals((Circle) other);
     }
 
+    /** {@inheritDoc} */
     @Override
     public double geodesicDistanceTo(Element other) {
         if (other instanceof Position) {
             return Math.max(0, center.geodesicDistanceTo(other) - radius);
         }
         return super.geodesicDistanceTo(other);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public BoundingBox getBoundingBox() {
+        double right = cs.pointOnBearing(center, radius, 0).latitude;
+        double left = cs.pointOnBearing(center, radius, 180).latitude;
+        double top = cs.pointOnBearing(center, radius, 90).longitude;
+        double buttom = cs.pointOnBearing(center, radius, 270).longitude;
+        Position topLeft = Position.create(left, top);
+        Position buttomRight = Position.create(right, buttom);
+        return BoundingBox.create(topLeft, buttomRight, cs);
     }
 
     /**
@@ -103,42 +150,6 @@ public class Circle extends Area {
 
     /** {@inheritDoc} */
     @Override
-    public int hashCode() {
-        return center.hashCode() ^ new Double(radius).hashCode();
-    }
-
-    @Override
-    public double rhumbLineDistanceTo(Element other) {
-        if (other instanceof Position) {
-            return Math.max(0, center.rhumbLineDistanceTo(other) - radius);
-        }
-        return super.rhumbLineDistanceTo(other);
-    }
-
-    /**
-     * Returns a new circle with the same radius as this circle but with the new position as the center
-     * 
-     * @param center
-     *            the new center of the circle
-     * @return a new circle
-     */
-    public Circle withCenter(Position center) {
-        return new Circle(center, radius, cs);
-    }
-
-    /**
-     * Returns a new circle with the same center as this circle but with the new radius.
-     * 
-     * @param radius
-     *            the new radius of the circle
-     * @return a new circle
-     */
-    public Circle withRadius(double radius) {
-        return new Circle(center, radius, cs);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public Position getRandomPosition(Random r) {
         BoundingBox bb = getBoundingBox();
         for (int i = 0; i < 10000; i++) {
@@ -152,14 +163,8 @@ public class Circle extends Area {
 
     /** {@inheritDoc} */
     @Override
-    public BoundingBox getBoundingBox() {
-        double right = cs.pointOnBearing(center, radius, 0).latitude;
-        double left = cs.pointOnBearing(center, radius, 180).latitude;
-        double top = cs.pointOnBearing(center, radius, 90).longitude;
-        double buttom = cs.pointOnBearing(center, radius, 270).longitude;
-        Position topLeft = Position.create(left, top);
-        Position buttomRight = Position.create(right, buttom);
-        return BoundingBox.create(topLeft, buttomRight, cs);
+    public int hashCode() {
+        return center.hashCode() ^ new Double(radius).hashCode();
     }
 
     /** {@inheritDoc} */
@@ -176,6 +181,11 @@ public class Circle extends Area {
 
     public boolean intersects(BoundingBox other) {
         return other.intersects(this);
+    }
+
+    public boolean intersects(Circle other) {
+        double centerDistance = getCoordinateSystem().distanceBetween(center, other.center);
+        return radius + other.radius >= centerDistance;
     }
 
     public boolean intersects(Line line) {
@@ -199,8 +209,51 @@ public class Circle extends Area {
         return disc >= 0;
     }
 
-    public boolean intersects(Circle other) {
-        double centerDistance = getCoordinateSystem().distanceBetween(center, other.center);
-        return radius + other.radius >= centerDistance;
+    @Override
+    public double rhumbLineDistanceTo(Element other) {
+        if (other instanceof Position) {
+            return Math.max(0, center.rhumbLineDistanceTo(other) - radius);
+        }
+        return super.rhumbLineDistanceTo(other);
+    }
+
+    /**
+     * Returns a new circle with the same radius as this circle but with the new position as the center
+     * 
+     * @param center
+     *            the new center of the circle
+     * @return a new circle
+     */
+    public Circle withCenter(Position center) {
+        return new Circle(center, radius);
+    }
+
+    /**
+     * Returns a new circle with the same center as this circle but with the new radius.
+     * 
+     * @param radius
+     *            the new radius of the circle
+     * @return a new circle
+     */
+    public Circle withRadius(double radius) {
+        return new Circle(center, radius);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void writeTo(MessageWriter w) throws IOException {
+        center.writeToPacked(w, 1, "center-latitude", 2, "center-longitude");
+
+        w.writeFloat(2, "radius", (float) radius);
+    }
+
+    public String toString() {
+        return "Circle: center = " + center + ", radius = " + radius;
+    }
+
+    static Circle readCircleFrom(MessageReader r) throws IOException {
+        Position center = Position.readFromPacked(r, 1, "center-latitude", 2, "center-longitude");
+        float radius = r.readRequiredFloat(2, "radius");
+        return new Circle(center, radius);
     }
 }

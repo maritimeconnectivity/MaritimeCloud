@@ -25,7 +25,7 @@ import net.maritimecloud.internal.net.messages.TextMessageWriter;
 import net.maritimecloud.internal.net.messages.TransportMessage;
 
 /**
- *
+ * 
  * @author Kasper Nielsen
  */
 public class HelloMessage extends TransportMessage {
@@ -50,6 +50,9 @@ public class HelloMessage extends TransportMessage {
         return lastReceivedMessageId;
     }
 
+    /**
+     * @param messageType
+     */
     public HelloMessage(MaritimeId clientId, String clientInfo, String reconnectId, long lastReceivedMessageId,
             double lat, double lon) {
         super(MessageType.HELLO);

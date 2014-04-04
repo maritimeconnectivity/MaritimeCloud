@@ -6,4 +6,6 @@ target
 .project
 .classpath
 /_old
+mc-msdl/*.msdl
+mc-msdl/generated
 private

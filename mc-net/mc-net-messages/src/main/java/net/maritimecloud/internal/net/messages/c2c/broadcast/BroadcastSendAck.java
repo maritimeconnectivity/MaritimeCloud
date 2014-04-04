@@ -21,11 +21,15 @@ import net.maritimecloud.internal.net.messages.TextMessageReader;
 import net.maritimecloud.internal.net.messages.s2c.ServerResponseMessage;
 
 /**
- *
+ * 
  * @author Kasper Nielsen
  */
 public class BroadcastSendAck extends ServerResponseMessage {
 
+    /**
+     * @param messageType
+     * @throws IOException
+     */
     public BroadcastSendAck(TextMessageReader pr) throws IOException {
         super(MessageType.BROADCAST_SEND_ACK, pr);
     }

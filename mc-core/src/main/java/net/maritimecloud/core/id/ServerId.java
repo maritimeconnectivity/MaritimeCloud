@@ -16,7 +16,7 @@ package net.maritimecloud.core.id;
 
 
 /**
- *
+ * 
  * @author Kasper Nielsen
  */
 public class ServerId extends MaritimeId {
@@ -26,11 +26,17 @@ public class ServerId extends MaritimeId {
 
     private final int id;
 
+    /**
+     * @param scheme
+     */
     public ServerId(int id) {
         super("server");
         this.id = id;
     }
 
+    /**
+     * @param takeString
+     */
     public ServerId(String takeString) {
         this(4321);
     }

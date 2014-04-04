@@ -24,5 +24,4 @@ public interface ServiceInvocationFuture<T> extends ConnectionFuture<T> {
 
     ConnectionFuture<Object> receivedByCloud();
 
-    // ConnectionFuture<Object> receivedByClient();
 }

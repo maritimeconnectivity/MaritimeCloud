@@ -14,27 +14,31 @@
  */
 package net.maritimecloud.internal.net.util;
 
+import java.io.IOException;
 import java.util.Random;
 
+import net.maritimecloud.core.message.MessageWriter;
 import net.maritimecloud.util.geometry.Area;
 import net.maritimecloud.util.geometry.BoundingBox;
-import net.maritimecloud.util.geometry.CoordinateSystem;
 import net.maritimecloud.util.geometry.Position;
 
 /**
  * A "fake" relative area.
- *
+ * 
  * @author Kasper Nielsen
  */
 public class RelativeCircularArea extends Area {
+
     /** serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
     /** The radius. */
     private final double radius;
 
+    /**
+     * @param cs
+     */
     public RelativeCircularArea(double radius) {
-        super(CoordinateSystem.CARTESIAN);
         this.radius = radius;
 
     }
@@ -62,6 +66,16 @@ public class RelativeCircularArea extends Area {
     @Override
     public boolean intersects(Area other) {
         throw new UnsupportedOperationException();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void writeTo(MessageWriter w) throws IOException {}
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean contains(Position position) {
+        return false;
     }
 
 }

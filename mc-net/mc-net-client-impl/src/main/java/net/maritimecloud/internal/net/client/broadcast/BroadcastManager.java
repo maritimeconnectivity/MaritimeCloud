@@ -37,7 +37,7 @@ import net.maritimecloud.net.broadcast.BroadcastFuture;
 import net.maritimecloud.net.broadcast.BroadcastListener;
 import net.maritimecloud.net.broadcast.BroadcastMessage;
 import net.maritimecloud.net.broadcast.BroadcastMessageHeader;
-import net.maritimecloud.net.broadcast.BroadcastOptions;
+import net.maritimecloud.net.broadcast.BroadcastSendOptions;
 import net.maritimecloud.net.broadcast.BroadcastSubscription;
 import net.maritimecloud.util.function.BiConsumer;
 import net.maritimecloud.util.geometry.Area;
@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Manages sending and receiving of broadcasts.
- *
+ * 
  * @author Kasper Nielsen
  */
 public class BroadcastManager {
@@ -75,6 +75,12 @@ public class BroadcastManager {
     /** Thread manager takes care of asynchronous processing. */
     private final ThreadManager threadManager;
 
+    /**
+     * Creates a new instance of this class.
+     * 
+     * @param network
+     *            the network
+     */
     public BroadcastManager(PositionManager positionManager, ThreadManager threadManager, ClientContainer client,
             ConnectionMessageBus connection) {
         this.connection = requireNonNull(connection);
@@ -85,7 +91,7 @@ public class BroadcastManager {
 
     /**
      * Sets up listeners for incoming broadcast messages.
-     *
+     * 
      * @param messageType
      *            the type of message to receive
      * @param listener
@@ -120,7 +126,7 @@ public class BroadcastManager {
 
     /**
      * Invoked whenever a broadcast message is received from a remote actor.
-     *
+     * 
      * @param broadcast
      *            the broadcast that was received
      */
@@ -152,7 +158,7 @@ public class BroadcastManager {
         }
     }
 
-    public BroadcastFuture sendBroadcastMessage(BroadcastMessage broadcast, BroadcastOptions options) {
+    public BroadcastFuture sendBroadcastMessage(BroadcastMessage broadcast, BroadcastSendOptions options) {
         requireNonNull(broadcast, "broadcast is null");
         requireNonNull(options, "options is null");
         options = options.immutable(); // we make the options immutable just in case

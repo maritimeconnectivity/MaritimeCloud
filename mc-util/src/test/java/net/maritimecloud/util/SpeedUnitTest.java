@@ -15,6 +15,7 @@
 package net.maritimecloud.util;
 
 import static org.junit.Assert.assertEquals;
+import net.maritimecloud.util.units.SpeedUnit;
 
 import org.junit.Test;
 

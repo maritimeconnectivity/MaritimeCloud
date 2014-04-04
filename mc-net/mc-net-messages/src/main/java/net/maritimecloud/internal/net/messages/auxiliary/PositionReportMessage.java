@@ -26,7 +26,7 @@ import net.maritimecloud.internal.net.messages.TextMessageWriter;
 import net.maritimecloud.util.geometry.PositionTime;
 
 /**
- *
+ * 
  * @author Kasper Nielsen
  */
 // Not sure this needs to be a connection message
@@ -34,6 +34,9 @@ public class PositionReportMessage extends ConnectionMessage implements Position
 
     private final PositionTime positionTime;
 
+    /**
+     * @param messageType
+     */
     public PositionReportMessage(double lat, double lon, long time) {
         this(PositionTime.create(lat, lon, time));
     }

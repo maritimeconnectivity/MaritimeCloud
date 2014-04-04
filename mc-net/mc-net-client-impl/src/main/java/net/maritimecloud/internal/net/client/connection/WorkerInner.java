@@ -119,6 +119,7 @@ public class WorkerInner {
             if (m == null || m.id > latestAck) {
                 return;
             }
+            System.out.println("ACKED " + m.cm.getClass() + " " + m.uuid);
             m.acked().complete(null);
             written.poll();
         }

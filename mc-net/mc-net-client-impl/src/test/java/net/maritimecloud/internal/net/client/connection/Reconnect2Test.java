@@ -86,7 +86,7 @@ public class Reconnect2Test extends AbstractClientConnectionTest {
 
         final CountDownLatch cdl = new CountDownLatch(1);
         c.broadcastListen(HelloWorld.class, new BroadcastListener<HelloWorld>() {
-            public void onMessage(BroadcastMessageHeader header, HelloWorld broadcast) {
+            public void onMessage(HelloWorld broadcast, BroadcastMessageHeader header) {
                 cdl.countDown();
             }
         });
@@ -135,7 +135,7 @@ public class Reconnect2Test extends AbstractClientConnectionTest {
 
         final CountDownLatch cdl = new CountDownLatch(1);
         c.broadcastListen(HelloWorld.class, new BroadcastListener<HelloWorld>() {
-            public void onMessage(BroadcastMessageHeader header, HelloWorld broadcast) {
+            public void onMessage(HelloWorld broadcast, BroadcastMessageHeader header) {
                 cdl.countDown();
             }
         });

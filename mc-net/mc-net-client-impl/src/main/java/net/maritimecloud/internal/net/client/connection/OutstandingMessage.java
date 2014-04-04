@@ -14,6 +14,8 @@
  */
 package net.maritimecloud.internal.net.client.connection;
 
+import java.util.UUID;
+
 import jsr166e.CompletableFuture;
 import net.maritimecloud.internal.net.messages.ConnectionMessage;
 
@@ -30,6 +32,8 @@ public class OutstandingMessage {
     final ConnectionMessage cm;
 
     long id;
+
+    public final UUID uuid = UUID.randomUUID();
 
     OutstandingMessage(ConnectionMessage cm) {
         this.cm = cm;

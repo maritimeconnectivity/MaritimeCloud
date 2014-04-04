@@ -14,7 +14,8 @@
    See the License for the specific language governing permissions and 
    limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -26,4 +27,28 @@
 
   <artifactId>mc-util</artifactId>
   <name>MaritimeCloud Util</name>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>net.maritimecloud</groupId>
+        <artifactId>mc-msdl-compiler-maven-plugin</artifactId>
+        <version>0.2-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mc-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>
