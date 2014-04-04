@@ -14,16 +14,14 @@
  */
 package net.maritimecloud.internal.message.util;
 
-import com.google.common.collect.AbstractIterator;
 
 /**
  *
  * @author Kasper Nielsen
  */
-public class InfList2 extends AbstractIterator<Object> {
+public class InfList2 {
 
     /** {@inheritDoc} */
-    @Override
     protected Object computeNext() {
         return null;
     }
