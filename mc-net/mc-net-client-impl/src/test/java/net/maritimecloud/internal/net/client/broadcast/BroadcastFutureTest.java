@@ -30,7 +30,7 @@ import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSendAck;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.broadcast.BroadcastFuture;
 import net.maritimecloud.net.broadcast.BroadcastMessage;
-import net.maritimecloud.net.broadcast.BroadcastMessage.Ack;
+import net.maritimecloud.net.broadcast.BroadcastMessageAck;
 import net.maritimecloud.net.broadcast.BroadcastSendOptions;
 import net.maritimecloud.util.function.Consumer;
 import net.maritimecloud.util.geometry.PositionTime;
@@ -40,7 +40,7 @@ import org.junit.Test;
 /**
  * Tests the future returned by {@link MaritimeCloudClient#broadcast(BroadcastMessage)} and
  * {@link MaritimeCloudClient#broadcast(BroadcastMessage, BroadcastSendOptions)}.
- * 
+ *
  * @author Kasper Nielsen
  */
 public class BroadcastFutureTest extends AbstractClientConnectionTest {
@@ -83,12 +83,12 @@ public class BroadcastFutureTest extends AbstractClientConnectionTest {
         // make sure it is received on the server
         bf.receivedOnServer().get(1, TimeUnit.SECONDS);
 
-        final BlockingQueue<BroadcastMessage.Ack> q = new LinkedBlockingQueue<>();
+        final BlockingQueue<BroadcastMessageAck> q = new LinkedBlockingQueue<>();
         BroadcastAck ba = new BroadcastAck(mb.getReplyTo(), ID3, PositionTime.create(3, 3, 3));
         t.send(ba);
 
-        bf.onAck(new Consumer<BroadcastMessage.Ack>() {
-            public void accept(Ack t) {
+        bf.onAck(new Consumer<BroadcastMessageAck>() {
+            public void accept(BroadcastMessageAck t) {
                 q.add(t);
             }
         });
@@ -96,11 +96,11 @@ public class BroadcastFutureTest extends AbstractClientConnectionTest {
         ba = new BroadcastAck(mb.getReplyTo(), ID4, PositionTime.create(4, 4, 4));
         t.send(ba);
 
-        Ack a3 = q.poll(1, TimeUnit.SECONDS);
+        BroadcastMessageAck a3 = q.poll(1, TimeUnit.SECONDS);
         assertEquals(ID3, a3.getId());
         assertEquals(PositionTime.create(3, 3, 3), a3.getPosition());
 
-        Ack a4 = q.poll(1, TimeUnit.SECONDS);
+        BroadcastMessageAck a4 = q.poll(1, TimeUnit.SECONDS);
         assertEquals(ID4, a4.getId());
         assertEquals(PositionTime.create(4, 4, 4), a4.getPosition());
 

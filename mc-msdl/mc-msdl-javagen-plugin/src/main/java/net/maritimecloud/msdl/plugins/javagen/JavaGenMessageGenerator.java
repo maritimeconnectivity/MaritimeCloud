@@ -21,6 +21,7 @@ import java.util.Objects;
 
 import net.maritimecloud.core.message.Message;
 import net.maritimecloud.core.message.MessageParser;
+import net.maritimecloud.core.message.MessageSerializers;
 import net.maritimecloud.core.message.MessageWriter;
 import net.maritimecloud.internal.util.Hashing;
 import net.maritimecloud.msdl.model.BaseMessage;
@@ -74,6 +75,7 @@ public class JavaGenMessageGenerator {
         generateEquals();
         generateWriteTo();
         generateAccessors();
+        generateTo();
         new JavaGenMessageParserGenerator(this).generateParser();
         new JavaGenMessageImmutableGenerator(this).generate();
         return this;
@@ -136,6 +138,13 @@ public class JavaGenMessageGenerator {
             c.addImport(Hashing.class);
             return "Hashing.hashcode(this." + f.getName() + ")";
         }
+    }
+
+    void generateTo() {
+        c.addImport(MessageSerializers.class);
+        CodegenMethod m = c.newMethod("public String toJSON()");
+        m.addJavadoc("Returns a JSON representation of this message");
+        m.add("return ", MessageSerializers.class, ".writeToJSON(this);");
     }
 
     void generateEquals() {

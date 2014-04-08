@@ -37,7 +37,7 @@ public class MessageSerializers {
      * created by {@link MessageSerializers#newJSONReader(CharSequence)}. The writer created by this method will not
      * include starting (<code>{</code>) and ending (<code>}</code>) tags. This tags are not added to allow for easier
      * embedding of fragments of JSON.
-     * 
+     *
      * @param ps
      *            the print stream to write to
      * @return a message writer that will write to the given print stream
@@ -49,7 +49,7 @@ public class MessageSerializers {
     /**
      * Creates a message writer that can serialize messages as JSON. The serialized message can be read by a reader
      * created by {@link MessageReader#createJSONReader(CharSequence)}.
-     * 
+     *
      * @param ps
      *            the writer to write to
      * @return a message writer that will write to the given print stream
@@ -57,6 +57,27 @@ public class MessageSerializers {
     public static MessageWriter newJSONFragmentWriter(Writer w) {
         PrintWriter pw = w instanceof PrintWriter ? (PrintWriter) w : new PrintWriter(w);
         return new JSONMessageWriter(pw);
+    }
+
+    public static String writeToJSON(MessageSerializable message) {
+        StringWriter sw = new StringWriter();
+        try {
+            writeToJSON(message, sw);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to write message as JSON", e);
+        }
+        return sw.toString();
+    }
+
+    public static void writeToJSON(MessageSerializable message, Writer w) throws IOException {
+        PrintWriter pw = w instanceof PrintWriter ? (PrintWriter) w : new PrintWriter(w);
+        try (JSONMessageWriter jw = new JSONMessageWriter(pw)) {
+            jw.writeMessage(message);
+        }
+    }
+
+    public static <T> T readFromJSON(CharSequence cs, MessageParser<T> parser) {
+        return null;
     }
 
     public static MessageReader newJSONReader(CharSequence cs, boolean readStartStopTags) {
@@ -68,7 +89,7 @@ public class MessageSerializers {
 
     /**
      * Returns a JSON string from the specified message serializable.
-     * 
+     *
      * @param rootName
      * @param serializable
      * @return

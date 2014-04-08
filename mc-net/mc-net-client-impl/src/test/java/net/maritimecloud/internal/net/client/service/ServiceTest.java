@@ -26,7 +26,7 @@ import net.maritimecloud.internal.net.messages.c2c.service.InvokeService;
 import net.maritimecloud.internal.net.messages.c2c.service.InvokeServiceResult;
 import net.maritimecloud.internal.net.messages.s2c.service.FindService;
 import net.maritimecloud.internal.net.messages.s2c.service.RegisterService;
-import net.maritimecloud.net.ConnectionFuture;
+import net.maritimecloud.net.NetworkFuture;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.service.ServiceEndpoint;
 import net.maritimecloud.net.service.ServiceInvocationFuture;
@@ -68,7 +68,7 @@ public class ServiceTest extends AbstractClientConnectionTest {
     @Test
     public void locate() throws Exception {
         MaritimeCloudClient c = createAndConnect();
-        ConnectionFuture<ServiceEndpoint<GetName, Reply>> locator = c.serviceLocate(HelloService.GET_NAME).nearest();
+        NetworkFuture<ServiceEndpoint<GetName, Reply>> locator = c.serviceLocate(HelloService.GET_NAME).nearest();
 
         FindService rs = t.take(FindService.class);
         assertEquals(HelloService.GET_NAME.getName(), rs.getServiceName());

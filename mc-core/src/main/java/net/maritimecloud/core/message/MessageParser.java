@@ -54,11 +54,26 @@ public abstract class MessageParser<T> {
      */
     public abstract T parse(MessageReader reader) throws IOException;
 
+    @SuppressWarnings("unused")
+    public T parseElement() throws IOException {
+        return null;
+    }
+
+    // TODO hvorfor skal de vaere statiske
     public static <E> MessageParser<Set<E>> ofSet(MessageParser<E> elementParser) {
         return null;
     }
 
+    public MessageParser<List<T>> ofList() {
+        return null;
+    }
+
+
     public static <E> MessageParser<List<E>> ofList(MessageParser<E> elementParser) {
+        return null;
+    }
+
+    public <V> MessageParser<Map<T, V>> ofMap(MessageParser<V> valueParser) {
         return null;
     }
 

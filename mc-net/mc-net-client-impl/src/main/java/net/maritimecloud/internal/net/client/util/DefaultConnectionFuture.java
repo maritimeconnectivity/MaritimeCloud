@@ -24,7 +24,7 @@ import java.util.concurrent.TimeoutException;
 
 import jsr166e.CompletableFuture;
 import jsr166e.CompletableFuture.BiFun;
-import net.maritimecloud.net.ConnectionFuture;
+import net.maritimecloud.net.NetworkFuture;
 import net.maritimecloud.util.function.BiConsumer;
 
 /**
@@ -32,7 +32,7 @@ import net.maritimecloud.util.function.BiConsumer;
  * 
  * @author Kasper Nielsen
  */
-public class DefaultConnectionFuture<T> implements ConnectionFuture<T> {
+public class DefaultConnectionFuture<T> implements NetworkFuture<T> {
     final CompletableFuture<T> delegate;
 
     final String requestId;

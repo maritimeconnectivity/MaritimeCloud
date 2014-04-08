@@ -21,15 +21,12 @@ import java.lang.reflect.Modifier;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.maritimecloud.core.id.MaritimeId;
-import net.maritimecloud.util.geometry.PositionTime;
-
 /**
  * Abstract class for a message that can be broadcast.
  * <p>
  * Any implementation of this message must contain a <tt>public static final String CHANNEL = "name"</tt> field.
  * Initialized to a unique channel that the broadcast is send via.
- * 
+ *
  * @author Kasper Nielsen
  */
 public abstract class BroadcastMessage {
@@ -38,7 +35,7 @@ public abstract class BroadcastMessage {
 
     /**
      * Returns the broadcast channel on which the broadcast is sent. Defaults (for now) to the name of the class.
-     * 
+     *
      * @return the broadcast channel on which the message should be sent
      */
     public final String channel() {
@@ -49,7 +46,7 @@ public abstract class BroadcastMessage {
 
     /**
      * Finds the broadcast message for the specified channel.
-     * 
+     *
      * @param channel
      *            the name of the channel
      * @return the corresponding to the specified channel
@@ -94,24 +91,5 @@ public abstract class BroadcastMessage {
         } catch (IllegalAccessException e) {
             throw new Error("oops, should never happen since the field is public", e);
         }
-    }
-
-
-    /** An acknowledgment that can be send every time a broadcast is received by an actor. */
-    public interface Ack {
-
-        /**
-         * Returns the id of the actor that received the broadcast.
-         * 
-         * @return the id of the actor that received the broadcast
-         */
-        MaritimeId getId();
-
-        /**
-         * Returns the position and time when the actor received the message.
-         * 
-         * @return the position and time when the actor received the message
-         */
-        PositionTime getPosition();
     }
 }

@@ -16,11 +16,10 @@ package net.maritimecloud.net.broadcast;
 
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.MaritimeCloudClientConfiguration;
-import net.maritimecloud.net.broadcast.BroadcastMessage.Ack;
 import net.maritimecloud.util.function.Consumer;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class Main {
@@ -37,8 +36,8 @@ public class Main {
         BroadcastFuture f = cc.broadcast(null, options);
 
 
-        f.onAck(new Consumer<Ack>() {
-            public void accept(Ack t) {
+        f.onAck(new Consumer<BroadcastMessageAck>() {
+            public void accept(BroadcastMessageAck t) {
                 System.out.println("Received by " + t.getId());
             }
         });

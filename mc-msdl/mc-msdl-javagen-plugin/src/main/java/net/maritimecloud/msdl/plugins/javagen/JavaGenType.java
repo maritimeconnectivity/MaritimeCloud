@@ -28,7 +28,7 @@ import net.maritimecloud.msdl.model.type.ListOrSetType;
 import net.maritimecloud.msdl.model.type.MSDLBaseType;
 import net.maritimecloud.msdl.model.type.MapType;
 import net.maritimecloud.msdl.parser.antlr.StringUtil;
-import net.maritimecloud.msdl.plugin.generator.java.annotation.JavaImplementation;
+import net.maritimecloud.msdl.plugins.javagen.annotation.JavaImplementation;
 import net.maritimecloud.util.Binary;
 
 import org.cakeframework.internal.codegen.AbstractCodegenEntity;

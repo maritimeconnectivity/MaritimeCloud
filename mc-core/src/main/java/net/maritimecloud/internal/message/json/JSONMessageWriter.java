@@ -27,6 +27,7 @@ import java.util.Set;
 import net.maritimecloud.core.message.MessageEnum;
 import net.maritimecloud.core.message.MessageSerializable;
 import net.maritimecloud.core.message.MessageWriter;
+import net.maritimecloud.util.Binary;
 
 /**
  *
@@ -37,14 +38,20 @@ public class JSONMessageWriter extends MessageWriter {
     /** The Unix line separator. */
     static final String LS = "\n";
 
+    /** The current number of indents. */
     private int indent;
 
-    boolean isFirst = true;
-
+    /** The print writer to write to */
     private final PrintWriter pw;
 
     public JSONMessageWriter(PrintWriter pw) {
         this.pw = requireNonNull(pw);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void close() throws IOException {
+        pw.close();
     }
 
     /** {@inheritDoc} */
@@ -68,50 +75,6 @@ public class JSONMessageWriter extends MessageWriter {
         }
     }
 
-    private void write(int tag, String name, Collection<?> list) throws IOException {
-        indent();
-        pw.print("\"" + name + "\": [");
-        pw.println();
-        indent++;
-        boolean isFirst = true;
-        for (Object o : list) {
-            if (!isFirst) {
-                pw.println(",");
-            }
-            if (o instanceof MessageSerializable) {
-                indent();
-                pw.append("{");
-                pw.println();
-                indent++;
-                this.isFirst = true;
-                ((MessageSerializable) o).writeTo(this);
-                indent--;
-                pw.println();
-                indent();
-                pw.append("}");
-            }
-            isFirst = false;
-        }
-        pw.println();
-        indent--;
-        indent();
-        pw.append("]");
-    }
-
-
-    private void write(int tag, String name, Object value) {
-        if (!isFirst) {
-            pw.println(",");
-        }
-        indent();
-        if (value instanceof String) {
-            pw.print("\"" + name + "\": \"" + value + "\"");
-        } else {
-            pw.print("\"" + name + "\": " + value);
-        }
-        isFirst = false;
-    }
-
     /** {@inheritDoc} */
     @Override
     public void writeBinary(int tag, String name, byte[] bytes, int offset, int length) throws IOException {
@@ -119,40 +82,136 @@ public class JSONMessageWriter extends MessageWriter {
         writeString(tag, name, SimpleBase64.encode(b));
     }
 
+    void writeBool(boolean value) {
+        pw.write(Boolean.toString(value));
+    }
+
     /** {@inheritDoc} */
     @Override
     public void writeBool(int tag, String name, boolean value) throws IOException {
-        write(tag, name, value);
+        writeTag(tag, name);
+        writeBool(value);
+    }
+
+    void writeDouble(double value) throws IOException {
+        if (!Double.isFinite(value)) {
+            throw new IOException("Cannot write double value " + value);
+        }
+        pw.write(Double.toString(value));
     }
 
     /** {@inheritDoc} */
     @Override
     public void writeDouble(int tag, String name, double value) throws IOException {
-        write(tag, name, value);
+        writeTag(tag, name);
+        writeDouble(value);
+    }
+
+    void writeElement(Object value) throws IOException {
+        if (value instanceof MessageSerializable) {
+            MessageSerializable message = (MessageSerializable) value;
+            pw.println("{");
+            indent++;
+            message.writeTo(this);
+            indent--;
+            pw.println();
+            indent();
+            pw.println("}");
+        } else if (value instanceof List || value instanceof Set) {
+            writeListOrSet((Collection<?>) value);
+        } else if (value instanceof MessageEnum) {
+            MessageEnum e = (MessageEnum) value;
+            pw.print("\"" + e.getName() + "\"");
+        } else if (value instanceof String) {
+            writeString((String) value);
+        } else if (value instanceof Binary) {
+            byte[] b = ((Binary) value).toByteArray();
+            pw.print("\"" + SimpleBase64.encode(b) + "\"");
+        } else if (value instanceof Long) {
+            writeInt64((Long) value);
+        } else if (value instanceof Integer) {
+            writeInt32((Integer) value);
+        } else if (value instanceof Double) {
+            writeDouble((Double) value);
+        } else if (value instanceof Float) {
+            writeFloat((Float) value);
+        } else if (value instanceof Boolean) {
+            writeBool((Boolean) value);
+        } else {
+            throw new IOException("Don't know how to write instances of " + value.getClass());
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public void writeEnum(int tag, String name, MessageEnum enumValue) throws IOException {
-        write(tag, name, enumValue.getName());
+        writeString(tag, name, enumValue.getName());
+    }
+
+    void writeFloat(float value) throws IOException {
+        if (!Float.isFinite(value)) {
+            throw new IOException("Cannot write float value " + value);
+        }
+        pw.write(Float.toString(value));
     }
 
     /** {@inheritDoc} */
     @Override
     public void writeFloat(int tag, String name, float value) throws IOException {
-        write(tag, name, value);
+        writeTag(tag, name);
+        writeFloat(value);
+    }
+
+    void writeInt32(int value) {
+        pw.write(Integer.toString(value));
     }
 
     /** {@inheritDoc} */
     @Override
     public void writeInt32(int tag, String name, int value) throws IOException {
-        write(tag, name, value);
+        writeTag(tag, name);
+        writeInt32(value);
     }
 
     /** {@inheritDoc} */
     @Override
     public void writeInt64(int tag, String name, long value) throws IOException {
-        write(tag, name, value);
+        writeTag(tag, name);
+        writeInt64(value);
+    }
+
+    void writeInt64(long value) {
+        pw.write(Long.toString(value));
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws IOException
+     */
+    @Override
+    public void writeList(int tag, String name, List<?> list) throws IOException {
+        writeTag(tag, name);
+        writeListOrSet(requireNonNull(list, "list is null"));
+    }
+
+    void writeListOrSet(Collection<?> list) throws IOException {
+        pw.print("[");
+        pw.println();
+        indent++;
+        boolean isFirst = true;
+        for (Object o : list) {
+            if (!isFirst) {
+                pw.println(",");
+            }
+            indent();
+            writeElement(o);
+            isFirst = false;
+        }
+        pw.println();
+        indent--;
+        indent();
+        pw.append("]");
     }
 
     /** {@inheritDoc} */
@@ -165,7 +224,6 @@ public class JSONMessageWriter extends MessageWriter {
         if (message != null) {
             indent();
             pw.println("\"" + name + "\": {");
-            isFirst = true;
             indent++;
             message.writeTo(this);
             indent--;
@@ -176,30 +234,31 @@ public class JSONMessageWriter extends MessageWriter {
         }
     }
 
+    public void writeMessage(MessageSerializable message) throws IOException {
+        writeElement(message);
+    }
+
     @Override
     public void writeSet(int tag, String name, Set<?> set) throws IOException {
-        write(tag, name, set);
+        writeTag(tag, name);
+        writeListOrSet(requireNonNull(set, "set is null"));
     }
 
     /** {@inheritDoc} */
     @Override
     public void writeString(int tag, String name, String value) throws IOException {
-        write(tag, name, value);
+        writeTag(tag, name);
+        writeString(requireNonNull(value, "value is null"));
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public void close() throws IOException {
-        pw.close();
+    void writeString(String value) {
+        pw.write('"');
+        pw.write(value);
+        pw.write('"');
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @throws IOException
-     */
-    @Override
-    public void writeList(int tag, String name, List<?> list) throws IOException {
-        write(tag, name, list);
+    private void writeTag(int tag, String name) {
+        indent();
+        pw.print("\"" + name + "\": ");
     }
 }

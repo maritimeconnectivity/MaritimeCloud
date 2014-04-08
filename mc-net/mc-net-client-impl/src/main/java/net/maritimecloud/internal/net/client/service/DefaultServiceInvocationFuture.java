@@ -20,7 +20,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import net.maritimecloud.net.ConnectionFuture;
+import net.maritimecloud.net.NetworkFuture;
 import net.maritimecloud.net.service.ServiceInvocationFuture;
 import net.maritimecloud.util.function.BiConsumer;
 
@@ -30,17 +30,17 @@ import net.maritimecloud.util.function.BiConsumer;
  */
 public class DefaultServiceInvocationFuture<T> implements ServiceInvocationFuture<T> {
 
-    final ConnectionFuture<T> delegate;
+    final NetworkFuture<T> delegate;
 
-    final ConnectionFuture<Object> receivedOnClient;
+    final NetworkFuture<Object> receivedOnClient;
 
-    final ConnectionFuture<Object> receivedOnServer;
+    final NetworkFuture<Object> receivedOnServer;
 
     /**
      * @param tm
      */
-    protected DefaultServiceInvocationFuture(ConnectionFuture<T> f, ConnectionFuture<Object> receivedOnClient,
-            ConnectionFuture<Object> receivedOnServer) {
+    protected DefaultServiceInvocationFuture(NetworkFuture<T> f, NetworkFuture<Object> receivedOnClient,
+            NetworkFuture<Object> receivedOnServer) {
         this.delegate = requireNonNull(f);
         this.receivedOnClient = requireNonNull(receivedOnClient);
         this.receivedOnServer = requireNonNull(receivedOnServer);
@@ -83,13 +83,13 @@ public class DefaultServiceInvocationFuture<T> implements ServiceInvocationFutur
 
     /** {@inheritDoc} */
     @Override
-    public ConnectionFuture<Object> receivedByCloud() {
+    public NetworkFuture<Object> receivedByCloud() {
         return receivedOnServer;
     }
 
     /** {@inheritDoc} */
     @Override
-    public ConnectionFuture<T> timeout(long timeout, TimeUnit unit) {
+    public NetworkFuture<T> timeout(long timeout, TimeUnit unit) {
         return delegate.timeout(timeout, unit);
     }
 

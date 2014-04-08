@@ -25,14 +25,12 @@ import java.util.concurrent.TimeUnit;
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.net.broadcast.BroadcastSendOptions;
 import net.maritimecloud.util.function.Consumer;
-import net.maritimecloud.util.function.Supplier;
 import net.maritimecloud.util.geometry.Circle;
 import net.maritimecloud.util.geometry.PositionReader;
 import net.maritimecloud.util.geometry.PositionReaderSimulator;
-import net.maritimecloud.util.geometry.PositionTime;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class MaritimeCloudClientConfiguration {
@@ -73,7 +71,7 @@ public class MaritimeCloudClientConfiguration {
 
     /**
      * Adds a state listener that will be invoked whenever the state of the connection changes.
-     * 
+     *
      * @param stateListener
      *            the state listener
      * @throws NullPointerException
@@ -208,21 +206,6 @@ public class MaritimeCloudClientConfiguration {
     public MaritimeCloudClientConfiguration setPositionReader(PositionReader positionReader) {
         this.positionReader = requireNonNull(positionReader);
         return this;
-    }
-
-    /**
-     * @deprecated use {@link #setPositionReader(PositionReader)}
-     */
-    @Deprecated
-    public MaritimeCloudClientConfiguration setPositionSupplier(final Supplier<PositionTime> positionSupplier) {
-        requireNonNull(positionSupplier);
-        return setPositionReader(new PositionReader() {
-
-            @Override
-            public PositionTime getCurrentPosition() {
-                return positionSupplier.get();
-            }
-        });
     }
 
     public static MaritimeCloudClientConfiguration create() {

@@ -28,7 +28,7 @@ import net.maritimecloud.msdl.model.EnumDeclaration;
 import net.maritimecloud.msdl.model.FileDeclaration;
 import net.maritimecloud.msdl.model.MessageDeclaration;
 import net.maritimecloud.msdl.model.Project;
-import net.maritimecloud.msdl.plugin.generator.java.annotation.JavaImplementation;
+import net.maritimecloud.msdl.plugins.javagen.annotation.JavaImplementation;
 
 import org.cakeframework.internal.codegen.CodegenClass;
 import org.cakeframework.internal.codegen.CodegenUtil;

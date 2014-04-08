@@ -14,14 +14,14 @@
  */
 package net.maritimecloud.net.service;
 
-import net.maritimecloud.net.ConnectionFuture;
+import net.maritimecloud.net.NetworkFuture;
 
 /**
  *
  * @author Kasper Nielsen
  */
-public interface ServiceInvocationFuture<T> extends ConnectionFuture<T> {
+public interface ServiceInvocationFuture<T> extends NetworkFuture<T> {
 
-    ConnectionFuture<Object> receivedByCloud();
+    NetworkFuture<Object> receivedByCloud();
 
 }

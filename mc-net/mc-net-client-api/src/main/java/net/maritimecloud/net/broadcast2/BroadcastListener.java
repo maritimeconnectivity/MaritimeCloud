@@ -12,15 +12,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.core.net;
+package net.maritimecloud.net.broadcast2;
 
-import net.maritimecloud.core.message.Message;
-
+import net.maritimecloud.core.net.BroadcastMessage;
 
 /**
+ * A callback interface for receiving broadcast messages of a specific type.
  *
  * @author Kasper Nielsen
  */
-public abstract class AbstractMessage<T extends AbstractMessage<T>> implements Message<T> {
+public interface BroadcastListener<T extends BroadcastMessage<T>> {
 
+    /**
+     * Invoked whenever a broadcast message was received.
+     *
+     * @param header
+     *            header for the broadcast
+     * @param broadcast
+     *            the message that was received
+     */
+    void onMessage(T broadcast, BroadcastMessageHeader header);
 }

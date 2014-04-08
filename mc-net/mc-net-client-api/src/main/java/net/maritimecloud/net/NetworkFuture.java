@@ -25,7 +25,7 @@ import net.maritimecloud.util.function.BiConsumer;
  * 
  * @author Kasper Nielsen
  */
-public interface ConnectionFuture<T> {
+public interface NetworkFuture<T> {
 
     /**
      * Waits if necessary for the computation to complete, and then retrieves its result.
@@ -97,6 +97,6 @@ public interface ConnectionFuture<T> {
      *            the time unit of the timeout argument
      * @return the new network future
      */
-    ConnectionFuture<T> timeout(long timeout, TimeUnit unit);
+    NetworkFuture<T> timeout(long timeout, TimeUnit unit);
 
 }

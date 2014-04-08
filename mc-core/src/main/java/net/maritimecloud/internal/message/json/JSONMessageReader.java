@@ -68,17 +68,6 @@ public class JSONMessageReader extends MessageReader {
         return factory.from(name);
     }
 
-    public Integer readInt32(int tag, String name) {
-        System.out.println("X " + name);
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    public int readInt32(int tag, String name, int defaultValue) {
-        System.out.println("X " + name);
-        return 0;
-    }
-
     /** {@inheritDoc} */
     @Override
     public <T> List<T> readList(int tag, String name, MessageParser<T> parser) {
@@ -129,22 +118,22 @@ public class JSONMessageReader extends MessageReader {
     }
 
     /** {@inheritDoc} */
-    public float readFloat(int tag, String name, float defaultValue) {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
     @Override
     public void close() throws IOException {}
 
-    /** {@inheritDoc} */
-    public Boolean readBoolean(int tag, String name, boolean defaultValue) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     *
+     * @throws IOException
+     */
     @Override
-    public <T> Set<T> readSet(int tag, String name, MessageParser<T> parser) {
+    public <T> Set<T> readSet(int tag, String name, MessageParser<T> parser) throws IOException {
+        // parser.
+        //
+        // for (xxxx) {
+        // elementParser.
+        // }
+        // parser.parse(this);
         return null;
     }
 

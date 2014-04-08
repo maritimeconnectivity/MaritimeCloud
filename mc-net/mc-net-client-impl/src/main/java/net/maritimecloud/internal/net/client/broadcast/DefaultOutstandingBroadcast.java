@@ -25,10 +25,9 @@ import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.net.client.util.DefaultConnectionFuture;
 import net.maritimecloud.internal.net.client.util.ThreadManager;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastAck;
-import net.maritimecloud.net.ConnectionFuture;
+import net.maritimecloud.net.NetworkFuture;
 import net.maritimecloud.net.broadcast.BroadcastFuture;
-import net.maritimecloud.net.broadcast.BroadcastMessage;
-import net.maritimecloud.net.broadcast.BroadcastMessage.Ack;
+import net.maritimecloud.net.broadcast.BroadcastMessageAck;
 import net.maritimecloud.net.broadcast.BroadcastSendOptions;
 import net.maritimecloud.util.function.Consumer;
 import net.maritimecloud.util.geometry.PositionTime;
@@ -38,7 +37,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The default implementation of {@link BroadcastFuture}.
- * 
+ *
  * @author Kasper Nielsen
  */
 class DefaultOutstandingBroadcast implements BroadcastFuture {
@@ -47,10 +46,10 @@ class DefaultOutstandingBroadcast implements BroadcastFuture {
     private static final Logger LOG = LoggerFactory.getLogger(BroadcastManager.class);
 
     /** A list of all ACKs we have received. */
-    private final List<Ack> acks = new ArrayList<>();
+    private final List<BroadcastMessageAck> acks = new ArrayList<>();
 
     /** All registered consumers. */
-    private final CopyOnWriteArrayList<Consumer<? super Ack>> consumers = new CopyOnWriteArrayList<>();
+    private final CopyOnWriteArrayList<Consumer<? super BroadcastMessageAck>> consumers = new CopyOnWriteArrayList<>();
 
     /** The main lock. */
     private final ReentrantLock lock = new ReentrantLock();
@@ -68,7 +67,7 @@ class DefaultOutstandingBroadcast implements BroadcastFuture {
 
     /** {@inheritDoc} */
     @Override
-    public void onAck(Consumer<? super Ack> consumer) {
+    public void onAck(Consumer<? super BroadcastMessageAck> consumer) {
         requireNonNull(consumer);
         if (!options.isReceiverAckEnabled()) {
             throw new UnsupportedOperationException("Receiver ack is not enabled, must be set in BroadcastOptions");
@@ -78,7 +77,7 @@ class DefaultOutstandingBroadcast implements BroadcastFuture {
             consumers.add(consumer);
             // We need to replay acks in case someone have already acked a messages.
             // before this method is called (big GC pause, for example)
-            for (Ack ack : acks) {
+            for (BroadcastMessageAck ack : acks) {
                 try {
                     consumer.accept(ack);
                 } catch (Exception e) {
@@ -93,7 +92,7 @@ class DefaultOutstandingBroadcast implements BroadcastFuture {
     void onAckMessage(BroadcastAck ack) {
         final PositionTime pt = ack.getPositionTime();
         final MaritimeId mid = ack.getId();
-        onAckMessage0(new BroadcastMessage.Ack() {
+        onAckMessage0(new BroadcastMessageAck() {
             public MaritimeId getId() {
                 return mid;
             }
@@ -104,12 +103,12 @@ class DefaultOutstandingBroadcast implements BroadcastFuture {
         });
     }
 
-    private void onAckMessage0(Ack ack) {
+    private void onAckMessage0(BroadcastMessageAck ack) {
         requireNonNull(ack);
         lock.lock();
         try {
             acks.add(ack);
-            for (Consumer<? super Ack> consumer : consumers) {
+            for (Consumer<? super BroadcastMessageAck> consumer : consumers) {
                 try {
                     consumer.accept(ack);
                 } catch (Exception e) {
@@ -123,7 +122,7 @@ class DefaultOutstandingBroadcast implements BroadcastFuture {
 
     /** {@inheritDoc} */
     @Override
-    public ConnectionFuture<Void> receivedOnServer() {
+    public NetworkFuture<Void> receivedOnServer() {
         return receivedOnServer;
     }
 }

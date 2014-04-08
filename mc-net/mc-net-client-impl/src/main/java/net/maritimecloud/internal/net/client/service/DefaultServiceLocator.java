@@ -24,7 +24,7 @@ import net.maritimecloud.internal.net.client.util.DefaultConnectionFuture;
 import net.maritimecloud.internal.net.client.util.ThreadManager;
 import net.maritimecloud.internal.net.messages.s2c.service.FindService;
 import net.maritimecloud.internal.net.messages.s2c.service.FindServiceResult;
-import net.maritimecloud.net.ConnectionFuture;
+import net.maritimecloud.net.NetworkFuture;
 import net.maritimecloud.net.service.ServiceEndpoint;
 import net.maritimecloud.net.service.ServiceLocator;
 import net.maritimecloud.net.service.spi.ServiceInitiationPoint;
@@ -65,7 +65,7 @@ class DefaultServiceLocator<T, E extends ServiceMessage<T>> implements ServiceLo
 
     /** {@inheritDoc} */
     @Override
-    public ConnectionFuture<ServiceEndpoint<E, T>> nearest() {
+    public NetworkFuture<ServiceEndpoint<E, T>> nearest() {
         DefaultConnectionFuture<FindServiceResult> f = csm.serviceFindOne(new FindService(sip.getName(), distance, 1));
         final DefaultConnectionFuture<ServiceEndpoint<E, T>> result = threadManager.create();
         f.thenAcceptAsync(new DefaultConnectionFuture.Action<FindServiceResult>() {
@@ -85,7 +85,7 @@ class DefaultServiceLocator<T, E extends ServiceMessage<T>> implements ServiceLo
 
     /** {@inheritDoc} */
     @Override
-    public ConnectionFuture<List<ServiceEndpoint<E, T>>> nearest(int limit) {
+    public NetworkFuture<List<ServiceEndpoint<E, T>>> nearest(int limit) {
         if (limit < 1) {
             throw new IllegalArgumentException("The specified limit must be positive (>=1), was " + limit);
         }

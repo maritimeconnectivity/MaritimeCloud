@@ -68,7 +68,7 @@ public class Polygon extends Area {
         return new Polygon(CoordinateSystem.CARTESIAN, positions);
     }
 
-    static Polygon readPolygonFrom(MessageReader r) {
+    static Polygon readPolygonFrom(MessageReader r) throws IOException {
         List<Position> positions = r.readList(1, "points", Position.PARSER);
         return Polygon.from(positions.toArray(new Position[positions.size()]));
     }

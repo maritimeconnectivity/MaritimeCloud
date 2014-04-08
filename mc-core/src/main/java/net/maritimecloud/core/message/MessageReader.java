@@ -39,15 +39,15 @@ public abstract class MessageReader implements Closeable {
 
     public abstract boolean isNext(int tag, String name);
 
-    public abstract Boolean readBool(int tag, String name, Boolean defaultValue);
+    public abstract Boolean readBool(int tag, String name, Boolean defaultValue) throws IOException;
 
-    public abstract Float readFloat(int tag, String name, Float defaultValue);
+    public abstract Float readFloat(int tag, String name, Float defaultValue) throws IOException;
 
-    public abstract Double readDouble(int tag, String name, Double defaultValue);
+    public abstract Double readDouble(int tag, String name, Double defaultValue) throws IOException;
 
-    public abstract float readRequiredFloat(int tag, String name);
+    public abstract float readRequiredFloat(int tag, String name) throws IOException;
 
-    public abstract double readRequiredDouble(int tag, String name);
+    public abstract double readRequiredDouble(int tag, String name) throws IOException;
 
     public abstract int readRequiredInt32(int tag, String name) throws IOException;
 
@@ -65,12 +65,12 @@ public abstract class MessageReader implements Closeable {
     public abstract <T extends MessageSerializable> T readMessage(int tag, String name, MessageParser<T> parser)
             throws IOException;
 
-    public abstract <T> List<T> readList(int tag, String name, MessageParser<T> parser);
+    public abstract <T> List<T> readList(int tag, String name, MessageParser<T> parser) throws IOException;
 
-    public abstract <T> Set<T> readSet(int tag, String name, MessageParser<T> parser);
+    public abstract <T> Set<T> readSet(int tag, String name, MessageParser<T> parser) throws IOException;
 
     public abstract <K, V> Map<K, V> readMap(int tag, String name, MessageParser<K> keyParser,
-            MessageParser<V> valueParser);
+            MessageParser<V> valueParser) throws IOException;
 }
 
 // public abstract int readInt32(int tag, String name, int defaultValue) throws IOException;

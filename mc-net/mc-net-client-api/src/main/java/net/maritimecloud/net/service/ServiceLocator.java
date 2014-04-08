@@ -16,7 +16,7 @@ package net.maritimecloud.net.service;
 
 import java.util.List;
 
-import net.maritimecloud.net.ConnectionFuture;
+import net.maritimecloud.net.NetworkFuture;
 import net.maritimecloud.net.service.spi.ServiceMessage;
 
 /**
@@ -39,7 +39,7 @@ public interface ServiceLocator<T, E extends ServiceMessage<T>> {
      * 
      * @return the nearest service end point to the clients current position
      */
-    ConnectionFuture<ServiceEndpoint<E, T>> nearest();
+    NetworkFuture<ServiceEndpoint<E, T>> nearest();
 
     /**
      * Returns a list of multiple service end points to the clients current position.
@@ -48,6 +48,6 @@ public interface ServiceLocator<T, E extends ServiceMessage<T>> {
      *            the maximum number of service end points to return
      * @return a list of multiple service end points to the clients current position
      */
-    ConnectionFuture<List<ServiceEndpoint<E, T>>> nearest(int limit);
+    NetworkFuture<List<ServiceEndpoint<E, T>>> nearest(int limit);
 
 }

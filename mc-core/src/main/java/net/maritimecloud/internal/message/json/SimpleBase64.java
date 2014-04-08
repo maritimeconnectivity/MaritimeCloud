@@ -1,6 +1,6 @@
 package net.maritimecloud.internal.message.json;
 
-public class SimpleBase64 {
+class SimpleBase64 {
 
     private final static char[] CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
             .toCharArray();
