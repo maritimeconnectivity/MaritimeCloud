@@ -346,6 +346,9 @@ public class CodegenClass extends AbstractCodegenEntity {
             ArrayList<CodegenEnumConstant> list = ((CodegenEnum) this).constants;
             for (int i = 0; i < list.size(); i++) {
                 CodegenEnumConstant cec = list.get(i);
+                if (cec.b != null) {
+                    cec.b.toString(sb, indent + 1);
+                }
                 sb.append(indent(indent + 1)).append(cec.definition);
                 if (!cec.methods.isEmpty()) {
 
@@ -357,6 +360,7 @@ public class CodegenClass extends AbstractCodegenEntity {
                 }
                 if (i != list.size() - 1) {
                     sb.append(",");
+                    sb.append(LS);
                 } else {
                     sb.append(";");
                 }

@@ -24,22 +24,29 @@ import java.util.List;
 import java.util.Map.Entry;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
-class JavadocBuilder {
+public class JavadocBuilder {
 
     private String main;
 
     private final List<Entry<String, String>> parameters = new ArrayList<>();
 
-    public JavadocBuilder set(String main) {
-        this.main = main;
-        return this;
-    }
+    private String retur;
 
     public JavadocBuilder addParameter(String name, String contents) {
         parameters.add(new SimpleImmutableEntry<>(name, contents));
+        return this;
+    }
+
+    public JavadocBuilder addReturn(String contents) {
+        retur = contents;
+        return this;
+    }
+
+    public JavadocBuilder set(String main) {
+        this.main = main;
         return this;
     }
 
@@ -55,16 +62,18 @@ class JavadocBuilder {
      * @param indent
      */
     public void toString(StringBuilder b, int indent) {
-        if (main == null && parameters.size() == 0) {
+        if (main == null && parameters.size() == 0 && retur == null) {
             return;
         }
 
-        if (parameters.size() == 0 && main.length() <= 90) {
+        if (retur == null && parameters.size() == 0 && main.length() <= 90) {
             b.append(indent(indent)).append("/** " + main + " */").append(LS);
         } else {
             b.append(indent(indent)).append("/**").append(LS);
             // TODO wordwrap
-            b.append(indent(indent)).append(" * " + main).append(LS);
+            if (main != null) {
+                b.append(indent(indent)).append(" * " + main).append(LS);
+            }
             if (main != null & parameters.size() > 0) {
                 // Add an empty line between the description and the list of parameters
                 b.append(indent(indent)).append(" *").append(LS);
@@ -73,6 +82,10 @@ class JavadocBuilder {
                 b.append(indent(indent)).append(" * @param " + e.getKey()).append(LS);
                 b.append(indent(indent)).append(" *            " + e.getValue()).append(LS);
             }
+            if (retur != null) {
+                b.append(indent(indent)).append(" * @return " + retur).append(LS);
+            }
+
             b.append(indent(indent)).append(" */").append(LS);
         }
     }

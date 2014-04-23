@@ -17,7 +17,7 @@ package net.maritimecloud.util.units;
 
 /**
  * A distance of unit.
- * 
+ *
  * @author Kasper Nielsen
  */
 public enum DistanceUnit {
@@ -59,14 +59,14 @@ public enum DistanceUnit {
         }
     };
 
-    static final double METERS_TO_MILES = 1609.344;
+    public static final double METERS_TO_MILES = 1609.344;
 
-    static final double METERS_TO_NAUTICAL_MILES = 1852;
+    public static final double METERS_TO_NAUTICAL_MILES = 1852;
 
     /**
      * Converts the specified distance from this distance unit to kilometers. For example, to convert 100 meters to
      * kilometers: <code>DistanceUnit.METERS.toKilometers(100)</code>.
-     * 
+     *
      * @param distance
      *            the distance to convert
      * @return the converted distance
@@ -78,7 +78,7 @@ public enum DistanceUnit {
     /**
      * Converts the specified distance from this distance unit to miles. For example, to convert 100 miles to meters:
      * <code>DistanceUnit.MILES.toMeters(100)</code>.
-     * 
+     *
      * @param distance
      *            the distance to convert
      * @return the converted distance
@@ -88,7 +88,7 @@ public enum DistanceUnit {
     /**
      * Converts the specified distance from this distance unit to miles. For example, to convert 100 meters to miles:
      * <code>DistanceUnit.METERS.toMiles(100)</code>.
-     * 
+     *
      * @param distance
      *            the distance to convert
      * @return the converted distance
@@ -100,7 +100,7 @@ public enum DistanceUnit {
     /**
      * Converts the specified distance from this distance unit to nautical miles. For example, to convert 100 meters to
      * nautical miles: <code>DistanceUnit.METERS.toNauticalMiles(100)</code>.
-     * 
+     *
      * @param distance
      *            the distance to convert
      * @return the converted distance

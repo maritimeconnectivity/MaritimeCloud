@@ -17,12 +17,16 @@ package net.maritimecloud.core.message;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 
+import javax.json.JsonReader;
+import javax.json.spi.JsonProvider;
+
 import net.maritimecloud.internal.message.json.JSONMessageReader;
 import net.maritimecloud.internal.message.json.JSONMessageWriter;
-import net.maritimecloud.internal.message.json.JSONTokener;
+import net.maritimecloud.util.geometry.Position;
 
 /**
  *
@@ -76,15 +80,29 @@ public class MessageSerializers {
         }
     }
 
-    public static <T> T readFromJSON(CharSequence cs, MessageParser<T> parser) {
-        return null;
+    public static void main(String[] args) {
+        Position p = Position.create(1, 2);
+        String s = p.toJSON();
+        Position p2 = readFromJSON(Position.PARSER, s);
+        System.out.println(p.equals(p2));
+    }
+
+    public static <T> T readFromJSON(MessageParser<T> parser, CharSequence cs) {
+        JsonReader reader = JsonProvider.provider().createReader(new StringReader(cs.toString()));
+        JSONMessageReader r = new JSONMessageReader(reader);
+        try {
+            return parser.parse(r);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read message from JSON", e);
+        }
     }
 
     public static MessageReader newJSONReader(CharSequence cs, boolean readStartStopTags) {
         if (!readStartStopTags) {
             cs = "{" + cs + "}";
         }
-        return new JSONMessageReader(new JSONTokener(cs.toString()));
+        // return new JSONMessageReader(new JSONTokener(cs.toString()));
+        return null;
     }
 
     /**

@@ -32,6 +32,13 @@ public class CodegenMethod extends CodegenBlock {
 
     private final JavadocBuilder builder = new JavadocBuilder();
 
+    /**
+     * @return the builder
+     */
+    public JavadocBuilder javadoc() {
+        return builder;
+    }
+
     public CodegenMethod addJavadoc(Object... definition) {
         return addJavadoc(toStringg(definition));
     }
@@ -124,7 +131,6 @@ public class CodegenMethod extends CodegenBlock {
                     + declaration.substring(leftBracket);
         }
         int indent = depth();
-
         builder.toString(sb, indent);
         annotations.toString(sb, indent);
         sb.append(indent(indent)).append(declaration);

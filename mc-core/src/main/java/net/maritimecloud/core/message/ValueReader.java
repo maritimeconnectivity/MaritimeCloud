@@ -25,7 +25,7 @@ import net.maritimecloud.util.Binary;
  *
  * @author Kasper Nielsen
  */
-public abstract class ElementReader {
+public abstract class ValueReader {
 
     public abstract Boolean readBool() throws IOException;
 

@@ -32,45 +32,40 @@ public abstract class MessageReader implements Closeable {
         return true;
     }
 
-    /**
-     * Returns the next tag or null if there are no more tags.
-     */
-    public abstract Map.Entry<Integer, String> nextTag();
-
     public abstract boolean isNext(int tag, String name);
+
+    public abstract Binary readBinary(int tag, String name, Binary defaultValue) throws IOException;
 
     public abstract Boolean readBool(int tag, String name, Boolean defaultValue) throws IOException;
 
-    public abstract Float readFloat(int tag, String name, Float defaultValue) throws IOException;
-
     public abstract Double readDouble(int tag, String name, Double defaultValue) throws IOException;
 
-    public abstract float readRequiredFloat(int tag, String name) throws IOException;
+    public abstract <T extends Enum<T> & MessageEnum> T readEnum(int tag, String name, MessageEnumParser<T> factory)
+            throws IOException;
 
-    public abstract double readRequiredDouble(int tag, String name) throws IOException;
+    public abstract Float readFloat(int tag, String name, Float defaultValue) throws IOException;
 
-    public abstract int readRequiredInt32(int tag, String name) throws IOException;
+    public abstract int readInt32(int tag, String name) throws IOException;
 
     public abstract Integer readInt32(int tag, String name, Integer defaultValue) throws IOException;
 
     public abstract Long readInt64(int tag, String name, Long defaultValue) throws IOException;
 
-    public abstract Binary readBinary(int tag, String name, Binary defaultValue) throws IOException;
+    public abstract <T> List<T> readList(int tag, String name, MessageParser<T> parser) throws IOException;
 
-    public abstract String readString(int tag, String name, String defaultValue) throws IOException;
-
-    public abstract <T extends Enum<T> & MessageEnum> T readEnum(int tag, String name, MessageEnumParser<T> factory)
-            throws IOException;
+    public abstract <K, V> Map<K, V> readMap(int tag, String name, MessageParser<K> keyParser,
+            MessageParser<V> valueParser) throws IOException;
 
     public abstract <T extends MessageSerializable> T readMessage(int tag, String name, MessageParser<T> parser)
             throws IOException;
 
-    public abstract <T> List<T> readList(int tag, String name, MessageParser<T> parser) throws IOException;
+    public abstract double readRequiredDouble(int tag, String name) throws IOException;
+
+    public abstract float readRequiredFloat(int tag, String name) throws IOException;
 
     public abstract <T> Set<T> readSet(int tag, String name, MessageParser<T> parser) throws IOException;
 
-    public abstract <K, V> Map<K, V> readMap(int tag, String name, MessageParser<K> keyParser,
-            MessageParser<V> valueParser) throws IOException;
+    public abstract String readString(int tag, String name, String defaultValue) throws IOException;
 }
 
 // public abstract int readInt32(int tag, String name, int defaultValue) throws IOException;

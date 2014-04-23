@@ -17,17 +17,21 @@ package net.maritimecloud.internal.message.json;
 import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
-import java.util.ArrayDeque;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import javax.json.JsonObject;
+import javax.json.JsonReader;
 
 import net.maritimecloud.core.message.MessageEnum;
 import net.maritimecloud.core.message.MessageEnumParser;
 import net.maritimecloud.core.message.MessageParser;
 import net.maritimecloud.core.message.MessageReader;
 import net.maritimecloud.core.message.MessageSerializable;
+import net.maritimecloud.core.message.MessageSerializationException;
 import net.maritimecloud.util.Binary;
 
 /**
@@ -36,29 +40,59 @@ import net.maritimecloud.util.Binary;
  */
 public class JSONMessageReader extends MessageReader {
 
-    JSONObject o;
+    final JsonIterator iter;
 
-    ArrayDeque<JSONObject> stack = new ArrayDeque<>();
+    final JsonReader r;
 
-    final JSONTokener t;
-
-    public JSONMessageReader(JSONTokener t) {
-        this.t = requireNonNull(t);
-        o = new JSONObject(t);
+    JSONMessageReader(JSONMessageReader r, JsonObject o) {
+        this.r = r.r;
+        iter = new JsonIterator(o);
     }
+
+    public JSONMessageReader(JsonReader r) {
+        this.r = requireNonNull(r);
+        iter = new JsonIterator(r.readObject());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void close() throws IOException {}
 
     /** {@inheritDoc} */
     @Override
     public boolean isNext(int tag, String name) {
-        System.out.println(name);
-        String s = (String) o.keys().next();
-        return name.equals(s);
+        requireNonNull(name, "name is null");
+        if (iter.hasNext()) {
+            return name.equals(iter.peek().getKey());
+        }
+        return false;
     }
 
     /** {@inheritDoc} */
     @Override
-    public Entry<Integer, String> nextTag() {
-        return null;
+    public Binary readBinary(int tag, String name, Binary defaultValue) throws IOException {
+        if (isNext(-1, name)) {
+            return Binary.copyFromBase64(iter.next().getValue().toString());
+        }
+        return defaultValue;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Boolean readBool(int tag, String name, Boolean defaultValue) {
+        if (isNext(-1, name)) {
+            return Boolean.parseBoolean(iter.next().getValue().toString());
+        }
+        return defaultValue;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Double readDouble(int tag, String name, Double defaultValue) {
+        if (isNext(-1, name)) {
+            return Double.parseDouble(iter.next().getValue().toString());
+        }
+        return defaultValue;
     }
 
     /** {@inheritDoc} */
@@ -70,7 +104,40 @@ public class JSONMessageReader extends MessageReader {
 
     /** {@inheritDoc} */
     @Override
+    public Float readFloat(int tag, String name, Float defaultValue) {
+        if (isNext(-1, name)) {
+            return Float.parseFloat(iter.next().getValue().toString());
+        }
+        return defaultValue;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Integer readInt32(int tag, String name, Integer defaultValue) throws IOException {
+        if (isNext(-1, name)) {
+            return Integer.parseInt(iter.next().getValue().toString());
+        }
+        return defaultValue;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Long readInt64(int tag, String name, Long defaultValue) throws IOException {
+        if (isNext(-1, name)) {
+            return Long.parseLong(iter.next().getValue().toString());
+        }
+        return defaultValue;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public <T> List<T> readList(int tag, String name, MessageParser<T> parser) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <K, V> Map<K, V> readMap(int tag, String name, MessageParser<K> keyParser, MessageParser<V> valueParser) {
         return null;
     }
 
@@ -78,48 +145,34 @@ public class JSONMessageReader extends MessageReader {
     @Override
     public <T extends MessageSerializable> T readMessage(int tag, String name, MessageParser<T> parser)
             throws IOException {
-        stack.push(o);
-        o = (JSONObject) o.get(name);
-        T result = parser.parse(this);
-        o = stack.pop();
-        return result;
-    }
-
-    // /** {@inheritDoc} */
-    // @Override
-    // public double readRequiredDouble(int tag, String name) throws IOException {
-    // Object object = o.get(name);
-    // return (Double) object;
-    // }
-    //
-    // /** {@inheritDoc} */
-    // @Override
-    // public float readRequiredFloat(int tag, String name) throws IOException {
-    // Object object = o.get(name);
-    // return ((Double) object).floatValue();
-    // }
-    //
-    // /** {@inheritDoc} */
-    // @Override
-    // public int readRequiredInt32(int tag, String name) throws IOException {
-    // Object object = o.get(name);
-    // return (Integer) object;
-    // }
-    //
-    // /** {@inheritDoc} */
-    // @Override
-    // public <T extends MessageSerializable> T readRequiredMessage(int tag, String name, MessageParser<T> parser)
-    // throws IOException {
-    // return readMessage(tag, name, parser);
-    // }
-
-    public static JSONMessageReader create(CharSequence cs) {
-        return new JSONMessageReader(new JSONTokener(cs.toString()));
+        // stack.push(o);
+        // o = (JSONObject) o.get(name);
+        // T result = parser.parse(this);
+        // o = stack.pop();
+        // return result;
+        return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public void close() throws IOException {}
+    public double readRequiredDouble(int tag, String name) {
+        return 0;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public float readRequiredFloat(int tag, String name) {
+        return 0;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int readInt32(int tag, String name) throws IOException {
+        if (isNext(-1, name)) {
+            return Integer.parseInt(iter.next().getValue().toString());
+        }
+        throw new MessageSerializationException("Could not find tag '" + name + "'");
+    }
 
     /**
      * {@inheritDoc}
@@ -139,67 +192,43 @@ public class JSONMessageReader extends MessageReader {
 
     /** {@inheritDoc} */
     @Override
-    public <K, V> Map<K, V> readMap(int tag, String name, MessageParser<K> keyParser, MessageParser<V> valueParser) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Boolean readBool(int tag, String name, Boolean defaultValue) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Float readFloat(int tag, String name, Float defaultValue) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Double readDouble(int tag, String name, Double defaultValue) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Integer readInt32(int tag, String name, Integer defaultValue) throws IOException {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Long readInt64(int tag, String name, Long defaultValue) throws IOException {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Binary readBinary(int tag, String name, Binary defaultValue) throws IOException {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public String readString(int tag, String name, String defaultValue) throws IOException {
         return null;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public float readRequiredFloat(int tag, String name) {
-        return 0;
-    }
 
-    /** {@inheritDoc} */
-    @Override
-    public double readRequiredDouble(int tag, String name) {
-        return 0;
-    }
+    static class JsonIterator {
+        Iterator<Entry<String, javax.json.JsonValue>> iter;
 
-    /** {@inheritDoc} */
-    @Override
-    public int readRequiredInt32(int tag, String name) throws IOException {
-        return 0;
+        private Entry<String, javax.json.JsonValue> next;
+
+        final JsonObject o;
+
+        JsonIterator(JsonObject o) {
+            this.o = o;
+            iter = o.entrySet().iterator();
+            if (iter.hasNext()) {
+                next = iter.next();
+            }
+        }
+
+        boolean hasNext() {
+            return next != null;
+        }
+
+        Entry<String, javax.json.JsonValue> next() {
+            Entry<String, javax.json.JsonValue> n = next;
+            if (iter.hasNext()) {
+                next = iter.next();
+            } else {
+                next = null;
+            }
+            return n;
+        }
+
+        Entry<String, javax.json.JsonValue> peek() {
+            return next;
+        }
+
     }
 }

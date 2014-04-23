@@ -22,6 +22,7 @@ import java.util.Locale;
 import net.maritimecloud.core.message.Message;
 import net.maritimecloud.core.message.MessageParser;
 import net.maritimecloud.core.message.MessageReader;
+import net.maritimecloud.core.message.MessageSerializers;
 import net.maritimecloud.core.message.MessageWriter;
 import net.maritimecloud.util.geometry.CoordinateSystem.VincentyCalculationType;
 
@@ -50,7 +51,7 @@ public class Position implements Element, Message<Position> {
 
     /**
      * Constructor given position and timezone
-     * 
+     *
      * @param latitude
      *            Negative south of equator
      * @param longitude
@@ -83,7 +84,7 @@ public class Position implements Element, Message<Position> {
 
     /**
      * Get great circle distance to location
-     * 
+     *
      * @param location
      * @return distance in meters
      */
@@ -96,7 +97,7 @@ public class Position implements Element, Message<Position> {
 
     /**
      * Calculate final bearing for great circle route to location using Thaddeus Vincenty's</a> inverse formula.
-     * 
+     *
      * @param the
      *            second location
      * @return bearing in degrees
@@ -108,7 +109,7 @@ public class Position implements Element, Message<Position> {
 
     /**
      * Calculate initial bearing for great circle route to location using Thaddeus Vincenty's</a> inverse formula.
-     * 
+     *
      * @param the
      *            second location
      * @return bearing in degrees
@@ -138,7 +139,7 @@ public class Position implements Element, Message<Position> {
 
     /**
      * Returns the latitude part of this position.
-     * 
+     *
      * @return the latitude part of this position
      */
     public double getLatitude() {
@@ -164,7 +165,7 @@ public class Position implements Element, Message<Position> {
 
     /**
      * Returns the longitude part of this position.
-     * 
+     *
      * @return the longitude part of this position
      */
     public double getLongitude() {
@@ -208,7 +209,7 @@ public class Position implements Element, Message<Position> {
 
     /**
      * Calculates the rhumb line bearing to the specified position
-     * 
+     *
      * @param position
      *            the position
      * @return the rhumb line bearing in degrees
@@ -233,9 +234,14 @@ public class Position implements Element, Message<Position> {
         return other.rhumbLineDistanceTo(this);
     }
 
+    /** Returns a JSON representation of this message */
+    public String toJSON() {
+        return MessageSerializers.writeToJSON(this);
+    }
+
     /**
      * Packs the position into a long (losing some precision). Can be read later by {@link #fromPackedLong(long)}
-     * 
+     *
      * @return the packet long
      */
     public long toPackedLong() {
@@ -269,19 +275,19 @@ public class Position implements Element, Message<Position> {
 
     /**
      * Writes this position to the specified MSDL output stream.
-     * 
+     *
      * @param os
      *            the output stream
      * @throws IOException
      *             the position failed to be written
      */
     public void writeTo(MessageWriter w) throws IOException {
-        if (w.isCompact()) {
-            writeToPacked(w, 1, "latitude", 2, "longitude");
-        } else {
-            w.writeDouble(1, "latitude", latitude);
-            w.writeDouble(2, "longitude", longitude);
-        }
+        // if (w.isCompact()) {
+        // writeToPacked(w, 1, "latitude", 2, "longitude");
+        // } else {
+        w.writeDouble(1, "latitude", latitude);
+        w.writeDouble(2, "longitude", longitude);
+        // }
     }
 
     void writeToPacked(MessageWriter w, int latId, String latName, int lonId, String lonName) throws IOException {
@@ -291,7 +297,7 @@ public class Position implements Element, Message<Position> {
 
     /**
      * Creates a new position from the specified latitude and longitude.
-     * 
+     *
      * @param latitude
      *            the latitude
      * @param longitude
@@ -317,27 +323,27 @@ public class Position implements Element, Message<Position> {
     }
 
     public static Position readFrom(MessageReader r) throws IOException {
-        if (r.isCompact()) {
-            int lat = r.readRequiredInt32(1, "latitude");
-            int lon = r.readRequiredInt32(2, "longitude");
-            return Position.create(lat / 10_000_000d, lon / 10_000_000d);
-        } else {
-            double lat = r.readRequiredDouble(1, "latitude");
-            double lon = r.readRequiredDouble(2, "longitude");
-            return Position.create(lat, lon);
-        }
+        // if (r.isCompact()) {
+        // int lat = r.readInt32(1, "latitude");
+        // int lon = r.readInt32(2, "longitude");
+        // return Position.create(lat / 10_000_000d, lon / 10_000_000d);
+        // } else {
+        double lat = r.readRequiredDouble(1, "latitude");
+        double lon = r.readRequiredDouble(2, "longitude");
+        return Position.create(lat, lon);
+        // }
     }
 
     static Position readFromPacked(MessageReader r, int latId, String latName, int lonId, String lonName)
             throws IOException {
-        int lat = r.readRequiredInt32(latId, latName);
-        int lon = r.readRequiredInt32(lonId, lonName);
+        int lat = r.readInt32(latId, latName);
+        int lon = r.readInt32(lonId, lonName);
         return Position.create(lat / 10_000_000d, lon / 10_000_000d);
     }
 
     /**
      * Verify that latitude is within the interval [-90:90].
-     * 
+     *
      * @param latitude
      * @throws IllegalArgumentException
      *             When latitude is invalid
@@ -353,7 +359,7 @@ public class Position implements Element, Message<Position> {
 
     /**
      * Verify that longitude is within the interval [-180:180].
-     * 
+     *
      * @param longitude
      * @throws IllegalArgumentException
      *             When longitude is invalid

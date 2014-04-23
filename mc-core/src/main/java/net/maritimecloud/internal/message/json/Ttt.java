@@ -12,19 +12,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.core.message;
+package net.maritimecloud.internal.message.json;
+
+import net.maritimecloud.util.geometry.Circle;
+import net.maritimecloud.util.geometry.Position;
 
 /**
- * The basic message interface that all messages must be implement. Messages are normally generated from MSDL files.
  *
  * @author Kasper Nielsen
  */
-public interface Message<T extends Message<T>> extends MessageSerializable {
+public class Ttt {
 
-    /**
-     * Returns an immutable copy of this message.
-     *
-     * @return an immutable copy of this message
-     */
-    T immutable();
+    public static void main(String[] args) {
+        // Area.createUnion(null);
+        Circle c = Circle.create(Position.create(1.23423, 1), 123f);
+        // c.setCenter(Position.create(1.23423, 1));
+        // c.setRadius(123f);
+        System.out.println(c.toJSON());
+    }
 }

@@ -14,17 +14,30 @@
  */
 package net.maritimecloud.core.message;
 
+import java.io.IOException;
+
 /**
- * The basic message interface that all messages must be implement. Messages are normally generated from MSDL files.
  *
  * @author Kasper Nielsen
  */
-public interface Message<T extends Message<T>> extends MessageSerializable {
+public class MessageSerializationException extends IOException {
+
+    /**  */
+    private static final long serialVersionUID = 1L;
 
     /**
-     * Returns an immutable copy of this message.
-     *
-     * @return an immutable copy of this message
+     * @param message
      */
-    T immutable();
+    public MessageSerializationException(String message) {
+        super(message);
+    }
+
+    /**
+     * @param message
+     * @param cause
+     */
+    public MessageSerializationException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
 }

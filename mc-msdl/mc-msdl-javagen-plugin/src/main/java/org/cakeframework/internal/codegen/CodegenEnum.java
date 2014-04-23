@@ -44,6 +44,8 @@ public class CodegenEnum extends CodegenClass {
 
         final ArrayList<CodegenMethod> methods = new ArrayList<>(5);
 
+        JavadocBuilder b;
+
         CodegenEnumConstant(String definition) {
             this.definition = definition;
         }
@@ -53,6 +55,13 @@ public class CodegenEnum extends CodegenClass {
                 addMethod(method);
             }
             return method;
+        }
+
+        public JavadocBuilder javadoc() {
+            if (b == null) {
+                b = new JavadocBuilder();
+            }
+            return b;
         }
 
         public final CodegenMethod addMethod(CodegenMethod method) {

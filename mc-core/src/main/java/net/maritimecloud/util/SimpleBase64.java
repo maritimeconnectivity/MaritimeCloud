@@ -1,4 +1,4 @@
-package net.maritimecloud.internal.message.json;
+package net.maritimecloud.util;
 
 class SimpleBase64 {
 

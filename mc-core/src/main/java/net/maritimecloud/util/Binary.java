@@ -49,7 +49,7 @@ import java.util.NoSuchElementException;
  * <p>
  * Like {@link String}, the contents of a {@link Binary} can never be observed to change, not even in the presence of a
  * data race or incorrect API usage in the client code.
- * 
+ *
  * @author crazybob@google.com Bob Lee
  * @author kenton@google.com Kenton Varda
  * @author carlanton@google.com Carl Haverl
@@ -84,7 +84,7 @@ public abstract class Binary implements Iterable<Byte> {
      * Gets the byte at the given index. This method should be used only for random access to individual bytes. To
      * access bytes sequentially, use the {@link ByteIterator} returned by {@link #iterator()}, and call
      * {@link #substring(int, int)} first if necessary.
-     * 
+     *
      * @param index
      *            index of byte
      * @return the value
@@ -96,7 +96,7 @@ public abstract class Binary implements Iterable<Byte> {
     /**
      * Return a {@link Binary.ByteIterator} over the bytes in the ByteString. To avoid auto-boxing, you may get the
      * iterator manually and call {@link ByteIterator#nextByte()}.
-     * 
+     *
      * @return the iterator
      */
     public abstract ByteIterator iterator();
@@ -107,7 +107,7 @@ public abstract class Binary implements Iterable<Byte> {
     public interface ByteIterator extends Iterator<Byte> {
         /**
          * An alternative to {@link Iterator#next()} that returns an unboxed primitive {@code byte}.
-         * 
+         *
          * @return the next {@code byte} in the iteration
          * @throws NoSuchElementException
          *             if the iteration has no more elements
@@ -117,14 +117,14 @@ public abstract class Binary implements Iterable<Byte> {
 
     /**
      * Gets the number of bytes.
-     * 
+     *
      * @return size in bytes
      */
     public abstract int size();
 
     /**
      * Returns {@code true} if the size is {@code 0}, {@code false} otherwise.
-     * 
+     *
      * @return true if this is zero bytes long
      */
     public boolean isEmpty() {
@@ -136,7 +136,7 @@ public abstract class Binary implements Iterable<Byte> {
 
     /**
      * Return the substring from {@code beginIndex}, inclusive, to the end of the string.
-     * 
+     *
      * @param beginIndex
      *            start at this index
      * @return substring sharing underlying data
@@ -149,7 +149,7 @@ public abstract class Binary implements Iterable<Byte> {
 
     /**
      * Return the substring from {@code beginIndex}, inclusive, to {@code endIndex}, exclusive.
-     * 
+     *
      * @param beginIndex
      *            start at this index
      * @param endIndex
@@ -162,7 +162,7 @@ public abstract class Binary implements Iterable<Byte> {
 
     /**
      * Tests if this bytestring starts with the specified prefix. Similar to {@link String#startsWith(String)}
-     * 
+     *
      * @param prefix
      *            the prefix.
      * @return <code>true</code> if the byte sequence represented by the argument is a prefix of the byte sequence
@@ -177,7 +177,7 @@ public abstract class Binary implements Iterable<Byte> {
 
     /**
      * Copies the given bytes into a {@code ByteString}.
-     * 
+     *
      * @param bytes
      *            source array
      * @param offset
@@ -194,7 +194,7 @@ public abstract class Binary implements Iterable<Byte> {
 
     /**
      * Copies the given bytes into a {@code ByteString}.
-     * 
+     *
      * @param bytes
      *            to copy
      * @return new {@code ByteString}
@@ -205,7 +205,7 @@ public abstract class Binary implements Iterable<Byte> {
 
     /**
      * Copies the next {@code size} bytes from a {@code java.nio.ByteBuffer} into a {@code ByteString}.
-     * 
+     *
      * @param bytes
      *            source buffer
      * @param size
@@ -220,7 +220,7 @@ public abstract class Binary implements Iterable<Byte> {
 
     /**
      * Copies the remaining bytes from a {@code java.nio.ByteBuffer} into a {@code ByteString}.
-     * 
+     *
      * @param bytes
      *            sourceBuffer
      * @return new {@code ByteString}
@@ -232,7 +232,7 @@ public abstract class Binary implements Iterable<Byte> {
     /**
      * Encodes {@code text} into a sequence of bytes using the named charset and returns the result as a
      * {@code ByteString}.
-     * 
+     *
      * @param text
      *            source string
      * @param charsetName
@@ -247,7 +247,7 @@ public abstract class Binary implements Iterable<Byte> {
 
     /**
      * Encodes {@code text} into a sequence of UTF-8 bytes and returns the result as a {@code ByteString}.
-     * 
+     *
      * @param text
      *            source string
      * @return new {@code ByteString}
@@ -260,18 +260,22 @@ public abstract class Binary implements Iterable<Byte> {
         }
     }
 
+    public static Binary copyFromBase64(String text) {
+        return copyFrom(SimpleBase64.decode(text));
+    }
+
     // =================================================================
     // InputStream -> ByteString
 
     /**
      * Completely reads the given stream's bytes into a {@code ByteString}, blocking if necessary until all bytes are
      * read through to the end of the stream.
-     * 
+     *
      * <b>Performance notes:</b> The returned {@code ByteString} is an immutable tree of byte arrays ("chunks") of the
      * stream data. The first chunk is small, with subsequent chunks each being double the size, up to 8K. If the caller
      * knows the precise length of the stream and wishes to avoid all unnecessary copies and allocations, consider using
      * the two-argument version of this method, below.
-     * 
+     *
      * @param streamToDrain
      *            The source stream, which is read completely but not closed.
      * @return A new {@code ByteString} which is made up of chunks of various sizes, depending on the behavior of the
@@ -286,13 +290,13 @@ public abstract class Binary implements Iterable<Byte> {
     /**
      * Completely reads the given stream's bytes into a {@code ByteString}, blocking if necessary until all bytes are
      * read through to the end of the stream.
-     * 
+     *
      * <b>Performance notes:</b> The returned {@code ByteString} is an immutable tree of byte arrays ("chunks") of the
      * stream data. The chunkSize parameter sets the size of these byte arrays. In particular, if the chunkSize is
      * precisely the same as the length of the stream, unnecessary allocations and copies will be avoided. Otherwise,
      * the chunks will be of the given size, except for the last chunk, which will be resized (via a reallocation and
      * copy) to contain the remainder of the stream.
-     * 
+     *
      * @param streamToDrain
      *            The source stream, which is read completely but not closed.
      * @param chunkSize
@@ -327,7 +331,7 @@ public abstract class Binary implements Iterable<Byte> {
     /**
      * Blocks until a chunk of the given size can be made from the stream, or EOF is reached. Calls read() repeatedly in
      * case the given stream implementation doesn't completely fill the given buffer in one read() call.
-     * 
+     *
      * @return A chunk of the desired size, or else a chunk as large as was available when end of stream was reached.
      *         Returns null if the given stream had no more data in it.
      */
@@ -357,7 +361,7 @@ public abstract class Binary implements Iterable<Byte> {
      * {@link Binary#CONCATENATE_BY_COPY_SIZE}, are produced by copying the underlying bytes (as per Rope.java, <a
      * href="http://www.cs.ubc.ca/local/reading/proceedings/spe91-95/spe/vol25/issue12/spe986.pdf"> BAP95 </a>. In
      * general, the concatenate involves no copying.
-     * 
+     *
      * @param other
      *            string to concatenate
      * @return a new {@code ByteString} instance
@@ -375,12 +379,12 @@ public abstract class Binary implements Iterable<Byte> {
     /**
      * Concatenates all byte strings in the iterable and returns the result. This is designed to run in O(list size),
      * not O(total bytes).
-     * 
+     *
      * <p>
      * The returned {@code ByteString} is not necessarily a unique object. If the list is empty, the returned object is
      * the singleton empty {@code ByteString}. If the list has only one element, that {@code ByteString} will be
      * returned without copying.
-     * 
+     *
      * @param byteStrings
      *            strings to be concatenated
      * @return new {@code ByteString}
@@ -426,7 +430,7 @@ public abstract class Binary implements Iterable<Byte> {
 
     /**
      * Copies bytes into a buffer at the given offset.
-     * 
+     *
      * @param target
      *            buffer to copy into
      * @param offset
@@ -440,7 +444,7 @@ public abstract class Binary implements Iterable<Byte> {
 
     /**
      * Copies bytes into a buffer.
-     * 
+     *
      * @param target
      *            buffer to copy into
      * @param sourceOffset
@@ -475,7 +479,7 @@ public abstract class Binary implements Iterable<Byte> {
 
     /**
      * Internal (package private) implementation of
-     * 
+     *
      * @link{#copyTo(byte[],int,int,int . It assumes that all error checking has already been performed and that
      * @code{numberToCopy > 0}.
      */
@@ -483,7 +487,7 @@ public abstract class Binary implements Iterable<Byte> {
 
     /**
      * Copies bytes into a ByteBuffer.
-     * 
+     *
      * @param target
      *            ByteBuffer to copy into.
      * @throws java.nio.ReadOnlyBufferException
@@ -495,7 +499,7 @@ public abstract class Binary implements Iterable<Byte> {
 
     /**
      * Copies bytes to a {@code byte[]}.
-     * 
+     *
      * @return copied bytes
      */
     public byte[] toByteArray() {
@@ -507,7 +511,7 @@ public abstract class Binary implements Iterable<Byte> {
 
     /**
      * Writes the complete contents of this byte string to the specified output stream argument.
-     * 
+     *
      * @param out
      *            the output stream to which to write the data.
      * @throws IOException
@@ -518,7 +522,7 @@ public abstract class Binary implements Iterable<Byte> {
     /**
      * Constructs a read-only {@code java.nio.ByteBuffer} whose content is equal to the contents of this byte string.
      * The result uses the same backing array as the byte string, if possible.
-     * 
+     *
      * @return wrapped bytes
      */
     public abstract ByteBuffer asReadOnlyByteBuffer();
@@ -529,14 +533,14 @@ public abstract class Binary implements Iterable<Byte> {
      * <p>
      * By returning a list, implementations of this method may be able to avoid copying even when there are multiple
      * backing arrays.
-     * 
+     *
      * @return a list of wrapped bytes
      */
     public abstract List<ByteBuffer> asReadOnlyByteBufferList();
 
     /**
      * Constructs a new {@code String} by decoding the bytes using the specified charset.
-     * 
+     *
      * @param charsetName
      *            encode using this charset
      * @return new string
@@ -550,7 +554,7 @@ public abstract class Binary implements Iterable<Byte> {
 
     /**
      * Constructs a new {@code String} by decoding the bytes as UTF-8.
-     * 
+     *
      * @return new string using UTF-8 encoding
      */
     public String toStringUtf8() {
@@ -564,27 +568,27 @@ public abstract class Binary implements Iterable<Byte> {
     /**
      * Tells whether this {@code ByteString} represents a well-formed UTF-8 byte sequence, such that the original bytes
      * can be converted to a String object and then round tripped back to bytes without loss.
-     * 
+     *
      * <p>
      * More precisely, returns {@code true} whenever:
-     * 
+     *
      * <pre>
      * {@code
      * Arrays.equals(byteString.toByteArray(),
      *     new String(byteString.toByteArray(), "UTF-8").getBytes("UTF-8"))
      * }
      * </pre>
-     * 
+     *
      * <p>
      * This method returns {@code false} for "overlong" byte sequences, as well as for 3-byte sequences that would map
      * to a surrogate character, in accordance with the restricted definition of UTF-8 introduced in Unicode 3.1. Note
      * that the UTF-8 decoder included in Oracle's JDK has been modified to also reject "overlong" byte sequences, but
      * (as of 2011) still accepts 3-byte surrogate character byte sequences.
-     * 
+     *
      * <p>
      * See the Unicode Standard,</br> Table 3-6. <em>UTF-8 Bit Distribution</em>,</br> Table 3-7.
      * <em>Well Formed UTF-8 Byte Sequences</em>.
-     * 
+     *
      * @return whether the bytes in this {@code ByteString} are a well-formed UTF-8 byte sequence
      */
     public abstract boolean isValidUtf8();
@@ -593,7 +597,7 @@ public abstract class Binary implements Iterable<Byte> {
      * Tells whether the given byte sequence is a well-formed, malformed, or incomplete UTF-8 byte sequence. This method
      * accepts and returns a partial state result, allowing the bytes for a complete UTF-8 byte sequence to be composed
      * from multiple {@code ByteString} segments.
-     * 
+     *
      * @param state
      *            either {@code 0} (if this is the initial decoding operation) or the value returned from a call to a
      *            partial decoding method for the previous bytes
@@ -601,7 +605,7 @@ public abstract class Binary implements Iterable<Byte> {
      *            offset of the first byte to check
      * @param length
      *            number of bytes to check
-     * 
+     *
      * @return {@code -1} if the partial byte sequence is definitely malformed, {@code 0} if it is well-formed (no
      *         additional input needed), or, if the byte sequence is "incomplete", i.e. apparently terminated in the
      *         middle of a character, an opaque integer "state" value containing enough information to decode the
@@ -617,7 +621,7 @@ public abstract class Binary implements Iterable<Byte> {
 
     /**
      * Return a non-zero hashCode depending only on the sequence of bytes in this ByteString.
-     * 
+     *
      * @return hashCode value for this object
      */
     @Override
@@ -635,7 +639,7 @@ public abstract class Binary implements Iterable<Byte> {
      * will read/skip as many bytes as are available.
      * <p>
      * The methods in the returned {@link InputStream} might <b>not</b> be thread safe.
-     * 
+     *
      * @return an input stream that returns the bytes of this byte string.
      */
     public abstract InputStream newInput();
@@ -643,7 +647,7 @@ public abstract class Binary implements Iterable<Byte> {
     /**
      * Creates a {@link CodedInputStream} which can be used to read the bytes. Using this is often more efficient than
      * creating a {@link CodedInputStream} that wraps the result of {@link #newInput()}.
-     * 
+     *
      * @return stream based on wrapped data
      */
     // public abstract CodedInputStream newCodedInput();
@@ -657,7 +661,7 @@ public abstract class Binary implements Iterable<Byte> {
      * <p>
      * A {@link Binary.Output} offers the same functionality as a {@link ByteArrayOutputStream}, except that it returns
      * a {@link Binary} rather than a {@code byte} array.
-     * 
+     *
      * @param initialCapacity
      *            estimate of number of bytes to be written
      * @return {@code OutputStream} for building a {@code ByteString}
@@ -671,7 +675,7 @@ public abstract class Binary implements Iterable<Byte> {
      * <p>
      * A {@link Binary.Output} offers the same functionality as a {@link ByteArrayOutputStream}, except that it returns
      * a {@link Binary} rather than a {@code byte array}.
-     * 
+     *
      * @return {@code OutputStream} for building a {@code ByteString}
      */
     public static Output newOutput() {
@@ -707,7 +711,7 @@ public abstract class Binary implements Iterable<Byte> {
 
         /**
          * Creates a new ByteString output stream with the specified initial capacity.
-         * 
+         *
          * @param initialCapacity
          *            the initial capacity of the output stream.
          */
@@ -751,7 +755,7 @@ public abstract class Binary implements Iterable<Byte> {
         /**
          * Creates a byte string. Its size is the current size of this output stream and its output has been copied to
          * it.
-         * 
+         *
          * @return the current contents of this output stream, as a byte string.
          */
         public synchronized Binary toByteString() {
@@ -770,7 +774,7 @@ public abstract class Binary implements Iterable<Byte> {
 
         /**
          * Writes the complete contents of this byte array output stream to the specified output stream argument.
-         * 
+         *
          * @param out
          *            the output stream to which to write the data.
          * @throws IOException
@@ -796,7 +800,7 @@ public abstract class Binary implements Iterable<Byte> {
 
         /**
          * Returns the current size of the output stream.
-         * 
+         *
          * @return the current size of the output stream
          */
         public synchronized int size() {
@@ -910,7 +914,7 @@ public abstract class Binary implements Iterable<Byte> {
     /**
      * Return the depth of the tree representing this {@code ByteString}, if any, whose root is this node. If this is a
      * leaf node, return 0.
-     * 
+     *
      * @return tree depth or zero
      */
     protected abstract int getTreeDepth();
@@ -918,14 +922,14 @@ public abstract class Binary implements Iterable<Byte> {
     /**
      * Return {@code true} if this ByteString is literal (a leaf node) or a flat-enough tree in the sense of
      * {@link RopeByteString}.
-     * 
+     *
      * @return true if the tree is flat enough
      */
     protected abstract boolean isBalanced();
 
     /**
      * Return the cached hash code if available.
-     * 
+     *
      * @return value of cached hash code or 0 if not computed yet
      */
     protected abstract int peekCachedHashCode();
@@ -934,7 +938,7 @@ public abstract class Binary implements Iterable<Byte> {
      * Compute the hash across the value bytes starting with the given hash, and return the result. This is used to
      * compute the hash across strings represented as a set of pieces by allowing the hash computation to be continued
      * from piece to piece.
-     * 
+     *
      * @param h
      *            starting hash value
      * @param offset
@@ -948,5 +952,9 @@ public abstract class Binary implements Iterable<Byte> {
     @Override
     public String toString() {
         return String.format("<ByteString@%s size=%d>", Integer.toHexString(System.identityHashCode(this)), size());
+    }
+
+    public String base64encode() {
+        return SimpleBase64.encode(toByteArray());
     }
 }

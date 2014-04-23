@@ -23,6 +23,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import net.maritimecloud.core.message.MessageParser;
 import net.maritimecloud.core.message.MessageReader;
 import net.maritimecloud.core.message.MessageSerializable;
+import net.maritimecloud.core.message.MessageSerializers;
 import net.maritimecloud.core.message.MessageWriter;
 import net.maritimecloud.util.function.Predicate;
 
@@ -50,7 +51,7 @@ public abstract class Area implements Element, MessageSerializable {
 
     /**
      * Returns a random position within the area.
-     * 
+     *
      * @return a random position within the area
      */
     public final Position getRandomPosition() {
@@ -59,6 +60,10 @@ public abstract class Area implements Element, MessageSerializable {
 
     public abstract Position getRandomPosition(Random random);
 
+    /** Returns a JSON representation of this message */
+    public String toJSON() {
+        return MessageSerializers.writeToJSON(this);
+    }
 
     public final Predicate<Element> contains() {
         return new Predicate<Element>() {
@@ -70,14 +75,14 @@ public abstract class Area implements Element, MessageSerializable {
 
     /**
      * Returns a bounding box of the area.
-     * 
+     *
      * @return a bounding box of the area
      */
     public abstract BoundingBox getBoundingBox();
 
     /**
      * Returns <tt>true</tt> if the specified element is fully contained in the shape, otherwise <tt>false</tt>.
-     * 
+     *
      * @param element
      *            the element to test
      * @return true if the specified element is fully contained in the shape, otherwise false
