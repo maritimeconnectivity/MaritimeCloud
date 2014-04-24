@@ -14,28 +14,36 @@
  */
 package net.maritimecloud.core.message;
 
+import java.io.IOException;
+
 /**
  * A parser for creating message enums based on an integer or string value.
- * 
+ *
  * @author Kasper Nielsen
  */
-public interface MessageEnumParser<T extends Enum<T> & MessageEnum> {
+public abstract class MessageEnumParser<T extends Enum<T> & MessageEnum> extends ValueParser<T> {
 
     /**
      * Creates the enum from the specified integer value.
-     * 
+     *
      * @param value
      *            the integer value to create the enum from
      * @return the new enum
      */
-    T from(int value);
+    public abstract T from(int value);
 
     /**
      * Creates the enum from the specified string
-     * 
+     *
      * @param name
      *            the string value of this enum
      * @return the string value of this enum
      */
-    T from(String name);
+    public abstract T from(String name);
+
+    /** {@inheritDoc} */
+    @Override
+    public final T parse(ValueReader reader) throws IOException {
+        return reader.readEnum(this);
+    }
 }

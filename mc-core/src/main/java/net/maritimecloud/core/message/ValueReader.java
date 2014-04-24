@@ -45,10 +45,9 @@ public abstract class ValueReader {
 
     public abstract <T extends MessageSerializable> T readMessage(MessageParser<T> parser) throws IOException;
 
-    public abstract <T> List<T> readList(MessageParser<T> parser) throws IOException;
+    public abstract <T> List<T> readList(ValueParser<T> parser) throws IOException;
 
-    public abstract <T> Set<T> readSet(MessageParser<T> parser) throws IOException;
+    public abstract <T> Set<T> readSet(ValueParser<T> parser) throws IOException;
 
-    public abstract <K, V> Map<K, V> readMap(MessageParser<K> keyParser, MessageParser<V> valueParser)
-            throws IOException;
+    public abstract <K, V> Map<K, V> readMap(ValueParser<K> keyParser, ValueParser<V> valueParser) throws IOException;
 }

@@ -25,7 +25,7 @@ import net.maritimecloud.core.message.MessageWriter;
 
 /**
  * A circle
- * 
+ *
  */
 public class Circle extends Area {
 
@@ -33,8 +33,10 @@ public class Circle extends Area {
 
         /** {@inheritDoc} */
         @Override
-        public Circle parse(MessageReader reader) throws IOException {
-            return readCircleFrom(reader);
+        public Circle parse(MessageReader r) throws IOException {
+            Position center = Position.readFromPacked(r, 1, "center-latitude", 2, "center-longitude");
+            float radius = r.readRequiredFloat(3, "radius");
+            return new Circle(center, radius);
         }
     };
 
@@ -47,7 +49,7 @@ public class Circle extends Area {
     /** The radius of the circle. */
     private final double radius;
 
-    private Circle(Position center, double radius) {
+    Circle(Position center, double radius) {
         this.center = requireNonNull(center, "center is null");
         if (radius <= 0) {
             throw new IllegalArgumentException("Radius must be positive, was " + radius);
@@ -57,7 +59,7 @@ public class Circle extends Area {
 
     /**
      * Creates a new circle with the specified center and radius.
-     * 
+     *
      * @param center
      *            the center of the circle
      * @param radius
@@ -132,7 +134,7 @@ public class Circle extends Area {
 
     /**
      * Return the center of the circle.
-     * 
+     *
      * @return the center of the circle
      */
     public Position getCenter() {
@@ -141,7 +143,7 @@ public class Circle extends Area {
 
     /**
      * Returns the radius of the circle.
-     * 
+     *
      * @return the radius of the circle
      */
     public double getRadius() {
@@ -219,7 +221,7 @@ public class Circle extends Area {
 
     /**
      * Returns a new circle with the same radius as this circle but with the new position as the center
-     * 
+     *
      * @param center
      *            the new center of the circle
      * @return a new circle
@@ -230,7 +232,7 @@ public class Circle extends Area {
 
     /**
      * Returns a new circle with the same center as this circle but with the new radius.
-     * 
+     *
      * @param radius
      *            the new radius of the circle
      * @return a new circle
@@ -243,17 +245,10 @@ public class Circle extends Area {
     @Override
     public void writeTo(MessageWriter w) throws IOException {
         center.writeToPacked(w, 1, "center-latitude", 2, "center-longitude");
-
-        w.writeFloat(2, "radius", (float) radius);
+        w.writeFloat(3, "radius", (float) radius);
     }
 
     public String toString() {
         return "Circle: center = " + center + ", radius = " + radius;
-    }
-
-    static Circle readCircleFrom(MessageReader r) throws IOException {
-        Position center = Position.readFromPacked(r, 1, "center-latitude", 2, "center-longitude");
-        float radius = r.readRequiredFloat(2, "radius");
-        return new Circle(center, radius);
     }
 }

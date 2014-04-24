@@ -14,6 +14,8 @@
  */
 package net.maritimecloud.util.geometry;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,7 +52,16 @@ class AreaUnion extends Area {
      * @param cs
      */
     AreaUnion(Area... a) {
-        areas = a;
+        ArrayList<Area> areas = new ArrayList<>();
+        for (Area ar : a) {
+            requireNonNull(ar);
+            if (ar instanceof AreaUnion) {
+                areas.addAll(Arrays.asList(((AreaUnion) ar).areas));
+            } else {
+                areas.add(ar);
+            }
+        }
+        this.areas = areas.toArray(new Area[areas.size()]);
     }
 
     public boolean equals(Object other) {

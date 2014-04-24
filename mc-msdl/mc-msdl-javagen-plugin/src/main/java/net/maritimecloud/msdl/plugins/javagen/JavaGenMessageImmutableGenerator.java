@@ -14,7 +14,6 @@
  */
 package net.maritimecloud.msdl.plugins.javagen;
 
-import net.maritimecloud.internal.message.util.MessageHelper;
 import net.maritimecloud.msdl.model.FieldDeclaration;
 import net.maritimecloud.msdl.model.type.MSDLBaseType;
 import net.maritimecloud.msdl.parser.antlr.StringUtil;
@@ -52,18 +51,7 @@ class JavaGenMessageImmutableGenerator {
         m.addJavadoc("Creates a new Immutable instance.");
         m.addJavadocParameter("instance", "the instance to make an immutable copy of");
 
-        for (FieldDeclaration f : g.fields) {
-            MSDLBaseType t = f.getType().getBaseType();
-            if (t == MSDLBaseType.LIST || t == MSDLBaseType.SET || t == MSDLBaseType.MAP) {
-                c.addImport(MessageHelper.class);
-                m.add("this.", f.getName(), " = ", MessageHelper.class, ".immutableCopy(instance." + f.getName(), ");");
-            } else if (t == MSDLBaseType.MESSAGE) {
-                c.addImport(MessageHelper.class);
-                m.add("this.", f.getName(), " = ", MessageHelper.class, ".immutable(instance." + f.getName(), ");");
-            } else {
-                m.add("this.", f.getName(), " = instance." + f.getName(), ";");
-            }
-        }
+        m.add("super(instance);");
     }
 
     void generateImmutable() {

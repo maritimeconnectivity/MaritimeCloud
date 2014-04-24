@@ -14,10 +14,10 @@
  */
 package net.maritimecloud.msdl.plugins.javagen;
 
-import net.maritimecloud.core.message.MessageEnumParser;
 import net.maritimecloud.core.message.MessageEnum;
-import net.maritimecloud.msdl.model.EnumDeclaration;
+import net.maritimecloud.core.message.MessageEnumParser;
 import net.maritimecloud.msdl.model.EnumConstantDeclaration;
+import net.maritimecloud.msdl.model.EnumDeclaration;
 
 import org.cakeframework.internal.codegen.CodegenClass;
 import org.cakeframework.internal.codegen.CodegenEnum;
@@ -80,7 +80,7 @@ class JavaGenEnumGenerator {
     private static void createEnumParser(CodegenEnum c) {
         CodegenClass i = c.newInnerClass();
         i.addImport(MessageEnumParser.class);
-        i.setDefinition("static class Parser implements ", MessageEnumParser.class, "<", c.getSimpleName(), ">");
+        i.setDefinition("static class Parser extends ", MessageEnumParser.class, "<", c.getSimpleName(), ">");
 
         CodegenMethod m = i.newMethod("public ", c.getSimpleName(), " from(int value)");
         m.addJavadoc("{@inheritDoc}").addAnnotation(Override.class);

@@ -206,8 +206,10 @@ public class JSONMessageWriter extends MessageWriter {
      */
     @Override
     public void writeList(int tag, String name, List<?> list) throws IOException {
-        writeTag(tag, name);
-        writeListOrSet(requireNonNull(list, "list is null"));
+        if (requireNonNull(list, "list is null").size() > 0) {
+            writeTag(tag, name);
+            writeListOrSet(list);
+        }
     }
 
     void writeListOrSet(Collection<?> list) throws IOException {
@@ -258,8 +260,10 @@ public class JSONMessageWriter extends MessageWriter {
 
     @Override
     public void writeSet(int tag, String name, Set<?> set) throws IOException {
-        writeTag(tag, name);
-        writeListOrSet(requireNonNull(set, "set is null"));
+        if (requireNonNull(set, "set is null").size() > 0) {
+            writeTag(tag, name);
+            writeListOrSet(set);
+        }
     }
 
     /** {@inheritDoc} */
@@ -320,7 +324,7 @@ public class JSONMessageWriter extends MessageWriter {
                 break;
             default:
                 if (ch >= '\u0000' && ch <= '\u001F' || ch >= '\u007F' && ch <= '\u009F' || ch >= '\u2000'
-                && ch <= '\u20FF') {
+                        && ch <= '\u20FF') {
                     String ss = Integer.toHexString(ch);
                     sb.append("\\u");
                     for (int k = 0; k < 4 - ss.length(); k++) {

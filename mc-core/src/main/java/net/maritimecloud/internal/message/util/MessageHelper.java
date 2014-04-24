@@ -14,6 +14,7 @@
  */
 package net.maritimecloud.internal.message.util;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -23,13 +24,20 @@ import java.util.Map;
 import java.util.Set;
 
 import net.maritimecloud.core.message.Message;
+import net.maritimecloud.core.message.MessageReader;
+import net.maritimecloud.core.message.ValueParser;
 
 /**
  * Various utility method that are used by generated messages.
- * 
+ *
  * @author Kasper Nielsen
  */
 public class MessageHelper {
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private static <T> T convert(T value) {
+        return value instanceof Message ? (T) ((Message) value).immutable() : value;
+    }
 
     public static <T extends Message<T>> T immutable(T t) {
         return t == null ? null : t.immutable();
@@ -59,8 +67,21 @@ public class MessageHelper {
         return Collections.unmodifiableSet(l);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    private static <T> T convert(T value) {
-        return value instanceof Message ? (T) ((Message) value).immutable() : value;
+    public static <T> List<T> readList(MessageReader reader, int tag, String name, ValueParser<T> parser)
+            throws IOException {
+        // TODO make sure it is a valid list.
+        return reader.readList(tag, name, parser);
+    }
+
+    public static <K, V> Map<K, V> readMap(MessageReader reader, int tag, String name, ValueParser<K> keyParser,
+            ValueParser<V> valueParser) throws IOException {
+        // TODO make sure it is a valid list.
+        return reader.readMap(tag, name, keyParser, valueParser);
+    }
+
+    public static <T> Set<T> readSet(MessageReader reader, int tag, String name, ValueParser<T> parser)
+            throws IOException {
+        // TODO make sure it is a valid list.
+        return reader.readSet(tag, name, parser);
     }
 }

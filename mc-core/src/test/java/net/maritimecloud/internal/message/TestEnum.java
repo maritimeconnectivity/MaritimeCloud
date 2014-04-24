@@ -60,7 +60,7 @@ public enum TestEnum implements MessageEnum {
         }
     }
 
-    static class Parser implements MessageEnumParser<TestEnum> {
+    static class Parser extends MessageEnumParser<TestEnum> {
 
         /** {@inheritDoc} */
         @Override

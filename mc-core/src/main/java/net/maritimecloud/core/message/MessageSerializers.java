@@ -87,7 +87,7 @@ public class MessageSerializers {
         System.out.println(p.equals(p2));
     }
 
-    public static <T> T readFromJSON(MessageParser<T> parser, CharSequence cs) {
+    public static <T extends MessageSerializable> T readFromJSON(MessageParser<T> parser, CharSequence cs) {
         JsonReader reader = JsonProvider.provider().createReader(new StringReader(cs.toString()));
         JSONMessageReader r = new JSONMessageReader(reader);
         try {

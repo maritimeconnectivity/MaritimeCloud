@@ -14,6 +14,8 @@
  */
 package net.maritimecloud.internal.message.json;
 
+import net.maritimecloud.core.message.MessageSerializers;
+import net.maritimecloud.util.geometry.Area;
 import net.maritimecloud.util.geometry.Circle;
 import net.maritimecloud.util.geometry.Position;
 
@@ -24,10 +26,21 @@ import net.maritimecloud.util.geometry.Position;
 public class Ttt {
 
     public static void main(String[] args) {
+
         // Area.createUnion(null);
-        Circle c = Circle.create(Position.create(1.23423, 1), 123f);
+        Circle c1 = Circle.create(Position.create(1.23423, 1), 123f);
+        Circle c2 = Circle.create(Position.create(1.23423, 1), 123f);
+
+        Area a = c1.unionWith(c2);
         // c.setCenter(Position.create(1.23423, 1));
         // c.setRadius(123f);
-        System.out.println(c.toJSON());
+        String circle = a.toJSON();
+        System.out.println(circle);
+        Area cc = MessageSerializers.readFromJSON(Area.PARSER, circle);
+        System.out.println("DDD");
+        System.out.println(cc.toJSON());
+        System.out.println(a.equals(cc));
+
+
     }
 }

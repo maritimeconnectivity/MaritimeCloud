@@ -17,6 +17,7 @@ package net.maritimecloud.util.geometry;
 import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -116,7 +117,7 @@ public abstract class Area implements Element, MessageSerializable {
     }
 
     public Area unionWith(Area other) {
-        throw new UnsupportedOperationException();
+        return new AreaUnion(this, other);
     }
 
     public final MessageSerializable areaWriter() {
@@ -139,9 +140,9 @@ public abstract class Area implements Element, MessageSerializable {
             if (a instanceof Circle) {
                 w.writeMessage(1, "circle", a);
             } else if (a instanceof BoundingBox) {
-
+                throw new UnsupportedOperationException();
             } else if (a instanceof Polygon) {
-
+                throw new UnsupportedOperationException();
             } else {
                 w.writeMessage(4, "areas", a);
             }
@@ -160,7 +161,8 @@ public abstract class Area implements Element, MessageSerializable {
         } else if (r.isNext(3, "polygon")) {
             return r.readMessage(3, "polygon", BoundingBox.PARSER);
         } else {
-            return r.readMessage(4, "areas", AreaUnion.PARSER);
+            List<AreaUnion> readList = r.readList(4, "areas", AreaUnion.PARSER);
+            return new AreaUnion(readList.toArray(new AreaUnion[0]));
         }
     }
 }
