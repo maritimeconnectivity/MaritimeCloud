@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class takes of connecting and handshaking with a remote server.
- * 
+ *
  * @author Kasper Nielsen
  */
 class ClientConnectFuture implements Runnable {
@@ -63,12 +63,55 @@ class ClientConnectFuture implements Runnable {
         this.connection = requireNonNull(connection);
         this.reconnectId = reconnectId;
         transport = connection.connectionManager.ctm.create(connection, this);
-        // transport = new ConnectionTransportJsr356(this, connection);
     }
 
-    /** {@inheritDoc} */
-    @Override
     public void run() {
+        // RECONNECTIN
+        // [MaritimeCloud-ConnectingThread] INFO net.maritimecloud.internal.net.client.connection.ClientConnectFuture -
+        // Trying to connect to ws://localhost:30000/
+        // [Thread-15] ERROR
+        // net.maritimecloud.internal.net.client.connection.ConnectionTransportManagerJsr356$ConnectionTransportJsr356 -
+        // Connect timed out after 10 seconds
+        // [MaritimeCloud-ConnectingThread] ERROR net.maritimecloud.internal.net.client.connection.ClientConnectFuture -
+        // Could not connect to ws://localhost:30000/, will try again later
+        // RECONNECTIN
+        // [Thread-16] ERROR
+        // net.maritimecloud.internal.net.client.connection.ConnectionTransportManagerJsr356$ConnectionTransportJsr356 -
+        // Connect timed out after 10 seconds
+        // [MaritimeCloud-ConnectingThread] ERROR net.maritimecloud.internal.net.client.connection.ClientConnectFuture -
+        // Could not connect to ws://localhost:30000/, will try again later
+        // RECONNECTIN
+        // [Thread-17] ERROR
+        // net.maritimecloud.internal.net.client.connection.ConnectionTransportManagerJsr356$ConnectionTransportJsr356 -
+        // Connect timed out after 10 seconds
+        // [MaritimeCloud-ConnectingThread] ERROR net.maritimecloud.internal.net.client.connection.ClientConnectFuture -
+        // Could not connect to ws://localhost:30000/, will try again later
+        // RECONNECTIN
+        // [Thread-18] ERROR
+        // net.maritimecloud.internal.net.client.connection.ConnectionTransportManagerJsr356$ConnectionTransportJsr356 -
+        // Connect timed out after 10 seconds
+        // [MaritimeCloud-ConnectingThread] ERROR net.maritimecloud.internal.net.client.connection.ClientConnectFuture -
+        // Could not connect to ws://localhost:30000/, will try again later
+        // RECONNECTIN
+        // Bye connect
+        // [WebSocketClient@1644443712-21] ERROR net.maritimecloud.internal.net.client.connection.ClientConnectFuture -
+        // Expected a connected message, but was: WelcomeMessage
+        // [WebSocketClient@1644443712-21] ERROR net.maritimecloud.internal.net.client.connection.ClientConnection -
+        // Connection to MaritimeCloud was lost: 'Expected a connected message, but was: WelcomeMessage' will try and
+        // reconnected
+        // [MaritimeCloud-ConnectingThread] INFO net.maritimecloud.internal.net.client.connection.ClientConnectFuture -
+        // Trying to connect to ws://localhost:30000/
+        // RECONNECTIN
+        // Bye connect
+        try {
+            run0();
+            System.out.println("Bye connect");
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
+
+    void run0() {
         final ConnectionManager cm = connection.connectionManager;
         cm.forEachListener(new Consumer<Listener>() {
             public void accept(Listener t) {
@@ -78,8 +121,10 @@ class ClientConnectFuture implements Runnable {
         LOG.info("Trying to connect to " + cm.uri);
         thread = Thread.currentThread();
         while (cancelled.getCount() > 0) {
+            System.out.println("RECONNECTIN");
             try {
                 transport.connect(cm.uri);
+                System.out.println("FFFFF");
                 return;
             } catch (IllegalStateException e) {
                 LOG.error("A serious internal error", e);
@@ -96,7 +141,7 @@ class ClientConnectFuture implements Runnable {
 
     /**
      * Takes care of the connection handshake.
-     * 
+     *
      * @param m
      *            the message we have received
      */

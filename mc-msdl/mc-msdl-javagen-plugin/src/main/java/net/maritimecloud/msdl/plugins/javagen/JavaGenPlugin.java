@@ -28,6 +28,7 @@ import net.maritimecloud.msdl.model.EnumDeclaration;
 import net.maritimecloud.msdl.model.FileDeclaration;
 import net.maritimecloud.msdl.model.MessageDeclaration;
 import net.maritimecloud.msdl.model.Project;
+import net.maritimecloud.msdl.model.ServiceDeclaration;
 import net.maritimecloud.msdl.plugins.javagen.annotation.JavaImplementation;
 
 import org.cakeframework.internal.codegen.CodegenClass;
@@ -79,7 +80,9 @@ public class JavaGenPlugin extends MsdlPlugin {
                 classes.add(new JavaGenMessageGenerator(null, md).generate().c);
             }
         }
-
+        for (ServiceDeclaration sd : definition.getServices()) {
+            classes.add(new JavaGenServiceGenerator(sd).generate().c);
+        }
         for (CodegenClass cc : classes) {
             if (definition.getNamespace() != null) {
                 cc.setPackage(definition.getNamespace());

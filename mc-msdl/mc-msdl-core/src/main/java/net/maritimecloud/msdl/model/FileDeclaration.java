@@ -43,4 +43,6 @@ public interface FileDeclaration {
      * @return
      */
     List<MessageDeclaration> getMessages();
+
+    List<ServiceDeclaration> getServices();
 }

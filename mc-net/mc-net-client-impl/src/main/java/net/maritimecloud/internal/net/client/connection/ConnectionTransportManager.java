@@ -17,7 +17,7 @@ package net.maritimecloud.internal.net.client.connection;
 import org.picocontainer.Startable;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 @SuppressWarnings("unchecked")
@@ -30,7 +30,7 @@ public abstract class ConnectionTransportManager implements Startable {
             + ".ConnectionTransportManagerJetty";
 
     static final String TRANSPORT_MANAGER_ANDROID = ConnectionTransportManager.class.getPackage().getName()
-            + ".ConnectionTransportManagerAndroid";
+            + ".ConnectionTransportManagerAndroidxx";
 
     static final Class<? extends ConnectionTransportManager> TRANSPORT_MANAGER;
 

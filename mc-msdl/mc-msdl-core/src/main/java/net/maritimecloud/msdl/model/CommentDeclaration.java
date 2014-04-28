@@ -19,6 +19,11 @@ package net.maritimecloud.msdl.model;
  * @author Kasper Nielsen
  */
 public interface CommentDeclaration {
+    // Ideen er at man skal kunne dokumentere nogle information i de MSDL filer.
+    // Annotations bliver _ALDRIG_ brugt til dokumentation de har altid en eller anden
+    // form for semantics mening.
+    String TITLE = "foo";
+
     String getMain();
 
     String getMainUncapitalized();

@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public final class ClientConnection {
@@ -73,7 +73,7 @@ public final class ClientConnection {
 
     /**
      * Invoked when we have successfully connected to the server.
-     * 
+     *
      * @param transport
      */
     void connected(ClientConnectFuture future, ConnectionTransport transport) {
@@ -162,7 +162,7 @@ public final class ClientConnection {
 
     /**
      * Invoked whenever we want to send a message
-     * 
+     *
      * @param message
      *            the message to send
      */

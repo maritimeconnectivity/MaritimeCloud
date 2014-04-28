@@ -66,7 +66,7 @@ public class TestWriter extends AbstractJSONTest {
 
     @Test
     public void testListAndSet() throws IOException {
-        assertJSON(w -> w.writeList(1, "i1", Arrays.asList()), "\"i1\": [", "]");
+        assertJSON(w -> w.writeList(1, "i1", Arrays.asList()));
         assertJSON(w -> w.writeList(1, "i1", Arrays.asList(1, 3, 2, -4, 1)), "\"i1\": [", "  1,", "  3,", "  2,",
                 "  -4,", "  1", "]");
         assertJSON(w -> w.writeSet(1, "i1", new LinkedHashSet<>(Arrays.asList(1, 3, 2, -4, 1))), "\"i1\": [", "  1,",
@@ -99,8 +99,8 @@ public class TestWriter extends AbstractJSONTest {
         m.i1 = 123;
         m.i2 = 1234;
         m.l1 = -123;
-        assertJSON(w -> w.writeMessage(1, "m", m), "\"m\": {", "  \"i1\": 123,", "  \"i2\": 1234,", "  \"l1\": -123,",
-                "  \"list\": [", "  ]", "}");
+        assertJSON(w -> w.writeMessage(1, "m", m), "\"m\": {", "  \"i1\": 123,", "  \"i2\": 1234,", "  \"l1\": -123",
+                "}");
 
         Msg1 m2 = new Msg1();
         m2.i1 = 123;
@@ -108,8 +108,8 @@ public class TestWriter extends AbstractJSONTest {
         m2.l1 = -123;
         m2.list.add(m);
         assertJSON(w -> w.writeMessage(1, "m", m2), "\"m\": {", "  \"i1\": 123,", "  \"i2\": 1234,", "  \"l1\": -123,",
-                "  \"list\": [", "    {", "      \"i1\": 123,", "      \"i2\": 1234,", "      \"l1\": -123,",
-                "      \"list\": [", "      ]", "    }", "  ]", "}");
+                "  \"list\": [", "    {", "      \"i1\": 123,", "      \"i2\": 1234,", "      \"l1\": -123", "    }",
+                "  ]", "}");
     }
 
     static class Msg1 extends MessageParser<Msg1> implements MessageSerializable {

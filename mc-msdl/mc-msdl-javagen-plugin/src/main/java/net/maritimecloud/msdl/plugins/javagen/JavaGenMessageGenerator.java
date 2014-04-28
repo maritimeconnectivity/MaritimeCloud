@@ -25,6 +25,7 @@ import net.maritimecloud.core.message.MessageReader;
 import net.maritimecloud.core.message.MessageSerializers;
 import net.maritimecloud.core.message.MessageWriter;
 import net.maritimecloud.core.message.ValueParser;
+import net.maritimecloud.core.net.BroadcastMessage;
 import net.maritimecloud.internal.message.util.MessageHelper;
 import net.maritimecloud.internal.util.Hashing;
 import net.maritimecloud.msdl.model.BaseMessage;
@@ -43,7 +44,7 @@ import org.cakeframework.internal.codegen.CodegenMethod;
  * @author Kasper Nielsen
  */
 public class JavaGenMessageGenerator {
-    final CodegenClass c = new CodegenClass();
+    final CodegenClass c;
 
     final CodegenClass parent;
 
@@ -55,23 +56,23 @@ public class JavaGenMessageGenerator {
         this.parent = parent;
         this.msg = msg;
         fields = msg.getFields();
+        this.c = parent == null ? new CodegenClass() : parent.newInnerClass();
     }
 
     void generateClass() {
-        c.addImport(Message.class);
-
+        Class<?> mType = this instanceof JavaGenBroadcastMessageGenerator ? BroadcastMessage.class : Message.class;
+        c.addImport(mType);
         if (parent == null) {
-            c.setDefinition("public class ", msg.getName(), " implements ", Message.class, "<", msg.getName(), ">");
+            c.setDefinition("public class ", msg.getName(), " implements ", mType, "<", msg.getName(), ">");
         } else {
-            c.setDefinition("public static class ", msg.getName(), " implements ", Message.class, "<", msg.getName(),
-                    ">");
+            c.setDefinition("public static class ", msg.getName(), " implements ", mType, "<", msg.getName(), ">");
         }
         c.addImport(MessageParser.class);
         c.addFieldWithJavadoc("A message parser that can create new instances of this class.", "public static final ",
                 MessageParser.class, "<", msg.getName(), "> PARSER = new Parser();");
     }
 
-    final JavaGenMessageGenerator generate() {
+    JavaGenMessageGenerator generate() {
         generateClass();
         generateFields();
         // We only generate constructors if we have at least one field, otherwise we rely on default constructors

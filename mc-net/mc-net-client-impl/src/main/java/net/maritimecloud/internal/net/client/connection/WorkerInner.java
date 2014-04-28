@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class WorkerInner {
@@ -85,6 +85,8 @@ public class WorkerInner {
      * @return false if there are no messages to process
      */
     boolean processNext() {
+        System.out.println("ProcessNext" + Thread.currentThread().getName());
+        // System.out.println(System.currentTimeMillis() + " XXXXXXXXXXXXX");
         boolean nextIsReceived = this.nextIsReceived;
         this.nextIsReceived = !nextIsReceived;
         if (nextIsReceived) {
@@ -110,7 +112,8 @@ public class WorkerInner {
 
     private void processReceived() {
         ConnectionMessage cm = received.poll();
-        // System.out.println("GOT MSG with " + cm.getLatestReceivedId() + " " + cm.toJSON());
+        // System.out
+        // .println(System.currentTimeMillis() + " GOT MSG with " + cm.getLatestReceivedId() + " " + cm.toJSON());
         latestReceivedMessageId = cm.getMessageId();
         latestAck = cm.getLatestReceivedId();
         worker.connection.getBus().onMsg(cm);
@@ -119,13 +122,14 @@ public class WorkerInner {
             if (m == null || m.id > latestAck) {
                 return;
             }
-            System.out.println("ACKED " + m.cm.getClass() + " " + m.uuid);
+            // System.out.println(System.currentTimeMillis() + " ACKED " + m.cm.getClass() + " " + m.uuid);
             m.acked().complete(null);
             written.poll();
         }
     }
 
     private void processWritten() {
+        System.out.println("Proc written " + Thread.currentThread().getName());
         ConnectionTransport transport = worker.connection.getTransport();
         if (transport != null && transport == this.transport) {
             OutstandingMessage om = unwritten.poll();

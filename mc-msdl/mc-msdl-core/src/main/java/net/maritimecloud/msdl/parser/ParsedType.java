@@ -89,8 +89,8 @@ public class ParsedType {
             }
         } else {
             QualifiedNameContext con = c.qualifiedName();
-            // TODO parse qualified name
             referenceName = con.Identifier().get(0).getText();
+            // System.out.println(referenceName);
         }
         return this;
     }
@@ -109,7 +109,7 @@ public class ParsedType {
             AnyType valueType = arguments.get(1).toType();
             return new MapTypeImpl(keyType, valueType);
         } else {
-            return (AnyType) messageOrEnum;
+            return requireNonNull((AnyType) messageOrEnum);
         }
     }
 

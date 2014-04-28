@@ -14,10 +14,22 @@
  */
 package net.maritimecloud.msdl.model;
 
+import java.util.List;
+
 /**
  *
  * @author Kasper Nielsen
  */
 public interface ServiceDeclaration {
 
+    List<BroadcastMessageDeclaration> getBroadcastMessages();
+
+    /**
+     * Returns the file this enum is defined in.
+     *
+     * @return the file this enum is defined in
+     */
+    FileDeclaration getFile();
+
+    String getName();
 }

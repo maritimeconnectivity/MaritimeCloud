@@ -27,6 +27,6 @@ import net.maritimecloud.core.message.Message;
  */
 public interface BroadcastMessage<T extends BroadcastMessage<T>> extends Message<T> {
 
-    Object getService();// Or name???
+    // Object getService();// Or name???
 
 }

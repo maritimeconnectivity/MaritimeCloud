@@ -24,6 +24,7 @@ import java.util.List;
 import net.maritimecloud.msdl.model.EnumDeclaration;
 import net.maritimecloud.msdl.model.FileDeclaration;
 import net.maritimecloud.msdl.model.MessageDeclaration;
+import net.maritimecloud.msdl.model.ServiceDeclaration;
 import net.maritimecloud.msdl.parser.antlr.AntlrFile;
 import net.maritimecloud.msdl.parser.antlr.MsdlParser.EnumDeclarationContext;
 import net.maritimecloud.msdl.parser.antlr.MsdlParser.ImportDeclarationContext;
@@ -53,6 +54,8 @@ class ParsedFile implements FileDeclaration {
     final List<ParsedEnum> enums = new ArrayList<>();
 
     final List<ParsedMessage> messages = new ArrayList<>();
+
+    final List<ParsedService> services = new ArrayList<>();
 
     ParsedFile(ParsedProject project, AntlrFile antlrFile) {
         this.antlrFile = requireNonNull(antlrFile);
@@ -86,14 +89,13 @@ class ParsedFile implements FileDeclaration {
     private void parseTypes() {
         for (TypeDeclarationContext tdc : antlrFile.getCompilationUnit().typeDeclaration()) {
             AnnotationContainer ac = new AnnotationContainer(this).parse(tdc);
-
             ParseTree child = tdc.getChild(tdc.getChildCount() - 1);
             if (child instanceof EnumDeclarationContext) {
                 enums.add(new ParsedEnum(this, ac).parse((EnumDeclarationContext) child));
             } else if (child instanceof MessageDeclarationContext) {
                 messages.add(new ParsedMessage(this, ac).parse((MessageDeclarationContext) child));
             } else if (child instanceof ServiceDeclarationContext) {
-                // types.add(ParsedService.create(this, (ServiceDeclarationContext) child));
+                services.add(new ParsedService(this, ac).parse((ServiceDeclarationContext) child));
             }
         }
     }
@@ -131,5 +133,12 @@ class ParsedFile implements FileDeclaration {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public List<MessageDeclaration> getMessages() {
         return (List) Collections.unmodifiableList(messages);
+    }
+
+    /** {@inheritDoc} */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Override
+    public List<ServiceDeclaration> getServices() {
+        return (List) Collections.unmodifiableList(services);
     }
 }

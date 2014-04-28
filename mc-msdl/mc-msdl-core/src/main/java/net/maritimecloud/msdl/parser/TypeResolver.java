@@ -31,9 +31,9 @@ import com.google.common.collect.Multimap;
 class TypeResolver {
     final Collection<ParsedFile> files;
 
-    final Multimap<String, Object> types = ArrayListMultimap.create();
-
     final MsdlLogger logger;
+
+    final Multimap<String, Object> types = ArrayListMultimap.create();
 
     TypeResolver(MsdlLogger logger, Collection<ParsedFile> files) {
         this.files = requireNonNull(files);
@@ -43,6 +43,11 @@ class TypeResolver {
 
     void resolve() {
         for (ParsedFile f : files) {
+            for (ParsedService ps : f.services) {
+                for (ParsedBroadcastMessage m : ps.broadcastMessages) {
+                    resolveMessage0(m);
+                }
+            }
             for (ParsedMessage m : f.messages) {
                 resolveMessage0(m);
             }
@@ -50,19 +55,25 @@ class TypeResolver {
                 resolveEnum0(e);
             }
         }
+
         for (ParsedFile f : files) {
+            for (ParsedService ps : f.services) {
+                for (ParsedBroadcastMessage m : ps.broadcastMessages) {
+                    resolveMessage1(m);
+                }
+            }
             for (ParsedMessage m : f.messages) {
                 resolveMessage1(m);
             }
         }
     }
 
-    private void resolveMessage0(ParsedMessage m) {
-        types.put(m.getName(), m);
-    }
-
     private void resolveEnum0(ParsedEnum e) {
         types.put(e.getName(), e);
+    }
+
+    private void resolveMessage0(ParsedMessage m) {
+        types.put(m.getName(), m);
     }
 
     private void resolveMessage1(ParsedMessage m) {

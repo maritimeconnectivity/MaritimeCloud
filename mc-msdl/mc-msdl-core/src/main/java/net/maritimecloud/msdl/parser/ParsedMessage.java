@@ -28,7 +28,10 @@ import net.maritimecloud.msdl.model.FileDeclaration;
 import net.maritimecloud.msdl.model.MessageDeclaration;
 import net.maritimecloud.msdl.model.type.MSDLBaseType;
 import net.maritimecloud.msdl.parser.antlr.MsdlParser.FieldContext;
+import net.maritimecloud.msdl.parser.antlr.MsdlParser.FieldsContext;
 import net.maritimecloud.msdl.parser.antlr.MsdlParser.MessageDeclarationContext;
+
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 /**
  *
@@ -61,9 +64,19 @@ public class ParsedMessage implements MessageDeclaration {
         // System.out.println(c.getStart().getCharPositionInLine());
         // System.out.println(c.getStop().getLine());
         // System.out.println(c.getStop().getCharPositionInLine());
+        parse(c.Identifier(), c.fields());
+        return this;
+    }
 
-        name = c.Identifier().getText();
-        for (FieldContext ec : c.fields().field()) {
+    ParsedMessage parse(TerminalNode identifier, FieldsContext fields) {
+        // System.out.println(c.getText());
+        // System.out.println(c.getStart().getLine());
+        // System.out.println(c.getStart().getCharPositionInLine());
+        // System.out.println(c.getStop().getLine());
+        // System.out.println(c.getStop().getCharPositionInLine());
+
+        name = identifier.getText();
+        for (FieldContext ec : fields.field()) {
             ParsedField pf = new ParsedField(this);
             pf.parse(ec);
             if (pf != null) {

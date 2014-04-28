@@ -12,20 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.maritimecloud.internal.net.client.connection;
 
 import java.io.IOException;
 import java.net.URI;
 
-import net.maritimecloud.internal.net.client.connection.ConnectionTransportManager;
 import net.maritimecloud.net.ClosingCode;
 import de.tavendo.autobahn.WebSocketConnection;
 import de.tavendo.autobahn.WebSocketException;
 import de.tavendo.autobahn.WebSocketHandler;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class ConnectionTransportManagerAndroid extends ConnectionTransportManager {

@@ -20,4 +20,5 @@ package net.maritimecloud.msdl.model;
  */
 public interface BroadcastMessageDeclaration extends BaseMessage {
 
+    // getService()??
 }

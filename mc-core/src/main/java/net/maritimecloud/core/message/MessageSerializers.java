@@ -26,7 +26,6 @@ import javax.json.spi.JsonProvider;
 
 import net.maritimecloud.internal.message.json.JSONMessageReader;
 import net.maritimecloud.internal.message.json.JSONMessageWriter;
-import net.maritimecloud.util.geometry.Position;
 
 /**
  *
@@ -80,12 +79,12 @@ public class MessageSerializers {
         }
     }
 
-    public static void main(String[] args) {
-        Position p = Position.create(1, 2);
-        String s = p.toJSON();
-        Position p2 = readFromJSON(Position.PARSER, s);
-        System.out.println(p.equals(p2));
-    }
+    // public static void main(String[] args) {
+    // Position p = Position.create(1, 2);
+    // String s = p.toJSON();
+    // Position p2 = readFromJSON(Position.PARSER, s);
+    // System.out.println(p.equals(p2));
+    // }
 
     public static <T extends MessageSerializable> T readFromJSON(MessageParser<T> parser, CharSequence cs) {
         JsonReader reader = JsonProvider.provider().createReader(new StringReader(cs.toString()));

@@ -18,8 +18,10 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
@@ -41,7 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 class ConnectionTransportManagerJsr356 extends ConnectionTransportManager {
@@ -88,10 +90,25 @@ class ConnectionTransportManagerJsr356 extends ConnectionTransportManager {
         }
 
         void connect(URI uri) throws IOException {
+            CountDownLatch done = new CountDownLatch(1);
+            Thread t = Thread.currentThread();
+            Runnable r = new Runnable() {
+                public void run() {
+                    try {
+                        if (!done.await(20, TimeUnit.SECONDS)) {
+                            LOG.error("Connect timed out after 20 seconds");
+                            t.interrupt();
+                        }
+                    } catch (InterruptedException ignore) {}
+                }
+            };
+            new Thread(r, "Connect timeout thread").start();
             try {
                 container.connectToServer(this, uri);
             } catch (DeploymentException e) {
                 throw new IllegalStateException("Internal Error", e);
+            } finally {
+                done.countDown();
             }
         }
 

@@ -29,15 +29,35 @@ import net.maritimecloud.util.Binary;
  */
 public abstract class ValueParser<T> {
 
-    public static final ValueParser<Binary> BINARY = null;
+    public static final ValueParser<Binary> BINARY = new ValueParser<Binary>() {
+        public Binary parse(ValueReader reader) throws IOException {
+            return reader.readBinary();
+        }
+    };
 
-    public static final ValueParser<Boolean> BOOL = null;
+    public static final ValueParser<Boolean> BOOL = new ValueParser<Boolean>() {
+        public Boolean parse(ValueReader reader) throws IOException {
+            return reader.readBool();
+        }
+    };;
 
-    public static final ValueParser<Double> DOUBLE = null;
+    public static final ValueParser<Double> DOUBLE = new ValueParser<Double>() {
+        public Double parse(ValueReader reader) throws IOException {
+            return reader.readDouble();
+        }
+    };;
 
-    public static final ValueParser<Float> FLOAT = null;
+    public static final ValueParser<Float> FLOAT = new ValueParser<Float>() {
+        public Float parse(ValueReader reader) throws IOException {
+            return reader.readFloat();
+        }
+    };;
 
-    public static final ValueParser<Integer> INT32 = null;
+    public static final ValueParser<Integer> INT32 = new ValueParser<Integer>() {
+        public Integer parse(ValueReader reader) throws IOException {
+            return reader.readInt32();
+        }
+    };;
 
     public static final ValueParser<Long> INT64 = new ValueParser<Long>() {
         public Long parse(ValueReader reader) throws IOException {
@@ -45,13 +65,17 @@ public abstract class ValueParser<T> {
         }
     };
 
-    public static final ValueParser<String> STRING = null;
+    public static final ValueParser<String> STRING = new ValueParser<String>() {
+        public String parse(ValueReader reader) throws IOException {
+            return reader.readString();
+        }
+    };;
 
-    public ValueParser<List<T>> listOf() {
+    public final ValueParser<List<T>> listOf() {
         return new ListParser<>(this);
     }
 
-    public <V> ValueParser<Map<T, V>> mappingTo(ValueParser<V> valueParser) {
+    public final <V> ValueParser<Map<T, V>> mappingTo(ValueParser<V> valueParser) {
         return new MapParser<>(this, valueParser);
     }
 
@@ -66,10 +90,9 @@ public abstract class ValueParser<T> {
      */
     public abstract T parse(ValueReader reader) throws IOException;
 
-    public ValueParser<Set<T>> setOf() {
+    public final ValueParser<Set<T>> setOf() {
         return new SetParser<>(this);
     }
-
 
     static class ListParser<E> extends ValueParser<List<E>> {
         final ValueParser<E> parser;

@@ -28,6 +28,7 @@ import org.antlr.v4.runtime.Token;
  * @author Kasper Nielsen
  */
 public class MsdlComment implements CommentDeclaration {
+
     String comment;
 
     /**

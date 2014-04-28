@@ -55,13 +55,8 @@ public interface MaritimeCloudClient extends AutoCloseable {
      * Broadcasts the specified message. No guarantees are made to the delivery of the specified message.
      * <p>
      * This method uses the the default options set by
-<<<<<<< HEAD
      * {@link MaritimeCloudClientConfiguration#setDefaultBroadcastOptions(BroadcastSendOptions)}.
      * 
-=======
-     * {@link MaritimeCloudClientConfiguration#setDefaultBroadcastOptions(BroadcastOptions)}.
-     *
->>>>>>> refs/heads/master
      * @param message
      *            the message to broadcast
      * @throws NullPointerException
