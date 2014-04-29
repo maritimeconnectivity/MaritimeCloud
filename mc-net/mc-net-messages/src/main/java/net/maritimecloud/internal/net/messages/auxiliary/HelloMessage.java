@@ -19,16 +19,16 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 
 import net.maritimecloud.core.id.MaritimeId;
+import net.maritimecloud.internal.net.messages.AbstractTransportMessage;
 import net.maritimecloud.internal.net.messages.MessageType;
 import net.maritimecloud.internal.net.messages.TextMessageReader;
 import net.maritimecloud.internal.net.messages.TextMessageWriter;
-import net.maritimecloud.internal.net.messages.TransportMessage;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
-public class HelloMessage extends TransportMessage {
+public class HelloMessage extends AbstractTransportMessage {
 
     // include connection type
     private final MaritimeId clientId;

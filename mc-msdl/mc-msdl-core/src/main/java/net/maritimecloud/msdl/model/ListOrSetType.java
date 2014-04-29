@@ -12,12 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.msdl.model.type;
+package net.maritimecloud.msdl.model;
 
 /**
  *
  * @author Kasper Nielsen
  */
-public interface ListOrSetType extends AnyType {
-    AnyType getElementType();
+public interface ListOrSetType extends Type {
+
+    /**
+     * Returns the type of elements in the list or set.
+     *
+     * @return the type of elements
+     */
+    Type getElementType();
 }

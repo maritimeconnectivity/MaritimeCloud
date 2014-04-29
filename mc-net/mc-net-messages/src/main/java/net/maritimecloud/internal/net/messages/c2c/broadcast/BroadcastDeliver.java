@@ -21,6 +21,7 @@ import java.io.IOException;
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.net.messages.ConnectionMessage;
 import net.maritimecloud.internal.net.messages.MessageType;
+import net.maritimecloud.internal.net.messages.TMHelpers;
 import net.maritimecloud.internal.net.messages.TextMessageReader;
 import net.maritimecloud.internal.net.messages.TextMessageWriter;
 import net.maritimecloud.net.broadcast.BroadcastMessage;
@@ -31,7 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * This message is send from the server to the client because the client was in proximity of broadcast that was sent to
  * the server.
- * 
+ *
  * @author Kasper Nielsen
  * @see BroadcastSend
  */
@@ -69,7 +70,7 @@ public class BroadcastDeliver extends ConnectionMessage {
     }
 
     public BroadcastDeliver cloneIt() {
-        return new BroadcastDeliver(id, positionTime, channel, escape(message));
+        return new BroadcastDeliver(id, positionTime, channel, TMHelpers.escape(message));
     }
 
     /**
@@ -123,6 +124,6 @@ public class BroadcastDeliver extends ConnectionMessage {
     }
 
     public static BroadcastDeliver create(MaritimeId sender, PositionTime position, String channel, String message) {
-        return new BroadcastDeliver(sender, position, channel, escape(message));
+        return new BroadcastDeliver(sender, position, channel, TMHelpers.escape(message));
     }
 }

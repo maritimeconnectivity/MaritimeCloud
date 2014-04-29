@@ -23,10 +23,10 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import net.maritimecloud.msdl.model.BaseType;
 import net.maritimecloud.msdl.model.FieldDeclaration;
 import net.maritimecloud.msdl.model.FileDeclaration;
 import net.maritimecloud.msdl.model.MessageDeclaration;
-import net.maritimecloud.msdl.model.type.MSDLBaseType;
 import net.maritimecloud.msdl.parser.antlr.MsdlParser.FieldContext;
 import net.maritimecloud.msdl.parser.antlr.MsdlParser.FieldsContext;
 import net.maritimecloud.msdl.parser.antlr.MsdlParser.MessageDeclarationContext;
@@ -97,8 +97,8 @@ public class ParsedMessage implements MessageDeclaration {
 
     /** {@inheritDoc} */
     @Override
-    public MSDLBaseType getBaseType() {
-        return MSDLBaseType.MESSAGE;
+    public BaseType getBaseType() {
+        return BaseType.MESSAGE;
     }
 
     /** {@inheritDoc} */

@@ -29,6 +29,7 @@ import java.util.Set;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
+import javax.json.JsonString;
 import javax.json.JsonValue;
 
 import net.maritimecloud.core.message.MessageEnum;
@@ -229,7 +230,11 @@ public class JSONMessageReader extends MessageReader {
     /** {@inheritDoc} */
     @Override
     public String readString(int tag, String name, String defaultValue) throws IOException {
-        return null;
+        if (isNext(-1, name)) {
+            JsonString val = (JsonString) iter.next().getValue();
+            return val.getString();
+        }
+        return defaultValue;
     }
 
 

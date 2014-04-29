@@ -12,24 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.net.broadcast2;
-
-import net.maritimecloud.core.net.BroadcastMessage;
-
+package net.maritimecloud.net.broadcast;
 
 /**
  *
  * @author Kasper Nielsen
  */
-public interface BroadcastClient {
+public class BroadcastMessageHelper {
 
-    <T extends BroadcastMessage<T>> BroadcastFuture sendBroadcast(T message);
-
-    <T extends BroadcastMessage<T>> BroadcastFuture sendBroadcast(T message, BroadcastSendOptions options);
-
-    <T extends BroadcastMessage<T>> BroadcastSubscription listenForBroadcast(Class<T> messageType,
-            BroadcastListener<T> listener);
-
-    <T extends BroadcastMessage<T>> BroadcastSubscription listenForBroadcast(Class<T> messageType,
-            BroadcastListener<T> listener, BroadcastListenOptions options);
 }

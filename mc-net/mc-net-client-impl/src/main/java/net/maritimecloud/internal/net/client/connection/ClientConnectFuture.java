@@ -23,9 +23,9 @@ import java.util.concurrent.TimeUnit;
 
 import net.maritimecloud.internal.net.client.ClientContainer;
 import net.maritimecloud.internal.net.messages.TransportMessage;
-import net.maritimecloud.internal.net.messages.auxiliary.ConnectedMessage;
 import net.maritimecloud.internal.net.messages.auxiliary.HelloMessage;
 import net.maritimecloud.internal.net.messages.auxiliary.WelcomeMessage;
+import net.maritimecloud.messages.Connected;
 import net.maritimecloud.net.ClosingCode;
 import net.maritimecloud.net.MaritimeCloudConnection.Listener;
 import net.maritimecloud.util.function.Consumer;
@@ -153,7 +153,7 @@ class ClientConnectFuture implements Runnable {
                 String connectName = connection.connectionId == null ? "" : connection.connectionId;
                 transport.sendText(new HelloMessage(client.getLocalId(), connection.connectionManager.client
                         .getClientConnectString(), connectName, reconnectId, pt.getLatitude(), pt.getLongitude())
-                        .toJSON());
+                        .toText());
                 receivedHelloMessage = true;
             } else {
                 String err = "Expected a welcome message, but was: " + m.getClass().getSimpleName();
@@ -161,8 +161,8 @@ class ClientConnectFuture implements Runnable {
                 transport.doClose(ClosingCode.WRONG_MESSAGE.withMessage(err));
             }
         } else {
-            if (m instanceof ConnectedMessage) {
-                ConnectedMessage cm = (ConnectedMessage) m;
+            if (m instanceof Connected) {
+                Connected cm = (Connected) m;
                 boolean isReconnected = Objects.equals(cm.getConnectionId(), connection.connectionId);
                 connection.connectionId = cm.getConnectionId();
                 // if (cm.getLastReceivedMessageId() >= 0) {

@@ -17,10 +17,10 @@ package net.maritimecloud.internal.net.client.broadcast.stubs;
 import net.maritimecloud.net.broadcast.BroadcastMessage;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
-public class BroadcastTestMessage extends BroadcastMessage {
+public class BroadcastTestMessage implements BroadcastMessage {
 
     /** The name of the channel that this broadcast is sent via. */
     public static final String CHANNEL = "test.broadcast";

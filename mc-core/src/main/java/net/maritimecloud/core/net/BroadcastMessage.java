@@ -25,8 +25,10 @@ import net.maritimecloud.core.message.Message;
  *
  * @author Kasper Nielsen
  */
-public interface BroadcastMessage<T extends BroadcastMessage<T>> extends Message<T> {
+public interface BroadcastMessage extends Message {
 
     // Object getService();// Or name???
-
+    default String channel() {
+        return getClass().getCanonicalName();
+    }
 }

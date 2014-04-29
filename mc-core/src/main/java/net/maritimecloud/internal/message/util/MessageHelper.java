@@ -34,13 +34,14 @@ import net.maritimecloud.core.message.ValueParser;
  */
 public class MessageHelper {
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({ "unchecked" })
     private static <T> T convert(T value) {
         return value instanceof Message ? (T) ((Message) value).immutable() : value;
     }
 
-    public static <T extends Message<T>> T immutable(T t) {
-        return t == null ? null : t.immutable();
+    @SuppressWarnings("unchecked")
+    public static <T extends Message> T immutable(T t) {
+        return t == null ? null : (T) t.immutable();
     }
 
     public static <T> List<T> immutableCopy(List<? extends T> list) {

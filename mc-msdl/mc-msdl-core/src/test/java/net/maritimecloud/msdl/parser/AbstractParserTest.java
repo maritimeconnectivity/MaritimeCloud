@@ -28,9 +28,9 @@ import java.util.function.Consumer;
 
 import net.maritimecloud.msdl.MsdlPlugin;
 import net.maritimecloud.msdl.MsdlProcessor;
+import net.maritimecloud.msdl.model.BaseType;
 import net.maritimecloud.msdl.model.FieldDeclaration;
 import net.maritimecloud.msdl.model.Project;
-import net.maritimecloud.msdl.model.type.MSDLBaseType;
 import net.maritimecloud.msdl.parser.TestLogger.Entry;
 
 import com.google.jimfs.Configuration;
@@ -42,7 +42,7 @@ import com.google.jimfs.Jimfs;
  */
 public abstract class AbstractParserTest {
 
-    public static void assertField(int tag, String name, MSDLBaseType type, FieldDeclaration def) {
+    public static void assertField(int tag, String name, BaseType type, FieldDeclaration def) {
         assertEquals(tag, def.getTag());
         assertEquals(name, def.getName());
         assertEquals(type, def.getType().getBaseType());

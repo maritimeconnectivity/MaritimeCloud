@@ -20,7 +20,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import net.maritimecloud.core.id.MaritimeId;
-import net.maritimecloud.internal.net.messages.auxiliary.ConnectedMessage;
+import net.maritimecloud.messages.Connected;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.MaritimeCloudClientConfiguration;
 
@@ -32,7 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class AbstractClientConnectionTest {
@@ -78,7 +78,7 @@ public class AbstractClientConnectionTest {
     protected MaritimeCloudClient createAndConnect() throws InterruptedException {
         MaritimeCloudClient c = conf.build();
         t.m.take();
-        t.send(new ConnectedMessage("ABC", 0));
+        t.send(new Connected().setConnectionId("ABC").setLastReceivedMessageId(0L));
         assertTrue(c.connection().awaitConnected(1, TimeUnit.SECONDS));
         assertTrue(c.connection().isConnected());
         return client = c;

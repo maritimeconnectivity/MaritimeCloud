@@ -111,6 +111,9 @@ public class AnnotationContainer {
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             for (Entry<String, Object> e : pairs) {
                 if (e.getKey().equals(method.getName())) {
+                    if (method.getReturnType().equals(String[].class)) {
+                        return new String[] { (String) e.getValue() };
+                    }
                     return e.getValue();
                 }
             }

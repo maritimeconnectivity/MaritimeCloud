@@ -18,9 +18,9 @@ import net.maritimecloud.core.message.Message;
 import net.maritimecloud.core.net.Endpoint;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
-public class RpcEndpoint<T extends Message<T>, R extends Message<R>> extends Endpoint {
+public class RpcEndpoint<T extends Message, R extends Message> extends Endpoint {
 
 }

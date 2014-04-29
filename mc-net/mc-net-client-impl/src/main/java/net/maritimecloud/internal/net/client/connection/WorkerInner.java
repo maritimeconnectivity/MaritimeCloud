@@ -85,7 +85,7 @@ public class WorkerInner {
      * @return false if there are no messages to process
      */
     boolean processNext() {
-        System.out.println("ProcessNext" + Thread.currentThread().getName());
+        // System.out.println("ProcessNext" + Thread.currentThread().getName());
         // System.out.println(System.currentTimeMillis() + " XXXXXXXXXXXXX");
         boolean nextIsReceived = this.nextIsReceived;
         this.nextIsReceived = !nextIsReceived;
@@ -129,7 +129,7 @@ public class WorkerInner {
     }
 
     private void processWritten() {
-        System.out.println("Proc written " + Thread.currentThread().getName());
+        // System.out.println("Proc written " + Thread.currentThread().getName());
         ConnectionTransport transport = worker.connection.getTransport();
         if (transport != null && transport == this.transport) {
             OutstandingMessage om = unwritten.poll();
@@ -137,7 +137,7 @@ public class WorkerInner {
             om.id = nextSendId++;
             cm.setMessageId(om.id);
             cm.setLatestReceivedId(latestReceivedMessageId);
-            String message = cm.toJSON();
+            String message = cm.toText();
             written.add(om);
             // System.out.println("Adding " + om.id + " to written");
             transport.sendText(message);

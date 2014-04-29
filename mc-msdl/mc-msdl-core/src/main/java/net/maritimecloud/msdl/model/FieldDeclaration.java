@@ -14,7 +14,6 @@
  */
 package net.maritimecloud.msdl.model;
 
-import net.maritimecloud.msdl.model.type.AnyType;
 
 /**
  * The definition of a message field.
@@ -49,5 +48,5 @@ public interface FieldDeclaration {
      *
      * @return the type of the field
      */
-    AnyType getType();
+    Type getType();
 }

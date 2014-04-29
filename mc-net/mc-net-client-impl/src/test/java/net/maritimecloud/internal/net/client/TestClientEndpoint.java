@@ -30,10 +30,11 @@ import javax.websocket.server.ServerEndpoint;
 
 import net.maritimecloud.core.id.ServerId;
 import net.maritimecloud.internal.net.messages.TransportMessage;
+import net.maritimecloud.internal.net.messages.TMHelpers;
 import net.maritimecloud.internal.net.messages.auxiliary.WelcomeMessage;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 @ServerEndpoint(value = "/")
@@ -52,7 +53,7 @@ public class TestClientEndpoint {
         if (session != userSession) {
             throw new Error();
         }
-        TransportMessage tm = TransportMessage.parseMessage(msg);
+        TransportMessage tm = TMHelpers.parseMessage(msg);
         m.put(tm);
     }
 
@@ -71,7 +72,7 @@ public class TestClientEndpoint {
     public void send(TransportMessage m) {
         Basic r = session.getBasicRemote();
         try {
-            r.sendText(m.toJSON());
+            r.sendText(m.toText());
         } catch (IOException e) {
             throw new AssertionError(e);
         }

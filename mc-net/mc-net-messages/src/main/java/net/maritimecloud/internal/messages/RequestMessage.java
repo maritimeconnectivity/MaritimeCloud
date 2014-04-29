@@ -12,29 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.net.broadcast2;
-
-import net.maritimecloud.util.geometry.Area;
+package net.maritimecloud.internal.messages;
 
 /**
  *
  * @author Kasper Nielsen
  */
-public class BroadcastListenOptions {
+public interface RequestMessage extends ConnectionMessage {
 
-    Area area;
-
-    /**
-     * Sets the area for which the broadcast will be visible to other actors. The area is not relative to the current
-     * position of the client. Any area set by this method will override any radius set by
-     * {@link #setBroadcastRadius(int)}.
-     *
-     * @param area
-     *            the area to listen for broadcasts within
-     * @return this option object
-     */
-    public BroadcastListenOptions setArea(Area area) {
-        this.area = area;
-        return this;
-    }
 }

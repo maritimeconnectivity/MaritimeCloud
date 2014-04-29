@@ -18,9 +18,9 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 
+import net.maritimecloud.msdl.model.BaseType;
 import net.maritimecloud.msdl.model.EnumDeclaration;
 import net.maritimecloud.msdl.model.FileDeclaration;
-import net.maritimecloud.msdl.model.type.MSDLBaseType;
 
 import org.junit.Test;
 
@@ -39,7 +39,7 @@ public class EnumParserTest extends AbstractParserTest {
             assertEquals(1, f.getEnums().size());
 
             EnumDeclaration en = f.getEnums().get(0);
-            assertEquals(MSDLBaseType.ENUM, en.getBaseType());
+            assertEquals(BaseType.ENUM, en.getBaseType());
             assertEquals("Foof", en.getName());
             assertEquals(1, en.getValues().size());
             assertEquals("Foo", en.getValues().get(0).getName());
@@ -54,7 +54,7 @@ public class EnumParserTest extends AbstractParserTest {
             FileDeclaration f = e.getFiles().get(0);
             assertEquals(1, f.getEnums().size());
             EnumDeclaration en = f.getEnums().get(0);
-            assertEquals(MSDLBaseType.ENUM, en.getBaseType());
+            assertEquals(BaseType.ENUM, en.getBaseType());
             assertEquals("Foof", en.getName());
 
             assertEquals(3, en.getValues().size());

@@ -31,6 +31,11 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>mc-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>mc-msdl-core</artifactId>
       <version>${project.version}</version>
     </dependency>

@@ -12,29 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.net.broadcast2;
-
-import net.maritimecloud.core.id.MaritimeId;
-import net.maritimecloud.util.geometry.PositionTime;
+package net.maritimecloud.internal.messages;
 
 /**
- * An acknowledgment that can be send every time a broadcast is received by an actor.
- * 
+ *
  * @author Kasper Nielsen
  */
-public interface BroadcastMessageAck {
+public interface ReplyMessage extends ConnectionMessage {
 
-    /**
-     * Returns the id of the actor that received the broadcast.
-     *
-     * @return the id of the actor that received the broadcast
-     */
-    MaritimeId getId();
-
-    /**
-     * Returns the position and time when the actor received the message.
-     *
-     * @return the position and time when the actor received the message
-     */
-    PositionTime getPosition();
 }

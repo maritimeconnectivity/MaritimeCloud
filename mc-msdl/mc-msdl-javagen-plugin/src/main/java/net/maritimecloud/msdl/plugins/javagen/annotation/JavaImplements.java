@@ -12,14 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.msdl.model.type;
+package net.maritimecloud.msdl.plugins.javagen.annotation;
 
 /**
  *
  * @author Kasper Nielsen
  */
-public interface MapType extends AnyType {
-    AnyType getKeyType();
-
-    AnyType getValueType();
+public @interface JavaImplements {
+    String[] value();
 }

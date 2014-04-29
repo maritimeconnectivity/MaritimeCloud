@@ -140,7 +140,7 @@ public class BroadcastManager {
                 bm = broadcast.tryRead();
             } catch (Exception e) {
                 LOG.error("Exception while trying to deserialize an incoming broadcast message ", e);
-                LOG.error(broadcast.toJSON());
+                LOG.error(broadcast.toText());
                 return;
             }
 

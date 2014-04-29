@@ -38,8 +38,11 @@ import net.maritimecloud.msdl.MsdlPluginException;
  * @author Kasper Nielsen
  */
 class ImportResolver implements Iterable<ParsedFile> {
+
+    /** A map of all msdl files. */
     Map<String, Path> dependencies;
 
+    /** A map of all parsed msdl files. */
     Map<String, ParsedFile> resolvedDependency = new LinkedHashMap<>();
 
     final List<Path> directories;

@@ -19,12 +19,12 @@ package net.maritimecloud.core.message;
  *
  * @author Kasper Nielsen
  */
-public interface Message<T extends Message<T>> extends MessageSerializable {
+public interface Message extends MessageSerializable {
 
     /**
      * Returns an immutable copy of this message.
      *
      * @return an immutable copy of this message
      */
-    T immutable();
+    Message immutable();
 }

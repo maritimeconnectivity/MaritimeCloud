@@ -17,10 +17,10 @@ package net.maritimecloud.net.service.rpc;
 import net.maritimecloud.core.message.Message;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
-public interface RpcContext<R extends Message<R>> {
+public interface RpcContext<R extends Message> {
 
     void complete(R result);
 }

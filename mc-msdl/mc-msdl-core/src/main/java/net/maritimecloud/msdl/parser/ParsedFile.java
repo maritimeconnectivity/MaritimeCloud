@@ -141,4 +141,8 @@ class ParsedFile implements FileDeclaration {
     public List<ServiceDeclaration> getServices() {
         return (List) Collections.unmodifiableList(services);
     }
+
+    public String toString() {
+        return antlrFile.getPath().toString();
+    }
 }

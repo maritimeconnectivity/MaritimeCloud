@@ -23,10 +23,10 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import net.maritimecloud.msdl.model.BaseType;
 import net.maritimecloud.msdl.model.EnumDeclaration;
 import net.maritimecloud.msdl.model.EnumConstantDeclaration;
 import net.maritimecloud.msdl.model.FileDeclaration;
-import net.maritimecloud.msdl.model.type.MSDLBaseType;
 import net.maritimecloud.msdl.parser.antlr.MsdlParser.EnumDeclarationContext;
 import net.maritimecloud.msdl.parser.antlr.MsdlParser.EnumTypeDeclarationContext;
 
@@ -102,8 +102,8 @@ public class ParsedEnum implements EnumDeclaration {
 
     /** {@inheritDoc} */
     @Override
-    public MSDLBaseType getBaseType() {
-        return MSDLBaseType.ENUM;
+    public BaseType getBaseType() {
+        return BaseType.ENUM;
     }
 
     /** {@inheritDoc} */

@@ -12,24 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.net.broadcast2;
-
-import net.maritimecloud.core.net.BroadcastMessage;
+package net.maritimecloud.msdl.model;
 
 /**
- * A callback interface for receiving broadcast messages of a specific type.
  *
  * @author Kasper Nielsen
  */
-public interface BroadcastListener<T extends BroadcastMessage<T>> {
+public interface MapType extends Type {
+    Type getKeyType();
 
-    /**
-     * Invoked whenever a broadcast message was received.
-     *
-     * @param header
-     *            header for the broadcast
-     * @param broadcast
-     *            the message that was received
-     */
-    void onMessage(T broadcast, BroadcastMessageHeader header);
+    Type getValueType();
 }

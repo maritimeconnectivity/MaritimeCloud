@@ -29,12 +29,13 @@ import net.maritimecloud.core.net.BroadcastMessage;
 import net.maritimecloud.internal.message.util.MessageHelper;
 import net.maritimecloud.internal.util.Hashing;
 import net.maritimecloud.msdl.model.BaseMessage;
+import net.maritimecloud.msdl.model.BaseType;
 import net.maritimecloud.msdl.model.FieldDeclaration;
-import net.maritimecloud.msdl.model.type.AnyType;
-import net.maritimecloud.msdl.model.type.ListOrSetType;
-import net.maritimecloud.msdl.model.type.MSDLBaseType;
-import net.maritimecloud.msdl.model.type.MapType;
+import net.maritimecloud.msdl.model.ListOrSetType;
+import net.maritimecloud.msdl.model.MapType;
+import net.maritimecloud.msdl.model.Type;
 import net.maritimecloud.msdl.parser.antlr.StringUtil;
+import net.maritimecloud.msdl.plugins.javagen.annotation.JavaImplements;
 
 import org.cakeframework.internal.codegen.CodegenClass;
 import org.cakeframework.internal.codegen.CodegenMethod;
@@ -61,11 +62,18 @@ public class JavaGenMessageGenerator {
 
     void generateClass() {
         Class<?> mType = this instanceof JavaGenBroadcastMessageGenerator ? BroadcastMessage.class : Message.class;
+        String imple = "";
+        if (msg.isAnnotationPresent(JavaImplements.class)) {
+            for (String s : msg.getAnnotation(JavaImplements.class).value()) {
+                imple += ", " + s;
+            }
+        }
         c.addImport(mType);
         if (parent == null) {
-            c.setDefinition("public class ", msg.getName(), " implements ", mType, "<", msg.getName(), ">");
+            c.setDefinition("public class ", msg.getName(), " implements ", mType, imple);// "<", msg.getName(), ">");
         } else {
-            c.setDefinition("public static class ", msg.getName(), " implements ", mType, "<", msg.getName(), ">");
+            c.setDefinition("public static class ", msg.getName(), " implements ", mType, imple);// , "<",
+                                                                                                 // msg.getName(), ">");
         }
         c.addImport(MessageParser.class);
         c.addFieldWithJavadoc("A message parser that can create new instances of this class.", "public static final ",
@@ -96,12 +104,12 @@ public class JavaGenMessageGenerator {
         CodegenMethod m = c.newMethod("public ", c.getSimpleName(), "()");
         m.addJavadoc("Creates a new ", c.getSimpleName(), ".");
         for (FieldDeclaration f : fields) {
-            MSDLBaseType t = f.getType().getBaseType();
-            if (t == MSDLBaseType.LIST) {
+            BaseType t = f.getType().getBaseType();
+            if (t == BaseType.LIST) {
                 m.add(f.getName(), " = new java.util.ArrayList<>();");
-            } else if (t == MSDLBaseType.SET) {
+            } else if (t == BaseType.SET) {
                 m.add(f.getName(), " = new java.util.LinkedHashSet<>();");
-            } else if (t == MSDLBaseType.MAP) {
+            } else if (t == BaseType.MAP) {
                 m.add(f.getName(), " = new java.util.LinkedHashMap<>();");
             }
         }
@@ -112,23 +120,23 @@ public class JavaGenMessageGenerator {
         m.addJavadoc("Creates a new ", c.getSimpleName(), " by reading from a message reader.");
         m.addJavadocParameter("reader", "the message reader");
         for (FieldDeclaration f : fields) {
-            MSDLBaseType type = f.getType().getBaseType();
+            BaseType type = f.getType().getBaseType();
             if (type.isPrimitive()) {
                 String s = StringUtil.capitalizeFirstLetter(type.name().toLowerCase());
                 m.add("this.", f.getName(), " = reader.read", s, "(", f.getTag(), ", \"", f.getName(), "\", null);");
-            } else if (type == MSDLBaseType.ENUM) {
+            } else if (type == BaseType.ENUM) {
                 JavaGenType ty = new JavaGenType(f.getType());
                 m.add("this.", f.getName(), " = reader.readEnum(", f.getTag(), ", \"", f.getName(), "\", ",
                         ty.render(), ".PARSER);");
-            } else if (type == MSDLBaseType.MESSAGE) {
+            } else if (type == BaseType.MESSAGE) {
                 JavaGenType ty = new JavaGenType(f.getType());
                 m.add("this.", f.getName(), " = reader.readMessage(", f.getTag(), ", \"", f.getName(), "\", ",
                         ty.render(), ".PARSER);");
-            } else if (type == MSDLBaseType.LIST) { // Complex type
+            } else if (type == BaseType.LIST) { // Complex type
                 ListOrSetType los = (ListOrSetType) f.getType();
                 m.add("this.", f.getName(), " = ", MessageHelper.class, ".readList(reader, ", f.getTag(), ", \"",
                         f.getName(), "\", ", complexParser(los.getElementType()), ");");
-            } else if (type == MSDLBaseType.SET) { // Complex type
+            } else if (type == BaseType.SET) { // Complex type
                 ListOrSetType los = (ListOrSetType) f.getType();
                 m.add("this.", f.getName(), " = ", MessageHelper.class, ".readSet(reader, ", f.getTag(), ", \"",
                         f.getName(), "\", ", complexParser(los.getElementType()), ");");
@@ -150,11 +158,11 @@ public class JavaGenMessageGenerator {
         m.addJavadoc("Creates a new ", c.getSimpleName(), " by copying an existing.");
         m.addJavadocParameter("instance", "the instance to copy all fields from");
         for (FieldDeclaration f : fields) {
-            MSDLBaseType t = f.getType().getBaseType();
-            if (t == MSDLBaseType.LIST || t == MSDLBaseType.SET || t == MSDLBaseType.MAP) {
+            BaseType t = f.getType().getBaseType();
+            if (t == BaseType.LIST || t == BaseType.SET || t == BaseType.MAP) {
                 c.addImport(MessageHelper.class);
                 m.add("this.", f.getName(), " = ", MessageHelper.class, ".immutableCopy(instance." + f.getName(), ");");
-            } else if (t == MSDLBaseType.MESSAGE) {
+            } else if (t == BaseType.MESSAGE) {
                 c.addImport(MessageHelper.class);
                 m.add("this.", f.getName(), " = ", MessageHelper.class, ".immutable(instance." + f.getName(), ");");
             } else {
@@ -178,18 +186,18 @@ public class JavaGenMessageGenerator {
     }
 
 
-    String complexParser(AnyType type) {
-        MSDLBaseType b = type.getBaseType();
+    String complexParser(Type type) {
+        BaseType b = type.getBaseType();
         if (b.isPrimitive()) {
             c.addImport(ValueParser.class);
             return ValueParser.class.getSimpleName() + "." + b.name().toUpperCase();
         } else if (b.isReferenceType()) {
             JavaGenType ty = new JavaGenType(type);
             return ty.render() + ".PARSER";
-        } else if (b == MSDLBaseType.LIST) {
+        } else if (b == BaseType.LIST) {
             ListOrSetType los = (ListOrSetType) type;
             return complexParser(los.getElementType()) + ".listOf()";
-        } else if (b == MSDLBaseType.SET) {
+        } else if (b == BaseType.SET) {
             ListOrSetType los = (ListOrSetType) type;
             return complexParser(los.getElementType()) + ".setOf()";
         } else {
@@ -291,7 +299,7 @@ public class JavaGenMessageGenerator {
     void generateAccessors() {
         for (FieldDeclaration f : fields) {
             String beanPrefix = StringUtil.capitalizeFirstLetter(f.getName());
-            MSDLBaseType t = f.getType().getBaseType();
+            BaseType t = f.getType().getBaseType();
             JavaGenType los = new JavaGenType(f.getType());
             String r = los.render();
 
@@ -318,13 +326,13 @@ public class JavaGenMessageGenerator {
 
             // SETTER
             CodegenMethod set;
-            if (t == MSDLBaseType.LIST || t == MSDLBaseType.SET) {
+            if (t == BaseType.LIST || t == BaseType.SET) {
                 String name = StringUtil.removePlural(f.getName());
                 set = generateComplexAccessor(c, f);
                 set.addImport(Objects.class);
                 set.add("java.util.Objects.requireNonNull(", name, ", \"", name, " is null\");");
                 set.add("this.", f.getName(), ".add(", name, ");");
-            } else if (t == MSDLBaseType.MAP) {
+            } else if (t == BaseType.MAP) {
                 set = generateComplexAccessor(c, f);
                 set.add("java.util.Objects.requireNonNull(key, \"key is null\");");
                 set.add("java.util.Objects.requireNonNull(value, \"value is null\");");
@@ -378,7 +386,7 @@ public class JavaGenMessageGenerator {
     CodegenMethod generateComplexAccessor(CodegenClass clazz, FieldDeclaration f) {
         String name = StringUtil.removePlural(f.getName());
         String beanPrefix2 = StringUtil.capitalizeFirstLetter(name);
-        if (f.getType().getBaseType() == MSDLBaseType.MAP) {
+        if (f.getType().getBaseType() == BaseType.MAP) {
             JavaGenType key = new JavaGenType(((MapType) f.getType()).getKeyType());
             JavaGenType value = new JavaGenType(((MapType) f.getType()).getValueType());
             return clazz.newMethod("public ", c.getSimpleName(), " put", beanPrefix2, "(", key.render(), " key, ",

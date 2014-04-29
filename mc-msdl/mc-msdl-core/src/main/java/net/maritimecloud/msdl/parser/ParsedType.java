@@ -19,10 +19,10 @@ import static java.util.Objects.requireNonNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.maritimecloud.msdl.model.type.AnyType;
-import net.maritimecloud.msdl.model.type.ListOrSetType;
-import net.maritimecloud.msdl.model.type.MSDLBaseType;
-import net.maritimecloud.msdl.model.type.MapType;
+import net.maritimecloud.msdl.model.BaseType;
+import net.maritimecloud.msdl.model.ListOrSetType;
+import net.maritimecloud.msdl.model.MapType;
+import net.maritimecloud.msdl.model.Type;
 import net.maritimecloud.msdl.parser.antlr.MsdlParser;
 import net.maritimecloud.msdl.parser.antlr.MsdlParser.ComplexTypeContext;
 import net.maritimecloud.msdl.parser.antlr.MsdlParser.PrimitiveTypeContext;
@@ -37,7 +37,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
  */
 public class ParsedType {
 
-    MSDLBaseType type;
+    BaseType type;
 
     /** If this type is an enum or a message. The name of the referenced type. */
     String referenceName;
@@ -51,19 +51,19 @@ public class ParsedType {
             PrimitiveTypeContext ptc = c.primitiveType();
             int t = ptc.start.getType();
             if (t == MsdlParser.INT32) {
-                type = MSDLBaseType.INT32;
+                type = BaseType.INT32;
             } else if (t == MsdlParser.INT64) {
-                type = MSDLBaseType.INT64;
+                type = BaseType.INT64;
             } else if (t == MsdlParser.FLOAT) {
-                type = MSDLBaseType.FLOAT;
+                type = BaseType.FLOAT;
             } else if (t == MsdlParser.DOUBLE) {
-                type = MSDLBaseType.DOUBLE;
+                type = BaseType.DOUBLE;
             } else if (t == MsdlParser.BOOLEAN) {
-                type = MSDLBaseType.BOOL;
+                type = BaseType.BOOL;
             } else if (t == MsdlParser.BINARY) {
-                type = MSDLBaseType.BINARY;
+                type = BaseType.BINARY;
             } else if (t == MsdlParser.STRING) {
-                type = MSDLBaseType.STRING;
+                type = BaseType.STRING;
             } else {
                 throw new Error("Unknown type " + t);
             }
@@ -71,15 +71,15 @@ public class ParsedType {
             ComplexTypeContext ctc = c.complexType();
             int t = ((TerminalNode) ctc.getChild(0)).getSymbol().getType();
             if (t == MsdlParser.LIST) {
-                type = MSDLBaseType.LIST;
+                type = BaseType.LIST;
                 ParsedType element = new ParsedType().parse(ctc.type(0));
                 arguments.add(element);
             } else if (t == MsdlParser.SET) {
-                type = MSDLBaseType.SET;
+                type = BaseType.SET;
                 ParsedType element = new ParsedType().parse(ctc.type(0));
                 arguments.add(element);
             } else if (t == MsdlParser.MAP) {
-                type = MSDLBaseType.MAP;
+                type = BaseType.MAP;
                 ParsedType key = new ParsedType().parse(ctc.type(0));
                 ParsedType value = new ParsedType().parse(ctc.type(1));
                 arguments.add(key);
@@ -95,103 +95,103 @@ public class ParsedType {
         return this;
     }
 
-    AnyType toType() {
+    Type toType() {
         if (type.isPrimitive()) {
             return new PrimitiveType(type);
-        } else if (type == MSDLBaseType.LIST) {
-            AnyType anyType = arguments.get(0).toType();
+        } else if (type == BaseType.LIST) {
+            Type anyType = arguments.get(0).toType();
             return new ListTypeImpl(anyType);
-        } else if (type == MSDLBaseType.SET) {
-            AnyType anyType = arguments.get(0).toType();
+        } else if (type == BaseType.SET) {
+            Type anyType = arguments.get(0).toType();
             return new SetTypeImpl(anyType);
-        } else if (type == MSDLBaseType.MAP) {
-            AnyType keyType = arguments.get(0).toType();
-            AnyType valueType = arguments.get(1).toType();
+        } else if (type == BaseType.MAP) {
+            Type keyType = arguments.get(0).toType();
+            Type valueType = arguments.get(1).toType();
             return new MapTypeImpl(keyType, valueType);
         } else {
-            return requireNonNull((AnyType) messageOrEnum);
+            return requireNonNull((Type) messageOrEnum);
         }
     }
 
     static class MapTypeImpl implements MapType {
-        final AnyType key;
+        final Type key;
 
-        final AnyType value;
+        final Type value;
 
-        MapTypeImpl(AnyType key, AnyType value) {
+        MapTypeImpl(Type key, Type value) {
             this.key = requireNonNull(key);
             this.value = requireNonNull(value);
         }
 
         /** {@inheritDoc} */
         @Override
-        public MSDLBaseType getBaseType() {
-            return MSDLBaseType.MAP;
+        public BaseType getBaseType() {
+            return BaseType.MAP;
         }
 
         /** {@inheritDoc} */
         @Override
-        public AnyType getKeyType() {
+        public Type getKeyType() {
             return key;
         }
 
         /** {@inheritDoc} */
         @Override
-        public AnyType getValueType() {
+        public Type getValueType() {
             return value;
         }
     }
 
     static class SetTypeImpl implements ListOrSetType {
-        final AnyType type;
+        final Type type;
 
-        SetTypeImpl(AnyType type) {
+        SetTypeImpl(Type type) {
             this.type = requireNonNull(type);
         }
 
         /** {@inheritDoc} */
         @Override
-        public MSDLBaseType getBaseType() {
-            return MSDLBaseType.SET;
+        public BaseType getBaseType() {
+            return BaseType.SET;
         }
 
         /** {@inheritDoc} */
         @Override
-        public AnyType getElementType() {
+        public Type getElementType() {
             return type;
         }
     }
 
     static class ListTypeImpl implements ListOrSetType {
-        final AnyType type;
+        final Type type;
 
-        ListTypeImpl(AnyType type) {
+        ListTypeImpl(Type type) {
             this.type = requireNonNull(type);
         }
 
         /** {@inheritDoc} */
         @Override
-        public MSDLBaseType getBaseType() {
-            return MSDLBaseType.LIST;
+        public BaseType getBaseType() {
+            return BaseType.LIST;
         }
 
         /** {@inheritDoc} */
         @Override
-        public AnyType getElementType() {
+        public Type getElementType() {
             return type;
         }
     }
 
-    static class PrimitiveType implements AnyType {
-        MSDLBaseType type;
+    static class PrimitiveType implements Type {
+        BaseType type;
 
-        PrimitiveType(MSDLBaseType type) {
+        PrimitiveType(BaseType type) {
             this.type = type;
         }
 
         /** {@inheritDoc} */
         @Override
-        public MSDLBaseType getBaseType() {
+        public BaseType getBaseType() {
             return type;
         }
 

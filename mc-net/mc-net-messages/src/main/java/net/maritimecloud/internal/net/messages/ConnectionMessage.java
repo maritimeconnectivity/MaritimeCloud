@@ -17,10 +17,10 @@ package net.maritimecloud.internal.net.messages;
 import java.io.IOException;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
-public abstract class ConnectionMessage extends TransportMessage {
+public abstract class ConnectionMessage extends AbstractTransportMessage {
 
     /** The id of the message. */
     private long messageId;

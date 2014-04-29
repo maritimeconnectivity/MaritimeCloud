@@ -20,10 +20,10 @@ import net.maritimecloud.core.message.Message;
 import net.maritimecloud.core.message.MessageWriter;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
-public class VoidMessage implements Message<VoidMessage> {
+public class VoidMessage implements Message {
     public static final VoidMessage INSTANCE = new VoidMessage();
 
     private VoidMessage() {}

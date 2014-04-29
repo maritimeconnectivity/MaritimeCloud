@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.URI;
 
 import net.maritimecloud.internal.net.messages.ConnectionMessage;
+import net.maritimecloud.internal.net.messages.TMHelpers;
 import net.maritimecloud.internal.net.messages.TransportMessage;
 import net.maritimecloud.net.ClosingCode;
 import net.maritimecloud.net.MaritimeCloudConnection;
@@ -32,7 +33,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The client implementation of a transport. Every time the client connects to a server a new transport is created.
  * Unlike {@link ClientConnection} which will persist over multiple connects, and provide smooth reconnect.
- * 
+ *
  * @author Kasper Nielsen
  */
 abstract class ConnectionTransport {
@@ -61,7 +62,7 @@ abstract class ConnectionTransport {
             }
         });
         try {
-            msg = TransportMessage.parseMessage(textMessage);
+            msg = TMHelpers.parseMessage(textMessage);
         } catch (Exception e) {
             e.printStackTrace();
             LOG.error("Failed to parse incoming message", e);

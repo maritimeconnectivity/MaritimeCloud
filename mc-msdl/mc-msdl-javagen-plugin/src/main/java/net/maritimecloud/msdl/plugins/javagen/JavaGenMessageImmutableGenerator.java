@@ -14,8 +14,8 @@
  */
 package net.maritimecloud.msdl.plugins.javagen;
 
+import net.maritimecloud.msdl.model.BaseType;
 import net.maritimecloud.msdl.model.FieldDeclaration;
-import net.maritimecloud.msdl.model.type.MSDLBaseType;
 import net.maritimecloud.msdl.parser.antlr.StringUtil;
 
 import org.cakeframework.internal.codegen.CodegenClass;
@@ -62,8 +62,8 @@ class JavaGenMessageImmutableGenerator {
 
         for (FieldDeclaration f : g.fields) {
             String beanPrefix = StringUtil.capitalizeFirstLetter(f.getName());
-            MSDLBaseType t = f.getType().getBaseType();
-            if (t == MSDLBaseType.LIST || t == MSDLBaseType.SET || t == MSDLBaseType.MAP) {
+            BaseType t = f.getType().getBaseType();
+            if (t == BaseType.LIST || t == BaseType.SET || t == BaseType.MAP) {
                 m = g.generateComplexAccessor(c, f);
             } else {
                 // HAS

@@ -33,7 +33,7 @@ public class BroadcastListenOptions {
      *            the area to listen for broadcasts within
      * @return this option object
      */
-    public BroadcastListenOptions setListenArea(Area area) {
+    public BroadcastListenOptions setArea(Area area) {
         this.area = area;
         return this;
     }

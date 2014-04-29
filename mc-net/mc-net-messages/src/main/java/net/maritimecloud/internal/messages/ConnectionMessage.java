@@ -12,12 +12,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.msdl.model.type;
+package net.maritimecloud.internal.messages;
+
+import net.maritimecloud.internal.net.messages.TransportMessage;
+
 
 /**
  *
  * @author Kasper Nielsen
  */
-public interface AnyType {
-    MSDLBaseType getBaseType();
+public interface ConnectionMessage extends TransportMessage {
+    Long getMessageId();
+
+    Long getLatestReceivedId();
+
+    ConnectionMessage setMessageId(Long messageId);
+
+    ConnectionMessage setLatestReceivedId(Long latestReceivedId);
 }

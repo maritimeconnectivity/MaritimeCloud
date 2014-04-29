@@ -29,7 +29,7 @@ import net.maritimecloud.util.geometry.CoordinateSystem.VincentyCalculationType;
 /**
  * Representation of a WGS84 position and methods for calculating range and bearing between positions.
  */
-public class Position implements Element, Message<Position> {
+public class Position implements Element, Message {
 
     public static final MessageParser<Position> PARSER = new MessageParser<Position>() {
 

@@ -18,14 +18,14 @@ import net.maritimecloud.core.message.Message;
 
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
-public interface RpcListener<T extends Message<T>, R extends Message<R>> {
+public interface RpcListener<T extends Message, R extends Message> {
 
     /**
      * Invoked whenever a broadcast message was received.
-     * 
+     *
      * @param header
      *            header for the broadcast
      * @param broadcast

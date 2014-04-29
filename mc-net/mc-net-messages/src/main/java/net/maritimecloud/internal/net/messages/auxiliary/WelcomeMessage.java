@@ -20,16 +20,16 @@ import java.io.IOException;
 
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.core.id.ServerId;
+import net.maritimecloud.internal.net.messages.AbstractTransportMessage;
 import net.maritimecloud.internal.net.messages.MessageType;
 import net.maritimecloud.internal.net.messages.TextMessageReader;
 import net.maritimecloud.internal.net.messages.TextMessageWriter;
-import net.maritimecloud.internal.net.messages.TransportMessage;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
-public class WelcomeMessage extends TransportMessage {
+public class WelcomeMessage extends AbstractTransportMessage {
 
     /** The version of the protocol, must be one. */
     private final int protocolVersion;

@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
+import net.maritimecloud.core.message.Message;
 import net.maritimecloud.core.message.MessageParser;
 import net.maritimecloud.core.message.MessageReader;
 import net.maritimecloud.core.message.MessageSerializable;
@@ -31,7 +32,7 @@ import net.maritimecloud.util.function.Predicate;
 /**
  * A shape has an area
  **/
-public abstract class Area implements Element, MessageSerializable {
+public abstract class Area implements Element, Message {
     /** serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
@@ -64,6 +65,10 @@ public abstract class Area implements Element, MessageSerializable {
     /** Returns a JSON representation of this message */
     public String toJSON() {
         return MessageSerializers.writeToJSON(this);
+    }
+
+    public Area immutable() {
+        return this;
     }
 
     public final Predicate<Element> contains() {

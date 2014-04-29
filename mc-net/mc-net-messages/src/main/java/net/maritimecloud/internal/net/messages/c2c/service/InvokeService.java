@@ -17,6 +17,7 @@ package net.maritimecloud.internal.net.messages.c2c.service;
 import java.io.IOException;
 
 import net.maritimecloud.internal.net.messages.MessageType;
+import net.maritimecloud.internal.net.messages.TMHelpers;
 import net.maritimecloud.internal.net.messages.TextMessageReader;
 import net.maritimecloud.internal.net.messages.TextMessageWriter;
 import net.maritimecloud.internal.net.messages.c2c.ClientRelayedMessage;
@@ -24,7 +25,7 @@ import net.maritimecloud.internal.net.messages.c2c.ClientRelayedMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class InvokeService extends ClientRelayedMessage {
@@ -40,7 +41,7 @@ public class InvokeService extends ClientRelayedMessage {
     final int status;
 
     public InvokeService(int status, String conversationId, String serviceType, String messageType, Object o) {
-        this(status, conversationId, serviceType, messageType, persistAndEscape(o));
+        this(status, conversationId, serviceType, messageType, TMHelpers.persistAndEscape(o));
     }
 
     /**
@@ -75,7 +76,8 @@ public class InvokeService extends ClientRelayedMessage {
     /** {@inheritDoc} */
     @Override
     public ClientRelayedMessage cloneIt() {
-        InvokeService is = new InvokeService(status, conversationId, serviceType, messageType, escape(message));
+        InvokeService is = new InvokeService(status, conversationId, serviceType, messageType,
+                TMHelpers.escape(message));
         is.setDestination(super.getDestination());
         is.setSource(super.getSource());
         return is;
@@ -85,8 +87,8 @@ public class InvokeService extends ClientRelayedMessage {
      * @param result
      */
     public InvokeServiceResult createReply(Object result) {
-        InvokeServiceResult isa = new InvokeServiceResult(conversationId, persistAndEscape(result), result.getClass()
-                .getName());
+        InvokeServiceResult isa = new InvokeServiceResult(conversationId, TMHelpers.persistAndEscape(result), result
+                .getClass().getName());
         isa.setDestination(getSource());
         isa.setSource(getDestination());
         return isa;

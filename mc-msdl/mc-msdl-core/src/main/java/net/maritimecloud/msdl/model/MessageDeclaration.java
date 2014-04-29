@@ -14,12 +14,11 @@
  */
 package net.maritimecloud.msdl.model;
 
-import net.maritimecloud.msdl.model.type.AnyType;
 
 /**
  *
  * @author Kasper Nielsen
  */
-public interface MessageDeclaration extends BaseMessage, AnyType {
+public interface MessageDeclaration extends BaseMessage, Type {
 
 }

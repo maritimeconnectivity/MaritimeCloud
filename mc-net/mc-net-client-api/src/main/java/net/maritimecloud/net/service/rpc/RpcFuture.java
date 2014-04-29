@@ -18,9 +18,9 @@ import net.maritimecloud.core.message.Message;
 
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
-public interface RpcFuture<T extends Message<T>> {
+public interface RpcFuture<T extends Message> {
 
 }

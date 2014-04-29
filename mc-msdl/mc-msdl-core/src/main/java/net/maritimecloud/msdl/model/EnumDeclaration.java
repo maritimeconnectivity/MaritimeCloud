@@ -17,14 +17,12 @@ package net.maritimecloud.msdl.model;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
-import net.maritimecloud.msdl.model.type.AnyType;
-
 
 /**
  *
  * @author Kasper Nielsen
  */
-public interface EnumDeclaration extends Iterable<EnumConstantDeclaration>, AnyType {
+public interface EnumDeclaration extends Iterable<EnumConstantDeclaration>, Type {
 
     <T extends Annotation> T getAnnotation(Class<T> type);
 

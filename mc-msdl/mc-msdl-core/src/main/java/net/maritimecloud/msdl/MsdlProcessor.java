@@ -115,7 +115,7 @@ public class MsdlProcessor {
                 if (!Files.exists(file)) {
                     logger.error("Could not find file " + p + " at " + file);
                 }
-                m.put(file.toString(), file.toAbsolutePath());
+                m.put(getSourceDirectory().relativize(file).toString(), file.toAbsolutePath());
             }
         }
         return m;

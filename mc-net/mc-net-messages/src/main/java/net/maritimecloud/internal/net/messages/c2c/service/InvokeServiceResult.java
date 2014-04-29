@@ -19,12 +19,13 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 
 import net.maritimecloud.internal.net.messages.MessageType;
+import net.maritimecloud.internal.net.messages.TMHelpers;
 import net.maritimecloud.internal.net.messages.TextMessageReader;
 import net.maritimecloud.internal.net.messages.TextMessageWriter;
 import net.maritimecloud.internal.net.messages.c2c.ClientRelayedMessage;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class InvokeServiceResult extends ClientRelayedMessage {
@@ -84,7 +85,7 @@ public class InvokeServiceResult extends ClientRelayedMessage {
     /** {@inheritDoc} */
     @Override
     public ClientRelayedMessage cloneIt() {
-        InvokeServiceResult is = new InvokeServiceResult(uuid, escape(message), replyType);
+        InvokeServiceResult is = new InvokeServiceResult(uuid, TMHelpers.escape(message), replyType);
         is.setDestination(super.getDestination());
         is.setSource(super.getSource());
         return is;

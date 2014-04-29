@@ -21,6 +21,7 @@ import java.io.IOException;
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.net.messages.MessageType;
 import net.maritimecloud.internal.net.messages.PositionTimeMessage;
+import net.maritimecloud.internal.net.messages.TMHelpers;
 import net.maritimecloud.internal.net.messages.TextMessageReader;
 import net.maritimecloud.internal.net.messages.TextMessageWriter;
 import net.maritimecloud.internal.net.messages.s2c.ServerRequestMessage;
@@ -35,7 +36,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * This message is send from the client to server. Unlike {@link BroadcastDeliver} which is the relay message from the
  * server to the clients that need to receive the broadcast.
- * 
+ *
  * @author Kasper Nielsen
  */
 public class BroadcastSend extends ServerRequestMessage<BroadcastSendAck> implements PositionTimeMessage {
@@ -161,8 +162,8 @@ public class BroadcastSend extends ServerRequestMessage<BroadcastSendAck> implem
         if (broadcastArea == null) {
             broadcastArea = new RelativeCircularArea(options.getBroadcastRadius());
         }
-        return new BroadcastSend(sender, position, message.channel(), persistAndEscape(message), broadcastArea,
-                options.isReceiverAckEnabled());
+        return new BroadcastSend(sender, position, message.channel(), TMHelpers.persistAndEscape(message),
+                broadcastArea, options.isReceiverAckEnabled());
     }
 
     public BroadcastSendAck createReply() {

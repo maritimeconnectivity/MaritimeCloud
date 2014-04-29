@@ -17,10 +17,10 @@ package net.maritimecloud.internal.net.client.broadcast.stubs;
 import net.maritimecloud.net.broadcast.BroadcastMessage;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
-public class HelloWorld2 extends BroadcastMessage {
+public class HelloWorld2 implements BroadcastMessage {
 
     private String message;
 

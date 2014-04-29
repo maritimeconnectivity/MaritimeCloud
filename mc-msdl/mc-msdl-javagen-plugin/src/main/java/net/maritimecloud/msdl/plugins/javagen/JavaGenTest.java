@@ -31,10 +31,11 @@ public class JavaGenTest {
         Logger lo = Logger.getLogger("msdl");
         lo.setLevel(Level.FINE);
         MsdlProcessor g = new MsdlProcessor();
-        g.setSourceDirectory(Paths.get("/Users/kasperni/dma-workspace/MaritimeCloud/mc-msdl/"));
-        g.addDependencyDirectory(Paths.get("/Users/kasperni/dma-workspace/MaritimeCloud/mc-msdl/"));
+        g.setSourceDirectory(Paths.get("/Users/kasperni/dma-workspace/MaritimeCloud/private/msdl/"));
+        g.addDependencyDirectory(Paths.get("/Users/kasperni/dma-workspace/MaritimeCloud/private/msdl/"));
         g.addFile("geometry.msdl");
         g.addFile("indentedrouted.msdl");
+        g.addFile("maritimecloud-messages.msdl");
         g.addPlugin(JavaGenPlugin.create("/Users/kasperni/dma-workspace/MaritimeCloud/mc-msdl/generated"));
         g.process();
     }

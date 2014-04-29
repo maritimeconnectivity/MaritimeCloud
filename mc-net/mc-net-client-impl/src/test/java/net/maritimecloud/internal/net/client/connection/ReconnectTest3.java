@@ -15,14 +15,14 @@
 package net.maritimecloud.internal.net.client.connection;
 
 import net.maritimecloud.internal.net.client.AbstractClientConnectionTest;
-import net.maritimecloud.internal.net.messages.auxiliary.ConnectedMessage;
 import net.maritimecloud.internal.net.messages.auxiliary.HelloMessage;
+import net.maritimecloud.messages.Connected;
 import net.maritimecloud.net.MaritimeCloudClient;
 
 import org.junit.Test;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class ReconnectTest3 extends AbstractClientConnectionTest {
@@ -35,7 +35,7 @@ public class ReconnectTest3 extends AbstractClientConnectionTest {
         t.close();
         // we will try to reconnect anyways
         t.take(HelloMessage.class);
-        t.send(new ConnectedMessage("ABC", 0));
+        t.send(new Connected().setConnectionId("ABC").setLastReceivedMessageId(0L));
 
     }
 }

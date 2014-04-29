@@ -19,7 +19,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import net.maritimecloud.internal.net.messages.auxiliary.ConnectedMessage;
 import net.maritimecloud.internal.net.messages.auxiliary.HelloMessage;
 import net.maritimecloud.internal.net.messages.auxiliary.PositionReportMessage;
 import net.maritimecloud.internal.net.messages.auxiliary.WelcomeMessage;
@@ -36,10 +35,11 @@ import net.maritimecloud.internal.net.messages.s2c.service.FindService;
 import net.maritimecloud.internal.net.messages.s2c.service.FindServiceResult;
 import net.maritimecloud.internal.net.messages.s2c.service.RegisterService;
 import net.maritimecloud.internal.net.messages.s2c.service.RegisterServiceResult;
+import net.maritimecloud.messages.Connected;
 
 /**
  * The type of messages that can be sent around in the system.
- * 
+ *
  * @author Kasper Nielsen
  */
 public enum MessageType {
@@ -53,7 +53,7 @@ public enum MessageType {
     HELLO(2, HelloMessage.class), // 1. message from client 2 server
 
     /** The final handshake massage from the server, contains the connection id */
-    CONNECTED(3, ConnectedMessage.class), // 2. message from server 2 client
+    CONNECTED(3, Connected.class), // 2. message from server 2 client
 
     /** A keep alive message sent periodically. Contains current position/time. */
     POSITION_REPORT(9, PositionReportMessage.class),

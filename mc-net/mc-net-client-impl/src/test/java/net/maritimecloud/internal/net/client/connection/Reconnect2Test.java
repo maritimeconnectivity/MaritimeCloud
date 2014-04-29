@@ -22,10 +22,10 @@ import java.util.concurrent.TimeUnit;
 
 import net.maritimecloud.internal.net.client.AbstractClientConnectionTest;
 import net.maritimecloud.internal.net.client.broadcast.stubs.HelloWorld;
-import net.maritimecloud.internal.net.messages.auxiliary.ConnectedMessage;
 import net.maritimecloud.internal.net.messages.auxiliary.HelloMessage;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastDeliver;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSend;
+import net.maritimecloud.messages.Connected;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.broadcast.BroadcastListener;
 import net.maritimecloud.net.broadcast.BroadcastMessageHeader;
@@ -34,7 +34,7 @@ import net.maritimecloud.util.geometry.PositionTime;
 import org.junit.Test;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class Reconnect2Test extends AbstractClientConnectionTest {
@@ -43,7 +43,7 @@ public class Reconnect2Test extends AbstractClientConnectionTest {
     public void simpleMessage() throws Exception {
         MaritimeCloudClient c = create();
         t.m.take();
-        t.send(new ConnectedMessage("ABCDEFG", 0));
+        t.send(new Connected().setConnectionId("ABCDEFG").setLastReceivedMessageId(0L));
 
         c.broadcast(new HelloWorld("hello"));
         BroadcastSend m = t.take(BroadcastSend.class);
@@ -59,9 +59,9 @@ public class Reconnect2Test extends AbstractClientConnectionTest {
 
         HelloMessage hm = t.take(HelloMessage.class);
         assertEquals("ABCDEFG", hm.getReconnectId());
-        System.out.println(hm.toJSON());
+        System.out.println(hm.toText());
 
-        t.send(new ConnectedMessage("ABCDEFG", 1));
+        t.send(new Connected().setConnectionId("ABCDEFG").setLastReceivedMessageId(1L));
 
         m = t.take(BroadcastSend.class);
         assertEquals(2L, m.getMessageId());
@@ -77,7 +77,7 @@ public class Reconnect2Test extends AbstractClientConnectionTest {
     public void simpleMessage2() throws Exception {
         MaritimeCloudClient c = create();
         t.m.take();
-        t.send(new ConnectedMessage("ABCDEFG", 0));
+        t.send(new Connected().setConnectionId("ABCDEFG").setLastReceivedMessageId(0L));
 
         c.broadcast(new HelloWorld("hello"));
         BroadcastSend m = t.take(BroadcastSend.class);
@@ -108,9 +108,9 @@ public class Reconnect2Test extends AbstractClientConnectionTest {
 
         HelloMessage hm = t.take(HelloMessage.class);
         assertEquals("ABCDEFG", hm.getReconnectId());
-        System.out.println(hm.toJSON());
+        System.out.println(hm.toText());
 
-        t.send(new ConnectedMessage("ABCDEFG", 1));
+        t.send(new Connected().setConnectionId("ABCDEFG").setLastReceivedMessageId(1L));
 
         m = t.take(BroadcastSend.class);
         assertEquals(2L, m.getMessageId());
@@ -126,7 +126,7 @@ public class Reconnect2Test extends AbstractClientConnectionTest {
     public void serverReceivedNoMessage() throws Exception {
         MaritimeCloudClient c = create();
         t.m.take();
-        t.send(new ConnectedMessage("ABCDEFG", 0));
+        t.send(new Connected().setConnectionId("ABCDEFG").setLastReceivedMessageId(0L));
 
         c.broadcast(new HelloWorld("hello1"));
         BroadcastSend m = t.take(BroadcastSend.class);
@@ -157,9 +157,9 @@ public class Reconnect2Test extends AbstractClientConnectionTest {
 
         HelloMessage hm = t.take(HelloMessage.class);
         assertEquals("ABCDEFG", hm.getReconnectId());
-        System.out.println(hm.toJSON());
+        System.out.println(hm.toText());
 
-        t.send(new ConnectedMessage("ABCDEFG", 0));
+        t.send(new Connected().setConnectionId("ABCDEFG").setLastReceivedMessageId(0L));
 
         m = t.take(BroadcastSend.class);
         assertEquals(1L, m.getMessageId());

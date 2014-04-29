@@ -15,8 +15,8 @@
 package net.maritimecloud.net.broadcast;
 
 import net.maritimecloud.net.ConnectionClosedException;
-import net.maritimecloud.net.NetworkFuture;
 import net.maritimecloud.net.MaritimeCloudClient;
+import net.maritimecloud.net.NetworkFuture;
 import net.maritimecloud.util.function.Consumer;
 
 /**
@@ -29,9 +29,9 @@ public interface BroadcastFuture {
 
     /**
      * A future that can be used to determine when the messages has been received by the server. The future will return
-     * with {@link ConnectionClosedException} if the broadcast is not received by the server.
+     * with {@link ConnectionClosedException} if the broadcast could not be delivered to the server.
      *
-     * @return a future that can be used to determine when the messages has been received by the server
+     * @return a future that can be used to determine when the broadcast messages is received by the server
      */
     NetworkFuture<Void> receivedOnServer();
 

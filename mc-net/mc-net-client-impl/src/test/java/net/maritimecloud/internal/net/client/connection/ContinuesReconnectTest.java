@@ -22,14 +22,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import net.maritimecloud.internal.net.client.AbstractClientConnectionTest;
 import net.maritimecloud.internal.net.client.broadcast.stubs.HelloWorld;
 import net.maritimecloud.internal.net.messages.TransportMessage;
-import net.maritimecloud.internal.net.messages.auxiliary.ConnectedMessage;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSend;
+import net.maritimecloud.messages.Connected;
 import net.maritimecloud.net.MaritimeCloudClient;
 
 import org.junit.Test;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class ContinuesReconnectTest extends AbstractClientConnectionTest {
@@ -86,7 +86,7 @@ public class ContinuesReconnectTest extends AbstractClientConnectionTest {
                         ack.set(ackIt);
                         latestId = ackIt;
                         System.out.println("CONNECTED  " + ackIt);
-                        t.send(new ConnectedMessage("ABC", ackIt));
+                        t.send(new Connected().setConnectionId("ABC").setLastReceivedMessageId((long) ackIt));
                     }
                 }
             }

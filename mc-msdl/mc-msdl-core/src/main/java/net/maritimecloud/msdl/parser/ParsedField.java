@@ -17,7 +17,7 @@ package net.maritimecloud.msdl.parser;
 import static java.util.Objects.requireNonNull;
 import net.maritimecloud.msdl.model.CommentDeclaration;
 import net.maritimecloud.msdl.model.FieldDeclaration;
-import net.maritimecloud.msdl.model.type.AnyType;
+import net.maritimecloud.msdl.model.Type;
 import net.maritimecloud.msdl.parser.antlr.MsdlParser.FieldContext;
 import net.maritimecloud.msdl.parser.antlr.MsdlParser.TypeContext;
 
@@ -33,7 +33,7 @@ public class ParsedField implements FieldDeclaration {
 
     String name;
 
-    AnyType publicType;
+    Type publicType;
 
     int tag;
 
@@ -58,7 +58,7 @@ public class ParsedField implements FieldDeclaration {
 
     /** {@inheritDoc} */
     @Override
-    public AnyType getType() {
+    public Type getType() {
         if (publicType == null) {
             return publicType = type.toType();
         }

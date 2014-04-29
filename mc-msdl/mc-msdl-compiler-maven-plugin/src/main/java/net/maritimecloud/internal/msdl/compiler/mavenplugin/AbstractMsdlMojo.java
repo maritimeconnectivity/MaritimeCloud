@@ -237,7 +237,6 @@ abstract class AbstractMsdlMojo extends AbstractMojo {
                         Path headerPath = Paths.get(headerLocation).toAbsolutePath();
                         if (!Files.exists(headerPath)) {
                             getLog().warn("Could not find headerFile: " + headerPath);
-                            // throw new MojoFailureException("Could not find headerFile: " + headerPath);
                         } else {
                             javaPlugin.setHeader(headerPath);
                         }

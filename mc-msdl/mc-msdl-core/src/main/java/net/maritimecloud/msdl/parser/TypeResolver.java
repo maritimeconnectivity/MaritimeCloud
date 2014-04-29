@@ -19,7 +19,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.Collection;
 
 import net.maritimecloud.msdl.MsdlLogger;
-import net.maritimecloud.msdl.model.type.MSDLBaseType;
+import net.maritimecloud.msdl.model.BaseType;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -94,9 +94,9 @@ class TypeResolver {
                 Object o = l.iterator().next();
                 t.messageOrEnum = o;
                 if (o instanceof ParsedEnum) {
-                    t.type = MSDLBaseType.ENUM;
+                    t.type = BaseType.ENUM;
                 } else {
-                    t.type = MSDLBaseType.MESSAGE;
+                    t.type = BaseType.MESSAGE;
                 }
             }
         }

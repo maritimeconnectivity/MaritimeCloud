@@ -21,12 +21,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.maritimecloud.msdl.model.BaseType;
 import net.maritimecloud.msdl.model.EnumDeclaration;
+import net.maritimecloud.msdl.model.ListOrSetType;
+import net.maritimecloud.msdl.model.MapType;
 import net.maritimecloud.msdl.model.MessageDeclaration;
-import net.maritimecloud.msdl.model.type.AnyType;
-import net.maritimecloud.msdl.model.type.ListOrSetType;
-import net.maritimecloud.msdl.model.type.MSDLBaseType;
-import net.maritimecloud.msdl.model.type.MapType;
+import net.maritimecloud.msdl.model.Type;
 import net.maritimecloud.msdl.parser.antlr.StringUtil;
 import net.maritimecloud.msdl.plugins.javagen.annotation.JavaImplementation;
 import net.maritimecloud.util.Binary;
@@ -39,13 +39,13 @@ import org.cakeframework.internal.codegen.AbstractCodegenEntity;
  */
 public class JavaGenType {
 
-    final AnyType type;
+    final Type type;
 
-    final MSDLBaseType t;
+    final BaseType t;
 
     final List<JavaGenType> parameters = new ArrayList<>();
 
-    public JavaGenType(AnyType type) {
+    public JavaGenType(Type type) {
         this.type = requireNonNull(type);
         t = type.getBaseType();
         if (type instanceof ListOrSetType) {
@@ -57,13 +57,13 @@ public class JavaGenType {
     }
 
     public void addImports(AbstractCodegenEntity e) {
-        if (t == MSDLBaseType.LIST) {
+        if (t == BaseType.LIST) {
             e.addImport(List.class);
-        } else if (t == MSDLBaseType.SET) {
+        } else if (t == BaseType.SET) {
             e.addImport(Set.class);
-        } else if (t == MSDLBaseType.MAP) {
+        } else if (t == BaseType.MAP) {
             e.addImport(Map.class);
-        } else if (t == MSDLBaseType.BINARY) {
+        } else if (t == BaseType.BINARY) {
             e.addImport(Binary.class);
         }
         for (JavaGenType t : parameters) {

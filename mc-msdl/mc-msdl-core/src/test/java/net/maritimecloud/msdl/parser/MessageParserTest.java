@@ -20,12 +20,12 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
+import net.maritimecloud.msdl.model.BaseType;
 import net.maritimecloud.msdl.model.FileDeclaration;
+import net.maritimecloud.msdl.model.ListOrSetType;
+import net.maritimecloud.msdl.model.MapType;
 import net.maritimecloud.msdl.model.MessageDeclaration;
 import net.maritimecloud.msdl.model.Project;
-import net.maritimecloud.msdl.model.type.ListOrSetType;
-import net.maritimecloud.msdl.model.type.MSDLBaseType;
-import net.maritimecloud.msdl.model.type.MapType;
 
 import org.junit.Test;
 
@@ -43,7 +43,7 @@ public class MessageParserTest extends AbstractParserTest {
         assertEquals(1, f.getMessages().size());
 
         MessageDeclaration en = f.getMessages().get(0);
-        assertEquals(MSDLBaseType.MESSAGE, en.getBaseType());
+        assertEquals(BaseType.MESSAGE, en.getBaseType());
         assertEquals("Foof", en.getName());
         return en;
     }
@@ -62,7 +62,7 @@ public class MessageParserTest extends AbstractParserTest {
             MessageDeclaration msg = singleMessage(e, "Foof");
 
             assertEquals(1, msg.getFields().size());
-            assertField(1, "fi", MSDLBaseType.INT32, msg.getFields().get(0));
+            assertField(1, "fi", BaseType.INT32, msg.getFields().get(0));
         }, "message Foof {", "1: int32 fi;", "}");
     }
 
@@ -76,13 +76,13 @@ public class MessageParserTest extends AbstractParserTest {
 
             assertEquals(7, msg.getFields().size());
 
-            assertField(1, "fi", MSDLBaseType.INT32, msg.getFields().get(0));
-            assertField(3, "ifi", MSDLBaseType.INT64, msg.getFields().get(1));
-            assertField(2, "ffi", MSDLBaseType.FLOAT, msg.getFields().get(2));
-            assertField(99, "dfi", MSDLBaseType.DOUBLE, msg.getFields().get(3));
-            assertField(11, "boi", MSDLBaseType.BOOL, msg.getFields().get(4));
-            assertField(23, "sfi", MSDLBaseType.STRING, msg.getFields().get(5));
-            assertField(123, "bfi", MSDLBaseType.BINARY, msg.getFields().get(6));
+            assertField(1, "fi", BaseType.INT32, msg.getFields().get(0));
+            assertField(3, "ifi", BaseType.INT64, msg.getFields().get(1));
+            assertField(2, "ffi", BaseType.FLOAT, msg.getFields().get(2));
+            assertField(99, "dfi", BaseType.DOUBLE, msg.getFields().get(3));
+            assertField(11, "boi", BaseType.BOOL, msg.getFields().get(4));
+            assertField(23, "sfi", BaseType.STRING, msg.getFields().get(5));
+            assertField(123, "bfi", BaseType.BINARY, msg.getFields().get(6));
         }, manyFields);
     }
 
@@ -92,19 +92,19 @@ public class MessageParserTest extends AbstractParserTest {
             MessageDeclaration msg = singleMessage(e, "Foof");
             assertEquals(3, msg.getFields().size());
 
-            assertField(1, "fi", MSDLBaseType.LIST, msg.getFields().get(0));
-            assertField(3, "ifi", MSDLBaseType.SET, msg.getFields().get(1));
-            assertField(2, "ffi", MSDLBaseType.MAP, msg.getFields().get(2));
+            assertField(1, "fi", BaseType.LIST, msg.getFields().get(0));
+            assertField(3, "ifi", BaseType.SET, msg.getFields().get(1));
+            assertField(2, "ffi", BaseType.MAP, msg.getFields().get(2));
 
             ListOrSetType listType = (ListOrSetType) msg.getFields().get(0).getType();
-            assertSame(MSDLBaseType.INT64, listType.getElementType().getBaseType());
+            assertSame(BaseType.INT64, listType.getElementType().getBaseType());
 
             ListOrSetType setType = (ListOrSetType) msg.getFields().get(1).getType();
-            assertSame(MSDLBaseType.STRING, setType.getElementType().getBaseType());
+            assertSame(BaseType.STRING, setType.getElementType().getBaseType());
 
             MapType mapType = (MapType) msg.getFields().get(2).getType();
-            assertSame(MSDLBaseType.INT32, mapType.getKeyType().getBaseType());
-            assertSame(MSDLBaseType.FLOAT, mapType.getValueType().getBaseType());
+            assertSame(BaseType.INT32, mapType.getKeyType().getBaseType());
+            assertSame(BaseType.FLOAT, mapType.getValueType().getBaseType());
         }, "message Foof {", "1: list<int64> fi;", "3: set<string> ifi;", "2: map<int32, float> ffi;", "}");
     }
 }

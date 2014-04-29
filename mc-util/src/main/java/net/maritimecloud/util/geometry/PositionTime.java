@@ -14,12 +14,39 @@
  */
 package net.maritimecloud.util.geometry;
 
+import java.io.IOException;
+
+import net.maritimecloud.core.message.MessageParser;
+import net.maritimecloud.core.message.MessageReader;
+
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 // TODO make it serializable
 public class PositionTime extends Position {
+
+    public static final MessageParser<PositionTime> PARSER = new MessageParser<PositionTime>() {
+
+        /** {@inheritDoc} */
+        @Override
+        public PositionTime parse(MessageReader reader) throws IOException {
+            return readFrom(reader);
+        }
+    };
+
+    public static PositionTime readFrom(MessageReader r) throws IOException {
+        // if (r.isCompact()) {
+        // int lat = r.readInt32(1, "latitude");
+        // int lon = r.readInt32(2, "longitude");
+        // return Position.create(lat / 10_000_000d, lon / 10_000_000d);
+        // } else {
+        double lat = r.readRequiredDouble(1, "latitude");
+        double lon = r.readRequiredDouble(2, "longitude");
+        long time = r.readInt64(3, "time", 0L);
+        return PositionTime.create(lat, lon, time);
+        // }
+    }
 
     /** serialVersionUID */
     private static final long serialVersionUID = 1L;
@@ -79,7 +106,7 @@ public class PositionTime extends Position {
 
     /**
      * Creates a new position from the specified latitude and longitude.
-     * 
+     *
      * @param latitude
      *            the latitude
      * @param longitude
