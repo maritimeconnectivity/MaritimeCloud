@@ -21,6 +21,7 @@ import java.util.Random;
 
 import net.maritimecloud.core.message.MessageParser;
 import net.maritimecloud.core.message.MessageReader;
+import net.maritimecloud.core.message.MessageSerializable;
 import net.maritimecloud.core.message.MessageWriter;
 
 /**
@@ -44,10 +45,10 @@ public class Circle extends Area {
     private static final long serialVersionUID = 1L;
 
     /** The center of the circle. */
-    private final Position center;
+    final Position center;
 
     /** The radius of the circle. */
-    private final double radius;
+    final double radius;
 
     Circle(Position center, double radius) {
         this.center = requireNonNull(center, "center is null");
@@ -244,8 +245,12 @@ public class Circle extends Area {
     /** {@inheritDoc} */
     @Override
     public void writeTo(MessageWriter w) throws IOException {
-        center.writeToPacked(w, 1, "center-latitude", 2, "center-longitude");
-        w.writeFloat(3, "radius", (float) radius);
+        w.writeMessage(1, "circle", new MessageSerializable() {
+            public void writeTo(MessageWriter w) throws IOException {
+                center.writeToPacked(w, 1, "center-latitude", 2, "center-longitude");
+                w.writeFloat(3, "radius", (float) radius);
+            }
+        });
     }
 
     public String toString() {

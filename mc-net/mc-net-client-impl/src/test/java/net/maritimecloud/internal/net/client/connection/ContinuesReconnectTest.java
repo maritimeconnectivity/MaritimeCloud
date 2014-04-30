@@ -19,10 +19,11 @@ import static org.junit.Assert.assertEquals;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import net.maritimecloud.internal.messages.BroadcastHelper;
 import net.maritimecloud.internal.messages.TransportMessage;
 import net.maritimecloud.internal.net.client.AbstractClientConnectionTest;
 import net.maritimecloud.internal.net.client.broadcast.stubs.HelloWorld;
-import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSend;
+import net.maritimecloud.messages.BroadcastPublish;
 import net.maritimecloud.messages.Connected;
 import net.maritimecloud.net.MaritimeCloudClient;
 
@@ -68,10 +69,10 @@ public class ContinuesReconnectTest extends AbstractClientConnectionTest {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    if (tm instanceof BroadcastSend) {
-                        BroadcastSend bs = (BroadcastSend) tm;
+                    if (tm instanceof BroadcastPublish) {
+                        BroadcastPublish bs = (BroadcastPublish) tm;
                         try {
-                            HelloWorld hw = (HelloWorld) bs.tryRead();
+                            HelloWorld hw = (HelloWorld) BroadcastHelper.tryRead(bs);
                             int id = Integer.parseInt(hw.getMessage());
                             assertEquals(++latestId, id);
                         } catch (Exception e) {

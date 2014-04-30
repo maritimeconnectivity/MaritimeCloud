@@ -25,7 +25,7 @@ public class FindServiceAck implements Message, net.maritimecloud.internal.messa
     private Long latestReceivedId;
 
     /** Hey */
-    private Long replyId;
+    private Long messageAck;
 
     /** Hey */
     private final List<String> remoteIDS;
@@ -47,7 +47,7 @@ public class FindServiceAck implements Message, net.maritimecloud.internal.messa
     FindServiceAck(MessageReader reader) throws IOException {
         this.messageId = reader.readInt64(1, "messageId", null);
         this.latestReceivedId = reader.readInt64(2, "latestReceivedId", null);
-        this.replyId = reader.readInt64(3, "replyId", null);
+        this.messageAck = reader.readInt64(3, "messageAck", null);
         this.remoteIDS = MessageHelper.readList(reader, 4, "remoteIDS", ValueParser.STRING);
         this.errorCode = reader.readInt32(5, "errorCode", null);
     }
@@ -61,7 +61,7 @@ public class FindServiceAck implements Message, net.maritimecloud.internal.messa
     FindServiceAck(FindServiceAck instance) {
         this.messageId = instance.messageId;
         this.latestReceivedId = instance.latestReceivedId;
-        this.replyId = instance.replyId;
+        this.messageAck = instance.messageAck;
         this.remoteIDS = MessageHelper.immutableCopy(instance.remoteIDS);
         this.errorCode = instance.errorCode;
     }
@@ -71,7 +71,7 @@ public class FindServiceAck implements Message, net.maritimecloud.internal.messa
     public int hashCode() {
         int result = 31 + Hashing.hashcode(this.messageId);
         result = 31 * result + Hashing.hashcode(this.latestReceivedId);
-        result = 31 * result + Hashing.hashcode(this.replyId);
+        result = 31 * result + Hashing.hashcode(this.messageAck);
         result = 31 * result + Hashing.hashcode(this.remoteIDS);
         return 31 * result + Hashing.hashcode(this.errorCode);
     }
@@ -85,7 +85,7 @@ public class FindServiceAck implements Message, net.maritimecloud.internal.messa
             FindServiceAck o = (FindServiceAck) other;
             return Objects.equals(messageId, o.messageId) &&
                    Objects.equals(latestReceivedId, o.latestReceivedId) &&
-                   Objects.equals(replyId, o.replyId) &&
+                   Objects.equals(messageAck, o.messageAck) &&
                    Objects.equals(remoteIDS, o.remoteIDS) &&
                    Objects.equals(errorCode, o.errorCode);
         }
@@ -97,7 +97,7 @@ public class FindServiceAck implements Message, net.maritimecloud.internal.messa
     public void writeTo(MessageWriter w) throws IOException {
         w.writeInt64(1, "messageId", messageId);
         w.writeInt64(2, "latestReceivedId", latestReceivedId);
-        w.writeInt64(3, "replyId", replyId);
+        w.writeInt64(3, "messageAck", messageAck);
         w.writeList(4, "remoteIDS", remoteIDS);
         w.writeInt32(5, "errorCode", errorCode);
     }
@@ -128,16 +128,16 @@ public class FindServiceAck implements Message, net.maritimecloud.internal.messa
         return this;
     }
 
-    public Long getReplyId() {
-        return replyId;
+    public Long getMessageAck() {
+        return messageAck;
     }
 
-    public boolean hasReplyId() {
-        return replyId != null;
+    public boolean hasMessageAck() {
+        return messageAck != null;
     }
 
-    public FindServiceAck setReplyId(Long replyId) {
-        this.replyId = replyId;
+    public FindServiceAck setMessageAck(Long messageAck) {
+        this.messageAck = messageAck;
         return this;
     }
 
@@ -222,7 +222,7 @@ public class FindServiceAck implements Message, net.maritimecloud.internal.messa
 
         /** {@inheritDoc} */
         @Override
-        public FindServiceAck setReplyId(Long replyId) {
+        public FindServiceAck setMessageAck(Long messageAck) {
             throw new UnsupportedOperationException("Instance is immutable");
         }
 

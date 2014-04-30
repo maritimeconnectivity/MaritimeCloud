@@ -22,7 +22,7 @@ public class BroadcastPublishAck implements Message, net.maritimecloud.internal.
     private Long latestReceivedId;
 
     /** Hey */
-    private Long replyId;
+    private Long messageAck;
 
     /** Creates a new BroadcastPublishAck. */
     public BroadcastPublishAck() {}
@@ -36,7 +36,7 @@ public class BroadcastPublishAck implements Message, net.maritimecloud.internal.
     BroadcastPublishAck(MessageReader reader) throws IOException {
         this.messageId = reader.readInt64(1, "messageId", null);
         this.latestReceivedId = reader.readInt64(2, "latestReceivedId", null);
-        this.replyId = reader.readInt64(3, "replyId", null);
+        this.messageAck = reader.readInt64(3, "messageAck", null);
     }
 
     /**
@@ -48,7 +48,7 @@ public class BroadcastPublishAck implements Message, net.maritimecloud.internal.
     BroadcastPublishAck(BroadcastPublishAck instance) {
         this.messageId = instance.messageId;
         this.latestReceivedId = instance.latestReceivedId;
-        this.replyId = instance.replyId;
+        this.messageAck = instance.messageAck;
     }
 
     /** {@inheritDoc} */
@@ -56,7 +56,7 @@ public class BroadcastPublishAck implements Message, net.maritimecloud.internal.
     public int hashCode() {
         int result = 31 + Hashing.hashcode(this.messageId);
         result = 31 * result + Hashing.hashcode(this.latestReceivedId);
-        return 31 * result + Hashing.hashcode(this.replyId);
+        return 31 * result + Hashing.hashcode(this.messageAck);
     }
 
     /** {@inheritDoc} */
@@ -68,7 +68,7 @@ public class BroadcastPublishAck implements Message, net.maritimecloud.internal.
             BroadcastPublishAck o = (BroadcastPublishAck) other;
             return Objects.equals(messageId, o.messageId) &&
                    Objects.equals(latestReceivedId, o.latestReceivedId) &&
-                   Objects.equals(replyId, o.replyId);
+                   Objects.equals(messageAck, o.messageAck);
         }
         return false;
     }
@@ -78,7 +78,7 @@ public class BroadcastPublishAck implements Message, net.maritimecloud.internal.
     public void writeTo(MessageWriter w) throws IOException {
         w.writeInt64(1, "messageId", messageId);
         w.writeInt64(2, "latestReceivedId", latestReceivedId);
-        w.writeInt64(3, "replyId", replyId);
+        w.writeInt64(3, "messageAck", messageAck);
     }
 
     public Long getMessageId() {
@@ -107,16 +107,16 @@ public class BroadcastPublishAck implements Message, net.maritimecloud.internal.
         return this;
     }
 
-    public Long getReplyId() {
-        return replyId;
+    public Long getMessageAck() {
+        return messageAck;
     }
 
-    public boolean hasReplyId() {
-        return replyId != null;
+    public boolean hasMessageAck() {
+        return messageAck != null;
     }
 
-    public BroadcastPublishAck setReplyId(Long replyId) {
-        this.replyId = replyId;
+    public BroadcastPublishAck setMessageAck(Long messageAck) {
+        this.messageAck = messageAck;
         return this;
     }
 
@@ -174,7 +174,7 @@ public class BroadcastPublishAck implements Message, net.maritimecloud.internal.
 
         /** {@inheritDoc} */
         @Override
-        public BroadcastPublishAck setReplyId(Long replyId) {
+        public BroadcastPublishAck setMessageAck(Long messageAck) {
             throw new UnsupportedOperationException("Instance is immutable");
         }
     }

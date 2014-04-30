@@ -22,7 +22,7 @@ public class UnregisterService implements Message, net.maritimecloud.internal.me
     private Long latestReceivedId;
 
     /** Hey */
-    private Long requestId;
+    private Long replyTo;
 
     /** Hey */
     private String serviceName;
@@ -39,7 +39,7 @@ public class UnregisterService implements Message, net.maritimecloud.internal.me
     UnregisterService(MessageReader reader) throws IOException {
         this.messageId = reader.readInt64(1, "messageId", null);
         this.latestReceivedId = reader.readInt64(2, "latestReceivedId", null);
-        this.requestId = reader.readInt64(3, "requestId", null);
+        this.replyTo = reader.readInt64(3, "replyTo", null);
         this.serviceName = reader.readString(4, "serviceName", null);
     }
 
@@ -52,7 +52,7 @@ public class UnregisterService implements Message, net.maritimecloud.internal.me
     UnregisterService(UnregisterService instance) {
         this.messageId = instance.messageId;
         this.latestReceivedId = instance.latestReceivedId;
-        this.requestId = instance.requestId;
+        this.replyTo = instance.replyTo;
         this.serviceName = instance.serviceName;
     }
 
@@ -61,7 +61,7 @@ public class UnregisterService implements Message, net.maritimecloud.internal.me
     public int hashCode() {
         int result = 31 + Hashing.hashcode(this.messageId);
         result = 31 * result + Hashing.hashcode(this.latestReceivedId);
-        result = 31 * result + Hashing.hashcode(this.requestId);
+        result = 31 * result + Hashing.hashcode(this.replyTo);
         return 31 * result + Hashing.hashcode(this.serviceName);
     }
 
@@ -74,7 +74,7 @@ public class UnregisterService implements Message, net.maritimecloud.internal.me
             UnregisterService o = (UnregisterService) other;
             return Objects.equals(messageId, o.messageId) &&
                    Objects.equals(latestReceivedId, o.latestReceivedId) &&
-                   Objects.equals(requestId, o.requestId) &&
+                   Objects.equals(replyTo, o.replyTo) &&
                    Objects.equals(serviceName, o.serviceName);
         }
         return false;
@@ -85,7 +85,7 @@ public class UnregisterService implements Message, net.maritimecloud.internal.me
     public void writeTo(MessageWriter w) throws IOException {
         w.writeInt64(1, "messageId", messageId);
         w.writeInt64(2, "latestReceivedId", latestReceivedId);
-        w.writeInt64(3, "requestId", requestId);
+        w.writeInt64(3, "replyTo", replyTo);
         w.writeString(4, "serviceName", serviceName);
     }
 
@@ -115,16 +115,16 @@ public class UnregisterService implements Message, net.maritimecloud.internal.me
         return this;
     }
 
-    public Long getRequestId() {
-        return requestId;
+    public Long getReplyTo() {
+        return replyTo;
     }
 
-    public boolean hasRequestId() {
-        return requestId != null;
+    public boolean hasReplyTo() {
+        return replyTo != null;
     }
 
-    public UnregisterService setRequestId(Long requestId) {
-        this.requestId = requestId;
+    public UnregisterService setReplyTo(Long replyTo) {
+        this.replyTo = replyTo;
         return this;
     }
 
@@ -195,7 +195,7 @@ public class UnregisterService implements Message, net.maritimecloud.internal.me
 
         /** {@inheritDoc} */
         @Override
-        public UnregisterService setRequestId(Long requestId) {
+        public UnregisterService setReplyTo(Long replyTo) {
             throw new UnsupportedOperationException("Instance is immutable");
         }
 

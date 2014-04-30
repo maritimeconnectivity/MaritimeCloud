@@ -12,22 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.internal.net.messages.c2c.broadcast;
-
-import net.maritimecloud.messages.BroadcastRelay;
-import net.maritimecloud.net.broadcast.BroadcastMessage;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+package net.maritimecloud.internal.messages;
 
 /**
  *
  * @author Kasper Nielsen
  */
-public class BroadcastHelper {
+public interface RelayMessage {
+    RelayMessage setSource(String destination);
 
-    public static BroadcastMessage tryRead(BroadcastRelay bd) throws Exception {
-        Class<BroadcastMessage> cl = (Class<BroadcastMessage>) Class.forName(bd.getChannel());
-        ObjectMapper om = new ObjectMapper();
-        return om.readValue(bd.getMsg(), cl);
-    }
+    RelayMessage setDestination(String destination);
+
+    String getDestination();
+
+    String getSource();
 }

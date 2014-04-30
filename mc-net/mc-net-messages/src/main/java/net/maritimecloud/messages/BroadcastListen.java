@@ -8,12 +8,13 @@ import net.maritimecloud.core.message.MessageParser;
 import net.maritimecloud.core.message.MessageReader;
 import net.maritimecloud.core.message.MessageSerializers;
 import net.maritimecloud.core.message.MessageWriter;
+import net.maritimecloud.internal.message.util.MessageHelper;
 import net.maritimecloud.internal.util.Hashing;
 
-public class RegisterService implements Message, net.maritimecloud.internal.messages.RequestMessage {
+public class BroadcastListen implements Message, net.maritimecloud.internal.messages.RequestMessage {
 
     /** A message parser that can create new instances of this class. */
-    public static final MessageParser<RegisterService> PARSER = new Parser();
+    public static final MessageParser<BroadcastListen> PARSER = new Parser();
 
     /** Hey */
     private Long messageId;
@@ -25,35 +26,40 @@ public class RegisterService implements Message, net.maritimecloud.internal.mess
     private Long replyTo;
 
     /** Hey */
-    private String serviceName;
+    private net.maritimecloud.util.geometry.Area area;
 
-    /** Creates a new RegisterService. */
-    public RegisterService() {}
+    /** Hey */
+    private String channel;
+
+    /** Creates a new BroadcastListen. */
+    public BroadcastListen() {}
 
     /**
-     * Creates a new RegisterService by reading from a message reader.
+     * Creates a new BroadcastListen by reading from a message reader.
      *
      * @param reader
      *            the message reader
      */
-    RegisterService(MessageReader reader) throws IOException {
+    BroadcastListen(MessageReader reader) throws IOException {
         this.messageId = reader.readInt64(1, "messageId", null);
         this.latestReceivedId = reader.readInt64(2, "latestReceivedId", null);
         this.replyTo = reader.readInt64(3, "replyTo", null);
-        this.serviceName = reader.readString(4, "serviceName", null);
+        this.area = reader.readMessage(4, "area", net.maritimecloud.util.geometry.Area.PARSER);
+        this.channel = reader.readString(5, "channel", null);
     }
 
     /**
-     * Creates a new RegisterService by copying an existing.
+     * Creates a new BroadcastListen by copying an existing.
      *
      * @param instance
      *            the instance to copy all fields from
      */
-    RegisterService(RegisterService instance) {
+    BroadcastListen(BroadcastListen instance) {
         this.messageId = instance.messageId;
         this.latestReceivedId = instance.latestReceivedId;
         this.replyTo = instance.replyTo;
-        this.serviceName = instance.serviceName;
+        this.area = MessageHelper.immutable(instance.area);
+        this.channel = instance.channel;
     }
 
     /** {@inheritDoc} */
@@ -62,7 +68,8 @@ public class RegisterService implements Message, net.maritimecloud.internal.mess
         int result = 31 + Hashing.hashcode(this.messageId);
         result = 31 * result + Hashing.hashcode(this.latestReceivedId);
         result = 31 * result + Hashing.hashcode(this.replyTo);
-        return 31 * result + Hashing.hashcode(this.serviceName);
+        result = 31 * result + Hashing.hashcode(this.area);
+        return 31 * result + Hashing.hashcode(this.channel);
     }
 
     /** {@inheritDoc} */
@@ -70,12 +77,13 @@ public class RegisterService implements Message, net.maritimecloud.internal.mess
     public boolean equals(Object other) {
         if (other == this) {
             return true;
-        } else if (other instanceof RegisterService) {
-            RegisterService o = (RegisterService) other;
+        } else if (other instanceof BroadcastListen) {
+            BroadcastListen o = (BroadcastListen) other;
             return Objects.equals(messageId, o.messageId) &&
                    Objects.equals(latestReceivedId, o.latestReceivedId) &&
                    Objects.equals(replyTo, o.replyTo) &&
-                   Objects.equals(serviceName, o.serviceName);
+                   Objects.equals(area, o.area) &&
+                   Objects.equals(channel, o.channel);
         }
         return false;
     }
@@ -86,7 +94,8 @@ public class RegisterService implements Message, net.maritimecloud.internal.mess
         w.writeInt64(1, "messageId", messageId);
         w.writeInt64(2, "latestReceivedId", latestReceivedId);
         w.writeInt64(3, "replyTo", replyTo);
-        w.writeString(4, "serviceName", serviceName);
+        w.writeMessage(4, "area", area);
+        w.writeString(5, "channel", channel);
     }
 
     public Long getMessageId() {
@@ -97,7 +106,7 @@ public class RegisterService implements Message, net.maritimecloud.internal.mess
         return messageId != null;
     }
 
-    public RegisterService setMessageId(Long messageId) {
+    public BroadcastListen setMessageId(Long messageId) {
         this.messageId = messageId;
         return this;
     }
@@ -110,7 +119,7 @@ public class RegisterService implements Message, net.maritimecloud.internal.mess
         return latestReceivedId != null;
     }
 
-    public RegisterService setLatestReceivedId(Long latestReceivedId) {
+    public BroadcastListen setLatestReceivedId(Long latestReceivedId) {
         this.latestReceivedId = latestReceivedId;
         return this;
     }
@@ -123,21 +132,34 @@ public class RegisterService implements Message, net.maritimecloud.internal.mess
         return replyTo != null;
     }
 
-    public RegisterService setReplyTo(Long replyTo) {
+    public BroadcastListen setReplyTo(Long replyTo) {
         this.replyTo = replyTo;
         return this;
     }
 
-    public String getServiceName() {
-        return serviceName;
+    public net.maritimecloud.util.geometry.Area getArea() {
+        return area;
     }
 
-    public boolean hasServiceName() {
-        return serviceName != null;
+    public boolean hasArea() {
+        return area != null;
     }
 
-    public RegisterService setServiceName(String serviceName) {
-        this.serviceName = serviceName;
+    public BroadcastListen setArea(net.maritimecloud.util.geometry.Area area) {
+        this.area = area;
+        return this;
+    }
+
+    public String getChannel() {
+        return channel;
+    }
+
+    public boolean hasChannel() {
+        return channel != null;
+    }
+
+    public BroadcastListen setChannel(String channel) {
+        this.channel = channel;
         return this;
     }
 
@@ -148,22 +170,22 @@ public class RegisterService implements Message, net.maritimecloud.internal.mess
 
     /** {@inheritDoc} */
     @Override
-    public RegisterService immutable() {
+    public BroadcastListen immutable() {
         return new Immutable(this);
     }
 
-    /** A parser for parsing instances of RegisterService. */
-    static class Parser extends MessageParser<RegisterService> {
+    /** A parser for parsing instances of BroadcastListen. */
+    static class Parser extends MessageParser<BroadcastListen> {
 
         /** {@inheritDoc} */
         @Override
-        public RegisterService parse(MessageReader reader) throws IOException {
-            return new RegisterService(reader);
+        public BroadcastListen parse(MessageReader reader) throws IOException {
+            return new BroadcastListen(reader);
         }
     }
 
-    /** An immutable version of RegisterService. */
-    static class Immutable extends RegisterService {
+    /** An immutable version of BroadcastListen. */
+    static class Immutable extends BroadcastListen {
 
         /**
          * Creates a new Immutable instance.
@@ -171,37 +193,43 @@ public class RegisterService implements Message, net.maritimecloud.internal.mess
          * @param instance
          *            the instance to make an immutable copy of
          */
-        Immutable(RegisterService instance) {
+        Immutable(BroadcastListen instance) {
             super(instance);
         }
 
         /** {@inheritDoc} */
         @Override
-        public RegisterService immutable() {
+        public BroadcastListen immutable() {
             return this;
         }
 
         /** {@inheritDoc} */
         @Override
-        public RegisterService setMessageId(Long messageId) {
+        public BroadcastListen setMessageId(Long messageId) {
             throw new UnsupportedOperationException("Instance is immutable");
         }
 
         /** {@inheritDoc} */
         @Override
-        public RegisterService setLatestReceivedId(Long latestReceivedId) {
+        public BroadcastListen setLatestReceivedId(Long latestReceivedId) {
             throw new UnsupportedOperationException("Instance is immutable");
         }
 
         /** {@inheritDoc} */
         @Override
-        public RegisterService setReplyTo(Long replyTo) {
+        public BroadcastListen setReplyTo(Long replyTo) {
             throw new UnsupportedOperationException("Instance is immutable");
         }
 
         /** {@inheritDoc} */
         @Override
-        public RegisterService setServiceName(String serviceName) {
+        public BroadcastListen setArea(net.maritimecloud.util.geometry.Area area) {
+            throw new UnsupportedOperationException("Instance is immutable");
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public BroadcastListen setChannel(String channel) {
             throw new UnsupportedOperationException("Instance is immutable");
         }
     }

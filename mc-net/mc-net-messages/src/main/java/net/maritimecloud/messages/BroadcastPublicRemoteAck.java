@@ -11,7 +11,7 @@ import net.maritimecloud.core.message.MessageWriter;
 import net.maritimecloud.internal.message.util.MessageHelper;
 import net.maritimecloud.internal.util.Hashing;
 
-public class BroadcastPublicRemoteAck implements Message, net.maritimecloud.internal.messages.ReplyMessage {
+public class BroadcastPublicRemoteAck implements Message, net.maritimecloud.internal.messages.ConnectionMessage {
 
     /** A message parser that can create new instances of this class. */
     public static final MessageParser<BroadcastPublicRemoteAck> PARSER = new Parser();
@@ -21,9 +21,6 @@ public class BroadcastPublicRemoteAck implements Message, net.maritimecloud.inte
 
     /** Hey */
     private Long latestReceivedId;
-
-    /** Hey */
-    private Long replyId;
 
     /** Hey */
     private String id;
@@ -46,10 +43,9 @@ public class BroadcastPublicRemoteAck implements Message, net.maritimecloud.inte
     BroadcastPublicRemoteAck(MessageReader reader) throws IOException {
         this.messageId = reader.readInt64(1, "messageId", null);
         this.latestReceivedId = reader.readInt64(2, "latestReceivedId", null);
-        this.replyId = reader.readInt64(3, "replyId", null);
-        this.id = reader.readString(4, "id", null);
-        this.positionTime = reader.readMessage(5, "positionTime", net.maritimecloud.util.geometry.PositionTime.PARSER);
-        this.broadcastId = reader.readInt64(6, "broadcastId", null);
+        this.id = reader.readString(3, "id", null);
+        this.positionTime = reader.readMessage(4, "positionTime", net.maritimecloud.util.geometry.PositionTime.PARSER);
+        this.broadcastId = reader.readInt64(5, "broadcastId", null);
     }
 
     /**
@@ -61,7 +57,6 @@ public class BroadcastPublicRemoteAck implements Message, net.maritimecloud.inte
     BroadcastPublicRemoteAck(BroadcastPublicRemoteAck instance) {
         this.messageId = instance.messageId;
         this.latestReceivedId = instance.latestReceivedId;
-        this.replyId = instance.replyId;
         this.id = instance.id;
         this.positionTime = MessageHelper.immutable(instance.positionTime);
         this.broadcastId = instance.broadcastId;
@@ -72,7 +67,6 @@ public class BroadcastPublicRemoteAck implements Message, net.maritimecloud.inte
     public int hashCode() {
         int result = 31 + Hashing.hashcode(this.messageId);
         result = 31 * result + Hashing.hashcode(this.latestReceivedId);
-        result = 31 * result + Hashing.hashcode(this.replyId);
         result = 31 * result + Hashing.hashcode(this.id);
         result = 31 * result + Hashing.hashcode(this.positionTime);
         return 31 * result + Hashing.hashcode(this.broadcastId);
@@ -87,7 +81,6 @@ public class BroadcastPublicRemoteAck implements Message, net.maritimecloud.inte
             BroadcastPublicRemoteAck o = (BroadcastPublicRemoteAck) other;
             return Objects.equals(messageId, o.messageId) &&
                    Objects.equals(latestReceivedId, o.latestReceivedId) &&
-                   Objects.equals(replyId, o.replyId) &&
                    Objects.equals(id, o.id) &&
                    Objects.equals(positionTime, o.positionTime) &&
                    Objects.equals(broadcastId, o.broadcastId);
@@ -100,10 +93,9 @@ public class BroadcastPublicRemoteAck implements Message, net.maritimecloud.inte
     public void writeTo(MessageWriter w) throws IOException {
         w.writeInt64(1, "messageId", messageId);
         w.writeInt64(2, "latestReceivedId", latestReceivedId);
-        w.writeInt64(3, "replyId", replyId);
-        w.writeString(4, "id", id);
-        w.writeMessage(5, "positionTime", positionTime);
-        w.writeInt64(6, "broadcastId", broadcastId);
+        w.writeString(3, "id", id);
+        w.writeMessage(4, "positionTime", positionTime);
+        w.writeInt64(5, "broadcastId", broadcastId);
     }
 
     public Long getMessageId() {
@@ -129,19 +121,6 @@ public class BroadcastPublicRemoteAck implements Message, net.maritimecloud.inte
 
     public BroadcastPublicRemoteAck setLatestReceivedId(Long latestReceivedId) {
         this.latestReceivedId = latestReceivedId;
-        return this;
-    }
-
-    public Long getReplyId() {
-        return replyId;
-    }
-
-    public boolean hasReplyId() {
-        return replyId != null;
-    }
-
-    public BroadcastPublicRemoteAck setReplyId(Long replyId) {
-        this.replyId = replyId;
         return this;
     }
 
@@ -233,12 +212,6 @@ public class BroadcastPublicRemoteAck implements Message, net.maritimecloud.inte
         /** {@inheritDoc} */
         @Override
         public BroadcastPublicRemoteAck setLatestReceivedId(Long latestReceivedId) {
-            throw new UnsupportedOperationException("Instance is immutable");
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public BroadcastPublicRemoteAck setReplyId(Long replyId) {
             throw new UnsupportedOperationException("Instance is immutable");
         }
 

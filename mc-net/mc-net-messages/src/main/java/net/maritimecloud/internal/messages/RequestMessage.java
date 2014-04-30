@@ -14,10 +14,13 @@
  */
 package net.maritimecloud.internal.messages;
 
+
 /**
  *
  * @author Kasper Nielsen
  */
 public interface RequestMessage extends ConnectionMessage {
+    RequestMessage setReplyTo(Long replyTo);
 
+    Long getReplyTo();
 }

@@ -19,7 +19,6 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import net.maritimecloud.internal.net.util.RelativeCircularArea;
 import net.maritimecloud.util.geometry.Area;
 import net.maritimecloud.util.geometry.BoundingBox;
 import net.maritimecloud.util.geometry.Circle;
@@ -31,7 +30,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class TextMessageReader {
@@ -86,7 +85,8 @@ public class TextMessageReader {
         int type = takeInt();
         if (type == 0) {
             double radius = takeDouble();
-            return new RelativeCircularArea(radius);
+            throw new UnsupportedOperationException();
+            // return new RelativeCircularArea(radius);
         } else if (type == 1) {
             Position center = takePosition();
             double radius = takeDouble();

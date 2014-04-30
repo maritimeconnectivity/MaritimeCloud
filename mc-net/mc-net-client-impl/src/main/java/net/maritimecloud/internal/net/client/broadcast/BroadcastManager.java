@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import net.maritimecloud.core.id.MaritimeId;
+import net.maritimecloud.internal.messages.BroadcastHelper;
 import net.maritimecloud.internal.net.client.ClientContainer;
 import net.maritimecloud.internal.net.client.connection.ConnectionMessageBus;
 import net.maritimecloud.internal.net.client.connection.OnMessage;
@@ -29,10 +30,9 @@ import net.maritimecloud.internal.net.client.util.CustomConcurrentHashMap;
 import net.maritimecloud.internal.net.client.util.CustomConcurrentHashMap.Strength;
 import net.maritimecloud.internal.net.client.util.DefaultConnectionFuture;
 import net.maritimecloud.internal.net.client.util.ThreadManager;
-import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastHelper;
-import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSend;
-import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSendAck;
 import net.maritimecloud.messages.BroadcastPublicRemoteAck;
+import net.maritimecloud.messages.BroadcastPublish;
+import net.maritimecloud.messages.BroadcastPublishAck;
 import net.maritimecloud.messages.BroadcastRelay;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.broadcast.BroadcastFuture;
@@ -167,16 +167,20 @@ public class BroadcastManager {
         options = options.immutable(); // we make the options immutable just in case
 
         // create the message we will send to the server
-        BroadcastSend b = BroadcastSend.create(client.getLocalId(), positionManager.getPositionTime(), broadcast,
+        // BroadcastPublish b = new BroadcastPublish();
+        // b.setId(client.getLocalId().toString());
+        // b.setPositionTime(positionManager.getPositionTime());
+        // b.setMsg(null)
+        BroadcastPublish b = BroadcastHelper.create(client.getLocalId(), positionManager.getPositionTime(), broadcast,
                 options);
 
-        DefaultConnectionFuture<BroadcastSendAck> response = connection.sendMessage(b);
+        DefaultConnectionFuture<BroadcastPublishAck> response = connection.sendMessage(BroadcastPublishAck.class, b);
 
         final DefaultOutstandingBroadcast dbf = new DefaultOutstandingBroadcast(threadManager, options);
         outstandingBroadcasts.put(b.getReplyTo(), dbf);
 
-        response.handle(new BiConsumer<BroadcastSendAck, Throwable>() {
-            public void accept(BroadcastSendAck ack, Throwable cause) {
+        response.handle(new BiConsumer<BroadcastPublishAck, Throwable>() {
+            public void accept(BroadcastPublishAck ack, Throwable cause) {
                 if (ack != null) {
                     dbf.receivedOnServer.complete(null);
                 } else {
@@ -187,7 +191,6 @@ public class BroadcastManager {
         });
         return dbf;
     }
-
 
     public <T extends BroadcastMessage> BroadcastSubscription broadcastListen(Class<T> messageType,
             BroadcastListener<T> consumer, Area area) {

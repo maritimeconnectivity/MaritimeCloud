@@ -19,9 +19,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.concurrent.TimeUnit;
 
+import net.maritimecloud.internal.messages.BroadcastHelper;
 import net.maritimecloud.internal.net.client.AbstractClientConnectionTest;
 import net.maritimecloud.internal.net.client.broadcast.stubs.HelloWorld;
-import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSend;
+import net.maritimecloud.messages.BroadcastPublish;
 import net.maritimecloud.messages.Connected;
 import net.maritimecloud.net.MaritimeCloudClient;
 
@@ -57,7 +58,7 @@ public class ConnectTest extends AbstractClientConnectionTest {
         c.broadcast(new HelloWorld("foo2"));
         assertTrue(c.connection().awaitConnected(10, TimeUnit.SECONDS));
         assertTrue(c.connection().isConnected());
-        assertEquals("foo1", t.take(BroadcastSend.class).tryRead(HelloWorld.class).getMessage());
-        assertEquals("foo2", t.take(BroadcastSend.class).tryRead(HelloWorld.class).getMessage());
+        assertEquals("foo1", ((HelloWorld) BroadcastHelper.tryRead(t.take(BroadcastPublish.class))).getMessage());
+        assertEquals("foo2", ((HelloWorld) BroadcastHelper.tryRead(t.take(BroadcastPublish.class))).getMessage());
     }
 }

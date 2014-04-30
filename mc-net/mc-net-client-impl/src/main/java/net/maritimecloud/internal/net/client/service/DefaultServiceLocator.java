@@ -22,8 +22,8 @@ import java.util.List;
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.net.client.util.DefaultConnectionFuture;
 import net.maritimecloud.internal.net.client.util.ThreadManager;
-import net.maritimecloud.internal.net.messages.s2c.service.FindService;
-import net.maritimecloud.internal.net.messages.s2c.service.FindServiceResult;
+import net.maritimecloud.messages.FindService;
+import net.maritimecloud.messages.FindServiceAck;
 import net.maritimecloud.net.NetworkFuture;
 import net.maritimecloud.net.service.ServiceEndpoint;
 import net.maritimecloud.net.service.ServiceLocator;
@@ -32,7 +32,7 @@ import net.maritimecloud.net.service.spi.ServiceMessage;
 
 /**
  * The default implementation of ServiceLocator.
- * 
+ *
  * @author Kasper Nielsen
  */
 class DefaultServiceLocator<T, E extends ServiceMessage<T>> implements ServiceLocator<T, E> {
@@ -66,14 +66,16 @@ class DefaultServiceLocator<T, E extends ServiceMessage<T>> implements ServiceLo
     /** {@inheritDoc} */
     @Override
     public NetworkFuture<ServiceEndpoint<E, T>> nearest() {
-        DefaultConnectionFuture<FindServiceResult> f = csm.serviceFindOne(new FindService(sip.getName(), distance, 1));
+        // public FindService(String serviceName, int meters, int max) {
+        DefaultConnectionFuture<FindServiceAck> f = csm.serviceFindOne(new FindService().setServiceName(sip.getName())
+                .setMeters(distance).setMax(1));
         final DefaultConnectionFuture<ServiceEndpoint<E, T>> result = threadManager.create();
-        f.thenAcceptAsync(new DefaultConnectionFuture.Action<FindServiceResult>() {
+        f.thenAcceptAsync(new DefaultConnectionFuture.Action<FindServiceAck>() {
             @Override
-            public void accept(FindServiceResult ack) {
-                String[] st = ack.getMax();
-                if (st.length > 0) {
-                    result.complete(new DefaultRemoteServiceEndpoint<>(csm, MaritimeId.create(st[0]), sip));
+            public void accept(FindServiceAck ack) {
+                List<String> st = ack.getRemoteIDS();
+                if (st.size() > 0) {
+                    result.complete(new DefaultRemoteServiceEndpoint<>(csm, MaritimeId.create(st.get(0)), sip));
                 } else {
                     result.complete(null);
                     // result.completeExceptionally(new ServiceNotFoundException(""));
@@ -89,15 +91,15 @@ class DefaultServiceLocator<T, E extends ServiceMessage<T>> implements ServiceLo
         if (limit < 1) {
             throw new IllegalArgumentException("The specified limit must be positive (>=1), was " + limit);
         }
-        DefaultConnectionFuture<FindServiceResult> f = csm.serviceFindOne(new FindService(sip.getName(), distance,
-                limit));
+        DefaultConnectionFuture<FindServiceAck> f = csm.serviceFindOne(new FindService().setServiceName(sip.getName())
+                .setMeters(distance).setMax(limit));
         final DefaultConnectionFuture<List<ServiceEndpoint<E, T>>> result = threadManager.create();
-        f.thenAcceptAsync(new DefaultConnectionFuture.Action<FindServiceResult>() {
+        f.thenAcceptAsync(new DefaultConnectionFuture.Action<FindServiceAck>() {
             @Override
-            public void accept(FindServiceResult ack) {
-                String[] st = ack.getMax();
+            public void accept(FindServiceAck ack) {
+                List<String> st = ack.getRemoteIDS();
                 List<ServiceEndpoint<E, T>> l = new ArrayList<>();
-                if (st.length > 0) {
+                if (st.size() > 0) {
                     for (String s : st) {
                         l.add(new DefaultRemoteServiceEndpoint<>(csm, MaritimeId.create(s), sip));
                     }

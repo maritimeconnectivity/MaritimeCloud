@@ -22,11 +22,12 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import net.maritimecloud.internal.messages.BroadcastHelper;
 import net.maritimecloud.internal.net.client.AbstractClientConnectionTest;
 import net.maritimecloud.internal.net.client.broadcast.stubs.HelloWorld;
-import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSend;
-import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSendAck;
 import net.maritimecloud.messages.BroadcastPublicRemoteAck;
+import net.maritimecloud.messages.BroadcastPublish;
+import net.maritimecloud.messages.BroadcastPublishAck;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.broadcast.BroadcastFuture;
 import net.maritimecloud.net.broadcast.BroadcastMessage;
@@ -50,10 +51,11 @@ public class BroadcastFutureTest extends AbstractClientConnectionTest {
         MaritimeCloudClient c = createAndConnect();
 
         BroadcastFuture bf = c.broadcast(new HelloWorld("hello"));
-        BroadcastSend mb = t.take(BroadcastSend.class);
-        assertEquals("hello", ((HelloWorld) mb.tryRead()).getMessage());
+        BroadcastPublish mb = t.take(BroadcastPublish.class);
+        assertEquals("hello", ((HelloWorld) BroadcastHelper.tryRead(mb)).getMessage());
 
-        BroadcastSendAck bsa = new BroadcastSendAck(mb.getReplyTo());
+        BroadcastPublishAck bsa = new BroadcastPublishAck().setMessageAck(mb.getReplyTo()).setMessageId(0L)
+                .setLatestReceivedId(0L);
         t.send(bsa);
 
         // make sure it is received on the server
@@ -74,10 +76,12 @@ public class BroadcastFutureTest extends AbstractClientConnectionTest {
         options.setReceiverAckEnabled(true);
 
         BroadcastFuture bf = c.broadcast(new HelloWorld("hello"), options);
-        BroadcastSend mb = t.take(BroadcastSend.class);
-        assertEquals("hello", ((HelloWorld) mb.tryRead()).getMessage());
+        BroadcastPublish mb = t.take(BroadcastPublish.class);
+        assertEquals("hello", ((HelloWorld) BroadcastHelper.tryRead(mb)).getMessage());
 
-        BroadcastSendAck bsa = new BroadcastSendAck(mb.getReplyTo());
+        BroadcastPublishAck bsa = new BroadcastPublishAck().setMessageAck(mb.getReplyTo()).setMessageId(0L)
+                .setLatestReceivedId(0L);
+
         t.send(bsa);
 
         // make sure it is received on the server

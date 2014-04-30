@@ -23,21 +23,19 @@ import java.util.TreeMap;
 
 import net.maritimecloud.core.message.MessageParser;
 import net.maritimecloud.internal.messages.TransportMessage;
-import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastListen;
-import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastListenAck;
-import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSend;
-import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSendAck;
-import net.maritimecloud.internal.net.messages.c2c.service.InvokeService;
-import net.maritimecloud.internal.net.messages.c2c.service.InvokeServiceResult;
-import net.maritimecloud.internal.net.messages.s2c.service.FindService;
-import net.maritimecloud.internal.net.messages.s2c.service.FindServiceResult;
-import net.maritimecloud.internal.net.messages.s2c.service.RegisterService;
-import net.maritimecloud.internal.net.messages.s2c.service.RegisterServiceResult;
+import net.maritimecloud.messages.BroadcastListen;
+import net.maritimecloud.messages.BroadcastListenAck;
 import net.maritimecloud.messages.BroadcastPublicRemoteAck;
+import net.maritimecloud.messages.BroadcastPublish;
+import net.maritimecloud.messages.BroadcastPublishAck;
 import net.maritimecloud.messages.BroadcastRelay;
 import net.maritimecloud.messages.Connected;
+import net.maritimecloud.messages.FindService;
+import net.maritimecloud.messages.FindServiceAck;
 import net.maritimecloud.messages.Hello;
 import net.maritimecloud.messages.PositionReport;
+import net.maritimecloud.messages.RegisterService;
+import net.maritimecloud.messages.RegisterServiceAck;
 import net.maritimecloud.messages.Welcome;
 
 /**
@@ -71,23 +69,24 @@ public enum MessageType {
     /* ******************** Communication client<->server ******************* */
 
     /** Registers a service with server. (client->server) */
-    REGISTER_SERVICE(100, RegisterService.class), // throws ServiceRegisterException
-    REGISTER_SERVICE_RESULT(101, RegisterServiceResult.class), // just an ack of the service???
+    REGISTER_SERVICE(100, RegisterService.class, RegisterService.PARSER), // throws ServiceRegisterException
+    REGISTER_SERVICE_RESULT(101, RegisterServiceAck.class, RegisterServiceAck.PARSER), // just an ack of the service???
 
     // servicen der skal unregistreres
-    UNREGISTER_SERVICE(110, RegisterService.class), //
-    UNREGISTER_SERVICE_ACK(111, RegisterServiceResult.class), // throws ServiceUnregisterException
+    UNREGISTER_SERVICE(110, RegisterService.class, RegisterService.PARSER), //
+    UNREGISTER_SERVICE_ACK(111, RegisterServiceAck.class, RegisterServiceAck.PARSER), // throws
+    // ServiceUnregisterException
 
-    FIND_SERVICE(120, FindService.class), //
-    FIND_SERVICE_ACK(121, FindServiceResult.class), // throws ServiceFindException
+    FIND_SERVICE(120, FindService.class, FindService.PARSER), //
+    FIND_SERVICE_ACK(121, FindServiceAck.class, FindServiceAck.PARSER), // throws ServiceFindException
 
     /* Broadcast */
 
     /** Broadcasts a message (client->server). */
-    BROADCAST_SEND(150, BroadcastSend.class), // client->server
+    BROADCAST_SEND(150, BroadcastPublish.class, BroadcastPublish.PARSER), // client->server
 
     /** Acknowledgment of broadcast message (server->client). */
-    BROADCAST_SEND_ACK(151, BroadcastSendAck.class),
+    BROADCAST_SEND_ACK(151, BroadcastPublishAck.class, BroadcastPublishAck.PARSER),
 
     /** Relay of broadcast from server (server->client). */
     BROADCAST_DELIVER(152, BroadcastRelay.class, BroadcastRelay.PARSER),
@@ -96,8 +95,9 @@ public enum MessageType {
     BROADCAST_DELIVER_ACK(153, BroadcastPublicRemoteAck.class, BroadcastPublicRemoteAck.PARSER),
 
     /** Registers a service with server. (client->server) */
-    BROADCAST_LISTEN(160, BroadcastListen.class), // throws ServiceRegisterException
-    BROADCAST_LISTEN_RESULT(161, BroadcastListenAck.class), // just an ack of the service???
+    BROADCAST_LISTEN(160, BroadcastListen.class, BroadcastListen.PARSER), // throws ServiceRegisterException
+    BROADCAST_LISTEN_RESULT(161, BroadcastListenAck.class, BroadcastListenAck.PARSER), // NOT USED currently just an ack
+    // of the service???
 
     /** The standard error message sent for an invalid request from the client */
     // REQUEST_ERROR(199, ServerRequestError.class), // <- requestId, int error_code, String message

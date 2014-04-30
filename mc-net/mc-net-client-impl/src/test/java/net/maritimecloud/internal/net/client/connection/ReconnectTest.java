@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 import net.maritimecloud.internal.messages.TransportMessage;
 import net.maritimecloud.internal.net.client.AbstractClientConnectionTest;
 import net.maritimecloud.internal.net.client.broadcast.stubs.HelloWorld;
-import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSend;
+import net.maritimecloud.messages.BroadcastPublish;
 import net.maritimecloud.messages.BroadcastRelay;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.broadcast.BroadcastListener;
@@ -48,12 +48,12 @@ public class ReconnectTest extends AbstractClientConnectionTest {
         MaritimeCloudClient c = createAndConnect();
 
         c.broadcast(new HelloWorld("hello"));
-        BroadcastSend m = t.take(BroadcastSend.class);
+        BroadcastPublish m = t.take(BroadcastPublish.class);
         assertEquals(1L, m.getMessageId().longValue());
         assertEquals(0L, m.getLatestReceivedId().longValue());
 
         c.broadcast(new HelloWorld("hello"));
-        m = t.take(BroadcastSend.class);
+        m = t.take(BroadcastPublish.class);
         assertEquals(2L, m.getMessageId().longValue());
         assertEquals(0L, m.getLatestReceivedId().longValue());
     }
@@ -63,7 +63,7 @@ public class ReconnectTest extends AbstractClientConnectionTest {
         MaritimeCloudClient c = createAndConnect();
         for (int i = 0; i < 200; i++) {
             c.broadcast(new HelloWorld("hello"));
-            BroadcastSend m = t.take(BroadcastSend.class);
+            BroadcastPublish m = t.take(BroadcastPublish.class);
             assertEquals(i + 1, m.getMessageId().longValue());
             assertEquals(0L, m.getLatestReceivedId().longValue());
         }
@@ -98,7 +98,7 @@ public class ReconnectTest extends AbstractClientConnectionTest {
 
         Thread.sleep(1000);
         c.broadcast(new HelloWorld("hello"));
-        BroadcastSend m = t.take(BroadcastSend.class);
+        BroadcastPublish m = t.take(BroadcastPublish.class);
         assertEquals(1L, m.getMessageId().longValue());
         assertEquals(1L, m.getLatestReceivedId().longValue());
 
@@ -112,7 +112,7 @@ public class ReconnectTest extends AbstractClientConnectionTest {
 
         assertTrue(cdl3.await(1, TimeUnit.SECONDS));
         c.broadcast(new HelloWorld("hello"));
-        m = t.take(BroadcastSend.class);
+        m = t.take(BroadcastPublish.class);
         assertEquals(2L, m.getMessageId().longValue());
         assertEquals(3L, m.getLatestReceivedId().longValue());
     }
@@ -147,7 +147,7 @@ public class ReconnectTest extends AbstractClientConnectionTest {
         }
         bq.clear();
         c.broadcast(new HelloWorld("hello"));
-        BroadcastSend m = t.take(BroadcastSend.class);
+        BroadcastPublish m = t.take(BroadcastPublish.class);
         assertEquals(count - lastestOut + 1, m.getMessageId().longValue());
         assertEquals(lastestOut, m.getLatestReceivedId().longValue());
     }

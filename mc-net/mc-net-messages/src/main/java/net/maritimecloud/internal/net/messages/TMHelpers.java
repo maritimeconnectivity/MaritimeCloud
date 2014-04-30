@@ -51,6 +51,7 @@ public class TMHelpers {
             TransportMessage tm = MessageSerializers.readFromJSON(p, msg);
             return tm;
         }
+        System.out.println("No parsers for " + type);
         TextMessageReader pr = new TextMessageReader(msg);
         try {
             Class<? extends TransportMessage> cl = MessageType.getType(type);
@@ -62,7 +63,7 @@ public class TMHelpers {
         }
     }
 
-    private static String persist(Object o) {
+    public static String persist(Object o) {
         ObjectMapper om = new ObjectMapper();
         om.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         try {

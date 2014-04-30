@@ -91,6 +91,9 @@ class AreaUnion extends Area {
     }
 
     public int hashCode() {
+        if (areas.length == 0) {
+            return 0;
+        }
         // hashCode is commutative
         int hashCode = areas[0].hashCode();
         for (int i = 1; i < areas.length; i++) {

@@ -22,7 +22,7 @@ public class RegisterServiceAck implements Message, net.maritimecloud.internal.m
     private Long latestReceivedId;
 
     /** Hey */
-    private Long replyId;
+    private Long messageAck;
 
     /** Creates a new RegisterServiceAck. */
     public RegisterServiceAck() {}
@@ -36,7 +36,7 @@ public class RegisterServiceAck implements Message, net.maritimecloud.internal.m
     RegisterServiceAck(MessageReader reader) throws IOException {
         this.messageId = reader.readInt64(1, "messageId", null);
         this.latestReceivedId = reader.readInt64(2, "latestReceivedId", null);
-        this.replyId = reader.readInt64(3, "replyId", null);
+        this.messageAck = reader.readInt64(3, "messageAck", null);
     }
 
     /**
@@ -48,7 +48,7 @@ public class RegisterServiceAck implements Message, net.maritimecloud.internal.m
     RegisterServiceAck(RegisterServiceAck instance) {
         this.messageId = instance.messageId;
         this.latestReceivedId = instance.latestReceivedId;
-        this.replyId = instance.replyId;
+        this.messageAck = instance.messageAck;
     }
 
     /** {@inheritDoc} */
@@ -56,7 +56,7 @@ public class RegisterServiceAck implements Message, net.maritimecloud.internal.m
     public int hashCode() {
         int result = 31 + Hashing.hashcode(this.messageId);
         result = 31 * result + Hashing.hashcode(this.latestReceivedId);
-        return 31 * result + Hashing.hashcode(this.replyId);
+        return 31 * result + Hashing.hashcode(this.messageAck);
     }
 
     /** {@inheritDoc} */
@@ -68,7 +68,7 @@ public class RegisterServiceAck implements Message, net.maritimecloud.internal.m
             RegisterServiceAck o = (RegisterServiceAck) other;
             return Objects.equals(messageId, o.messageId) &&
                    Objects.equals(latestReceivedId, o.latestReceivedId) &&
-                   Objects.equals(replyId, o.replyId);
+                   Objects.equals(messageAck, o.messageAck);
         }
         return false;
     }
@@ -78,7 +78,7 @@ public class RegisterServiceAck implements Message, net.maritimecloud.internal.m
     public void writeTo(MessageWriter w) throws IOException {
         w.writeInt64(1, "messageId", messageId);
         w.writeInt64(2, "latestReceivedId", latestReceivedId);
-        w.writeInt64(3, "replyId", replyId);
+        w.writeInt64(3, "messageAck", messageAck);
     }
 
     public Long getMessageId() {
@@ -107,16 +107,16 @@ public class RegisterServiceAck implements Message, net.maritimecloud.internal.m
         return this;
     }
 
-    public Long getReplyId() {
-        return replyId;
+    public Long getMessageAck() {
+        return messageAck;
     }
 
-    public boolean hasReplyId() {
-        return replyId != null;
+    public boolean hasMessageAck() {
+        return messageAck != null;
     }
 
-    public RegisterServiceAck setReplyId(Long replyId) {
-        this.replyId = replyId;
+    public RegisterServiceAck setMessageAck(Long messageAck) {
+        this.messageAck = messageAck;
         return this;
     }
 
@@ -174,7 +174,7 @@ public class RegisterServiceAck implements Message, net.maritimecloud.internal.m
 
         /** {@inheritDoc} */
         @Override
-        public RegisterServiceAck setReplyId(Long replyId) {
+        public RegisterServiceAck setMessageAck(Long messageAck) {
             throw new UnsupportedOperationException("Instance is immutable");
         }
     }

@@ -12,14 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.internal.net.messages.c2c.service;
+package net.maritimecloud.internal.net.messages;
 
 import java.io.IOException;
-
-import net.maritimecloud.internal.net.messages.MessageType;
-import net.maritimecloud.internal.net.messages.TMHelpers;
-import net.maritimecloud.internal.net.messages.TextMessageReader;
-import net.maritimecloud.internal.net.messages.TextMessageWriter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -96,7 +91,7 @@ public class InvokeService extends ClientRelayedMessage {
     public Object parseMessage() throws Exception {
         Class<?> mt = Class.forName(getServiceType());
         ObjectMapper om = new ObjectMapper();
-        return om.readValue(getMessage(), mt);
+        return om.readValue(getMsg(), mt);
     }
 
     /**
@@ -109,7 +104,7 @@ public class InvokeService extends ClientRelayedMessage {
     /**
      * @return the message
      */
-    public String getMessage() {
+    public String getMsg() {
         return message;
     }
 

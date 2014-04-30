@@ -26,12 +26,12 @@ import net.maritimecloud.internal.net.client.connection.OnMessage;
 import net.maritimecloud.internal.net.client.connection.OutstandingMessage;
 import net.maritimecloud.internal.net.client.util.DefaultConnectionFuture;
 import net.maritimecloud.internal.net.client.util.ThreadManager;
-import net.maritimecloud.internal.net.messages.c2c.service.InvokeService;
-import net.maritimecloud.internal.net.messages.c2c.service.InvokeServiceResult;
-import net.maritimecloud.internal.net.messages.s2c.service.FindService;
-import net.maritimecloud.internal.net.messages.s2c.service.FindServiceResult;
-import net.maritimecloud.internal.net.messages.s2c.service.RegisterService;
-import net.maritimecloud.internal.net.messages.s2c.service.RegisterServiceResult;
+import net.maritimecloud.internal.net.messages.InvokeService;
+import net.maritimecloud.internal.net.messages.InvokeServiceResult;
+import net.maritimecloud.messages.FindService;
+import net.maritimecloud.messages.FindServiceAck;
+import net.maritimecloud.messages.RegisterService;
+import net.maritimecloud.messages.RegisterServiceAck;
 import net.maritimecloud.net.service.ServiceLocator;
 import net.maritimecloud.net.service.invocation.InvocationCallback;
 import net.maritimecloud.net.service.registration.ServiceRegistration;
@@ -113,7 +113,7 @@ public class ClientServiceManager {
             try {
                 Class<?> mt = Class.forName(m.getReplyType());
                 ObjectMapper om = new ObjectMapper();
-                o = om.readValue(m.getMessage(), mt);
+                o = om.readValue(m.getMsg(), mt);
                 f.complete(o);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -128,8 +128,8 @@ public class ClientServiceManager {
         return new DefaultServiceLocator<>(threadManager, sip, this, 0);
     }
 
-    <T, E extends ServiceMessage<T>> DefaultConnectionFuture<FindServiceResult> serviceFindOne(FindService fs) {
-        return connection.sendMessage(fs);
+    <T, E extends ServiceMessage<T>> DefaultConnectionFuture<FindServiceAck> serviceFindOne(FindService fs) {
+        return connection.sendMessage(FindServiceAck.class, fs);
     }
 
     /** {@inheritDoc} */
@@ -140,10 +140,10 @@ public class ClientServiceManager {
             throw new IllegalArgumentException(
                     "A service of the specified type has already been registered. Can only register one at a time");
         }
-        final DefaultConnectionFuture<RegisterServiceResult> f = connection.sendMessage(new RegisterService(sip
-                .getName()));
-        f.thenAcceptAsync(new DefaultConnectionFuture.Action<RegisterServiceResult>() {
-            public void accept(RegisterServiceResult ack) {
+        final DefaultConnectionFuture<RegisterServiceAck> f = connection.sendMessage(RegisterServiceAck.class,
+                new RegisterService().setServiceName(sip.getName()));
+        f.thenAcceptAsync(new DefaultConnectionFuture.Action<RegisterServiceAck>() {
+            public void accept(RegisterServiceAck ack) {
                 reg.replied.countDown();
             }
         });

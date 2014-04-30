@@ -22,12 +22,12 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.maritimecloud.internal.messages.ConnectionMessage;
+import net.maritimecloud.internal.messages.ReplyMessage;
+import net.maritimecloud.internal.messages.RequestMessage;
 import net.maritimecloud.internal.net.client.util.DefaultConnectionFuture;
 import net.maritimecloud.internal.net.client.util.ThreadManager;
-import net.maritimecloud.internal.net.messages.s2c.ServerRequestMessage;
-import net.maritimecloud.internal.net.messages.s2c.ServerResponseMessage;
-import net.maritimecloud.internal.net.messages.s2c.service.FindServiceResult;
-import net.maritimecloud.internal.net.messages.s2c.service.RegisterServiceResult;
+import net.maritimecloud.messages.FindServiceAck;
+import net.maritimecloud.messages.RegisterServiceAck;
 
 import org.picocontainer.PicoContainer;
 import org.picocontainer.Startable;
@@ -72,18 +72,18 @@ public class ConnectionMessageBus implements Startable {
     /** {@inheritDoc} */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private void handleMessageReply(ConnectionMessage m, DefaultConnectionFuture<?> f) {
-        if (m instanceof RegisterServiceResult) {
-            serviceRegisteredAck((RegisterServiceResult) m, (DefaultConnectionFuture<RegisterServiceResult>) f);
-        } else if (m instanceof FindServiceResult) {
-            serviceFindAck((FindServiceResult) m, (DefaultConnectionFuture<FindServiceResult>) f);
+        if (m instanceof RegisterServiceAck) {
+            serviceRegisteredAck((RegisterServiceAck) m, (DefaultConnectionFuture<RegisterServiceAck>) f);
+        } else if (m instanceof FindServiceAck) {
+            serviceFindAck((FindServiceAck) m, (DefaultConnectionFuture<FindServiceAck>) f);
         } else {
             ((DefaultConnectionFuture) f).complete(m);
         }
     }
 
     public void onMsg(ConnectionMessage m) {
-        if (m instanceof ServerResponseMessage) {
-            ServerResponseMessage am = (ServerResponseMessage) m;
+        if (m instanceof ReplyMessage) {
+            ReplyMessage am = (ReplyMessage) m;
             DefaultConnectionFuture<?> f = acks.remove(am.getMessageAck());
             if (f == null) {
                 System.err.println("Orphaned packet with id " + am.getMessageAck() + " registered " + acks.keySet()
@@ -115,7 +115,8 @@ public class ConnectionMessageBus implements Startable {
         return connection().messageSend(b);
     }
 
-    public <T extends ServerResponseMessage> DefaultConnectionFuture<T> sendMessage(ServerRequestMessage<T> m) {
+    public <T extends ReplyMessage> DefaultConnectionFuture<T> sendMessage(Class<? extends ReplyMessage> cl,
+            RequestMessage m) {
         // we need to send the messages in the same order as they are numbered for now
         synchronized (ai) {
             long id = ai.incrementAndGet();
@@ -129,12 +130,12 @@ public class ConnectionMessageBus implements Startable {
     }
 
     /** {@inheritDoc} */
-    private void serviceFindAck(FindServiceResult a, DefaultConnectionFuture<FindServiceResult> f) {
+    private void serviceFindAck(FindServiceAck a, DefaultConnectionFuture<FindServiceAck> f) {
         f.complete(a);
     }
 
     /** {@inheritDoc} */
-    private void serviceRegisteredAck(RegisterServiceResult a, DefaultConnectionFuture<RegisterServiceResult> f) {
+    private void serviceRegisteredAck(RegisterServiceAck a, DefaultConnectionFuture<RegisterServiceAck> f) {
         f.complete(a);
     }
 

@@ -12,16 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.internal.net.messages.c2c.service;
+package net.maritimecloud.internal.net.messages;
 
 import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
-
-import net.maritimecloud.internal.net.messages.MessageType;
-import net.maritimecloud.internal.net.messages.TMHelpers;
-import net.maritimecloud.internal.net.messages.TextMessageReader;
-import net.maritimecloud.internal.net.messages.TextMessageWriter;
 
 /**
  *
@@ -55,7 +50,7 @@ public class InvokeServiceResult extends ClientRelayedMessage {
     /**
      * @return the message
      */
-    public String getMessage() {
+    public String getMsg() {
         return message;
     }
 

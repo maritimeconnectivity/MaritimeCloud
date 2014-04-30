@@ -20,10 +20,11 @@ import static org.junit.Assert.assertTrue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import net.maritimecloud.internal.messages.BroadcastHelper;
 import net.maritimecloud.internal.net.client.AbstractClientConnectionTest;
 import net.maritimecloud.internal.net.client.broadcast.stubs.HelloWorld;
 import net.maritimecloud.internal.net.client.broadcast.stubs.HelloWorld2;
-import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSend;
+import net.maritimecloud.messages.BroadcastPublish;
 import net.maritimecloud.messages.BroadcastRelay;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.broadcast.BroadcastListener;
@@ -46,8 +47,8 @@ public class BroadcastTest extends AbstractClientConnectionTest {
 
         c.broadcast(new HelloWorld("hello"));
 
-        BroadcastSend mb = t.take(BroadcastSend.class);
-        HelloWorld hw = (HelloWorld) mb.tryRead();
+        BroadcastPublish mb = t.take(BroadcastPublish.class);
+        HelloWorld hw = (HelloWorld) BroadcastHelper.tryRead(mb);
         assertEquals("hello", hw.getMessage());
     }
 

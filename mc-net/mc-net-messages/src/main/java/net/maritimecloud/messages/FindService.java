@@ -8,7 +8,6 @@ import net.maritimecloud.core.message.MessageParser;
 import net.maritimecloud.core.message.MessageReader;
 import net.maritimecloud.core.message.MessageSerializers;
 import net.maritimecloud.core.message.MessageWriter;
-import net.maritimecloud.internal.message.util.MessageHelper;
 import net.maritimecloud.internal.util.Hashing;
 
 public class FindService implements Message, net.maritimecloud.internal.messages.RequestMessage {
@@ -23,13 +22,16 @@ public class FindService implements Message, net.maritimecloud.internal.messages
     private Long latestReceivedId;
 
     /** Hey */
-    private Long requestId;
+    private Long replyTo;
 
     /** Hey */
     private String serviceName;
 
     /** Hey */
-    private net.maritimecloud.util.geometry.Area area;
+    private Integer meters;
+
+    /** Hey */
+    private Integer max;
 
     /** Creates a new FindService. */
     public FindService() {}
@@ -43,9 +45,10 @@ public class FindService implements Message, net.maritimecloud.internal.messages
     FindService(MessageReader reader) throws IOException {
         this.messageId = reader.readInt64(1, "messageId", null);
         this.latestReceivedId = reader.readInt64(2, "latestReceivedId", null);
-        this.requestId = reader.readInt64(3, "requestId", null);
+        this.replyTo = reader.readInt64(3, "replyTo", null);
         this.serviceName = reader.readString(4, "serviceName", null);
-        this.area = reader.readMessage(5, "area", net.maritimecloud.util.geometry.Area.PARSER);
+        this.meters = reader.readInt32(5, "meters", null);
+        this.max = reader.readInt32(6, "max", null);
     }
 
     /**
@@ -57,9 +60,10 @@ public class FindService implements Message, net.maritimecloud.internal.messages
     FindService(FindService instance) {
         this.messageId = instance.messageId;
         this.latestReceivedId = instance.latestReceivedId;
-        this.requestId = instance.requestId;
+        this.replyTo = instance.replyTo;
         this.serviceName = instance.serviceName;
-        this.area = MessageHelper.immutable(instance.area);
+        this.meters = instance.meters;
+        this.max = instance.max;
     }
 
     /** {@inheritDoc} */
@@ -67,9 +71,10 @@ public class FindService implements Message, net.maritimecloud.internal.messages
     public int hashCode() {
         int result = 31 + Hashing.hashcode(this.messageId);
         result = 31 * result + Hashing.hashcode(this.latestReceivedId);
-        result = 31 * result + Hashing.hashcode(this.requestId);
+        result = 31 * result + Hashing.hashcode(this.replyTo);
         result = 31 * result + Hashing.hashcode(this.serviceName);
-        return 31 * result + Hashing.hashcode(this.area);
+        result = 31 * result + Hashing.hashcode(this.meters);
+        return 31 * result + Hashing.hashcode(this.max);
     }
 
     /** {@inheritDoc} */
@@ -81,9 +86,10 @@ public class FindService implements Message, net.maritimecloud.internal.messages
             FindService o = (FindService) other;
             return Objects.equals(messageId, o.messageId) &&
                    Objects.equals(latestReceivedId, o.latestReceivedId) &&
-                   Objects.equals(requestId, o.requestId) &&
+                   Objects.equals(replyTo, o.replyTo) &&
                    Objects.equals(serviceName, o.serviceName) &&
-                   Objects.equals(area, o.area);
+                   Objects.equals(meters, o.meters) &&
+                   Objects.equals(max, o.max);
         }
         return false;
     }
@@ -93,9 +99,10 @@ public class FindService implements Message, net.maritimecloud.internal.messages
     public void writeTo(MessageWriter w) throws IOException {
         w.writeInt64(1, "messageId", messageId);
         w.writeInt64(2, "latestReceivedId", latestReceivedId);
-        w.writeInt64(3, "requestId", requestId);
+        w.writeInt64(3, "replyTo", replyTo);
         w.writeString(4, "serviceName", serviceName);
-        w.writeMessage(5, "area", area);
+        w.writeInt32(5, "meters", meters);
+        w.writeInt32(6, "max", max);
     }
 
     public Long getMessageId() {
@@ -124,16 +131,16 @@ public class FindService implements Message, net.maritimecloud.internal.messages
         return this;
     }
 
-    public Long getRequestId() {
-        return requestId;
+    public Long getReplyTo() {
+        return replyTo;
     }
 
-    public boolean hasRequestId() {
-        return requestId != null;
+    public boolean hasReplyTo() {
+        return replyTo != null;
     }
 
-    public FindService setRequestId(Long requestId) {
-        this.requestId = requestId;
+    public FindService setReplyTo(Long replyTo) {
+        this.replyTo = replyTo;
         return this;
     }
 
@@ -150,16 +157,29 @@ public class FindService implements Message, net.maritimecloud.internal.messages
         return this;
     }
 
-    public net.maritimecloud.util.geometry.Area getArea() {
-        return area;
+    public Integer getMeters() {
+        return meters;
     }
 
-    public boolean hasArea() {
-        return area != null;
+    public boolean hasMeters() {
+        return meters != null;
     }
 
-    public FindService setArea(net.maritimecloud.util.geometry.Area area) {
-        this.area = area;
+    public FindService setMeters(Integer meters) {
+        this.meters = meters;
+        return this;
+    }
+
+    public Integer getMax() {
+        return max;
+    }
+
+    public boolean hasMax() {
+        return max != null;
+    }
+
+    public FindService setMax(Integer max) {
+        this.max = max;
         return this;
     }
 
@@ -217,7 +237,7 @@ public class FindService implements Message, net.maritimecloud.internal.messages
 
         /** {@inheritDoc} */
         @Override
-        public FindService setRequestId(Long requestId) {
+        public FindService setReplyTo(Long replyTo) {
             throw new UnsupportedOperationException("Instance is immutable");
         }
 
@@ -229,7 +249,13 @@ public class FindService implements Message, net.maritimecloud.internal.messages
 
         /** {@inheritDoc} */
         @Override
-        public FindService setArea(net.maritimecloud.util.geometry.Area area) {
+        public FindService setMeters(Integer meters) {
+            throw new UnsupportedOperationException("Instance is immutable");
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public FindService setMax(Integer max) {
             throw new UnsupportedOperationException("Instance is immutable");
         }
     }

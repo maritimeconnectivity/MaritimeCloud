@@ -12,21 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.internal.net.messages.c2c.service;
+package net.maritimecloud.internal.net.messages;
 
 import java.io.IOException;
 
 import net.maritimecloud.core.id.MaritimeId;
-import net.maritimecloud.internal.net.messages.ConnectionOldMessage;
-import net.maritimecloud.internal.net.messages.MessageType;
-import net.maritimecloud.internal.net.messages.TextMessageReader;
-import net.maritimecloud.internal.net.messages.TextMessageWriter;
+import net.maritimecloud.internal.messages.RelayMessage;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
-public abstract class ClientRelayedMessage extends ConnectionOldMessage {
+public abstract class ClientRelayedMessage extends ConnectionOldMessage implements RelayMessage {
 
     String destination;
 
@@ -63,12 +60,14 @@ public abstract class ClientRelayedMessage extends ConnectionOldMessage {
         return MaritimeId.create(getSource());
     }
 
-    public void setDestination(String destination) {
+    public ClientRelayedMessage setDestination(String destination) {
         this.destination = destination;
+        return this;
     }
 
-    public void setSource(String source) {
+    public ClientRelayedMessage setSource(String source) {
         this.source = source;
+        return this;
     }
 
     /** {@inheritDoc} */

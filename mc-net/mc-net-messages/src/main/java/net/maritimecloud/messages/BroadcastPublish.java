@@ -23,22 +23,25 @@ public class BroadcastPublish implements Message, net.maritimecloud.internal.mes
     private Long latestReceivedId;
 
     /** Hey */
-    private Long requestId;
+    private Long replyTo;
 
     /** Hey */
     private net.maritimecloud.util.geometry.Area area;
 
     /** Hey */
-    private net.maritimecloud.util.geometry.PositionTime position;
+    private net.maritimecloud.util.geometry.PositionTime positionTime;
 
     /** Hey */
-    private Boolean receiveIndividualAcks;
+    private Boolean receiverAck;
 
     /** Hey */
-    private String broadcastId;
+    private String channel;
 
     /** Hey */
     private String msg;
+
+    /** Hey */
+    private String id;
 
     /** Creates a new BroadcastPublish. */
     public BroadcastPublish() {}
@@ -52,12 +55,13 @@ public class BroadcastPublish implements Message, net.maritimecloud.internal.mes
     BroadcastPublish(MessageReader reader) throws IOException {
         this.messageId = reader.readInt64(1, "messageId", null);
         this.latestReceivedId = reader.readInt64(2, "latestReceivedId", null);
-        this.requestId = reader.readInt64(3, "requestId", null);
+        this.replyTo = reader.readInt64(3, "replyTo", null);
         this.area = reader.readMessage(4, "area", net.maritimecloud.util.geometry.Area.PARSER);
-        this.position = reader.readMessage(5, "position", net.maritimecloud.util.geometry.PositionTime.PARSER);
-        this.receiveIndividualAcks = reader.readBool(6, "receiveIndividualAcks", null);
-        this.broadcastId = reader.readString(7, "broadcastId", null);
+        this.positionTime = reader.readMessage(5, "positionTime", net.maritimecloud.util.geometry.PositionTime.PARSER);
+        this.receiverAck = reader.readBool(6, "receiverAck", null);
+        this.channel = reader.readString(7, "channel", null);
         this.msg = reader.readString(8, "msg", null);
+        this.id = reader.readString(9, "id", null);
     }
 
     /**
@@ -69,12 +73,13 @@ public class BroadcastPublish implements Message, net.maritimecloud.internal.mes
     BroadcastPublish(BroadcastPublish instance) {
         this.messageId = instance.messageId;
         this.latestReceivedId = instance.latestReceivedId;
-        this.requestId = instance.requestId;
+        this.replyTo = instance.replyTo;
         this.area = MessageHelper.immutable(instance.area);
-        this.position = MessageHelper.immutable(instance.position);
-        this.receiveIndividualAcks = instance.receiveIndividualAcks;
-        this.broadcastId = instance.broadcastId;
+        this.positionTime = MessageHelper.immutable(instance.positionTime);
+        this.receiverAck = instance.receiverAck;
+        this.channel = instance.channel;
         this.msg = instance.msg;
+        this.id = instance.id;
     }
 
     /** {@inheritDoc} */
@@ -82,12 +87,13 @@ public class BroadcastPublish implements Message, net.maritimecloud.internal.mes
     public int hashCode() {
         int result = 31 + Hashing.hashcode(this.messageId);
         result = 31 * result + Hashing.hashcode(this.latestReceivedId);
-        result = 31 * result + Hashing.hashcode(this.requestId);
+        result = 31 * result + Hashing.hashcode(this.replyTo);
         result = 31 * result + Hashing.hashcode(this.area);
-        result = 31 * result + Hashing.hashcode(this.position);
-        result = 31 * result + Hashing.hashcode(this.receiveIndividualAcks);
-        result = 31 * result + Hashing.hashcode(this.broadcastId);
-        return 31 * result + Hashing.hashcode(this.msg);
+        result = 31 * result + Hashing.hashcode(this.positionTime);
+        result = 31 * result + Hashing.hashcode(this.receiverAck);
+        result = 31 * result + Hashing.hashcode(this.channel);
+        result = 31 * result + Hashing.hashcode(this.msg);
+        return 31 * result + Hashing.hashcode(this.id);
     }
 
     /** {@inheritDoc} */
@@ -99,12 +105,13 @@ public class BroadcastPublish implements Message, net.maritimecloud.internal.mes
             BroadcastPublish o = (BroadcastPublish) other;
             return Objects.equals(messageId, o.messageId) &&
                    Objects.equals(latestReceivedId, o.latestReceivedId) &&
-                   Objects.equals(requestId, o.requestId) &&
+                   Objects.equals(replyTo, o.replyTo) &&
                    Objects.equals(area, o.area) &&
-                   Objects.equals(position, o.position) &&
-                   Objects.equals(receiveIndividualAcks, o.receiveIndividualAcks) &&
-                   Objects.equals(broadcastId, o.broadcastId) &&
-                   Objects.equals(msg, o.msg);
+                   Objects.equals(positionTime, o.positionTime) &&
+                   Objects.equals(receiverAck, o.receiverAck) &&
+                   Objects.equals(channel, o.channel) &&
+                   Objects.equals(msg, o.msg) &&
+                   Objects.equals(id, o.id);
         }
         return false;
     }
@@ -114,12 +121,13 @@ public class BroadcastPublish implements Message, net.maritimecloud.internal.mes
     public void writeTo(MessageWriter w) throws IOException {
         w.writeInt64(1, "messageId", messageId);
         w.writeInt64(2, "latestReceivedId", latestReceivedId);
-        w.writeInt64(3, "requestId", requestId);
+        w.writeInt64(3, "replyTo", replyTo);
         w.writeMessage(4, "area", area);
-        w.writeMessage(5, "position", position);
-        w.writeBool(6, "receiveIndividualAcks", receiveIndividualAcks);
-        w.writeString(7, "broadcastId", broadcastId);
+        w.writeMessage(5, "positionTime", positionTime);
+        w.writeBool(6, "receiverAck", receiverAck);
+        w.writeString(7, "channel", channel);
         w.writeString(8, "msg", msg);
+        w.writeString(9, "id", id);
     }
 
     public Long getMessageId() {
@@ -148,16 +156,16 @@ public class BroadcastPublish implements Message, net.maritimecloud.internal.mes
         return this;
     }
 
-    public Long getRequestId() {
-        return requestId;
+    public Long getReplyTo() {
+        return replyTo;
     }
 
-    public boolean hasRequestId() {
-        return requestId != null;
+    public boolean hasReplyTo() {
+        return replyTo != null;
     }
 
-    public BroadcastPublish setRequestId(Long requestId) {
-        this.requestId = requestId;
+    public BroadcastPublish setReplyTo(Long replyTo) {
+        this.replyTo = replyTo;
         return this;
     }
 
@@ -174,42 +182,42 @@ public class BroadcastPublish implements Message, net.maritimecloud.internal.mes
         return this;
     }
 
-    public net.maritimecloud.util.geometry.PositionTime getPosition() {
-        return position;
+    public net.maritimecloud.util.geometry.PositionTime getPositionTime() {
+        return positionTime;
     }
 
-    public boolean hasPosition() {
-        return position != null;
+    public boolean hasPositionTime() {
+        return positionTime != null;
     }
 
-    public BroadcastPublish setPosition(net.maritimecloud.util.geometry.PositionTime position) {
-        this.position = position;
+    public BroadcastPublish setPositionTime(net.maritimecloud.util.geometry.PositionTime positionTime) {
+        this.positionTime = positionTime;
         return this;
     }
 
-    public Boolean getReceiveIndividualAcks() {
-        return receiveIndividualAcks;
+    public Boolean getReceiverAck() {
+        return receiverAck;
     }
 
-    public boolean hasReceiveIndividualAcks() {
-        return receiveIndividualAcks != null;
+    public boolean hasReceiverAck() {
+        return receiverAck != null;
     }
 
-    public BroadcastPublish setReceiveIndividualAcks(Boolean receiveIndividualAcks) {
-        this.receiveIndividualAcks = receiveIndividualAcks;
+    public BroadcastPublish setReceiverAck(Boolean receiverAck) {
+        this.receiverAck = receiverAck;
         return this;
     }
 
-    public String getBroadcastId() {
-        return broadcastId;
+    public String getChannel() {
+        return channel;
     }
 
-    public boolean hasBroadcastId() {
-        return broadcastId != null;
+    public boolean hasChannel() {
+        return channel != null;
     }
 
-    public BroadcastPublish setBroadcastId(String broadcastId) {
-        this.broadcastId = broadcastId;
+    public BroadcastPublish setChannel(String channel) {
+        this.channel = channel;
         return this;
     }
 
@@ -223,6 +231,19 @@ public class BroadcastPublish implements Message, net.maritimecloud.internal.mes
 
     public BroadcastPublish setMsg(String msg) {
         this.msg = msg;
+        return this;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public boolean hasId() {
+        return id != null;
+    }
+
+    public BroadcastPublish setId(String id) {
+        this.id = id;
         return this;
     }
 
@@ -280,7 +301,7 @@ public class BroadcastPublish implements Message, net.maritimecloud.internal.mes
 
         /** {@inheritDoc} */
         @Override
-        public BroadcastPublish setRequestId(Long requestId) {
+        public BroadcastPublish setReplyTo(Long replyTo) {
             throw new UnsupportedOperationException("Instance is immutable");
         }
 
@@ -292,25 +313,31 @@ public class BroadcastPublish implements Message, net.maritimecloud.internal.mes
 
         /** {@inheritDoc} */
         @Override
-        public BroadcastPublish setPosition(net.maritimecloud.util.geometry.PositionTime position) {
+        public BroadcastPublish setPositionTime(net.maritimecloud.util.geometry.PositionTime positionTime) {
             throw new UnsupportedOperationException("Instance is immutable");
         }
 
         /** {@inheritDoc} */
         @Override
-        public BroadcastPublish setReceiveIndividualAcks(Boolean receiveIndividualAcks) {
+        public BroadcastPublish setReceiverAck(Boolean receiverAck) {
             throw new UnsupportedOperationException("Instance is immutable");
         }
 
         /** {@inheritDoc} */
         @Override
-        public BroadcastPublish setBroadcastId(String broadcastId) {
+        public BroadcastPublish setChannel(String channel) {
             throw new UnsupportedOperationException("Instance is immutable");
         }
 
         /** {@inheritDoc} */
         @Override
         public BroadcastPublish setMsg(String msg) {
+            throw new UnsupportedOperationException("Instance is immutable");
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public BroadcastPublish setId(String id) {
             throw new UnsupportedOperationException("Instance is immutable");
         }
     }

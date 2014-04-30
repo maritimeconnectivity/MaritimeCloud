@@ -19,5 +19,11 @@ package net.maritimecloud.internal.messages;
  * @author Kasper Nielsen
  */
 public interface ReplyMessage extends ConnectionMessage {
+    Long getMessageAck();
 
+    /**
+     * @param messageAck
+     *            the messageAck to set
+     */
+    ReplyMessage setMessageAck(Long messageAck);
 }

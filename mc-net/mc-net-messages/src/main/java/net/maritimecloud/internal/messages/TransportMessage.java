@@ -25,7 +25,7 @@ import net.maritimecloud.internal.net.messages.MessageType;
 public interface TransportMessage {
 
     default String toText() {
-        System.out.println("SENDING " + toJSON());
+        // System.out.println("SENDING " + toJSON());
         return MessageType.getType(getClass()) + ":" + toJSON();
     }
 
