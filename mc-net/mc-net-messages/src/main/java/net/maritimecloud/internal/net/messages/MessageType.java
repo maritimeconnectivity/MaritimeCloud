@@ -23,7 +23,6 @@ import java.util.TreeMap;
 
 import net.maritimecloud.core.message.MessageParser;
 import net.maritimecloud.internal.net.messages.auxiliary.HelloMessage;
-import net.maritimecloud.internal.net.messages.auxiliary.PositionReportMessage;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastAck;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastDeliver;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastListen;
@@ -38,6 +37,7 @@ import net.maritimecloud.internal.net.messages.s2c.service.FindServiceResult;
 import net.maritimecloud.internal.net.messages.s2c.service.RegisterService;
 import net.maritimecloud.internal.net.messages.s2c.service.RegisterServiceResult;
 import net.maritimecloud.messages.Connected;
+import net.maritimecloud.messages.PositionReport;
 import net.maritimecloud.messages.Welcome;
 
 /**
@@ -59,7 +59,7 @@ public enum MessageType {
     CONNECTED(3, Connected.class, Connected.PARSER), // 2. message from server 2 client
 
     /** A keep alive message sent periodically. Contains current position/time. */
-    POSITION_REPORT(9, PositionReportMessage.class),
+    POSITION_REPORT(9, PositionReport.class, PositionReport.PARSER),
 
     // Channel Switched + men er jo naesten det samme som reconnect
     // nej lige saa snart man er connected, starter man med at sende beskeder der

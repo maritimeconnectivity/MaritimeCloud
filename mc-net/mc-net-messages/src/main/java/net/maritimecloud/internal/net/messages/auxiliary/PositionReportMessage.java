@@ -26,11 +26,11 @@ import net.maritimecloud.internal.net.messages.TextMessageWriter;
 import net.maritimecloud.util.geometry.PositionTime;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 // Not sure this needs to be a connection message
-public class PositionReportMessage extends ConnectionOldMessage implements PositionTimeMessage {
+class PositionReportMessage extends ConnectionOldMessage implements PositionTimeMessage {
 
     private final PositionTime positionTime;
 

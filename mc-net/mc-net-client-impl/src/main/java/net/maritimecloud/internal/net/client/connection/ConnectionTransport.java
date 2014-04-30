@@ -19,7 +19,7 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 import java.net.URI;
 
-import net.maritimecloud.internal.net.messages.ConnectionOldMessage;
+import net.maritimecloud.internal.messages.ConnectionMessage;
 import net.maritimecloud.internal.net.messages.TMHelpers;
 import net.maritimecloud.internal.net.messages.TransportMessage;
 import net.maritimecloud.net.ClosingCode;
@@ -71,8 +71,8 @@ abstract class ConnectionTransport {
         }
         if (connectFuture != null) {
             connectFuture.onMessage(msg);
-        } else if (msg instanceof ConnectionOldMessage) {
-            ConnectionOldMessage m = (ConnectionOldMessage) msg;
+        } else if (msg instanceof ConnectionMessage) {
+            ConnectionMessage m = (ConnectionMessage) msg;
             connection.messageReceive(this, m);
         } else {
             String err = "Unknown messageType " + msg.getClass().getSimpleName();

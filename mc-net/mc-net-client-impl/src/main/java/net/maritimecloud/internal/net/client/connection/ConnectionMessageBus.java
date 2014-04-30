@@ -21,9 +21,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import net.maritimecloud.internal.messages.ConnectionMessage;
 import net.maritimecloud.internal.net.client.util.DefaultConnectionFuture;
 import net.maritimecloud.internal.net.client.util.ThreadManager;
-import net.maritimecloud.internal.net.messages.ConnectionOldMessage;
 import net.maritimecloud.internal.net.messages.s2c.ServerRequestMessage;
 import net.maritimecloud.internal.net.messages.s2c.ServerResponseMessage;
 import net.maritimecloud.internal.net.messages.s2c.service.FindServiceResult;
@@ -33,7 +33,7 @@ import org.picocontainer.PicoContainer;
 import org.picocontainer.Startable;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class ConnectionMessageBus implements Startable {
@@ -71,7 +71,7 @@ public class ConnectionMessageBus implements Startable {
 
     /** {@inheritDoc} */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private void handleMessageReply(ConnectionOldMessage m, DefaultConnectionFuture<?> f) {
+    private void handleMessageReply(ConnectionMessage m, DefaultConnectionFuture<?> f) {
         if (m instanceof RegisterServiceResult) {
             serviceRegisteredAck((RegisterServiceResult) m, (DefaultConnectionFuture<RegisterServiceResult>) f);
         } else if (m instanceof FindServiceResult) {
@@ -81,7 +81,7 @@ public class ConnectionMessageBus implements Startable {
         }
     }
 
-    public void onMsg(ConnectionOldMessage m) {
+    public void onMsg(ConnectionMessage m) {
         if (m instanceof ServerResponseMessage) {
             ServerResponseMessage am = (ServerResponseMessage) m;
             DefaultConnectionFuture<?> f = acks.remove(am.getMessageAck());
@@ -111,7 +111,7 @@ public class ConnectionMessageBus implements Startable {
 
     }
 
-    public OutstandingMessage sendConnectionMessage(ConnectionOldMessage b) {
+    public OutstandingMessage sendConnectionMessage(ConnectionMessage b) {
         return connection().messageSend(b);
     }
 

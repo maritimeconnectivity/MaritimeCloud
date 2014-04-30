@@ -18,6 +18,7 @@ import java.io.IOException;
 
 import net.maritimecloud.core.message.MessageParser;
 import net.maritimecloud.core.message.MessageReader;
+import net.maritimecloud.core.message.MessageWriter;
 
 /**
  *
@@ -44,6 +45,7 @@ public class PositionTime extends Position {
         double lat = r.readRequiredDouble(1, "latitude");
         double lon = r.readRequiredDouble(2, "longitude");
         long time = r.readInt64(3, "time", 0L);
+
         return PositionTime.create(lat, lon, time);
         // }
     }
@@ -117,5 +119,28 @@ public class PositionTime extends Position {
      */
     public static PositionTime create(double latitude, double longitude, long time) {
         return new PositionTime(latitude, longitude, time);
+    }
+
+    @Override
+    public String toString() {
+        return "(" + getLatitude() + ", " + getLongitude() + ", time= " + time + ")";
+    }
+
+    /**
+     * Writes this position to the specified MSDL output stream.
+     *
+     * @param os
+     *            the output stream
+     * @throws IOException
+     *             the position failed to be written
+     */
+    public void writeTo(MessageWriter w) throws IOException {
+        // if (w.isCompact()) {
+        // writeToPacked(w, 1, "latitude", 2, "longitude");
+        // } else {
+        w.writeDouble(1, "latitude", latitude);
+        w.writeDouble(2, "longitude", longitude);
+        w.writeInt64(3, "time", time);
+        // }
     }
 }

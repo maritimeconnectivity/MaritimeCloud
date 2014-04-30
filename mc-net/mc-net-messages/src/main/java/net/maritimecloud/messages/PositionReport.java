@@ -11,7 +11,7 @@ import net.maritimecloud.core.message.MessageWriter;
 import net.maritimecloud.internal.message.util.MessageHelper;
 import net.maritimecloud.internal.util.Hashing;
 
-public class PositionReport implements Message, net.maritimecloud.internal.messages.ConnectionMessage {
+public class PositionReport implements Message, net.maritimecloud.internal.messages.ConnectionMessage, net.maritimecloud.internal.net.messages.PositionTimeMessage {
 
     /** A message parser that can create new instances of this class. */
     public static final MessageParser<PositionReport> PARSER = new Parser();

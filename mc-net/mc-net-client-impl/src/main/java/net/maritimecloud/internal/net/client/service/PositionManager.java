@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import net.maritimecloud.internal.net.client.connection.ConnectionMessageBus;
 import net.maritimecloud.internal.net.client.util.ThreadManager;
-import net.maritimecloud.internal.net.messages.auxiliary.PositionReportMessage;
+import net.maritimecloud.messages.PositionReport;
 import net.maritimecloud.net.MaritimeCloudClientConfiguration;
 import net.maritimecloud.util.geometry.PositionReader;
 import net.maritimecloud.util.geometry.PositionTime;
@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A runnable that will keep sending a keep alive signal.
- * 
+ *
  * @author Kasper Nielsen
  */
 public class PositionManager implements Startable {
@@ -82,7 +82,7 @@ public class PositionManager implements Startable {
         }
 
         latestTime = now;
-        connection.sendConnectionMessage(new PositionReportMessage(t));
+        connection.sendConnectionMessage(new PositionReport().setPositionTime(t));
     }
 
     public PositionTime getPositionTime() {

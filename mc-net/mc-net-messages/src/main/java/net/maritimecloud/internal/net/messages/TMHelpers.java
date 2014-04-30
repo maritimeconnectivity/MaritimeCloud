@@ -46,7 +46,7 @@ public class TMHelpers {
         int type = Integer.parseInt(t);// pr.takeInt();
         MessageParser<? extends TransportMessage> p = MessageType.getParser(type);
         if (p != null) {
-            // System.out.println("Got " + msg);
+            System.out.println("Got " + msg);
             TransportMessage tm = MessageSerializers.readFromJSON(p, msg);
             return tm;
         }

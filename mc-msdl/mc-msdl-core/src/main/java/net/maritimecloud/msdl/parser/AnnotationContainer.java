@@ -21,11 +21,14 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import net.maritimecloud.msdl.parser.antlr.MsdlParser.AnnotationContext;
+import net.maritimecloud.msdl.parser.antlr.MsdlParser.ElementValueArrayInitializerContext;
 import net.maritimecloud.msdl.parser.antlr.MsdlParser.ElementValueContext;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -75,9 +78,30 @@ public class AnnotationContainer {
                 ElementValueContext ev = ac.elementValue();
                 final Anno anno;
                 if (ev != null) {
-                    String text = ev.StringLiteral().getText();
-                    text = text.replace("\"", "");
-                    anno = new Anno(name, new Map.Entry[] { new AbstractMap.SimpleImmutableEntry("value", text) });
+                    // System.out.println("Y");
+                    List<String> list = new ArrayList<>();
+
+                    if (ev.StringLiteral() != null) {
+                        String text = ev.StringLiteral().getText();
+                        text = text.replace("\"", "");
+                        list.add(text);
+                    } else /* if (ev.elementValueArrayInitializer() != null) */{
+                        ElementValueArrayInitializerContext ec = ev.elementValueArrayInitializer();
+                        for (int i = 0; i < ec.children.size(); i++) {
+                            ElementValueContext evc = ec.elementValue(i);
+                            if (evc != null) {
+                                // System.out.println(ev.getChildCount());
+                                String text = evc.StringLiteral().getText();
+                                text = text.replace("\"", "");
+                                list.add(text);
+                            }
+                        }
+                    }
+                    // System.out.println(list);
+
+                    anno = new Anno(name, new Map.Entry[] { new AbstractMap.SimpleImmutableEntry("value",
+                            list.toArray(new String[0])) });
+
                 } else {
                     anno = new Anno(name, new Map.Entry[0]);
                 }
@@ -112,9 +136,10 @@ public class AnnotationContainer {
             for (Entry<String, Object> e : pairs) {
                 if (e.getKey().equals(method.getName())) {
                     if (method.getReturnType().equals(String[].class)) {
-                        return new String[] { (String) e.getValue() };
+                        // System.out.println("Ret " + Arrays.toString((String[]) e.getValue()));
+                        return e.getValue();
                     }
-                    return e.getValue();
+                    return ((String[]) e.getValue())[0];
                 }
             }
             return null;

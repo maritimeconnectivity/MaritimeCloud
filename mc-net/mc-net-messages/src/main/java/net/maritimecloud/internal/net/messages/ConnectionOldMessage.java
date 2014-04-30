@@ -59,12 +59,12 @@ public abstract class ConnectionOldMessage extends AbstractTransportMessage impl
         return messageId;
     }
 
-    public ConnectionOldMessage setLatestReceivedId(Long latestReceivedId) {
+    public ConnectionMessage setLatestReceivedId(Long latestReceivedId) {
         this.latestReceivedId = latestReceivedId;
         return this;
     }
 
-    public ConnectionOldMessage setMessageId(Long messageId) {
+    public ConnectionMessage setMessageId(Long messageId) {
         this.messageId = messageId;
         return this;
     }

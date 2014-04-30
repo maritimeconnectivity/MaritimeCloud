@@ -17,10 +17,10 @@ package net.maritimecloud.internal.net.client.connection;
 import java.util.UUID;
 
 import jsr166e.CompletableFuture;
-import net.maritimecloud.internal.net.messages.ConnectionOldMessage;
+import net.maritimecloud.internal.messages.ConnectionMessage;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class OutstandingMessage {
@@ -29,13 +29,13 @@ public class OutstandingMessage {
 
     volatile boolean isSent;
 
-    final ConnectionOldMessage cm;
+    final ConnectionMessage cm;
 
     long id;
 
     public final UUID uuid = UUID.randomUUID();
 
-    OutstandingMessage(ConnectionOldMessage cm) {
+    OutstandingMessage(ConnectionMessage cm) {
         this.cm = cm;
     }
 

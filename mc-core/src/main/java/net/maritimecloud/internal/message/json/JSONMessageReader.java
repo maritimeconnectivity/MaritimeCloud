@@ -197,10 +197,17 @@ public class JSONMessageReader extends MessageReader {
         // return result;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     * 
+     * @throws MessageSerializationException
+     */
     @Override
-    public double readRequiredDouble(int tag, String name) {
-        return 0;
+    public double readRequiredDouble(int tag, String name) throws MessageSerializationException {
+        if (isNext(-1, name)) {
+            return Double.parseDouble(iter.next().getValue().toString());
+        }
+        throw new MessageSerializationException("Could not find tag '" + tag + "'");
     }
 
     @Override
