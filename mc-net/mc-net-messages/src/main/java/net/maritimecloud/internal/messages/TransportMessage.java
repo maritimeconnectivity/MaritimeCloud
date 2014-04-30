@@ -12,14 +12,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.internal.net.messages.errors;
+package net.maritimecloud.internal.messages;
+
+import net.maritimecloud.internal.net.messages.MessageType;
+
 
 /**
- * 
+ * A text only message.
+ *
  * @author Kasper Nielsen
  */
-public enum ErrorCode {
+public interface TransportMessage {
+
+    default String toText() {
+        System.out.println("SENDING " + toJSON());
+        return MessageType.getType(getClass()) + ":" + toJSON();
+    }
 
 
-    UNVA
+    default String toJSON() {
+        throw new UnsupportedOperationException();
+    }
 }

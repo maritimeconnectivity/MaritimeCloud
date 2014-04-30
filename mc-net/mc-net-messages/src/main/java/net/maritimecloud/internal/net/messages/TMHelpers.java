@@ -18,6 +18,7 @@ import java.io.IOException;
 
 import net.maritimecloud.core.message.MessageParser;
 import net.maritimecloud.core.message.MessageSerializers;
+import net.maritimecloud.internal.messages.TransportMessage;
 import net.maritimecloud.messages.Connected;
 
 import com.fasterxml.jackson.core.JsonProcessingException;

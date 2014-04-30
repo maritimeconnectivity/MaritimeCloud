@@ -15,8 +15,8 @@
 package net.maritimecloud.internal.net.client.connection;
 
 import net.maritimecloud.internal.net.client.AbstractClientConnectionTest;
-import net.maritimecloud.internal.net.messages.auxiliary.HelloMessage;
 import net.maritimecloud.messages.Connected;
+import net.maritimecloud.messages.Hello;
 import net.maritimecloud.net.MaritimeCloudClient;
 
 import org.junit.Test;
@@ -31,10 +31,10 @@ public class ReconnectTest3 extends AbstractClientConnectionTest {
     public void disConnectWhileConnecting() throws Exception {
         @SuppressWarnings("unused")
         MaritimeCloudClient c = create();
-        t.take(HelloMessage.class);
+        t.take(Hello.class);
         t.close();
         // we will try to reconnect anyways
-        t.take(HelloMessage.class);
+        t.take(Hello.class);
         t.send(new Connected().setConnectionId("ABC").setLastReceivedMessageId(0L));
 
     }

@@ -22,7 +22,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import net.maritimecloud.core.message.MessageParser;
-import net.maritimecloud.internal.net.messages.auxiliary.HelloMessage;
+import net.maritimecloud.internal.messages.TransportMessage;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastAck;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastDeliver;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastListen;
@@ -31,12 +31,12 @@ import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSend;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSendAck;
 import net.maritimecloud.internal.net.messages.c2c.service.InvokeService;
 import net.maritimecloud.internal.net.messages.c2c.service.InvokeServiceResult;
-import net.maritimecloud.internal.net.messages.errors.ServerRequestError;
 import net.maritimecloud.internal.net.messages.s2c.service.FindService;
 import net.maritimecloud.internal.net.messages.s2c.service.FindServiceResult;
 import net.maritimecloud.internal.net.messages.s2c.service.RegisterService;
 import net.maritimecloud.internal.net.messages.s2c.service.RegisterServiceResult;
 import net.maritimecloud.messages.Connected;
+import net.maritimecloud.messages.Hello;
 import net.maritimecloud.messages.PositionReport;
 import net.maritimecloud.messages.Welcome;
 
@@ -53,7 +53,7 @@ public enum MessageType {
     WELCOME(1, Welcome.class, Welcome.PARSER), // 1. message from server 2 client
 
     /** This is the first message from the client to server. Contains an optional reconnect token. */
-    HELLO(2, HelloMessage.class), // 1. message from client 2 server
+    HELLO(2, Hello.class, Hello.PARSER), // 1. message from client 2 server
 
     /** The final handshake massage from the server, contains the connection id */
     CONNECTED(3, Connected.class, Connected.PARSER), // 2. message from server 2 client
@@ -100,7 +100,7 @@ public enum MessageType {
     BROADCAST_LISTEN_RESULT(161, BroadcastListenAck.class), // just an ack of the service???
 
     /** The standard error message sent for an invalid request from the client */
-    REQUEST_ERROR(199, ServerRequestError.class), // <- requestId, int error_code, String message
+    // REQUEST_ERROR(199, ServerRequestError.class), // <- requestId, int error_code, String message
 
     /* ******************** Communication client<->client ******************* */
 
@@ -109,10 +109,10 @@ public enum MessageType {
     SERVICE_INVOKE(200, InvokeService.class), //
 
     /** The successful result of invoking a service. */
-    SERVICE_INVOKE_RESULT(201, InvokeServiceResult.class), //
+    SERVICE_INVOKE_RESULT(201, InvokeServiceResult.class); //
 
     /** Invoking a service failed. */
-    SERVICE_INVOKE_ERROR(255, ServerRequestError.class);// indeholder lidt additional info taenker jeg
+    // SERVICE_INVOKE_ERROR(255, ServerRequestError.class);// indeholder lidt additional info taenker jeg
 
     final Class<? extends TransportMessage> cl;
 

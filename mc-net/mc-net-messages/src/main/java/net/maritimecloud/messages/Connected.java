@@ -10,7 +10,7 @@ import net.maritimecloud.core.message.MessageSerializers;
 import net.maritimecloud.core.message.MessageWriter;
 import net.maritimecloud.internal.util.Hashing;
 
-public class Connected implements Message, net.maritimecloud.internal.net.messages.TransportMessage {
+public class Connected implements Message, net.maritimecloud.internal.messages.TransportMessage {
 
     /** A message parser that can create new instances of this class. */
     public static final MessageParser<Connected> PARSER = new Parser();

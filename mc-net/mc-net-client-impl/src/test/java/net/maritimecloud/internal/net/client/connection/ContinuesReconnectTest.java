@@ -19,9 +19,9 @@ import static org.junit.Assert.assertEquals;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import net.maritimecloud.internal.messages.TransportMessage;
 import net.maritimecloud.internal.net.client.AbstractClientConnectionTest;
 import net.maritimecloud.internal.net.client.broadcast.stubs.HelloWorld;
-import net.maritimecloud.internal.net.messages.TransportMessage;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSend;
 import net.maritimecloud.messages.Connected;
 import net.maritimecloud.net.MaritimeCloudClient;

@@ -16,6 +16,8 @@ package net.maritimecloud.internal.net.client;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
@@ -39,7 +41,7 @@ import org.picocontainer.containers.ImmutablePicoContainer;
 
 /**
  * The internal client.
- * 
+ *
  * @author Kasper Nielsen
  */
 @SuppressWarnings("serial")
@@ -57,7 +59,7 @@ public class ClientContainer extends ReentrantLock {
     /** The container has been fully terminated. */
     static final int S_TERMINATED = 3;
 
-    private final String clientConnectString;
+    private final Map<String, String> clientConnectString;
 
     /** The id of this client */
     private final MaritimeId clientId;
@@ -78,7 +80,7 @@ public class ClientContainer extends ReentrantLock {
 
     /**
      * Creates a new instance of this class.
-     * 
+     *
      * @param configuration
      *            the configuration
      */
@@ -99,17 +101,17 @@ public class ClientContainer extends ReentrantLock {
         picoContainer.addComponent(new ImmutablePicoContainer(picoContainer));
         threadManager = picoContainer.getComponent(ThreadManager.class);
 
-        String s = "version=0.1";
+        clientConnectString = new HashMap<>();
+        clientConnectString.put("version", "0.1");
         if (configuration.properties().getName() != null) {
-            s += ",name=" + configuration.properties().getName();
+            clientConnectString.put("name", configuration.properties().getName());
         }
         if (configuration.properties().getDescription() != null) {
-            s += ",description=" + configuration.properties().getDescription();
+            clientConnectString.put("description", configuration.properties().getDescription());
         }
         if (configuration.properties().getOrganization() != null) {
-            s += ",organization=" + configuration.properties().getOrganization();
+            clientConnectString.put("organization", configuration.properties().getOrganization());
         }
-        clientConnectString = s;
     }
 
     public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
@@ -153,13 +155,13 @@ public class ClientContainer extends ReentrantLock {
     /**
      * @return the clientConnectString
      */
-    public String getClientConnectString() {
+    public Map<String, String> getClientConnectString() {
         return clientConnectString;
     }
 
     /**
      * Returns the maritime id of the client.
-     * 
+     *
      * @return the maritime id of the client
      */
     public MaritimeId getLocalId() {
@@ -183,7 +185,7 @@ public class ClientContainer extends ReentrantLock {
 
     /**
      * Reads and returns the current position.
-     * 
+     *
      * @return the current position
      */
     public PositionTime readCurrentPosition() {

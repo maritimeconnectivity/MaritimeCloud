@@ -17,14 +17,15 @@ package net.maritimecloud.internal.net.client.connection;
 import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import net.maritimecloud.internal.messages.TransportMessage;
 import net.maritimecloud.internal.net.client.ClientContainer;
-import net.maritimecloud.internal.net.messages.TransportMessage;
-import net.maritimecloud.internal.net.messages.auxiliary.HelloMessage;
 import net.maritimecloud.messages.Connected;
+import net.maritimecloud.messages.Hello;
 import net.maritimecloud.messages.Welcome;
 import net.maritimecloud.net.ClosingCode;
 import net.maritimecloud.net.MaritimeCloudConnection.Listener;
@@ -151,9 +152,20 @@ class ClientConnectFuture implements Runnable {
                 ClientContainer client = connection.connectionManager.client;
                 PositionTime pt = client.readCurrentPosition();
                 String connectName = connection.connectionId == null ? "" : connection.connectionId;
-                transport.sendText(new HelloMessage(client.getLocalId(), connection.connectionManager.client
-                        .getClientConnectString(), connectName, reconnectId, pt.getLatitude(), pt.getLongitude())
-                        .toText());
+                Hello h = new Hello();
+                h.setClientId(client.getLocalId().toString());
+                h.setPosition(PositionTime.create(pt.getLatitude(), pt.getLongitude(), System.currentTimeMillis()));
+                h.setReconnectId(connectName);
+                if (connection.connectionManager.client.getClientConnectString() != null) {
+                    for (Map.Entry<String, String> e : connection.connectionManager.client.getClientConnectString()
+                            .entrySet()) {
+                        h.putPropertie(e.getKey(), e.getValue());
+                    }
+                }
+                // new HelloMessage(client.getLocalId(), connection.connectionManager.client
+                // .getClientConnectString(), connectName, reconnectId, pt.getLatitude(), pt.getLongitude()
+
+                transport.sendText(h.toText());
                 receivedHelloMessage = true;
             } else {
                 String err = "Expected a welcome message, but was: " + m.getClass().getSimpleName();

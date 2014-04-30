@@ -14,7 +14,7 @@ import net.maritimecloud.core.message.ValueParser;
 import net.maritimecloud.internal.message.util.MessageHelper;
 import net.maritimecloud.internal.util.Hashing;
 
-public class Welcome implements Message, net.maritimecloud.internal.net.messages.TransportMessage {
+public class Welcome implements Message, net.maritimecloud.internal.messages.TransportMessage {
 
     /** A message parser that can create new instances of this class. */
     public static final MessageParser<Welcome> PARSER = new Parser();

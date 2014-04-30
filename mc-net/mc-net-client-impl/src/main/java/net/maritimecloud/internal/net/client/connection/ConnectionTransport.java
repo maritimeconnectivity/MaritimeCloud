@@ -20,8 +20,8 @@ import java.io.IOException;
 import java.net.URI;
 
 import net.maritimecloud.internal.messages.ConnectionMessage;
+import net.maritimecloud.internal.messages.TransportMessage;
 import net.maritimecloud.internal.net.messages.TMHelpers;
-import net.maritimecloud.internal.net.messages.TransportMessage;
 import net.maritimecloud.net.ClosingCode;
 import net.maritimecloud.net.MaritimeCloudConnection;
 import net.maritimecloud.net.MaritimeCloudConnection.Listener;

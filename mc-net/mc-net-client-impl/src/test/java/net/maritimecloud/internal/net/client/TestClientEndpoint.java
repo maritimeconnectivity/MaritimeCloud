@@ -28,8 +28,8 @@ import javax.websocket.RemoteEndpoint.Basic;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import net.maritimecloud.internal.messages.TransportMessage;
 import net.maritimecloud.internal.net.messages.TMHelpers;
-import net.maritimecloud.internal.net.messages.TransportMessage;
 import net.maritimecloud.messages.Welcome;
 
 /**

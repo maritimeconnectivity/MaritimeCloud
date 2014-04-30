@@ -14,6 +14,8 @@
  */
 package net.maritimecloud.internal.net.messages;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.IOException;
 
 import net.maritimecloud.internal.messages.ConnectionMessage;
@@ -22,7 +24,7 @@ import net.maritimecloud.internal.messages.ConnectionMessage;
  *
  * @author Kasper Nielsen
  */
-public abstract class ConnectionOldMessage extends AbstractTransportMessage implements ConnectionMessage {
+public abstract class ConnectionOldMessage implements ConnectionMessage {
 
     /** The id of the message. */
     private long messageId;
@@ -32,15 +34,29 @@ public abstract class ConnectionOldMessage extends AbstractTransportMessage impl
 
     // options
     // boolean fastack <- receiver should send some kind of ack immediatly
+
+    /** The type of message. */
+    private final MessageType messageType;
+
+    public String toText() {
+        TextMessageWriter w = new TextMessageWriter();
+        // w.writeInt(getMessageType().type);
+        write(w);
+        String s = w.sb.append("]").toString();
+        s = messageType.type + ":" + s;
+        return s;
+    }
+
+
     /**
      * @param messageType
      */
     public ConnectionOldMessage(MessageType messageType) {
-        super(messageType);
+        this.messageType = requireNonNull(messageType);
     }
 
     public ConnectionOldMessage(MessageType messageType, TextMessageReader pr) throws IOException {
-        super(messageType);
+        this.messageType = requireNonNull(messageType);
         this.messageId = pr.takeLong();
         this.latestReceivedId = pr.takeLong();
     }
@@ -70,7 +86,6 @@ public abstract class ConnectionOldMessage extends AbstractTransportMessage impl
     }
 
     /** {@inheritDoc} */
-    @Override
     protected final void write(TextMessageWriter w) {
         w.writeLong(messageId);
         w.writeLong(latestReceivedId);

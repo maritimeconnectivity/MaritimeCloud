@@ -19,6 +19,7 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -165,10 +166,19 @@ public class JSONMessageReader extends MessageReader {
         return Collections.emptyList();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     *
+     * @throws IOException
+     */
     @Override
-    public <K, V> Map<K, V> readMap(int tag, String name, ValueParser<K> keyParser, ValueParser<V> valueParser) {
-        return null;
+    public <K, V> Map<K, V> readMap(int tag, String name, ValueParser<K> keyParser, ValueParser<V> valueParser)
+            throws IOException {
+        if (isNext(-1, name)) {
+            Entry<String, JsonValue> next = iter.next();
+            return new JsonValueReader(next.getValue()).readMap(keyParser, valueParser);
+        }
+        return Collections.emptyMap();
     }
 
     /** {@inheritDoc} */
@@ -199,7 +209,7 @@ public class JSONMessageReader extends MessageReader {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws MessageSerializationException
      */
     @Override
@@ -363,7 +373,94 @@ public class JSONMessageReader extends MessageReader {
         /** {@inheritDoc} */
         @Override
         public <K, V> Map<K, V> readMap(ValueParser<K> keyParser, ValueParser<V> valueParser) throws IOException {
-            throw new UnsupportedOperationException();
+            Map<K, V> result = new HashMap<>();
+            JsonObject a = (JsonObject) value;
+            for (Map.Entry<String, JsonValue> e : a.entrySet()) {
+                JsonStringImpl kImpl = new JsonStringImpl(e.getKey());
+                K key = keyParser.parse(new JsonValueReader(kImpl));
+                V value = valueParser.parse(new JsonValueReader(e.getValue()));
+                result.put(key, value);
+            }
+            return result;
         }
+    }
+}
+
+final class JsonStringImpl implements JsonString {
+    private final String value;
+
+    JsonStringImpl(String value) {
+        this.value = value;
+    }
+
+    public String getString() {
+        return this.value;
+    }
+
+    public CharSequence getChars() {
+        return this.value;
+    }
+
+    public JsonValue.ValueType getValueType() {
+        return JsonValue.ValueType.STRING;
+    }
+
+    public int hashCode() {
+        return getString().hashCode();
+    }
+
+    public boolean equals(Object obj) {
+        if (!(obj instanceof JsonString)) {
+            return false;
+        }
+        JsonString other = (JsonString) obj;
+        return getString().equals(other.getString());
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append('"');
+
+        for (int i = 0; i < this.value.length(); ++i) {
+            char c = this.value.charAt(i);
+
+            if (c >= ' ' && c <= 1114111 && c != '"' && c != '\\') {
+                sb.append(c);
+            } else {
+                switch (c) {
+                case '"':
+                case '\\':
+                    sb.append('\\');
+                    sb.append(c);
+                    break;
+                case '\b':
+                    sb.append('\\');
+                    sb.append('b');
+                    break;
+                case '\f':
+                    sb.append('\\');
+                    sb.append('f');
+                    break;
+                case '\n':
+                    sb.append('\\');
+                    sb.append('n');
+                    break;
+                case '\r':
+                    sb.append('\\');
+                    sb.append('r');
+                    break;
+                case '\t':
+                    sb.append('\\');
+                    sb.append('t');
+                    break;
+                default:
+                    String hex = new StringBuilder().append("000").append(Integer.toHexString(c)).toString();
+                    sb.append("\\u").append(hex.substring(hex.length() - 4));
+                }
+            }
+        }
+
+        sb.append('"');
+        return sb.toString();
     }
 }

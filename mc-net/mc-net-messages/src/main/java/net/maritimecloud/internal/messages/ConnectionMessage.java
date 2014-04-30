@@ -14,7 +14,6 @@
  */
 package net.maritimecloud.internal.messages;
 
-import net.maritimecloud.internal.net.messages.TransportMessage;
 
 
 /**
