@@ -156,14 +156,14 @@ class ClientConnectFuture implements Runnable {
                 h.setClientId(client.getLocalId().toString());
                 h.setPosition(PositionTime.create(pt.getLatitude(), pt.getLongitude(), System.currentTimeMillis()));
                 h.setReconnectId(connectName);
+                h.setLastReceivedMessageId(reconnectId);
                 if (connection.connectionManager.client.getClientConnectString() != null) {
                     for (Map.Entry<String, String> e : connection.connectionManager.client.getClientConnectString()
                             .entrySet()) {
                         h.putPropertie(e.getKey(), e.getValue());
                     }
                 }
-                // new HelloMessage(client.getLocalId(), connection.connectionManager.client
-                // .getClientConnectString(), connectName, reconnectId, pt.getLatitude(), pt.getLongitude()
+                // new HelloMessage(client.getLocalId(), , pt.getLatitude(), pt.getLongitude()
 
                 transport.sendText(h.toText());
                 receivedHelloMessage = true;

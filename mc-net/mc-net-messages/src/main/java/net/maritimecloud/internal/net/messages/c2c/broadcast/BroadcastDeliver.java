@@ -24,10 +24,7 @@ import net.maritimecloud.internal.net.messages.MessageType;
 import net.maritimecloud.internal.net.messages.TMHelpers;
 import net.maritimecloud.internal.net.messages.TextMessageReader;
 import net.maritimecloud.internal.net.messages.TextMessageWriter;
-import net.maritimecloud.net.broadcast.BroadcastMessage;
 import net.maritimecloud.util.geometry.PositionTime;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * This message is send from the server to the client because the client was in proximity of broadcast that was sent to
@@ -86,7 +83,7 @@ public class BroadcastDeliver extends ConnectionOldMessage {
     /**
      * @return the message
      */
-    public String getMessage() {
+    public String getMsg() {
         return message;
     }
 
@@ -95,12 +92,6 @@ public class BroadcastDeliver extends ConnectionOldMessage {
      */
     public PositionTime getPositionTime() {
         return positionTime;
-    }
-
-    public BroadcastMessage tryRead() throws Exception {
-        Class<BroadcastMessage> cl = (Class<BroadcastMessage>) Class.forName(getChannel());
-        ObjectMapper om = new ObjectMapper();
-        return om.readValue(getMessage(), cl);
     }
 
     /** {@inheritDoc} */

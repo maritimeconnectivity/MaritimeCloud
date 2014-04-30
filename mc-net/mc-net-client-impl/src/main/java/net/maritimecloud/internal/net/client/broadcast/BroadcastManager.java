@@ -29,6 +29,7 @@ import net.maritimecloud.internal.net.client.util.CustomConcurrentHashMap.Streng
 import net.maritimecloud.internal.net.client.util.DefaultConnectionFuture;
 import net.maritimecloud.internal.net.client.util.ThreadManager;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastDeliver;
+import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastHelper;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSend;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSendAck;
 import net.maritimecloud.messages.BroadcastPublicRemoteAck;
@@ -137,7 +138,7 @@ public class BroadcastManager {
         if (set != null && !set.isEmpty()) {
             BroadcastMessage bm = null;
             try {
-                bm = broadcast.tryRead();
+                bm = BroadcastHelper.tryRead(broadcast);
             } catch (Exception e) {
                 LOG.error("Exception while trying to deserialize an incoming broadcast message ", e);
                 LOG.error(broadcast.toText());
