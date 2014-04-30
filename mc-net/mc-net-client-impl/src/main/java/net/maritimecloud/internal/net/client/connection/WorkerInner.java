@@ -18,7 +18,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.LinkedList;
 
-import net.maritimecloud.internal.net.messages.ConnectionMessage;
+import net.maritimecloud.internal.net.messages.ConnectionOldMessage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +37,7 @@ public class WorkerInner {
 
     private final LinkedList<OutstandingMessage> written = new LinkedList<>();
 
-    private final LinkedList<ConnectionMessage> received = new LinkedList<>();
+    private final LinkedList<ConnectionOldMessage> received = new LinkedList<>();
 
     final Worker worker;
 
@@ -77,7 +77,7 @@ public class WorkerInner {
         if (o instanceof OutstandingMessage) {
             unwritten.add((OutstandingMessage) o);
         } else {
-            received.add((ConnectionMessage) o);
+            received.add((ConnectionOldMessage) o);
         }
     }
 
@@ -111,7 +111,7 @@ public class WorkerInner {
 
 
     private void processReceived() {
-        ConnectionMessage cm = received.poll();
+        ConnectionOldMessage cm = received.poll();
         // System.out
         // .println(System.currentTimeMillis() + " GOT MSG with " + cm.getLatestReceivedId() + " " + cm.toJSON());
         latestReceivedMessageId = cm.getMessageId();
@@ -133,7 +133,7 @@ public class WorkerInner {
         ConnectionTransport transport = worker.connection.getTransport();
         if (transport != null && transport == this.transport) {
             OutstandingMessage om = unwritten.poll();
-            ConnectionMessage cm = om.cm;
+            ConnectionOldMessage cm = om.cm;
             om.id = nextSendId++;
             cm.setMessageId(om.id);
             cm.setLatestReceivedId(latestReceivedMessageId);

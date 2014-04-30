@@ -26,8 +26,8 @@ import net.maritimecloud.internal.net.messages.c2c.service.InvokeService;
 import net.maritimecloud.internal.net.messages.c2c.service.InvokeServiceResult;
 import net.maritimecloud.internal.net.messages.s2c.service.FindService;
 import net.maritimecloud.internal.net.messages.s2c.service.RegisterService;
-import net.maritimecloud.net.NetworkFuture;
 import net.maritimecloud.net.MaritimeCloudClient;
+import net.maritimecloud.net.NetworkFuture;
 import net.maritimecloud.net.service.ServiceEndpoint;
 import net.maritimecloud.net.service.ServiceInvocationFuture;
 import net.maritimecloud.net.service.registration.ServiceRegistration;
@@ -39,7 +39,7 @@ import test.stubs.HelloService.GetName;
 import test.stubs.HelloService.Reply;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class ServiceTest extends AbstractClientConnectionTest {
@@ -83,7 +83,7 @@ public class ServiceTest extends AbstractClientConnectionTest {
         assertFalse(invoke.receivedByCloud().isDone());
         InvokeService is = t.take(InvokeService.class);
         InvokeServiceResult isr = is.createReply(new Reply("okfoo"));
-        isr.setLatestReceivedId(2);
+        isr.setLatestReceivedId(2L);
         t.send(isr);
         invoke.receivedByCloud().get(1, TimeUnit.SECONDS);
         assertTrue(invoke.receivedByCloud().isDone());

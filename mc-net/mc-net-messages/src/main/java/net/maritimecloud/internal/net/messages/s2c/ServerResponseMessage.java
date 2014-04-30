@@ -16,7 +16,7 @@ package net.maritimecloud.internal.net.messages.s2c;
 
 import java.io.IOException;
 
-import net.maritimecloud.internal.net.messages.ConnectionMessage;
+import net.maritimecloud.internal.net.messages.ConnectionOldMessage;
 import net.maritimecloud.internal.net.messages.MessageType;
 import net.maritimecloud.internal.net.messages.TextMessageReader;
 import net.maritimecloud.internal.net.messages.TextMessageWriter;
@@ -25,7 +25,7 @@ import net.maritimecloud.internal.net.messages.TextMessageWriter;
  * 
  * @author Kasper Nielsen
  */
-public abstract class ServerResponseMessage extends ConnectionMessage {
+public abstract class ServerResponseMessage extends ConnectionOldMessage {
 
     final long messageAck;
 

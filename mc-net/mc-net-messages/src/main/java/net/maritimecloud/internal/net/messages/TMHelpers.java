@@ -16,6 +16,7 @@ package net.maritimecloud.internal.net.messages;
 
 import java.io.IOException;
 
+import net.maritimecloud.core.message.MessageParser;
 import net.maritimecloud.core.message.MessageSerializers;
 import net.maritimecloud.messages.Connected;
 
@@ -43,8 +44,10 @@ public class TMHelpers {
         String t = msg.substring(0, io);
         msg = msg.substring(io + 1);
         int type = Integer.parseInt(t);// pr.takeInt();
-        if (type == 3) {
-            TransportMessage tm = MessageSerializers.readFromJSON(Connected.PARSER, msg);
+        MessageParser<? extends TransportMessage> p = MessageType.getParser(type);
+        if (p != null) {
+            // System.out.println("Got " + msg);
+            TransportMessage tm = MessageSerializers.readFromJSON(p, msg);
             return tm;
         }
         TextMessageReader pr = new TextMessageReader(msg);

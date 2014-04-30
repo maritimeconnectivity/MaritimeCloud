@@ -19,7 +19,7 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 
 import net.maritimecloud.core.id.MaritimeId;
-import net.maritimecloud.internal.net.messages.ConnectionMessage;
+import net.maritimecloud.internal.net.messages.ConnectionOldMessage;
 import net.maritimecloud.internal.net.messages.MessageType;
 import net.maritimecloud.internal.net.messages.TextMessageReader;
 import net.maritimecloud.internal.net.messages.TextMessageWriter;
@@ -29,7 +29,7 @@ import net.maritimecloud.util.geometry.PositionTime;
  * 
  * @author Kasper Nielsen
  */
-public class BroadcastAck extends ConnectionMessage {
+public class BroadcastAck extends ConnectionOldMessage {
 
     final long broadcastId;
 

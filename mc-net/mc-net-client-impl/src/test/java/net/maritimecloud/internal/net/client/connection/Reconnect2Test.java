@@ -47,8 +47,8 @@ public class Reconnect2Test extends AbstractClientConnectionTest {
 
         c.broadcast(new HelloWorld("hello"));
         BroadcastSend m = t.take(BroadcastSend.class);
-        assertEquals(1L, m.getMessageId());
-        assertEquals(0L, m.getLatestReceivedId());
+        assertEquals(1L, m.getMessageId().longValue());
+        assertEquals(0L, m.getLatestReceivedId().longValue());
 
         t.close();
 
@@ -64,12 +64,12 @@ public class Reconnect2Test extends AbstractClientConnectionTest {
         t.send(new Connected().setConnectionId("ABCDEFG").setLastReceivedMessageId(1L));
 
         m = t.take(BroadcastSend.class);
-        assertEquals(2L, m.getMessageId());
-        assertEquals(0L, m.getLatestReceivedId());
+        assertEquals(2L, m.getMessageId().longValue());
+        assertEquals(0L, m.getLatestReceivedId().longValue());
 
         m = t.take(BroadcastSend.class);
-        assertEquals(3L, m.getMessageId());
-        assertEquals(0L, m.getLatestReceivedId());
+        assertEquals(3L, m.getMessageId().longValue());
+        assertEquals(0L, m.getLatestReceivedId().longValue());
     }
 
     /** Like the first one. But we have sent a message from the server before disconnecting. */
@@ -81,8 +81,8 @@ public class Reconnect2Test extends AbstractClientConnectionTest {
 
         c.broadcast(new HelloWorld("hello"));
         BroadcastSend m = t.take(BroadcastSend.class);
-        assertEquals(1L, m.getMessageId());
-        assertEquals(0L, m.getLatestReceivedId());
+        assertEquals(1L, m.getMessageId().longValue());
+        assertEquals(0L, m.getLatestReceivedId().longValue());
 
         final CountDownLatch cdl = new CountDownLatch(1);
         c.broadcastListen(HelloWorld.class, new BroadcastListener<HelloWorld>() {
@@ -93,8 +93,8 @@ public class Reconnect2Test extends AbstractClientConnectionTest {
 
         BroadcastDeliver bd = new BroadcastDeliver(ID2, PositionTime.create(1, 1, 1),
                 HelloWorld.class.getCanonicalName(), persistAndEscape(new HelloWorld("foo")));
-        bd.setMessageId(1);
-        bd.setLatestReceivedId(1);
+        bd.setMessageId(1L);
+        bd.setLatestReceivedId(1L);
         t.send(bd);
 
 
@@ -113,12 +113,12 @@ public class Reconnect2Test extends AbstractClientConnectionTest {
         t.send(new Connected().setConnectionId("ABCDEFG").setLastReceivedMessageId(1L));
 
         m = t.take(BroadcastSend.class);
-        assertEquals(2L, m.getMessageId());
-        assertEquals(1L, m.getLatestReceivedId());
+        assertEquals(2L, m.getMessageId().longValue());
+        assertEquals(1L, m.getLatestReceivedId().longValue());
 
         m = t.take(BroadcastSend.class);
-        assertEquals(3L, m.getMessageId());
-        assertEquals(1L, m.getLatestReceivedId());
+        assertEquals(3L, m.getMessageId().longValue());
+        assertEquals(1L, m.getLatestReceivedId().longValue());
     }
 
     /** Like the first one. But when we connect the server indicates that it have not received any message. */
@@ -130,8 +130,8 @@ public class Reconnect2Test extends AbstractClientConnectionTest {
 
         c.broadcast(new HelloWorld("hello1"));
         BroadcastSend m = t.take(BroadcastSend.class);
-        assertEquals(1L, m.getMessageId());
-        assertEquals(0L, m.getLatestReceivedId());
+        assertEquals(1L, m.getMessageId().longValue());
+        assertEquals(0L, m.getLatestReceivedId().longValue());
 
         final CountDownLatch cdl = new CountDownLatch(1);
         c.broadcastListen(HelloWorld.class, new BroadcastListener<HelloWorld>() {
@@ -142,8 +142,8 @@ public class Reconnect2Test extends AbstractClientConnectionTest {
 
         BroadcastDeliver bd = new BroadcastDeliver(ID2, PositionTime.create(1, 1, 1),
                 HelloWorld.class.getCanonicalName(), persistAndEscape(new HelloWorld("foo")));
-        bd.setMessageId(1);
-        bd.setLatestReceivedId(0);
+        bd.setMessageId(1L);
+        bd.setLatestReceivedId(0L);
         t.send(bd);
 
 
@@ -162,18 +162,18 @@ public class Reconnect2Test extends AbstractClientConnectionTest {
         t.send(new Connected().setConnectionId("ABCDEFG").setLastReceivedMessageId(0L));
 
         m = t.take(BroadcastSend.class);
-        assertEquals(1L, m.getMessageId());
-        assertEquals(1L, m.getLatestReceivedId());
+        assertEquals(1L, m.getMessageId().longValue());
+        assertEquals(1L, m.getLatestReceivedId().longValue());
         assertEquals("hello1", ((HelloWorld) m.tryRead()).getMessage());
 
         m = t.take(BroadcastSend.class);
-        assertEquals(2L, m.getMessageId());
-        assertEquals(1L, m.getLatestReceivedId());
+        assertEquals(2L, m.getMessageId().longValue());
+        assertEquals(1L, m.getLatestReceivedId().longValue());
         assertEquals("hello2", ((HelloWorld) m.tryRead()).getMessage());
 
         m = t.take(BroadcastSend.class);
-        assertEquals(3L, m.getMessageId());
-        assertEquals(1L, m.getLatestReceivedId());
+        assertEquals(3L, m.getMessageId().longValue());
+        assertEquals(1L, m.getLatestReceivedId().longValue());
         assertEquals("hello3", ((HelloWorld) m.tryRead()).getMessage());
     }
 }

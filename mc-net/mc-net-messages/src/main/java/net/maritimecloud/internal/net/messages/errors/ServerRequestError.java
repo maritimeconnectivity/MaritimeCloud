@@ -14,7 +14,7 @@
  */
 package net.maritimecloud.internal.net.messages.errors;
 
-import net.maritimecloud.internal.net.messages.ConnectionMessage;
+import net.maritimecloud.internal.net.messages.ConnectionOldMessage;
 import net.maritimecloud.internal.net.messages.MessageType;
 import net.maritimecloud.internal.net.messages.TextMessageWriter;
 
@@ -22,7 +22,7 @@ import net.maritimecloud.internal.net.messages.TextMessageWriter;
  * 
  * @author Kasper Nielsen
  */
-public class ServerRequestError extends ConnectionMessage {
+public class ServerRequestError extends ConnectionOldMessage {
 
     /**
      * @param messageType

@@ -38,7 +38,7 @@ import org.junit.Test;
 
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class ReconnectTest extends AbstractClientConnectionTest {
@@ -49,13 +49,13 @@ public class ReconnectTest extends AbstractClientConnectionTest {
 
         c.broadcast(new HelloWorld("hello"));
         BroadcastSend m = t.take(BroadcastSend.class);
-        assertEquals(1L, m.getMessageId());
-        assertEquals(0L, m.getLatestReceivedId());
+        assertEquals(1L, m.getMessageId().longValue());
+        assertEquals(0L, m.getLatestReceivedId().longValue());
 
         c.broadcast(new HelloWorld("hello"));
         m = t.take(BroadcastSend.class);
-        assertEquals(2L, m.getMessageId());
-        assertEquals(0L, m.getLatestReceivedId());
+        assertEquals(2L, m.getMessageId().longValue());
+        assertEquals(0L, m.getLatestReceivedId().longValue());
     }
 
     @Test
@@ -64,8 +64,8 @@ public class ReconnectTest extends AbstractClientConnectionTest {
         for (int i = 0; i < 200; i++) {
             c.broadcast(new HelloWorld("hello"));
             BroadcastSend m = t.take(BroadcastSend.class);
-            assertEquals(i + 1, m.getMessageId());
-            assertEquals(0L, m.getLatestReceivedId());
+            assertEquals(i + 1, m.getMessageId().longValue());
+            assertEquals(0L, m.getLatestReceivedId().longValue());
         }
     }
 
@@ -83,30 +83,30 @@ public class ReconnectTest extends AbstractClientConnectionTest {
 
         BroadcastDeliver bm = new BroadcastDeliver(ID3, PositionTime.create(2, 1, 4),
                 HelloWorld.class.getCanonicalName(), persistAndEscape(new HelloWorld("A")));
-        bm.setLatestReceivedId(0);
-        bm.setMessageId(1);
+        bm.setLatestReceivedId(0L);
+        bm.setMessageId(1L);
         t.send(bm);
         assertTrue(cdl1.await(1, TimeUnit.SECONDS));
 
         Thread.sleep(1000);
         c.broadcast(new HelloWorld("hello"));
         BroadcastSend m = t.take(BroadcastSend.class);
-        assertEquals(1L, m.getMessageId());
-        assertEquals(1L, m.getLatestReceivedId());
+        assertEquals(1L, m.getMessageId().longValue());
+        assertEquals(1L, m.getLatestReceivedId().longValue());
 
-        bm.setLatestReceivedId(1);
-        bm.setMessageId(2);
+        bm.setLatestReceivedId(1L);
+        bm.setMessageId(2L);
         t.send(bm);
 
-        bm.setLatestReceivedId(1);
-        bm.setMessageId(3);
+        bm.setLatestReceivedId(1L);
+        bm.setMessageId(3L);
         t.send(bm);
 
         assertTrue(cdl3.await(1, TimeUnit.SECONDS));
         c.broadcast(new HelloWorld("hello"));
         m = t.take(BroadcastSend.class);
-        assertEquals(2L, m.getMessageId());
-        assertEquals(3L, m.getLatestReceivedId());
+        assertEquals(2L, m.getMessageId().longValue());
+        assertEquals(3L, m.getLatestReceivedId().longValue());
     }
 
     /** Tests a mix of messages. */
@@ -122,8 +122,8 @@ public class ReconnectTest extends AbstractClientConnectionTest {
                 // server send message
                 BroadcastDeliver bm = new BroadcastDeliver(ID3, PositionTime.create(2, 1, 4),
                         HelloWorld.class.getCanonicalName(), persistAndEscape(new HelloWorld("A")));
-                bm.setLatestReceivedId(0);
-                bm.setMessageId(++lastestOut);
+                bm.setLatestReceivedId(0L);
+                bm.setMessageId((long) ++lastestOut);
                 t.send(bm);
             } else {
                 c.broadcast(new HelloWorld("hello"));
@@ -135,7 +135,7 @@ public class ReconnectTest extends AbstractClientConnectionTest {
         bq.clear();
         c.broadcast(new HelloWorld("hello"));
         BroadcastSend m = t.take(BroadcastSend.class);
-        assertEquals(count - lastestOut + 1, m.getMessageId());
-        assertEquals(lastestOut, m.getLatestReceivedId());
+        assertEquals(count - lastestOut + 1, m.getMessageId().longValue());
+        assertEquals(lastestOut, m.getLatestReceivedId().longValue());
     }
 }

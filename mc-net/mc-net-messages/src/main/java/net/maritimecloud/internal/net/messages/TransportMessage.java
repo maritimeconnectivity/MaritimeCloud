@@ -23,7 +23,7 @@ package net.maritimecloud.internal.net.messages;
 public interface TransportMessage {
 
     default String toText() {
-        return "3:" + toJSON();
+        return MessageType.getType(getClass()) + ":" + toJSON();
     }
 
 

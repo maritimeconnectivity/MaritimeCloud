@@ -16,11 +16,13 @@ package net.maritimecloud.internal.net.messages;
 
 import java.io.IOException;
 
+import net.maritimecloud.internal.messages.ConnectionMessage;
+
 /**
  *
  * @author Kasper Nielsen
  */
-public abstract class ConnectionMessage extends AbstractTransportMessage {
+public abstract class ConnectionOldMessage extends AbstractTransportMessage implements ConnectionMessage {
 
     /** The id of the message. */
     private long messageId;
@@ -33,11 +35,11 @@ public abstract class ConnectionMessage extends AbstractTransportMessage {
     /**
      * @param messageType
      */
-    public ConnectionMessage(MessageType messageType) {
+    public ConnectionOldMessage(MessageType messageType) {
         super(messageType);
     }
 
-    public ConnectionMessage(MessageType messageType, TextMessageReader pr) throws IOException {
+    public ConnectionOldMessage(MessageType messageType, TextMessageReader pr) throws IOException {
         super(messageType);
         this.messageId = pr.takeLong();
         this.latestReceivedId = pr.takeLong();
@@ -46,23 +48,23 @@ public abstract class ConnectionMessage extends AbstractTransportMessage {
     /**
      * @return the destination
      */
-    public long getLatestReceivedId() {
+    public Long getLatestReceivedId() {
         return latestReceivedId;
     }
 
     /**
      * @return the src
      */
-    public long getMessageId() {
+    public Long getMessageId() {
         return messageId;
     }
 
-    public ConnectionMessage setLatestReceivedId(long latestReceivedId) {
+    public ConnectionOldMessage setLatestReceivedId(Long latestReceivedId) {
         this.latestReceivedId = latestReceivedId;
         return this;
     }
 
-    public ConnectionMessage setMessageId(long messageId) {
+    public ConnectionOldMessage setMessageId(Long messageId) {
         this.messageId = messageId;
         return this;
     }

@@ -24,8 +24,8 @@ import java.util.concurrent.TimeUnit;
 import net.maritimecloud.internal.net.client.ClientContainer;
 import net.maritimecloud.internal.net.messages.TransportMessage;
 import net.maritimecloud.internal.net.messages.auxiliary.HelloMessage;
-import net.maritimecloud.internal.net.messages.auxiliary.WelcomeMessage;
 import net.maritimecloud.messages.Connected;
+import net.maritimecloud.messages.Welcome;
 import net.maritimecloud.net.ClosingCode;
 import net.maritimecloud.net.MaritimeCloudConnection.Listener;
 import net.maritimecloud.util.function.Consumer;
@@ -147,7 +147,7 @@ class ClientConnectFuture implements Runnable {
      */
     void onMessage(TransportMessage m) {
         if (!receivedHelloMessage) {
-            if (m instanceof WelcomeMessage) {
+            if (m instanceof Welcome) {
                 ClientContainer client = connection.connectionManager.client;
                 PositionTime pt = client.readCurrentPosition();
                 String connectName = connection.connectionId == null ? "" : connection.connectionId;

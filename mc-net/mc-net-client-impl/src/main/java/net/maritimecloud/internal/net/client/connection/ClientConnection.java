@@ -18,7 +18,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.concurrent.locks.ReentrantLock;
 
-import net.maritimecloud.internal.net.messages.ConnectionMessage;
+import net.maritimecloud.internal.net.messages.ConnectionOldMessage;
 import net.maritimecloud.net.ClosingCode;
 import net.maritimecloud.net.MaritimeCloudConnection;
 import net.maritimecloud.net.MaritimeCloudConnection.Listener;
@@ -147,7 +147,7 @@ public final class ClientConnection {
         }
     }
 
-    void messageReceive(ConnectionTransport transport, ConnectionMessage m) {
+    void messageReceive(ConnectionTransport transport, ConnectionOldMessage m) {
         retrieveLock.lock();
         try {
             worker.messageReceived(m);
@@ -166,7 +166,7 @@ public final class ClientConnection {
      * @param message
      *            the message to send
      */
-    OutstandingMessage messageSend(ConnectionMessage message) {
+    OutstandingMessage messageSend(ConnectionOldMessage message) {
         return worker.messageSend(message);
         //
         // sendLock.lock();

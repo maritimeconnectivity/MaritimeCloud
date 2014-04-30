@@ -18,7 +18,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 
-import net.maritimecloud.internal.net.messages.ConnectionMessage;
+import net.maritimecloud.internal.net.messages.ConnectionOldMessage;
 import net.maritimecloud.internal.net.messages.MessageType;
 import net.maritimecloud.internal.net.messages.PositionTimeMessage;
 import net.maritimecloud.internal.net.messages.TextMessageReader;
@@ -30,7 +30,7 @@ import net.maritimecloud.util.geometry.PositionTime;
  * @author Kasper Nielsen
  */
 // Not sure this needs to be a connection message
-public class PositionReportMessage extends ConnectionMessage implements PositionTimeMessage {
+public class PositionReportMessage extends ConnectionOldMessage implements PositionTimeMessage {
 
     private final PositionTime positionTime;
 

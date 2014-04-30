@@ -28,10 +28,9 @@ import javax.websocket.RemoteEndpoint.Basic;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
-import net.maritimecloud.core.id.ServerId;
-import net.maritimecloud.internal.net.messages.TransportMessage;
 import net.maritimecloud.internal.net.messages.TMHelpers;
-import net.maritimecloud.internal.net.messages.auxiliary.WelcomeMessage;
+import net.maritimecloud.internal.net.messages.TransportMessage;
+import net.maritimecloud.messages.Welcome;
 
 /**
  *
@@ -61,7 +60,7 @@ public class TestClientEndpoint {
     public final void onWebsocketOpen(Session session) {
         this.session = session;
         m.clear();
-        send(new WelcomeMessage(1, new ServerId(123), "enavServer/1.0"));
+        send(new Welcome().addProtocolVersion(1).setServerId("123").putPropertie("implementation", "enavServer/1.0"));
 
     }
 

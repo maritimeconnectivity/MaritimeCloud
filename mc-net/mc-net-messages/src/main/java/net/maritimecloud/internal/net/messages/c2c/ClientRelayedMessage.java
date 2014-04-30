@@ -17,7 +17,7 @@ package net.maritimecloud.internal.net.messages.c2c;
 import java.io.IOException;
 
 import net.maritimecloud.core.id.MaritimeId;
-import net.maritimecloud.internal.net.messages.ConnectionMessage;
+import net.maritimecloud.internal.net.messages.ConnectionOldMessage;
 import net.maritimecloud.internal.net.messages.MessageType;
 import net.maritimecloud.internal.net.messages.TextMessageReader;
 import net.maritimecloud.internal.net.messages.TextMessageWriter;
@@ -26,7 +26,7 @@ import net.maritimecloud.internal.net.messages.TextMessageWriter;
  * 
  * @author Kasper Nielsen
  */
-public abstract class ClientRelayedMessage extends ConnectionMessage {
+public abstract class ClientRelayedMessage extends ConnectionOldMessage {
 
     String destination;
 

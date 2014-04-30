@@ -16,12 +16,14 @@ package net.maritimecloud.internal.net.messages;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import net.maritimecloud.core.message.MessageParser;
 import net.maritimecloud.internal.net.messages.auxiliary.HelloMessage;
 import net.maritimecloud.internal.net.messages.auxiliary.PositionReportMessage;
-import net.maritimecloud.internal.net.messages.auxiliary.WelcomeMessage;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastAck;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastDeliver;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastListen;
@@ -36,6 +38,7 @@ import net.maritimecloud.internal.net.messages.s2c.service.FindServiceResult;
 import net.maritimecloud.internal.net.messages.s2c.service.RegisterService;
 import net.maritimecloud.internal.net.messages.s2c.service.RegisterServiceResult;
 import net.maritimecloud.messages.Connected;
+import net.maritimecloud.messages.Welcome;
 
 /**
  * The type of messages that can be sent around in the system.
@@ -47,13 +50,13 @@ public enum MessageType {
     // 0 - 9 : lifecycle, connect/reconnect/disconnect.. keep/alive
 
     /** This is the first message sent by the server to client. Whenever a Websocket connection has been created. */
-    WELCOME(1, WelcomeMessage.class), // 1. message from server 2 client
+    WELCOME(1, Welcome.class, Welcome.PARSER), // 1. message from server 2 client
 
     /** This is the first message from the client to server. Contains an optional reconnect token. */
     HELLO(2, HelloMessage.class), // 1. message from client 2 server
 
     /** The final handshake massage from the server, contains the connection id */
-    CONNECTED(3, Connected.class), // 2. message from server 2 client
+    CONNECTED(3, Connected.class, Connected.PARSER), // 2. message from server 2 client
 
     /** A keep alive message sent periodically. Contains current position/time. */
     POSITION_REPORT(9, PositionReportMessage.class),
@@ -115,25 +118,47 @@ public enum MessageType {
 
     final int type;
 
+    final MessageParser<? extends TransportMessage> p;
+
     MessageType(int type, Class<? extends TransportMessage> cl) {
+        this(type, cl, null);
+    }
+
+    MessageType(int type, Class<? extends TransportMessage> cl, MessageParser<? extends TransportMessage> p) {
         if (type < 1 || type > 255) {
             throw new IllegalArgumentException("type must be 1>= type <=255");
         }
         this.type = type;
         this.cl = requireNonNull(cl);
+        this.p = p;
     }
 
     public static Class<? extends TransportMessage> getType(int type) {
         return HelperHolder.TYPES[type].cl;
     }
 
+    public static MessageParser<? extends TransportMessage> getParser(int type) {
+        return HelperHolder.TYPES[type].p;
+    }
+
+    public static int getType(Class<? extends TransportMessage> c) {
+        return HelperHolder.map.get(c).type;
+    }
+
+    public static MessageParser<? extends TransportMessage> getParser(Class<? extends TransportMessage> c) {
+        return HelperHolder.map.get(c).p;
+    }
+
     /** A little initialization-on-demand holder idiom helper class */
     private static class HelperHolder {
         static MessageType[] TYPES;
+
+        static final Map<Class<? extends TransportMessage>, MessageType> map = new HashMap<>();
         static {
             TreeMap<Integer, MessageType> m = new TreeMap<>();
             for (MessageType mt : MessageType.values()) {
                 m.put(mt.type, mt);
+                map.put(mt.cl, mt);
             }
             TYPES = new MessageType[m.lastKey() + 1];
             for (Entry<Integer, MessageType> e : m.entrySet()) {

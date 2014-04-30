@@ -17,7 +17,7 @@ package net.maritimecloud.internal.net.client.connection;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
-import net.maritimecloud.internal.net.messages.ConnectionMessage;
+import net.maritimecloud.internal.net.messages.ConnectionOldMessage;
 
 /**
  *
@@ -45,7 +45,7 @@ public class Worker implements Runnable {
         this.connection = connection;
     }
 
-    public OutstandingMessage messageSend(ConnectionMessage message) {
+    public OutstandingMessage messageSend(ConnectionOldMessage message) {
         sendLock.lock();
         try {
             if (isShutdown) {
@@ -72,7 +72,7 @@ public class Worker implements Runnable {
         }
     }
 
-    public void messageReceived(ConnectionMessage message) {
+    public void messageReceived(ConnectionOldMessage message) {
         receiveLock.lock();
         try {
             if (!isShutdown) {

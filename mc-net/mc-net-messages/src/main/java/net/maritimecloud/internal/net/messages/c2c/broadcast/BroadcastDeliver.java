@@ -19,7 +19,7 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 
 import net.maritimecloud.core.id.MaritimeId;
-import net.maritimecloud.internal.net.messages.ConnectionMessage;
+import net.maritimecloud.internal.net.messages.ConnectionOldMessage;
 import net.maritimecloud.internal.net.messages.MessageType;
 import net.maritimecloud.internal.net.messages.TMHelpers;
 import net.maritimecloud.internal.net.messages.TextMessageReader;
@@ -36,7 +36,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Kasper Nielsen
  * @see BroadcastSend
  */
-public class BroadcastDeliver extends ConnectionMessage {
+public class BroadcastDeliver extends ConnectionOldMessage {
 
     final String channel;
 
