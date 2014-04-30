@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.internal.net.messages.c2c;
+package net.maritimecloud.internal.net.messages.c2c.service;
 
 import java.io.IOException;
 

@@ -20,7 +20,6 @@ import net.maritimecloud.internal.net.messages.MessageType;
 import net.maritimecloud.internal.net.messages.TMHelpers;
 import net.maritimecloud.internal.net.messages.TextMessageReader;
 import net.maritimecloud.internal.net.messages.TextMessageWriter;
-import net.maritimecloud.internal.net.messages.c2c.ClientRelayedMessage;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

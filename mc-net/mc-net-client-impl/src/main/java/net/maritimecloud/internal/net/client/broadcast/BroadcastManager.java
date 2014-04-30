@@ -28,10 +28,10 @@ import net.maritimecloud.internal.net.client.util.CustomConcurrentHashMap;
 import net.maritimecloud.internal.net.client.util.CustomConcurrentHashMap.Strength;
 import net.maritimecloud.internal.net.client.util.DefaultConnectionFuture;
 import net.maritimecloud.internal.net.client.util.ThreadManager;
-import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastAck;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastDeliver;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSend;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSendAck;
+import net.maritimecloud.messages.BroadcastPublicRemoteAck;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.broadcast.BroadcastFuture;
 import net.maritimecloud.net.broadcast.BroadcastListener;
@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Manages sending and receiving of broadcasts.
- * 
+ *
  * @author Kasper Nielsen
  */
 public class BroadcastManager {
@@ -77,7 +77,7 @@ public class BroadcastManager {
 
     /**
      * Creates a new instance of this class.
-     * 
+     *
      * @param network
      *            the network
      */
@@ -91,7 +91,7 @@ public class BroadcastManager {
 
     /**
      * Sets up listeners for incoming broadcast messages.
-     * 
+     *
      * @param messageType
      *            the type of message to receive
      * @param listener
@@ -116,7 +116,7 @@ public class BroadcastManager {
 
 
     @OnMessage
-    public void onBroadcastAck(BroadcastAck ack) {
+    public void onBroadcastAck(BroadcastPublicRemoteAck ack) {
         DefaultOutstandingBroadcast f = outstandingBroadcasts.get(ack.getBroadcastId());
         // if we do not have a valid outstanding broadcast just ignore the ack
         if (f != null) {
@@ -126,7 +126,7 @@ public class BroadcastManager {
 
     /**
      * Invoked whenever a broadcast message is received from a remote actor.
-     * 
+     *
      * @param broadcast
      *            the broadcast that was received
      */

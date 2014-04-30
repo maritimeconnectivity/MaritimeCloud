@@ -24,9 +24,9 @@ import java.util.concurrent.TimeUnit;
 
 import net.maritimecloud.internal.net.client.AbstractClientConnectionTest;
 import net.maritimecloud.internal.net.client.broadcast.stubs.HelloWorld;
-import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastAck;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSend;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSendAck;
+import net.maritimecloud.messages.BroadcastPublicRemoteAck;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.broadcast.BroadcastFuture;
 import net.maritimecloud.net.broadcast.BroadcastMessage;
@@ -84,7 +84,13 @@ public class BroadcastFutureTest extends AbstractClientConnectionTest {
         bf.receivedOnServer().get(1, TimeUnit.SECONDS);
 
         final BlockingQueue<BroadcastMessageAck> q = new LinkedBlockingQueue<>();
-        BroadcastAck ba = new BroadcastAck(mb.getReplyTo(), ID3, PositionTime.create(3, 3, 3));
+
+        BroadcastPublicRemoteAck ba = new BroadcastPublicRemoteAck();
+        ba.setMessageId(0L);
+        ba.setLatestReceivedId(0L);
+        ba.setBroadcastId(mb.getReplyTo());
+        ba.setId(ID3.toString());
+        ba.setPositionTime(PositionTime.create(3, 3, 3));
         t.send(ba);
 
         bf.onAck(new Consumer<BroadcastMessageAck>() {
@@ -93,7 +99,13 @@ public class BroadcastFutureTest extends AbstractClientConnectionTest {
             }
         });
 
-        ba = new BroadcastAck(mb.getReplyTo(), ID4, PositionTime.create(4, 4, 4));
+        // ba = new BroadcastAck(mb.getReplyTo(), ID4, PositionTime.create(4, 4, 4));
+        ba = new BroadcastPublicRemoteAck();
+        ba.setMessageId(0L);
+        ba.setBroadcastId(mb.getReplyTo());
+        ba.setId(ID4.toString());
+        ba.setPositionTime(PositionTime.create(4, 4, 4));
+        ba.setLatestReceivedId(0L);
         t.send(ba);
 
         BroadcastMessageAck a3 = q.poll(1, TimeUnit.SECONDS);

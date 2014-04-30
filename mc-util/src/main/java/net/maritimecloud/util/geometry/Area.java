@@ -33,11 +33,9 @@ import net.maritimecloud.util.function.Predicate;
  * A shape has an area
  **/
 public abstract class Area implements Element, Message {
-    /** serialVersionUID. */
-    private static final long serialVersionUID = 1L;
 
+    /** A parser of areas. */
     public static final MessageParser<Area> PARSER = new MessageParser<Area>() {
-
         /** {@inheritDoc} */
         @Override
         public Area parse(MessageReader reader) throws IOException {
@@ -45,30 +43,13 @@ public abstract class Area implements Element, Message {
         }
     };
 
+    /** serialVersionUID. */
+    private static final long serialVersionUID = 1L;
+
     final CoordinateSystem cs = CoordinateSystem.CARTESIAN;
 
-    static double nextDouble(Random r, double least, double bound) {
-        return r.nextDouble() * (bound - least) + least;
-    }
-
-    /**
-     * Returns a random position within the area.
-     *
-     * @return a random position within the area
-     */
-    public final Position getRandomPosition() {
-        return getRandomPosition(ThreadLocalRandom.current());
-    }
-
-    public abstract Position getRandomPosition(Random random);
-
-    /** Returns a JSON representation of this message */
-    public String toJSON() {
-        return MessageSerializers.writeToJSON(this);
-    }
-
-    public Area immutable() {
-        return this;
+    final MessageSerializable areaWriter() {
+        return new Writer();
     }
 
     public final Predicate<Element> contains() {
@@ -78,13 +59,6 @@ public abstract class Area implements Element, Message {
             }
         };
     }
-
-    /**
-     * Returns a bounding box of the area.
-     *
-     * @return a bounding box of the area
-     */
-    public abstract BoundingBox getBoundingBox();
 
     /**
      * Returns <tt>true</tt> if the specified element is fully contained in the shape, otherwise <tt>false</tt>.
@@ -99,59 +73,76 @@ public abstract class Area implements Element, Message {
 
     public abstract boolean contains(Position position);
 
-    public abstract boolean intersects(Area other);
-
+    /** {@inheritDoc} */
     @Override
     public final double distanceTo(Element other, CoordinateSystem system) {
         return requireNonNull(system) == CoordinateSystem.CARTESIAN ? rhumbLineDistanceTo(other)
                 : geodesicDistanceTo(other);
     }
 
+    /** {@inheritDoc} */
     @Override
     public double geodesicDistanceTo(Element other) {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Returns a bounding box of the area.
+     *
+     * @return a bounding box of the area
+     */
+    public abstract BoundingBox getBoundingBox();
+
     public final CoordinateSystem getCoordinateSystem() {
         return cs;
     }
+
+    /**
+     * Returns a random position within the area.
+     *
+     * @return a random position within the area
+     */
+    public final Position getRandomPosition() {
+        return getRandomPosition(ThreadLocalRandom.current());
+    }
+
+    /**
+     * Returns a random position within the area using a specified random source.
+     *
+     * @param random
+     *            the random source
+     * @return a random position within the area
+     */
+    public abstract Position getRandomPosition(Random random);
+
+    /** {@inheritDoc} */
+    public Area immutable() {
+        return this;
+    }
+
+    public abstract boolean intersects(Area other);
 
     @Override
     public double rhumbLineDistanceTo(Element other) {
         throw new UnsupportedOperationException();
     }
 
+    /** Returns a JSON representation of this message */
+    public String toJSON() {
+        return MessageSerializers.writeToJSON(this);
+    }
+
     public Area unionWith(Area other) {
         return new AreaUnion(this, other);
     }
-
-    public final MessageSerializable areaWriter() {
-        return new Writer();
-    }
-
 
     public static Area createUnion(Area... areas) {
         Area[] a = areas.clone();
         return new AreaUnion(a);
     }
 
-
-    class Writer implements MessageSerializable {
-
-        /** {@inheritDoc} */
-        @Override
-        public void writeTo(MessageWriter w) throws IOException {
-            Area a = Area.this;
-            if (a instanceof Circle) {
-                w.writeMessage(1, "circle", a);
-            } else if (a instanceof BoundingBox) {
-                throw new UnsupportedOperationException();
-            } else if (a instanceof Polygon) {
-                throw new UnsupportedOperationException();
-            } else {
-                w.writeMessage(4, "areas", a);
-            }
-        }
+    static double nextDouble(Random r, double least, double bound) {
+        return r.nextDouble() * (bound - least) + least;
     }
 
     public static Area readFrom(MessageReader r) throws IOException {
@@ -168,6 +159,24 @@ public abstract class Area implements Element, Message {
         } else {
             List<AreaUnion> readList = r.readList(4, "areas", AreaUnion.PARSER);
             return new AreaUnion(readList.toArray(new AreaUnion[0]));
+        }
+    }
+
+    class Writer implements MessageSerializable {
+
+        /** {@inheritDoc} */
+        @Override
+        public void writeTo(MessageWriter w) throws IOException {
+            Area a = Area.this;
+            if (a instanceof Circle) {
+                w.writeMessage(1, "circle", a);
+            } else if (a instanceof BoundingBox) {
+                throw new UnsupportedOperationException();
+            } else if (a instanceof Polygon) {
+                throw new UnsupportedOperationException();
+            } else {
+                w.writeMessage(4, "areas", a);
+            }
         }
     }
 }

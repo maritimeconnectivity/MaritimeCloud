@@ -24,7 +24,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.net.client.util.DefaultConnectionFuture;
 import net.maritimecloud.internal.net.client.util.ThreadManager;
-import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastAck;
+import net.maritimecloud.messages.BroadcastPublicRemoteAck;
 import net.maritimecloud.net.NetworkFuture;
 import net.maritimecloud.net.broadcast.BroadcastFuture;
 import net.maritimecloud.net.broadcast.BroadcastMessageAck;
@@ -89,9 +89,9 @@ class DefaultOutstandingBroadcast implements BroadcastFuture {
         }
     }
 
-    void onAckMessage(BroadcastAck ack) {
+    void onAckMessage(BroadcastPublicRemoteAck ack) {
         final PositionTime pt = ack.getPositionTime();
-        final MaritimeId mid = ack.getId();
+        final MaritimeId mid = MaritimeId.create(ack.getId());
         onAckMessage0(new BroadcastMessageAck() {
             public MaritimeId getId() {
                 return mid;

@@ -23,7 +23,6 @@ import java.util.TreeMap;
 
 import net.maritimecloud.core.message.MessageParser;
 import net.maritimecloud.internal.messages.TransportMessage;
-import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastAck;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastDeliver;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastListen;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastListenAck;
@@ -35,6 +34,7 @@ import net.maritimecloud.internal.net.messages.s2c.service.FindService;
 import net.maritimecloud.internal.net.messages.s2c.service.FindServiceResult;
 import net.maritimecloud.internal.net.messages.s2c.service.RegisterService;
 import net.maritimecloud.internal.net.messages.s2c.service.RegisterServiceResult;
+import net.maritimecloud.messages.BroadcastPublicRemoteAck;
 import net.maritimecloud.messages.Connected;
 import net.maritimecloud.messages.Hello;
 import net.maritimecloud.messages.PositionReport;
@@ -93,7 +93,7 @@ public enum MessageType {
     BROADCAST_DELIVER(152, BroadcastDeliver.class),
 
     /** Acknowledgment of successful broadcast for each client (server->client). */
-    BROADCAST_DELIVER_ACK(153, BroadcastAck.class),
+    BROADCAST_DELIVER_ACK(153, BroadcastPublicRemoteAck.class, BroadcastPublicRemoteAck.PARSER),
 
     /** Registers a service with server. (client->server) */
     BROADCAST_LISTEN(160, BroadcastListen.class), // throws ServiceRegisterException

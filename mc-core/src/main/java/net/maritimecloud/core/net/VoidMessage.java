@@ -37,4 +37,10 @@ public class VoidMessage implements Message {
     public VoidMessage immutable() {
         return this;
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toJSON() {
+        return "{}";
+    }
 }

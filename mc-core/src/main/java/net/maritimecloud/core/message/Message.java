@@ -27,4 +27,7 @@ public interface Message extends MessageSerializable {
      * @return an immutable copy of this message
      */
     Message immutable();
+
+
+    String toJSON();
 }

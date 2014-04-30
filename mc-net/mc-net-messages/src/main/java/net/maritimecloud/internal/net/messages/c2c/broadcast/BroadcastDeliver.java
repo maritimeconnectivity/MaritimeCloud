@@ -69,20 +69,11 @@ public class BroadcastDeliver extends ConnectionOldMessage {
         this.message = requireNonNull(pr.takeString());
     }
 
-    public BroadcastDeliver cloneIt() {
-        return new BroadcastDeliver(id, positionTime, channel, TMHelpers.escape(message));
-    }
-
     /**
      * @return the channel
      */
     public String getChannel() {
         return channel;
-    }
-
-    @SuppressWarnings("unchecked")
-    public Class<BroadcastMessage> getClassFromChannel() throws ClassNotFoundException {
-        return (Class<BroadcastMessage>) Class.forName(channel);
     }
 
     /**
@@ -107,7 +98,7 @@ public class BroadcastDeliver extends ConnectionOldMessage {
     }
 
     public BroadcastMessage tryRead() throws Exception {
-        Class<BroadcastMessage> cl = getClassFromChannel();
+        Class<BroadcastMessage> cl = (Class<BroadcastMessage>) Class.forName(getChannel());
         ObjectMapper om = new ObjectMapper();
         return om.readValue(getMessage(), cl);
     }
