@@ -26,13 +26,13 @@ public class BroadcastRelay implements Message, net.maritimecloud.internal.messa
     private Long requestId;
 
     /** Hey */
-    private String senderId;
+    private String id;
 
     /** Hey */
-    private net.maritimecloud.util.geometry.PositionTime senderPosition;
+    private net.maritimecloud.util.geometry.PositionTime positionTime;
 
     /** Hey */
-    private String broadcastId;
+    private String channel;
 
     /** Hey */
     private String msg;
@@ -50,9 +50,9 @@ public class BroadcastRelay implements Message, net.maritimecloud.internal.messa
         this.messageId = reader.readInt64(1, "messageId", null);
         this.latestReceivedId = reader.readInt64(2, "latestReceivedId", null);
         this.requestId = reader.readInt64(3, "requestId", null);
-        this.senderId = reader.readString(4, "senderId", null);
-        this.senderPosition = reader.readMessage(5, "senderPosition", net.maritimecloud.util.geometry.PositionTime.PARSER);
-        this.broadcastId = reader.readString(6, "broadcastId", null);
+        this.id = reader.readString(4, "id", null);
+        this.positionTime = reader.readMessage(5, "positionTime", net.maritimecloud.util.geometry.PositionTime.PARSER);
+        this.channel = reader.readString(6, "channel", null);
         this.msg = reader.readString(7, "msg", null);
     }
 
@@ -66,9 +66,9 @@ public class BroadcastRelay implements Message, net.maritimecloud.internal.messa
         this.messageId = instance.messageId;
         this.latestReceivedId = instance.latestReceivedId;
         this.requestId = instance.requestId;
-        this.senderId = instance.senderId;
-        this.senderPosition = MessageHelper.immutable(instance.senderPosition);
-        this.broadcastId = instance.broadcastId;
+        this.id = instance.id;
+        this.positionTime = MessageHelper.immutable(instance.positionTime);
+        this.channel = instance.channel;
         this.msg = instance.msg;
     }
 
@@ -78,9 +78,9 @@ public class BroadcastRelay implements Message, net.maritimecloud.internal.messa
         int result = 31 + Hashing.hashcode(this.messageId);
         result = 31 * result + Hashing.hashcode(this.latestReceivedId);
         result = 31 * result + Hashing.hashcode(this.requestId);
-        result = 31 * result + Hashing.hashcode(this.senderId);
-        result = 31 * result + Hashing.hashcode(this.senderPosition);
-        result = 31 * result + Hashing.hashcode(this.broadcastId);
+        result = 31 * result + Hashing.hashcode(this.id);
+        result = 31 * result + Hashing.hashcode(this.positionTime);
+        result = 31 * result + Hashing.hashcode(this.channel);
         return 31 * result + Hashing.hashcode(this.msg);
     }
 
@@ -94,9 +94,9 @@ public class BroadcastRelay implements Message, net.maritimecloud.internal.messa
             return Objects.equals(messageId, o.messageId) &&
                    Objects.equals(latestReceivedId, o.latestReceivedId) &&
                    Objects.equals(requestId, o.requestId) &&
-                   Objects.equals(senderId, o.senderId) &&
-                   Objects.equals(senderPosition, o.senderPosition) &&
-                   Objects.equals(broadcastId, o.broadcastId) &&
+                   Objects.equals(id, o.id) &&
+                   Objects.equals(positionTime, o.positionTime) &&
+                   Objects.equals(channel, o.channel) &&
                    Objects.equals(msg, o.msg);
         }
         return false;
@@ -108,9 +108,9 @@ public class BroadcastRelay implements Message, net.maritimecloud.internal.messa
         w.writeInt64(1, "messageId", messageId);
         w.writeInt64(2, "latestReceivedId", latestReceivedId);
         w.writeInt64(3, "requestId", requestId);
-        w.writeString(4, "senderId", senderId);
-        w.writeMessage(5, "senderPosition", senderPosition);
-        w.writeString(6, "broadcastId", broadcastId);
+        w.writeString(4, "id", id);
+        w.writeMessage(5, "positionTime", positionTime);
+        w.writeString(6, "channel", channel);
         w.writeString(7, "msg", msg);
     }
 
@@ -153,42 +153,42 @@ public class BroadcastRelay implements Message, net.maritimecloud.internal.messa
         return this;
     }
 
-    public String getSenderId() {
-        return senderId;
+    public String getId() {
+        return id;
     }
 
-    public boolean hasSenderId() {
-        return senderId != null;
+    public boolean hasId() {
+        return id != null;
     }
 
-    public BroadcastRelay setSenderId(String senderId) {
-        this.senderId = senderId;
+    public BroadcastRelay setId(String id) {
+        this.id = id;
         return this;
     }
 
-    public net.maritimecloud.util.geometry.PositionTime getSenderPosition() {
-        return senderPosition;
+    public net.maritimecloud.util.geometry.PositionTime getPositionTime() {
+        return positionTime;
     }
 
-    public boolean hasSenderPosition() {
-        return senderPosition != null;
+    public boolean hasPositionTime() {
+        return positionTime != null;
     }
 
-    public BroadcastRelay setSenderPosition(net.maritimecloud.util.geometry.PositionTime senderPosition) {
-        this.senderPosition = senderPosition;
+    public BroadcastRelay setPositionTime(net.maritimecloud.util.geometry.PositionTime positionTime) {
+        this.positionTime = positionTime;
         return this;
     }
 
-    public String getBroadcastId() {
-        return broadcastId;
+    public String getChannel() {
+        return channel;
     }
 
-    public boolean hasBroadcastId() {
-        return broadcastId != null;
+    public boolean hasChannel() {
+        return channel != null;
     }
 
-    public BroadcastRelay setBroadcastId(String broadcastId) {
-        this.broadcastId = broadcastId;
+    public BroadcastRelay setChannel(String channel) {
+        this.channel = channel;
         return this;
     }
 
@@ -265,19 +265,19 @@ public class BroadcastRelay implements Message, net.maritimecloud.internal.messa
 
         /** {@inheritDoc} */
         @Override
-        public BroadcastRelay setSenderId(String senderId) {
+        public BroadcastRelay setId(String id) {
             throw new UnsupportedOperationException("Instance is immutable");
         }
 
         /** {@inheritDoc} */
         @Override
-        public BroadcastRelay setSenderPosition(net.maritimecloud.util.geometry.PositionTime senderPosition) {
+        public BroadcastRelay setPositionTime(net.maritimecloud.util.geometry.PositionTime positionTime) {
             throw new UnsupportedOperationException("Instance is immutable");
         }
 
         /** {@inheritDoc} */
         @Override
-        public BroadcastRelay setBroadcastId(String broadcastId) {
+        public BroadcastRelay setChannel(String channel) {
             throw new UnsupportedOperationException("Instance is immutable");
         }
 

@@ -22,8 +22,8 @@ import java.util.concurrent.TimeUnit;
 
 import net.maritimecloud.internal.net.client.AbstractClientConnectionTest;
 import net.maritimecloud.internal.net.client.broadcast.stubs.HelloWorld;
-import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastDeliver;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSend;
+import net.maritimecloud.messages.BroadcastRelay;
 import net.maritimecloud.messages.Connected;
 import net.maritimecloud.messages.Hello;
 import net.maritimecloud.net.MaritimeCloudClient;
@@ -91,11 +91,17 @@ public class Reconnect2Test extends AbstractClientConnectionTest {
             }
         });
 
-        BroadcastDeliver bd = new BroadcastDeliver(ID2, PositionTime.create(1, 1, 1),
-                HelloWorld.class.getCanonicalName(), persistAndEscape(new HelloWorld("foo")));
-        bd.setMessageId(1L);
-        bd.setLatestReceivedId(1L);
-        t.send(bd);
+        // BroadcastDeliver bm = new BroadcastDeliver(ID2, PositionTime.create(1, 1, 1),
+        // HelloWorld.class.getCanonicalName(), persistAndEscape(new HelloWorld("foo")));
+        BroadcastRelay bm = new BroadcastRelay();
+        bm.setChannel(HelloWorld.class.getCanonicalName());
+        bm.setMsg(persist(new HelloWorld("foo")));
+        bm.setPositionTime(PositionTime.create(1, 1, 1));
+        bm.setId(ID2.toString());
+
+        bm.setMessageId(1L);
+        bm.setLatestReceivedId(1L);
+        t.send(bm);
 
 
         assertTrue(cdl.await(1, TimeUnit.SECONDS));
@@ -140,11 +146,18 @@ public class Reconnect2Test extends AbstractClientConnectionTest {
             }
         });
 
-        BroadcastDeliver bd = new BroadcastDeliver(ID2, PositionTime.create(1, 1, 1),
-                HelloWorld.class.getCanonicalName(), persistAndEscape(new HelloWorld("foo")));
-        bd.setMessageId(1L);
-        bd.setLatestReceivedId(0L);
-        t.send(bd);
+        // BroadcastDeliver bm = new BroadcastDeliver(ID2, PositionTime.create(1, 1, 1),
+        // HelloWorld.class.getCanonicalName(), persistAndEscape(new HelloWorld("foo")));
+        BroadcastRelay bm = new BroadcastRelay();
+        bm.setChannel(HelloWorld.class.getCanonicalName());
+        bm.setMsg(persist(new HelloWorld("foo")));
+        bm.setPositionTime(PositionTime.create(1, 1, 1));
+        bm.setId(ID2.toString());
+
+
+        bm.setMessageId(1L);
+        bm.setLatestReceivedId(0L);
+        t.send(bm);
 
 
         assertTrue(cdl.await(1, TimeUnit.SECONDS));

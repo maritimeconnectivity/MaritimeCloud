@@ -14,6 +14,7 @@
  */
 package net.maritimecloud.internal.net.messages.c2c.broadcast;
 
+import net.maritimecloud.messages.BroadcastRelay;
 import net.maritimecloud.net.broadcast.BroadcastMessage;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,7 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class BroadcastHelper {
 
-    public static BroadcastMessage tryRead(BroadcastDeliver bd) throws Exception {
+    public static BroadcastMessage tryRead(BroadcastRelay bd) throws Exception {
         Class<BroadcastMessage> cl = (Class<BroadcastMessage>) Class.forName(bd.getChannel());
         ObjectMapper om = new ObjectMapper();
         return om.readValue(bd.getMsg(), cl);

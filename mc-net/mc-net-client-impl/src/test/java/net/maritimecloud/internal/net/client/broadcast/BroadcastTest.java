@@ -23,8 +23,8 @@ import java.util.concurrent.TimeUnit;
 import net.maritimecloud.internal.net.client.AbstractClientConnectionTest;
 import net.maritimecloud.internal.net.client.broadcast.stubs.HelloWorld;
 import net.maritimecloud.internal.net.client.broadcast.stubs.HelloWorld2;
-import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastDeliver;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSend;
+import net.maritimecloud.messages.BroadcastRelay;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.broadcast.BroadcastListener;
 import net.maritimecloud.net.broadcast.BroadcastMessage;
@@ -35,7 +35,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class BroadcastTest extends AbstractClientConnectionTest {
@@ -66,14 +66,24 @@ public class BroadcastTest extends AbstractClientConnectionTest {
         });
 
         // the first message should not be send to the handler
-        HelloWorld2 hw2 = new HelloWorld2("NOTNT");
-        BroadcastDeliver m = new BroadcastDeliver(ID3, PositionTime.create(1, 1, 1),
-                HelloWorld2.class.getCanonicalName(), persistAndEscape(hw2));
+        // HelloWorld2 hw2 = new HelloWorld2("NOTNT");
+
+        // BroadcastDeliver bm = new BroadcastDeliver(ID3, PositionTime.create(1, 1, 1),
+        // HelloWorld2.class.getCanonicalName(), persistAndEscape(hw2));
 
         HelloWorld hw = new HelloWorld("foo$\\\n");
-        m = new BroadcastDeliver(ID2, PositionTime.create(1, 1, 1), HelloWorld.class.getCanonicalName(),
-                persistAndEscape(hw));
-        t.send(m);
+        // BroadcastDeliver bm = new BroadcastDeliver(ID2, PositionTime.create(1, 1, 1),
+        // HelloWorld.class.getCanonicalName(), persistAndEscape(hw));
+        //
+        BroadcastRelay bm = new BroadcastRelay();
+        bm.setLatestReceivedId(0L).setMessageId(0L);
+        bm.setChannel(HelloWorld.class.getCanonicalName());
+        bm.setMsg(persist(hw));
+        bm.setPositionTime(PositionTime.create(1, 1, 1));
+        bm.setId(ID2.toString());
+
+
+        t.send(bm);
 
         assertTrue(cdl.await(2, TimeUnit.SECONDS));
     }
@@ -106,14 +116,14 @@ public class BroadcastTest extends AbstractClientConnectionTest {
         });
 
         // the first message should not be send to the handler
-        HelloWorld2 hw2 = new HelloWorld2("NOTNT");
-        BroadcastDeliver m = new BroadcastDeliver(ID3, PositionTime.create(2, 1, 4),
-                HelloWorld2.class.getCanonicalName(), persistAndEscape(hw2));
-
-        HelloWorld hw = new HelloWorld("foo$\\\n");
-        m = new BroadcastDeliver(ID2, PositionTime.create(1, 1, 1), HelloWorld.class.getCanonicalName(),
-                persistAndEscape(hw));
-        t.send(m);
+        // HelloWorld2 hw2 = new HelloWorld2("NOTNT");
+        // BroadcastDeliver bm = new BroadcastDeliver(ID3, PositionTime.create(2, 1, 4),
+        // HelloWorld2.class.getCanonicalName(), persistAndEscape(hw2));
+        //
+        // HelloWorld hw = new HelloWorld("foo$\\\n");
+        // bm = new BroadcastDeliver(ID2, PositionTime.create(1, 1, 1), HelloWorld.class.getCanonicalName(),
+        // persistAndEscape(hw));
+        // t.send(bm);
 
         assertTrue(cdl.await(2, TimeUnit.SECONDS));
     }

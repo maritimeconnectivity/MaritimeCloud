@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.net.client.ClientContainer;
 import net.maritimecloud.internal.net.client.connection.ConnectionMessageBus;
 import net.maritimecloud.internal.net.client.connection.OnMessage;
@@ -28,11 +29,11 @@ import net.maritimecloud.internal.net.client.util.CustomConcurrentHashMap;
 import net.maritimecloud.internal.net.client.util.CustomConcurrentHashMap.Strength;
 import net.maritimecloud.internal.net.client.util.DefaultConnectionFuture;
 import net.maritimecloud.internal.net.client.util.ThreadManager;
-import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastDeliver;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastHelper;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSend;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSendAck;
 import net.maritimecloud.messages.BroadcastPublicRemoteAck;
+import net.maritimecloud.messages.BroadcastRelay;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.broadcast.BroadcastFuture;
 import net.maritimecloud.net.broadcast.BroadcastListener;
@@ -132,7 +133,7 @@ public class BroadcastManager {
      *            the broadcast that was received
      */
     @OnMessage
-    public void onBroadcastMessage(BroadcastDeliver broadcast) {
+    public void onBroadcastMessage(BroadcastRelay broadcast) {
         // Find out if we actually listens for it
         CopyOnWriteArraySet<BroadcastMessageSubscription> set = listeners.get(broadcast.getChannel());
         if (set != null && !set.isEmpty()) {
@@ -146,7 +147,8 @@ public class BroadcastManager {
             }
 
             final BroadcastMessage bmm = bm;
-            final BroadcastMessageHeader bp = new BroadcastMessageHeader(broadcast.getId(), broadcast.getPositionTime());
+            final BroadcastMessageHeader bp = new BroadcastMessageHeader(MaritimeId.create(broadcast.getId()),
+                    broadcast.getPositionTime());
 
             // Deliver to each listener
             for (final BroadcastMessageSubscription s : set) {

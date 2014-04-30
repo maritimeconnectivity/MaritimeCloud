@@ -26,8 +26,8 @@ import java.util.concurrent.TimeUnit;
 import net.maritimecloud.internal.messages.TransportMessage;
 import net.maritimecloud.internal.net.client.AbstractClientConnectionTest;
 import net.maritimecloud.internal.net.client.broadcast.stubs.HelloWorld;
-import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastDeliver;
 import net.maritimecloud.internal.net.messages.c2c.broadcast.BroadcastSend;
+import net.maritimecloud.messages.BroadcastRelay;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.broadcast.BroadcastListener;
 import net.maritimecloud.net.broadcast.BroadcastMessageHeader;
@@ -81,8 +81,16 @@ public class ReconnectTest extends AbstractClientConnectionTest {
             }
         });
 
-        BroadcastDeliver bm = new BroadcastDeliver(ID3, PositionTime.create(2, 1, 4),
-                HelloWorld.class.getCanonicalName(), persistAndEscape(new HelloWorld("A")));
+        // BroadcastDeliver bm = new BroadcastDeliver(ID3, PositionTime.create(2, 1, 4),
+        // HelloWorld.class.getCanonicalName(), persistAndEscape(new HelloWorld("A")));
+        BroadcastRelay bm = new BroadcastRelay();
+        bm.setLatestReceivedId(0L).setMessageId(0L);
+        bm.setChannel(HelloWorld.class.getCanonicalName());
+        bm.setMsg(persist(new HelloWorld("A")));
+        bm.setPositionTime(PositionTime.create(2, 1, 4));
+        bm.setId(ID3.toString());
+
+
         bm.setLatestReceivedId(0L);
         bm.setMessageId(1L);
         t.send(bm);
@@ -119,9 +127,14 @@ public class ReconnectTest extends AbstractClientConnectionTest {
         int lastestOut = 0;
         for (int i = 0; i < count; i++) {
             if (ThreadLocalRandom.current().nextBoolean()) {
-                // server send message
-                BroadcastDeliver bm = new BroadcastDeliver(ID3, PositionTime.create(2, 1, 4),
-                        HelloWorld.class.getCanonicalName(), persistAndEscape(new HelloWorld("A")));
+                BroadcastRelay bm = new BroadcastRelay();
+                bm.setLatestReceivedId(0L).setMessageId(0L);
+                bm.setChannel(HelloWorld.class.getCanonicalName());
+                bm.setMsg(persist(new HelloWorld("A")));
+                bm.setPositionTime(PositionTime.create(2, 1, 4));
+                bm.setId(ID3.toString());
+
+
                 bm.setLatestReceivedId(0L);
                 bm.setMessageId((long) ++lastestOut);
                 t.send(bm);
