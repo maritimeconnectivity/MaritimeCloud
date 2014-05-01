@@ -17,7 +17,7 @@ package net.maritimecloud.internal.net.client.connection;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
-import net.maritimecloud.internal.messages.ConnectionMessage;
+import net.maritimecloud.internal.net.messages.spi.ConnectionMessage;
 
 /**
  *

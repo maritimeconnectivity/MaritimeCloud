@@ -15,8 +15,8 @@
 package net.maritimecloud.internal.net.client.connection;
 
 import net.maritimecloud.internal.net.client.AbstractClientConnectionTest;
-import net.maritimecloud.messages.Connected;
-import net.maritimecloud.messages.Hello;
+import net.maritimecloud.internal.net.messages.Connected;
+import net.maritimecloud.internal.net.messages.Hello;
 import net.maritimecloud.net.MaritimeCloudClient;
 
 import org.junit.Test;

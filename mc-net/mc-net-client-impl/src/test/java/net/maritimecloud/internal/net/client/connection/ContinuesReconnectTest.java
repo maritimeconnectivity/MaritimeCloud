@@ -19,12 +19,12 @@ import static org.junit.Assert.assertEquals;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import net.maritimecloud.internal.messages.BroadcastHelper;
-import net.maritimecloud.internal.messages.TransportMessage;
 import net.maritimecloud.internal.net.client.AbstractClientConnectionTest;
 import net.maritimecloud.internal.net.client.broadcast.stubs.HelloWorld;
-import net.maritimecloud.messages.BroadcastPublish;
-import net.maritimecloud.messages.Connected;
+import net.maritimecloud.internal.net.messages.BroadcastPublish;
+import net.maritimecloud.internal.net.messages.Connected;
+import net.maritimecloud.internal.net.messages.spi.BroadcastHelper;
+import net.maritimecloud.internal.net.messages.spi.TransportMessage;
 import net.maritimecloud.net.MaritimeCloudClient;
 
 import org.junit.Test;

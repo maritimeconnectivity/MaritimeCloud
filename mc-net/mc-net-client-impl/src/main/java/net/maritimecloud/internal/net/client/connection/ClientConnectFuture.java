@@ -22,11 +22,11 @@ import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import net.maritimecloud.internal.messages.TransportMessage;
 import net.maritimecloud.internal.net.client.ClientContainer;
-import net.maritimecloud.messages.Connected;
-import net.maritimecloud.messages.Hello;
-import net.maritimecloud.messages.Welcome;
+import net.maritimecloud.internal.net.messages.Connected;
+import net.maritimecloud.internal.net.messages.Hello;
+import net.maritimecloud.internal.net.messages.Welcome;
+import net.maritimecloud.internal.net.messages.spi.TransportMessage;
 import net.maritimecloud.net.ClosingCode;
 import net.maritimecloud.net.MaritimeCloudConnection.Listener;
 import net.maritimecloud.util.function.Consumer;

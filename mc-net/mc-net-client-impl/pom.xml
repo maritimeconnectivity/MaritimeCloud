@@ -30,13 +30,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>mc-net-messages</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <!-- <dependency> <groupId>dk.dma.3rdparty</groupId> <artifactId>jsr166e</artifactId>
-      <version>${dependencies.jsr166e.version}</version> </dependency> -->
-    <dependency>
       <groupId>dk.dma.3rdparty</groupId>
       <artifactId>jsr166e</artifactId>
       <version>${dependencies.jsr166e.version}</version>
@@ -71,7 +64,16 @@
       <version>${dependencies.slf4j.version}</version>
       <scope>test</scope>
     </dependency>
-
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mc-net-client-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.1.1</version>
+    </dependency>
     <dependency>
       <groupId>org.picocontainer</groupId>
       <artifactId>picocontainer</artifactId>

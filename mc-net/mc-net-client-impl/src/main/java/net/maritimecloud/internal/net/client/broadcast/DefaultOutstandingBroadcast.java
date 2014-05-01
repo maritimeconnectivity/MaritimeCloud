@@ -24,7 +24,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.net.client.util.DefaultConnectionFuture;
 import net.maritimecloud.internal.net.client.util.ThreadManager;
-import net.maritimecloud.messages.BroadcastPublicRemoteAck;
+import net.maritimecloud.internal.net.messages.BroadcastPublicRemoteAck;
 import net.maritimecloud.net.NetworkFuture;
 import net.maritimecloud.net.broadcast.BroadcastFuture;
 import net.maritimecloud.net.broadcast.BroadcastMessageAck;

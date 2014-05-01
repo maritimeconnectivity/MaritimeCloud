@@ -18,7 +18,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.concurrent.locks.ReentrantLock;
 
-import net.maritimecloud.internal.messages.ConnectionMessage;
+import net.maritimecloud.internal.net.messages.spi.ConnectionMessage;
 import net.maritimecloud.net.ClosingCode;
 import net.maritimecloud.net.MaritimeCloudConnection;
 import net.maritimecloud.net.MaritimeCloudConnection.Listener;

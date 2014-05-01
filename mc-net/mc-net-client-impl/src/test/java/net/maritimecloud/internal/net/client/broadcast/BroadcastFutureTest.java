@@ -22,12 +22,12 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import net.maritimecloud.internal.messages.BroadcastHelper;
 import net.maritimecloud.internal.net.client.AbstractClientConnectionTest;
 import net.maritimecloud.internal.net.client.broadcast.stubs.HelloWorld;
-import net.maritimecloud.messages.BroadcastPublicRemoteAck;
-import net.maritimecloud.messages.BroadcastPublish;
-import net.maritimecloud.messages.BroadcastPublishAck;
+import net.maritimecloud.internal.net.messages.BroadcastPublicRemoteAck;
+import net.maritimecloud.internal.net.messages.BroadcastPublish;
+import net.maritimecloud.internal.net.messages.BroadcastPublishAck;
+import net.maritimecloud.internal.net.messages.spi.BroadcastHelper;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.broadcast.BroadcastFuture;
 import net.maritimecloud.net.broadcast.BroadcastMessage;

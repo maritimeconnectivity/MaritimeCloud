@@ -31,7 +31,6 @@
 
   <modules>
     <module>mc-net-client-api</module>
-    <module>mc-net-messages</module>
     <module>mc-net-client-impl</module>
   </modules>
 </project>

@@ -12,38 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.internal.net.client.connection;
+package net.maritimecloud.internal.net.messages.spi;
 
-import java.util.UUID;
 
-import jsr166e.CompletableFuture;
-import net.maritimecloud.internal.net.messages.spi.ConnectionMessage;
 
 /**
  *
  * @author Kasper Nielsen
  */
-public class OutstandingMessage {
+public interface ConnectionMessage extends TransportMessage {
+    Long getMessageId();
 
-    private final CompletableFuture<Object> acked = new CompletableFuture<>();
+    Long getLatestReceivedId();
 
-    volatile boolean isSent;
+    ConnectionMessage setMessageId(Long messageId);
 
-    final ConnectionMessage cm;
-
-    long id;
-
-    public final UUID uuid = UUID.randomUUID();
-
-    OutstandingMessage(ConnectionMessage cm) {
-        this.cm = cm;
-    }
-
-    public CompletableFuture<Object> acked() {
-        return acked;
-    }
-
-    public boolean isSent() {
-        return isSent;
-    }
+    ConnectionMessage setLatestReceivedId(Long latestReceivedId);
 }

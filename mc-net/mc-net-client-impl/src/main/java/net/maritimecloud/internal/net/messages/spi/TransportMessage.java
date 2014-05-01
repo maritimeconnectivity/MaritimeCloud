@@ -12,38 +12,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.internal.net.client.connection;
+package net.maritimecloud.internal.net.messages.spi;
 
-import java.util.UUID;
 
-import jsr166e.CompletableFuture;
-import net.maritimecloud.internal.net.messages.spi.ConnectionMessage;
 
 /**
+ * A text only message.
  *
  * @author Kasper Nielsen
  */
-public class OutstandingMessage {
+public interface TransportMessage {
 
-    private final CompletableFuture<Object> acked = new CompletableFuture<>();
-
-    volatile boolean isSent;
-
-    final ConnectionMessage cm;
-
-    long id;
-
-    public final UUID uuid = UUID.randomUUID();
-
-    OutstandingMessage(ConnectionMessage cm) {
-        this.cm = cm;
+    default String toText() {
+        // System.out.println("SENDING " + toJSON());
+        return MessageType.getType(getClass()) + ":" + toJSON();
     }
 
-    public CompletableFuture<Object> acked() {
-        return acked;
-    }
 
-    public boolean isSent() {
-        return isSent;
+    default String toJSON() {
+        throw new UnsupportedOperationException();
     }
 }

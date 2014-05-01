@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.net.client.connection.ConnectionMessageBus;
-import net.maritimecloud.messages.ServiceInvoke;
+import net.maritimecloud.internal.net.messages.ServiceInvoke;
 import net.maritimecloud.net.service.invocation.InvocationCallback;
 import net.maritimecloud.net.service.registration.ServiceRegistration;
 import net.maritimecloud.net.service.spi.ServiceInitiationPoint;

@@ -21,11 +21,11 @@ import java.util.concurrent.TimeUnit;
 
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.net.client.AbstractClientConnectionTest;
-import net.maritimecloud.messages.FindService;
-import net.maritimecloud.messages.FindServiceAck;
-import net.maritimecloud.messages.RegisterService;
-import net.maritimecloud.messages.RegisterServiceAck;
-import net.maritimecloud.messages.ServiceInvoke;
+import net.maritimecloud.internal.net.messages.FindService;
+import net.maritimecloud.internal.net.messages.FindServiceAck;
+import net.maritimecloud.internal.net.messages.RegisterService;
+import net.maritimecloud.internal.net.messages.RegisterServiceAck;
+import net.maritimecloud.internal.net.messages.ServiceInvoke;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.NetworkFuture;
 import net.maritimecloud.net.service.ServiceEndpoint;

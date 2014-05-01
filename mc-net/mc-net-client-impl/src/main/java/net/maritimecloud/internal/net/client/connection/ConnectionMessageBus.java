@@ -21,13 +21,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import net.maritimecloud.internal.messages.ConnectionMessage;
-import net.maritimecloud.internal.messages.ReplyMessage;
-import net.maritimecloud.internal.messages.RequestMessage;
 import net.maritimecloud.internal.net.client.util.DefaultConnectionFuture;
 import net.maritimecloud.internal.net.client.util.ThreadManager;
-import net.maritimecloud.messages.FindServiceAck;
-import net.maritimecloud.messages.RegisterServiceAck;
+import net.maritimecloud.internal.net.messages.FindServiceAck;
+import net.maritimecloud.internal.net.messages.RegisterServiceAck;
+import net.maritimecloud.internal.net.messages.spi.ConnectionMessage;
+import net.maritimecloud.internal.net.messages.spi.ReplyMessage;
+import net.maritimecloud.internal.net.messages.spi.RequestMessage;
 
 import org.picocontainer.PicoContainer;
 import org.picocontainer.Startable;

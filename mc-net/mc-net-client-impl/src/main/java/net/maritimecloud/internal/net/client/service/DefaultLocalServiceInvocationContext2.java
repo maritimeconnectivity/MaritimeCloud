@@ -17,9 +17,9 @@ package net.maritimecloud.internal.net.client.service;
 import static java.util.Objects.requireNonNull;
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.net.client.connection.ConnectionMessageBus;
-import net.maritimecloud.internal.net.messages.TMHelpers;
-import net.maritimecloud.messages.ServiceInvoke;
-import net.maritimecloud.messages.ServiceInvokeAck;
+import net.maritimecloud.internal.net.messages.ServiceInvoke;
+import net.maritimecloud.internal.net.messages.ServiceInvokeAck;
+import net.maritimecloud.internal.net.messages.spi.TMHelpers;
 import net.maritimecloud.net.service.invocation.InvocationCallback;
 
 import org.slf4j.Logger;

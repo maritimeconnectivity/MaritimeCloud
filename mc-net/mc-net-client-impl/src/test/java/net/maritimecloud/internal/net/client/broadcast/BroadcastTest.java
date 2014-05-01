@@ -20,12 +20,12 @@ import static org.junit.Assert.assertTrue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import net.maritimecloud.internal.messages.BroadcastHelper;
 import net.maritimecloud.internal.net.client.AbstractClientConnectionTest;
 import net.maritimecloud.internal.net.client.broadcast.stubs.HelloWorld;
 import net.maritimecloud.internal.net.client.broadcast.stubs.HelloWorld2;
-import net.maritimecloud.messages.BroadcastPublish;
-import net.maritimecloud.messages.BroadcastRelay;
+import net.maritimecloud.internal.net.messages.BroadcastPublish;
+import net.maritimecloud.internal.net.messages.BroadcastRelay;
+import net.maritimecloud.internal.net.messages.spi.BroadcastHelper;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.broadcast.BroadcastListener;
 import net.maritimecloud.net.broadcast.BroadcastMessage;

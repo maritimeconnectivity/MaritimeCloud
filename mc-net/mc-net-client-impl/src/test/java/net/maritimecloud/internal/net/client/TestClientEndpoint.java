@@ -28,9 +28,9 @@ import javax.websocket.RemoteEndpoint.Basic;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
-import net.maritimecloud.internal.messages.TransportMessage;
-import net.maritimecloud.internal.net.messages.TMHelpers;
-import net.maritimecloud.messages.Welcome;
+import net.maritimecloud.internal.net.messages.Welcome;
+import net.maritimecloud.internal.net.messages.spi.TMHelpers;
+import net.maritimecloud.internal.net.messages.spi.TransportMessage;
 
 /**
  *

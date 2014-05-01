@@ -18,7 +18,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.LinkedList;
 
-import net.maritimecloud.internal.messages.ConnectionMessage;
+import net.maritimecloud.internal.net.messages.spi.ConnectionMessage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
