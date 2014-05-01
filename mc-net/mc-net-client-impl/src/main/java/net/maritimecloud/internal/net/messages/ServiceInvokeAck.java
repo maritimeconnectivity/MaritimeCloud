@@ -8,7 +8,7 @@ import net.maritimecloud.core.message.MessageParser;
 import net.maritimecloud.core.message.MessageReader;
 import net.maritimecloud.core.message.MessageSerializers;
 import net.maritimecloud.core.message.MessageWriter;
-import net.maritimecloud.internal.util.Hashing;
+import net.maritimecloud.internal.message.util.Hashing;
 
 public class ServiceInvokeAck implements Message, net.maritimecloud.internal.net.messages.spi.RelayMessage {
 

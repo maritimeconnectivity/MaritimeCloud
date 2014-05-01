@@ -10,8 +10,8 @@ import net.maritimecloud.core.message.MessageReader;
 import net.maritimecloud.core.message.MessageSerializers;
 import net.maritimecloud.core.message.MessageWriter;
 import net.maritimecloud.core.message.ValueParser;
+import net.maritimecloud.internal.message.util.Hashing;
 import net.maritimecloud.internal.message.util.MessageHelper;
-import net.maritimecloud.internal.util.Hashing;
 
 public class FindServiceAck implements Message, net.maritimecloud.internal.net.messages.spi.ReplyMessage {
 
