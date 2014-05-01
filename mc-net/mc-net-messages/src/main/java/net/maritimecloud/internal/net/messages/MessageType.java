@@ -36,6 +36,7 @@ import net.maritimecloud.messages.Hello;
 import net.maritimecloud.messages.PositionReport;
 import net.maritimecloud.messages.RegisterService;
 import net.maritimecloud.messages.RegisterServiceAck;
+import net.maritimecloud.messages.ServiceInvokeAck;
 import net.maritimecloud.messages.Welcome;
 
 /**
@@ -109,7 +110,7 @@ public enum MessageType {
     SERVICE_INVOKE(200, InvokeService.class), //
 
     /** The successful result of invoking a service. */
-    SERVICE_INVOKE_RESULT(201, InvokeServiceResult.class); //
+    SERVICE_INVOKE_RESULT(201, ServiceInvokeAck.class, ServiceInvokeAck.PARSER); //
 
     /** Invoking a service failed. */
     // SERVICE_INVOKE_ERROR(255, ServerRequestError.class);// indeholder lidt additional info taenker jeg

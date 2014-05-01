@@ -27,11 +27,11 @@ import net.maritimecloud.internal.net.client.connection.OutstandingMessage;
 import net.maritimecloud.internal.net.client.util.DefaultConnectionFuture;
 import net.maritimecloud.internal.net.client.util.ThreadManager;
 import net.maritimecloud.internal.net.messages.InvokeService;
-import net.maritimecloud.internal.net.messages.InvokeServiceResult;
 import net.maritimecloud.messages.FindService;
 import net.maritimecloud.messages.FindServiceAck;
 import net.maritimecloud.messages.RegisterService;
 import net.maritimecloud.messages.RegisterServiceAck;
+import net.maritimecloud.messages.ServiceInvokeAck;
 import net.maritimecloud.net.service.ServiceLocator;
 import net.maritimecloud.net.service.invocation.InvocationCallback;
 import net.maritimecloud.net.service.registration.ServiceRegistration;
@@ -78,7 +78,7 @@ public class ClientServiceManager {
         is.setDestination(id.toString());
         is.setSource(container.getLocalId().toString());
         final DefaultConnectionFuture<T> f = threadManager.create();
-        DefaultConnectionFuture<InvokeServiceResult> fr = threadManager.create();
+        DefaultConnectionFuture<ServiceInvokeAck> fr = threadManager.create();
         invokers.put(is.getConversationId(), fr);
         fr.thenAcceptAsync(new DefaultConnectionFuture.Action<Object>() {
             @SuppressWarnings("unchecked")
@@ -106,7 +106,7 @@ public class ClientServiceManager {
     /** {@inheritDoc} */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @OnMessage
-    public void receiveInvokeServiceAck(InvokeServiceResult m) {
+    public void receiveInvokeServiceAck(ServiceInvokeAck m) {
         DefaultConnectionFuture f = invokers.get(m.getUuid());
         if (f != null) {
             Object o = null;

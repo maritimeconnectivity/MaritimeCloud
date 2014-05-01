@@ -18,6 +18,8 @@ import static java.util.Objects.requireNonNull;
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.net.client.connection.ConnectionMessageBus;
 import net.maritimecloud.internal.net.messages.InvokeService;
+import net.maritimecloud.internal.net.messages.TMHelpers;
+import net.maritimecloud.messages.ServiceInvokeAck;
 import net.maritimecloud.net.service.invocation.InvocationCallback;
 
 import org.slf4j.Logger;
@@ -25,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The default implementation of InvocationCallback.Context.
- * 
+ *
  * @author Kasper Nielsen
  */
 class DefaultLocalServiceInvocationContext2<T> implements InvocationCallback.Context<T> {
@@ -58,7 +60,24 @@ class DefaultLocalServiceInvocationContext2<T> implements InvocationCallback.Con
     public void complete(T message) {
         checkNotDone();
         this.message = message;
-        bus.sendConnectionMessage(is.createReply(message));
+
+        ServiceInvokeAck sia = new ServiceInvokeAck();
+
+        sia.setDestination(is.getDestination());
+        sia.setSource(is.getSource());
+        sia.setUuid(is.getConversationId());
+        sia.setMsg(TMHelpers.persist(message));
+        sia.setReplyType(message.getClass().getName());
+        
+        //String uuid, String message, String replyType
+        // sia.setc
+        // InvokeServiceResult isa = new InvokeServiceResult(conversationId, TMHelpers.persistAndEscape(result), result
+        // .getClass().getName());
+        // 
+        // return isa;
+
+
+        bus.sendConnectionMessage(sia);
     }
 
     /** {@inheritDoc} */

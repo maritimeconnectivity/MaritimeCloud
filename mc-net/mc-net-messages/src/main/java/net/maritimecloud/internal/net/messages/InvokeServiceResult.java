@@ -22,7 +22,7 @@ import java.io.IOException;
  *
  * @author Kasper Nielsen
  */
-public class InvokeServiceResult extends ClientRelayedMessage {
+class InvokeServiceResult extends ClientRelayedMessage {
 
     final String message;
 

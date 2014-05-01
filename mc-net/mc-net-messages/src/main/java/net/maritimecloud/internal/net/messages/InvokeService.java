@@ -77,16 +77,6 @@ public class InvokeService extends ClientRelayedMessage {
         return is;
     }
 
-    /**
-     * @param result
-     */
-    public InvokeServiceResult createReply(Object result) {
-        InvokeServiceResult isa = new InvokeServiceResult(conversationId, TMHelpers.persistAndEscape(result), result
-                .getClass().getName());
-        isa.setDestination(getSource());
-        isa.setSource(getDestination());
-        return isa;
-    }
 
     public Object parseMessage() throws Exception {
         Class<?> mt = Class.forName(getServiceType());

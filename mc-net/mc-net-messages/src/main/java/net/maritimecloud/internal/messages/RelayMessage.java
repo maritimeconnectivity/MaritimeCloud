@@ -18,7 +18,7 @@ package net.maritimecloud.internal.messages;
  *
  * @author Kasper Nielsen
  */
-public interface RelayMessage {
+public interface RelayMessage extends ConnectionMessage {
     RelayMessage setSource(String destination);
 
     RelayMessage setDestination(String destination);
