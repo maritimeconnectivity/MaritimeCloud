@@ -17,8 +17,8 @@ package net.maritimecloud.internal.net.client.service;
 import static java.util.Objects.requireNonNull;
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.net.client.connection.ConnectionMessageBus;
-import net.maritimecloud.internal.net.messages.InvokeService;
 import net.maritimecloud.internal.net.messages.TMHelpers;
+import net.maritimecloud.messages.ServiceInvoke;
 import net.maritimecloud.messages.ServiceInvokeAck;
 import net.maritimecloud.net.service.invocation.InvocationCallback;
 
@@ -47,9 +47,9 @@ class DefaultLocalServiceInvocationContext2<T> implements InvocationCallback.Con
 
     ConnectionMessageBus bus;
 
-    final InvokeService is;
+    final ServiceInvoke is;
 
-    DefaultLocalServiceInvocationContext2(InvokeService is, ConnectionMessageBus bus, MaritimeId id) {
+    DefaultLocalServiceInvocationContext2(ServiceInvoke is, ConnectionMessageBus bus, MaritimeId id) {
         this.id = requireNonNull(id);
         this.is = is;
         this.bus = requireNonNull(bus);
@@ -68,12 +68,12 @@ class DefaultLocalServiceInvocationContext2<T> implements InvocationCallback.Con
         sia.setUuid(is.getConversationId());
         sia.setMsg(TMHelpers.persist(message));
         sia.setReplyType(message.getClass().getName());
-        
-        //String uuid, String message, String replyType
+
+        // String uuid, String message, String replyType
         // sia.setc
         // InvokeServiceResult isa = new InvokeServiceResult(conversationId, TMHelpers.persistAndEscape(result), result
         // .getClass().getName());
-        // 
+        //
         // return isa;
 
 

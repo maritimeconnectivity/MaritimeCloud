@@ -46,21 +46,9 @@ public class TMHelpers {
         msg = msg.substring(io + 1);
         int type = Integer.parseInt(t);// pr.takeInt();
         MessageParser<? extends TransportMessage> p = MessageType.getParser(type);
-        if (p != null) {
-            // System.out.println("Got " + msg);
-            TransportMessage tm = MessageSerializers.readFromJSON(p, msg);
-            return tm;
-        }
-        System.out.println("No parsers for " + type);
-        TextMessageReader pr = new TextMessageReader(msg);
-        try {
-            Class<? extends TransportMessage> cl = MessageType.getType(type);
-            TransportMessage message = cl.getConstructor(TextMessageReader.class).newInstance(pr);
-            // message.rawMessage = msg;// for debugging purposes
-            return message;
-        } catch (ReflectiveOperationException e) {
-            throw new IOException(e);
-        }
+        // System.out.println("Got " + msg);
+        TransportMessage tm = MessageSerializers.readFromJSON(p, msg);
+        return tm;
     }
 
     public static String persist(Object o) {

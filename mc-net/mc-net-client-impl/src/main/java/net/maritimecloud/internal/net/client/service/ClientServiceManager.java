@@ -26,11 +26,12 @@ import net.maritimecloud.internal.net.client.connection.OnMessage;
 import net.maritimecloud.internal.net.client.connection.OutstandingMessage;
 import net.maritimecloud.internal.net.client.util.DefaultConnectionFuture;
 import net.maritimecloud.internal.net.client.util.ThreadManager;
-import net.maritimecloud.internal.net.messages.InvokeService;
+import net.maritimecloud.internal.net.messages.TMHelpers;
 import net.maritimecloud.messages.FindService;
 import net.maritimecloud.messages.FindServiceAck;
 import net.maritimecloud.messages.RegisterService;
 import net.maritimecloud.messages.RegisterServiceAck;
+import net.maritimecloud.messages.ServiceInvoke;
 import net.maritimecloud.messages.ServiceInvokeAck;
 import net.maritimecloud.net.service.ServiceLocator;
 import net.maritimecloud.net.service.invocation.InvocationCallback;
@@ -73,8 +74,20 @@ public class ClientServiceManager {
 
     /** {@inheritDoc} */
     public <T, S extends ServiceMessage<T>> DefaultServiceInvocationFuture<T> invokeService(MaritimeId id, S msg) {
-        InvokeService is = new InvokeService(1, UUID.randomUUID().toString(), msg.getClass().getName(),
-                msg.messageName(), msg);
+
+        ServiceInvoke is = new ServiceInvoke();
+        is.setStatus(1);
+        is.setConversationId(UUID.randomUUID().toString());
+        is.setServiceType(msg.getClass().getName());
+        is.setMessageType(msg.messageName());
+        is.setMsg(TMHelpers.persist(msg));
+        // public InvokeService(int status, String conversationId, String serviceType, String messageType, Object o) {
+        // this(status, conversationId, serviceType, messageType, TMHelpers.persistAndEscape(o));
+        // }
+        // InvokeService is = new InvokeService(1, UUID.randomUUID().toString(), msg.getClass().getName(),
+        // msg.messageName(), msg);
+
+
         is.setDestination(id.toString());
         is.setSource(container.getLocalId().toString());
         final DefaultConnectionFuture<T> f = threadManager.create();
@@ -93,7 +106,7 @@ public class ClientServiceManager {
     }
 
     @OnMessage
-    public void onInvokeService(InvokeService message) {
+    public void onInvokeService(ServiceInvoke message) {
         String type = message.getServiceType();
         DefaultLocalServiceRegistration s = localServices.get(type);
         if (s != null) {

@@ -19,14 +19,17 @@ import static java.util.Objects.requireNonNull;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.net.client.connection.ConnectionMessageBus;
-import net.maritimecloud.internal.net.messages.InvokeService;
+import net.maritimecloud.messages.ServiceInvoke;
 import net.maritimecloud.net.service.invocation.InvocationCallback;
 import net.maritimecloud.net.service.registration.ServiceRegistration;
 import net.maritimecloud.net.service.spi.ServiceInitiationPoint;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class DefaultLocalServiceRegistration implements ServiceRegistration {
@@ -46,10 +49,13 @@ public class DefaultLocalServiceRegistration implements ServiceRegistration {
         this.bus = requireNonNull(bus);
     }
 
-    void invoke(InvokeService message) {
+    void invoke(ServiceInvoke message) {
         Object o = null;
         try {
-            o = message.parseMessage();
+
+            Class<?> mt = Class.forName(message.getServiceType());
+            ObjectMapper om = new ObjectMapper();
+            o = om.readValue(message.getMsg(), mt);
         } catch (Exception e) {
             // LOG error
             // Send invalid message
@@ -73,7 +79,7 @@ public class DefaultLocalServiceRegistration implements ServiceRegistration {
         // }
 
         DefaultLocalServiceInvocationContext2<Object> context2 = new DefaultLocalServiceInvocationContext2<>(message,
-                bus, message.getSourceId());
+                bus, MaritimeId.create(message.getSource()));
         c.process(o, context2);
     }
 

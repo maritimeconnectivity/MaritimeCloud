@@ -21,11 +21,11 @@ import java.util.concurrent.TimeUnit;
 
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.net.client.AbstractClientConnectionTest;
-import net.maritimecloud.internal.net.messages.InvokeService;
 import net.maritimecloud.messages.FindService;
 import net.maritimecloud.messages.FindServiceAck;
 import net.maritimecloud.messages.RegisterService;
 import net.maritimecloud.messages.RegisterServiceAck;
+import net.maritimecloud.messages.ServiceInvoke;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.NetworkFuture;
 import net.maritimecloud.net.service.ServiceEndpoint;
@@ -82,7 +82,7 @@ public class ServiceTest extends AbstractClientConnectionTest {
 
         ServiceInvocationFuture<Reply> invoke = se.invoke(new GetName());
         assertFalse(invoke.receivedByCloud().isDone());
-        InvokeService is = t.take(InvokeService.class);
+        ServiceInvoke is = t.take(ServiceInvoke.class);
         // InvokeServiceResult isr = is.createReply(new Reply("okfoo"));
         // isr.setLatestReceivedId(2L).setMessageId(0L);
         // t.send(isr);
