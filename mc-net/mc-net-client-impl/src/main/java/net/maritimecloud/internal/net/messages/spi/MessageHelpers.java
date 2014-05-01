@@ -15,6 +15,8 @@
 package net.maritimecloud.internal.net.messages.spi;
 
 import net.maritimecloud.core.id.MaritimeId;
+import net.maritimecloud.core.message.MessageParser;
+import net.maritimecloud.core.message.MessageSerializers;
 import net.maritimecloud.internal.net.messages.BroadcastPublish;
 import net.maritimecloud.internal.net.messages.BroadcastRelay;
 import net.maritimecloud.net.broadcast.BroadcastMessage;
@@ -23,20 +25,46 @@ import net.maritimecloud.util.geometry.Area;
 import net.maritimecloud.util.geometry.Circle;
 import net.maritimecloud.util.geometry.PositionTime;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  *
  * @author Kasper Nielsen
  */
-public class BroadcastHelper {
+public class MessageHelpers {
 
+    public static TransportMessage parseMessage(String msg) {
+        int io = msg.indexOf(':');
+        String t = msg.substring(0, io);
+        msg = msg.substring(io + 1);
+        int type = Integer.parseInt(t);// pr.takeInt();
+        MessageParser<? extends TransportMessage> p = MessageType.getParser(type);
+        // System.out.println("Got " + msg);
+        TransportMessage tm = MessageSerializers.readFromJSON(p, msg);
+        return tm;
+    }
+
+    public static String persist(Object o) {
+        ObjectMapper om = new ObjectMapper();
+        om.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+        try {
+            return om.writeValueAsString(o);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("Could not be persisted", e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
     public static BroadcastMessage tryRead(BroadcastRelay bd) throws Exception {
         Class<BroadcastMessage> cl = (Class<BroadcastMessage>) Class.forName(bd.getChannel());
         ObjectMapper om = new ObjectMapper();
         return om.readValue(bd.getMsg(), cl);
     }
 
+
+    @SuppressWarnings("unchecked")
     public static BroadcastMessage tryRead(BroadcastPublish bd) throws Exception {
         Class<BroadcastMessage> cl = (Class<BroadcastMessage>) Class.forName(bd.getChannel());
         ObjectMapper om = new ObjectMapper();
@@ -53,7 +81,7 @@ public class BroadcastHelper {
         BroadcastPublish b = new BroadcastPublish();
         b.setId(sender.toString());
         b.setChannel(message.channel());
-        b.setMsg(TMHelpers.persist(message));
+        b.setMsg(MessageHelpers.persist(message));
         b.setArea(broadcastArea);
         b.setReceiverAck(options.isReceiverAckEnabled());
         // These are set for tests

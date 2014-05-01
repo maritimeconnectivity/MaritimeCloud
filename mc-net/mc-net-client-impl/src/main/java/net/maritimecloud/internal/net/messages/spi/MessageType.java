@@ -121,10 +121,6 @@ public enum MessageType {
 
     final MessageParser<? extends TransportMessage> p;
 
-    MessageType(int type, Class<? extends TransportMessage> cl) {
-        this(type, cl, null);
-    }
-
     MessageType(int type, Class<? extends TransportMessage> cl, MessageParser<? extends TransportMessage> p) {
         if (type < 1 || type > 255) {
             throw new IllegalArgumentException("type must be 1>= type <=255");
@@ -134,20 +130,12 @@ public enum MessageType {
         this.p = p;
     }
 
-    public static Class<? extends TransportMessage> getType(int type) {
-        return HelperHolder.TYPES[type].cl;
-    }
-
     public static MessageParser<? extends TransportMessage> getParser(int type) {
         return HelperHolder.TYPES[type].p;
     }
 
     public static int getType(Class<? extends TransportMessage> c) {
         return HelperHolder.map.get(c).type;
-    }
-
-    public static MessageParser<? extends TransportMessage> getParser(Class<? extends TransportMessage> c) {
-        return HelperHolder.map.get(c).p;
     }
 
     /** A little initialization-on-demand holder idiom helper class */

@@ -29,7 +29,7 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
 import net.maritimecloud.internal.net.messages.Welcome;
-import net.maritimecloud.internal.net.messages.spi.TMHelpers;
+import net.maritimecloud.internal.net.messages.spi.MessageHelpers;
 import net.maritimecloud.internal.net.messages.spi.TransportMessage;
 
 /**
@@ -48,11 +48,11 @@ public class TestClientEndpoint {
     }
 
     @OnMessage
-    public final void messageReceived(String msg, Session userSession) throws InterruptedException, IOException {
+    public final void messageReceived(String msg, Session userSession) throws InterruptedException {
         if (session != userSession) {
             throw new Error();
         }
-        TransportMessage tm = TMHelpers.parseMessage(msg);
+        TransportMessage tm = MessageHelpers.parseMessage(msg);
         m.put(tm);
     }
 

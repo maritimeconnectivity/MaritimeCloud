@@ -32,7 +32,7 @@ import net.maritimecloud.internal.net.messages.RegisterService;
 import net.maritimecloud.internal.net.messages.RegisterServiceAck;
 import net.maritimecloud.internal.net.messages.ServiceInvoke;
 import net.maritimecloud.internal.net.messages.ServiceInvokeAck;
-import net.maritimecloud.internal.net.messages.spi.TMHelpers;
+import net.maritimecloud.internal.net.messages.spi.MessageHelpers;
 import net.maritimecloud.net.service.ServiceLocator;
 import net.maritimecloud.net.service.invocation.InvocationCallback;
 import net.maritimecloud.net.service.registration.ServiceRegistration;
@@ -80,7 +80,7 @@ public class ClientServiceManager {
         is.setConversationId(UUID.randomUUID().toString());
         is.setServiceType(msg.getClass().getName());
         is.setMessageType(msg.messageName());
-        is.setMsg(TMHelpers.persist(msg));
+        is.setMsg(MessageHelpers.persist(msg));
         // public InvokeService(int status, String conversationId, String serviceType, String messageType, Object o) {
         // this(status, conversationId, serviceType, messageType, TMHelpers.persistAndEscape(o));
         // }

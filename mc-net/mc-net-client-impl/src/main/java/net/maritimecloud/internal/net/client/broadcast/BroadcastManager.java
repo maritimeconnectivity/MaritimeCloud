@@ -33,7 +33,7 @@ import net.maritimecloud.internal.net.messages.BroadcastPublicRemoteAck;
 import net.maritimecloud.internal.net.messages.BroadcastPublish;
 import net.maritimecloud.internal.net.messages.BroadcastPublishAck;
 import net.maritimecloud.internal.net.messages.BroadcastRelay;
-import net.maritimecloud.internal.net.messages.spi.BroadcastHelper;
+import net.maritimecloud.internal.net.messages.spi.MessageHelpers;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.broadcast.BroadcastFuture;
 import net.maritimecloud.net.broadcast.BroadcastListener;
@@ -139,7 +139,7 @@ public class BroadcastManager {
         if (set != null && !set.isEmpty()) {
             BroadcastMessage bm = null;
             try {
-                bm = BroadcastHelper.tryRead(broadcast);
+                bm = MessageHelpers.tryRead(broadcast);
             } catch (Exception e) {
                 LOG.error("Exception while trying to deserialize an incoming broadcast message ", e);
                 LOG.error(broadcast.toText());
@@ -171,7 +171,7 @@ public class BroadcastManager {
         // b.setId(client.getLocalId().toString());
         // b.setPositionTime(positionManager.getPositionTime());
         // b.setMsg(null)
-        BroadcastPublish b = BroadcastHelper.create(client.getLocalId(), positionManager.getPositionTime(), broadcast,
+        BroadcastPublish b = MessageHelpers.create(client.getLocalId(), positionManager.getPositionTime(), broadcast,
                 options);
 
         DefaultConnectionFuture<BroadcastPublishAck> response = connection.sendMessage(BroadcastPublishAck.class, b);

@@ -23,7 +23,7 @@ import net.maritimecloud.internal.net.client.AbstractClientConnectionTest;
 import net.maritimecloud.internal.net.client.broadcast.stubs.HelloWorld;
 import net.maritimecloud.internal.net.messages.BroadcastPublish;
 import net.maritimecloud.internal.net.messages.Connected;
-import net.maritimecloud.internal.net.messages.spi.BroadcastHelper;
+import net.maritimecloud.internal.net.messages.spi.MessageHelpers;
 import net.maritimecloud.net.MaritimeCloudClient;
 
 import org.junit.Test;
@@ -58,7 +58,7 @@ public class ConnectTest extends AbstractClientConnectionTest {
         c.broadcast(new HelloWorld("foo2"));
         assertTrue(c.connection().awaitConnected(10, TimeUnit.SECONDS));
         assertTrue(c.connection().isConnected());
-        assertEquals("foo1", ((HelloWorld) BroadcastHelper.tryRead(t.take(BroadcastPublish.class))).getMessage());
-        assertEquals("foo2", ((HelloWorld) BroadcastHelper.tryRead(t.take(BroadcastPublish.class))).getMessage());
+        assertEquals("foo1", ((HelloWorld) MessageHelpers.tryRead(t.take(BroadcastPublish.class))).getMessage());
+        assertEquals("foo2", ((HelloWorld) MessageHelpers.tryRead(t.take(BroadcastPublish.class))).getMessage());
     }
 }

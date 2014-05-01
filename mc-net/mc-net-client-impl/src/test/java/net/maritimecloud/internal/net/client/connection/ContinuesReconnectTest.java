@@ -23,7 +23,7 @@ import net.maritimecloud.internal.net.client.AbstractClientConnectionTest;
 import net.maritimecloud.internal.net.client.broadcast.stubs.HelloWorld;
 import net.maritimecloud.internal.net.messages.BroadcastPublish;
 import net.maritimecloud.internal.net.messages.Connected;
-import net.maritimecloud.internal.net.messages.spi.BroadcastHelper;
+import net.maritimecloud.internal.net.messages.spi.MessageHelpers;
 import net.maritimecloud.internal.net.messages.spi.TransportMessage;
 import net.maritimecloud.net.MaritimeCloudClient;
 
@@ -72,7 +72,7 @@ public class ContinuesReconnectTest extends AbstractClientConnectionTest {
                     if (tm instanceof BroadcastPublish) {
                         BroadcastPublish bs = (BroadcastPublish) tm;
                         try {
-                            HelloWorld hw = (HelloWorld) BroadcastHelper.tryRead(bs);
+                            HelloWorld hw = (HelloWorld) MessageHelpers.tryRead(bs);
                             int id = Integer.parseInt(hw.getMessage());
                             assertEquals(++latestId, id);
                         } catch (Exception e) {

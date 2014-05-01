@@ -26,7 +26,7 @@ import net.maritimecloud.internal.net.messages.BroadcastPublish;
 import net.maritimecloud.internal.net.messages.BroadcastRelay;
 import net.maritimecloud.internal.net.messages.Connected;
 import net.maritimecloud.internal.net.messages.Hello;
-import net.maritimecloud.internal.net.messages.spi.BroadcastHelper;
+import net.maritimecloud.internal.net.messages.spi.MessageHelpers;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.broadcast.BroadcastListener;
 import net.maritimecloud.net.broadcast.BroadcastMessageHeader;
@@ -178,16 +178,16 @@ public class Reconnect2Test extends AbstractClientConnectionTest {
         m = t.take(BroadcastPublish.class);
         assertEquals(1L, m.getMessageId().longValue());
         assertEquals(1L, m.getLatestReceivedId().longValue());
-        assertEquals("hello1", ((HelloWorld) BroadcastHelper.tryRead(m)).getMessage());
+        assertEquals("hello1", ((HelloWorld) MessageHelpers.tryRead(m)).getMessage());
 
         m = t.take(BroadcastPublish.class);
         assertEquals(2L, m.getMessageId().longValue());
         assertEquals(1L, m.getLatestReceivedId().longValue());
-        assertEquals("hello2", ((HelloWorld) BroadcastHelper.tryRead(m)).getMessage());
+        assertEquals("hello2", ((HelloWorld) MessageHelpers.tryRead(m)).getMessage());
 
         m = t.take(BroadcastPublish.class);
         assertEquals(3L, m.getMessageId().longValue());
         assertEquals(1L, m.getLatestReceivedId().longValue());
-        assertEquals("hello3", ((HelloWorld) BroadcastHelper.tryRead(m)).getMessage());
+        assertEquals("hello3", ((HelloWorld) MessageHelpers.tryRead(m)).getMessage());
     }
 }

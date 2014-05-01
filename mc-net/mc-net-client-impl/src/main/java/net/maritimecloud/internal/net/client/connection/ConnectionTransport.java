@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.net.URI;
 
 import net.maritimecloud.internal.net.messages.spi.ConnectionMessage;
-import net.maritimecloud.internal.net.messages.spi.TMHelpers;
+import net.maritimecloud.internal.net.messages.spi.MessageHelpers;
 import net.maritimecloud.internal.net.messages.spi.TransportMessage;
 import net.maritimecloud.net.ClosingCode;
 import net.maritimecloud.net.MaritimeCloudConnection;
@@ -62,7 +62,7 @@ abstract class ConnectionTransport {
             }
         });
         try {
-            msg = TMHelpers.parseMessage(textMessage);
+            msg = MessageHelpers.parseMessage(textMessage);
         } catch (Exception e) {
             e.printStackTrace();
             LOG.error("Failed to parse incoming message", e);

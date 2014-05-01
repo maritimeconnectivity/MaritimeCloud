@@ -27,7 +27,7 @@ import net.maritimecloud.internal.net.client.broadcast.stubs.HelloWorld;
 import net.maritimecloud.internal.net.messages.BroadcastPublicRemoteAck;
 import net.maritimecloud.internal.net.messages.BroadcastPublish;
 import net.maritimecloud.internal.net.messages.BroadcastPublishAck;
-import net.maritimecloud.internal.net.messages.spi.BroadcastHelper;
+import net.maritimecloud.internal.net.messages.spi.MessageHelpers;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.broadcast.BroadcastFuture;
 import net.maritimecloud.net.broadcast.BroadcastMessage;
@@ -52,7 +52,7 @@ public class BroadcastFutureTest extends AbstractClientConnectionTest {
 
         BroadcastFuture bf = c.broadcast(new HelloWorld("hello"));
         BroadcastPublish mb = t.take(BroadcastPublish.class);
-        assertEquals("hello", ((HelloWorld) BroadcastHelper.tryRead(mb)).getMessage());
+        assertEquals("hello", ((HelloWorld) MessageHelpers.tryRead(mb)).getMessage());
 
         BroadcastPublishAck bsa = new BroadcastPublishAck().setMessageAck(mb.getReplyTo()).setMessageId(0L)
                 .setLatestReceivedId(0L);
@@ -77,7 +77,7 @@ public class BroadcastFutureTest extends AbstractClientConnectionTest {
 
         BroadcastFuture bf = c.broadcast(new HelloWorld("hello"), options);
         BroadcastPublish mb = t.take(BroadcastPublish.class);
-        assertEquals("hello", ((HelloWorld) BroadcastHelper.tryRead(mb)).getMessage());
+        assertEquals("hello", ((HelloWorld) MessageHelpers.tryRead(mb)).getMessage());
 
         BroadcastPublishAck bsa = new BroadcastPublishAck().setMessageAck(mb.getReplyTo()).setMessageId(0L)
                 .setLatestReceivedId(0L);

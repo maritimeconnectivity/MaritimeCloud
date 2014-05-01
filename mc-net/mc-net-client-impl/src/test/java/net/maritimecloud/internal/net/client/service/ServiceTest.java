@@ -25,7 +25,6 @@ import net.maritimecloud.internal.net.messages.FindService;
 import net.maritimecloud.internal.net.messages.FindServiceAck;
 import net.maritimecloud.internal.net.messages.RegisterService;
 import net.maritimecloud.internal.net.messages.RegisterServiceAck;
-import net.maritimecloud.internal.net.messages.ServiceInvoke;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.NetworkFuture;
 import net.maritimecloud.net.service.ServiceEndpoint;
@@ -82,7 +81,7 @@ public class ServiceTest extends AbstractClientConnectionTest {
 
         ServiceInvocationFuture<Reply> invoke = se.invoke(new GetName());
         assertFalse(invoke.receivedByCloud().isDone());
-        ServiceInvoke is = t.take(ServiceInvoke.class);
+        // ServiceInvoke is = t.take(ServiceInvoke.class);
         // InvokeServiceResult isr = is.createReply(new Reply("okfoo"));
         // isr.setLatestReceivedId(2L).setMessageId(0L);
         // t.send(isr);

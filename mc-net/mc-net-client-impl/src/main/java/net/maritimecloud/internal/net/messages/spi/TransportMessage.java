@@ -15,7 +15,6 @@
 package net.maritimecloud.internal.net.messages.spi;
 
 
-
 /**
  * A text only message.
  *

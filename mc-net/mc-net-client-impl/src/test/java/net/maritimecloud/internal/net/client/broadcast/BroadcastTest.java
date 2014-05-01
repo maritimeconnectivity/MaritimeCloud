@@ -25,7 +25,7 @@ import net.maritimecloud.internal.net.client.broadcast.stubs.HelloWorld;
 import net.maritimecloud.internal.net.client.broadcast.stubs.HelloWorld2;
 import net.maritimecloud.internal.net.messages.BroadcastPublish;
 import net.maritimecloud.internal.net.messages.BroadcastRelay;
-import net.maritimecloud.internal.net.messages.spi.BroadcastHelper;
+import net.maritimecloud.internal.net.messages.spi.MessageHelpers;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.broadcast.BroadcastListener;
 import net.maritimecloud.net.broadcast.BroadcastMessage;
@@ -48,7 +48,7 @@ public class BroadcastTest extends AbstractClientConnectionTest {
         c.broadcast(new HelloWorld("hello"));
 
         BroadcastPublish mb = t.take(BroadcastPublish.class);
-        HelloWorld hw = (HelloWorld) BroadcastHelper.tryRead(mb);
+        HelloWorld hw = (HelloWorld) MessageHelpers.tryRead(mb);
         assertEquals("hello", hw.getMessage());
     }
 
