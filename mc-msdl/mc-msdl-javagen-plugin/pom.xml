@@ -31,7 +31,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>mc-core</artifactId>
+      <artifactId>mc-client-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

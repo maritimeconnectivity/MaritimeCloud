@@ -25,7 +25,6 @@ import net.maritimecloud.core.message.MessageReader;
 import net.maritimecloud.core.message.MessageSerializers;
 import net.maritimecloud.core.message.MessageWriter;
 import net.maritimecloud.core.message.ValueParser;
-import net.maritimecloud.core.net.BroadcastMessage;
 import net.maritimecloud.internal.message.util.Hashing;
 import net.maritimecloud.internal.message.util.MessageHelper;
 import net.maritimecloud.msdl.model.BaseMessage;
@@ -36,6 +35,7 @@ import net.maritimecloud.msdl.model.MapType;
 import net.maritimecloud.msdl.model.Type;
 import net.maritimecloud.msdl.parser.antlr.StringUtil;
 import net.maritimecloud.msdl.plugins.javagen.annotation.JavaImplements;
+import net.maritimecloud.net.broadcast.BroadcastMessage;
 
 import org.cakeframework.internal.codegen.CodegenClass;
 import org.cakeframework.internal.codegen.CodegenMethod;
@@ -73,7 +73,7 @@ public class JavaGenMessageGenerator {
             c.setDefinition("public class ", msg.getName(), " implements ", mType, imple);// "<", msg.getName(), ">");
         } else {
             c.setDefinition("public static class ", msg.getName(), " implements ", mType, imple);// , "<",
-                                                                                                 // msg.getName(), ">");
+            // msg.getName(), ">");
         }
         c.addImport(MessageParser.class);
         c.addFieldWithJavadoc("A message parser that can create new instances of this class.", "public static final ",

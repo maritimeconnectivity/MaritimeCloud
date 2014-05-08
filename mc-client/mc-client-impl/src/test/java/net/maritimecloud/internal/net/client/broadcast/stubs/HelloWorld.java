@@ -12,36 +12,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.core.message;
+package net.maritimecloud.internal.net.client.broadcast.stubs;
 
 import java.io.IOException;
-import java.util.List;
+
+import net.maritimecloud.core.message.MessageWriter;
+import net.maritimecloud.net.broadcast.BroadcastMessage;
 
 /**
  *
  * @author Kasper Nielsen
  */
-public class TestSerializers {
+public class HelloWorld implements BroadcastMessage {
 
-    static List<IntWrapper> intListOf(int size) {
-        return null;
+    private String message;
+
+    /**
+     * @return the message
+     */
+    public String getMsg() {
+        return message;
     }
 
-    static IntWrapper intOf(int i) {
-        return new IntWrapper(i);
+    /**
+     * @param message
+     *            the message to set
+     * @return
+     */
+    public HelloWorld setMsg(String message) {
+        this.message = message;
+        return this;
     }
 
-    public static class IntWrapper implements MessageSerializable {
-        final int i;
-
-        IntWrapper(int i) {
-            this.i = i;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void writeTo(MessageWriter w) throws IOException {
-            w.writeInt32(1, "ivalue", i);
-        }
+    /** {@inheritDoc} */
+    @Override
+    public void writeTo(MessageWriter w) throws IOException {
+        w.writeString(1, "msg", message);
     }
 }

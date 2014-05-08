@@ -12,21 +12,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.core.message;
+package net.maritimecloud.net.broadcast;
+
+import net.maritimecloud.core.id.MaritimeId;
+import net.maritimecloud.util.geometry.PositionTime;
 
 /**
- * The basic message interface that all messages must be implement. Messages are normally generated from MSDL files.
- *
+ * An acknowledgment that can be send every time a broadcast is received by an actor.
+ * 
  * @author Kasper Nielsen
  */
-public interface Message extends MessageSerializable {
+public interface BroadcastMessageReceived {
 
     /**
-     * Returns an immutable copy of this message.
+     * Returns the id of the actor that received the broadcast.
      *
-     * @return an immutable copy of this message
+     * @return the id of the actor that received the broadcast
      */
-    Message immutable();
+    MaritimeId getId();
 
-    String toJSON();
+    /**
+     * Returns the position and time when the actor received the message.
+     *
+     * @return the position and time when the actor received the message
+     */
+    PositionTime getPosition();
 }

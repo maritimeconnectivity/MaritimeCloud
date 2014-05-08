@@ -29,7 +29,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>mc-net-client-impl</artifactId>
+      <artifactId>mc-client-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

@@ -12,36 +12,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.core.message;
+package net.maritimecloud.net.broadcast;
 
-import java.io.IOException;
-import java.util.List;
+import net.maritimecloud.core.id.MaritimeId;
+import net.maritimecloud.util.geometry.PositionTime;
 
 /**
+ * Properties conveyed to receivers of broadcast messages.
  *
  * @author Kasper Nielsen
  */
-public class TestSerializers {
+public interface BroadcastMessageHeader {
 
-    static List<IntWrapper> intListOf(int size) {
-        return null;
-    }
+    /**
+     * Returns the id of the ship sending the broadcast.
+     *
+     * @return the id of the ship sending the broadcast
+     */
+    MaritimeId getId();
 
-    static IntWrapper intOf(int i) {
-        return new IntWrapper(i);
-    }
-
-    public static class IntWrapper implements MessageSerializable {
-        final int i;
-
-        IntWrapper(int i) {
-            this.i = i;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void writeTo(MessageWriter w) throws IOException {
-            w.writeInt32(1, "ivalue", i);
-        }
-    }
+    /**
+     * Returns the position and time of the ship sending the broadcast.
+     *
+     * @return the position and time of the ship sending the broadcast
+     */
+    PositionTime getPosition();
 }

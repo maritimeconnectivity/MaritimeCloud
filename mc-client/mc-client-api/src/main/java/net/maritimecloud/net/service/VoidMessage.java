@@ -12,36 +12,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.core.message;
+package net.maritimecloud.net.service;
 
 import java.io.IOException;
-import java.util.List;
+
+import net.maritimecloud.core.message.Message;
+import net.maritimecloud.core.message.MessageWriter;
 
 /**
  *
  * @author Kasper Nielsen
  */
-public class TestSerializers {
+public class VoidMessage implements Message {
+    public static final VoidMessage INSTANCE = new VoidMessage();
 
-    static List<IntWrapper> intListOf(int size) {
-        return null;
+    private VoidMessage() {}
+
+    /** {@inheritDoc} */
+    @Override
+    public void writeTo(MessageWriter w) throws IOException {}
+
+    /** {@inheritDoc} */
+    @Override
+    public VoidMessage immutable() {
+        return this;
     }
 
-    static IntWrapper intOf(int i) {
-        return new IntWrapper(i);
-    }
-
-    public static class IntWrapper implements MessageSerializable {
-        final int i;
-
-        IntWrapper(int i) {
-            this.i = i;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void writeTo(MessageWriter w) throws IOException {
-            w.writeInt32(1, "ivalue", i);
-        }
+    /** {@inheritDoc} */
+    @Override
+    public String toJSON() {
+        return "{}";
     }
 }

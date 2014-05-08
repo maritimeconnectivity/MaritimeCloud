@@ -20,37 +20,17 @@
 
   <parent>
     <groupId>net.maritimecloud</groupId>
-    <artifactId>mc-msdl-parent</artifactId>
+    <artifactId>mc-parent</artifactId>
     <version>0.2-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>mc-msdl-testproject</artifactId>
-  <name>MSDL test Generation</name>
+  <artifactId>mc-client-parent</artifactId>
+  <packaging>pom</packaging>
+  <name>MaritimeCloud Net Parent</name>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>net.maritimecloud</groupId>
-        <artifactId>mc-msdl-compiler-maven-plugin</artifactId>
-        <version>0.2-SNAPSHOT</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <headerLocation>src/license.txt</headerLocation>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-  <dependencies>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>mc-core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-  </dependencies>
+  <modules>
+    <module>mc-client-api</module>
+    <module>mc-client-impl</module>
+  </modules>
 </project>

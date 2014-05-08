@@ -12,36 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.core.message;
-
-import java.io.IOException;
-import java.util.List;
+package net.maritimecloud.net.service.rpc;
 
 /**
- *
+ * 
  * @author Kasper Nielsen
  */
-public class TestSerializers {
+public class Endpoint {
 
-    static List<IntWrapper> intListOf(int size) {
-        return null;
-    }
-
-    static IntWrapper intOf(int i) {
-        return new IntWrapper(i);
-    }
-
-    public static class IntWrapper implements MessageSerializable {
-        final int i;
-
-        IntWrapper(int i) {
-            this.i = i;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void writeTo(MessageWriter w) throws IOException {
-            w.writeInt32(1, "ivalue", i);
-        }
-    }
 }
