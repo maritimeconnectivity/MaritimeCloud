@@ -15,7 +15,6 @@
 package net.maritimecloud.net.broadcast;
 
 import net.maritimecloud.core.message.Message;
-import net.maritimecloud.core.message.MessageSerializers;
 
 
 /**
@@ -43,14 +42,6 @@ public interface BroadcastMessage extends Message {
      */
     default String channel() {
         return getClass().getName();
-    }
-
-    default BroadcastMessage immutable() {
-        return this;
-    }
-
-    default String toJSON() {
-        return MessageSerializers.writeToJSON(this);
     }
 }
 

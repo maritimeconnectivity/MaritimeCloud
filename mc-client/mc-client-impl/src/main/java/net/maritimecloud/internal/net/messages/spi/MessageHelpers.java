@@ -14,6 +14,8 @@
  */
 package net.maritimecloud.internal.net.messages.spi;
 
+import java.lang.reflect.Field;
+
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.core.message.MessageParser;
 import net.maritimecloud.core.message.MessageSerializers;
@@ -59,16 +61,18 @@ public class MessageHelpers {
     @SuppressWarnings("unchecked")
     public static BroadcastMessage tryRead(BroadcastRelay bd) throws Exception {
         Class<BroadcastMessage> cl = (Class<BroadcastMessage>) Class.forName(bd.getChannel());
-        ObjectMapper om = new ObjectMapper();
-        return om.readValue(bd.getMsg(), cl);
+        Field field = cl.getField("PARSER");
+        MessageParser<BroadcastMessage> p = (MessageParser<BroadcastMessage>) field.get(null);
+        return MessageSerializers.readFromJSON(p, bd.getMsg());
     }
 
 
     @SuppressWarnings("unchecked")
     public static BroadcastMessage tryRead(BroadcastPublish bd) throws Exception {
         Class<BroadcastMessage> cl = (Class<BroadcastMessage>) Class.forName(bd.getChannel());
-        ObjectMapper om = new ObjectMapper();
-        return om.readValue(bd.getMsg(), cl);
+        Field field = cl.getField("PARSER");
+        MessageParser<BroadcastMessage> p = (MessageParser<BroadcastMessage>) field.get(null);
+        return MessageSerializers.readFromJSON(p, bd.getMsg());
     }
 
 
