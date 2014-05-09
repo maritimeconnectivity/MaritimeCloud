@@ -79,9 +79,14 @@ public class MessageHelpers {
             broadcastArea = Circle.create(position, options.getBroadcastRadius());
         }
         BroadcastPublish b = new BroadcastPublish();
+        b.setPositionTime(position);
         b.setId(sender.toString());
         b.setChannel(message.channel());
-        b.setMsg(MessageHelpers.persist(message));
+
+        b.setMsg(MessageSerializers.writeToJSON(message));
+        // b.setMsg(MessageHelpers.persist(message));
+
+
         b.setArea(broadcastArea);
         b.setReceiverAck(options.isReceiverAckEnabled());
         // These are set for tests

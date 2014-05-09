@@ -14,7 +14,9 @@
  */
 package test;
 
+import imo.route.intendedroute.IntendedRoute;
 import imo.route.intendedroute.IntendedRouteService;
+import imo.route.intendedroute.IntendedRouteService.IntendedRouteBroadcast;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.MaritimeCloudClientConfiguration;
 import net.maritimecloud.net.broadcast.BroadcastFuture;
@@ -35,21 +37,29 @@ public class Main {
         Class.forName("imo.route.intendedroute.IntendedRouteService$IntendedRouteBroadcast");
     }
 
-    public static void main(String[] args) {
-        MaritimeCloudClientConfiguration conf = MaritimeCloudClientConfiguration.create("mmsi://123");
+    public static void main(String[] args) throws InterruptedException {
+        MaritimeCloudClientConfiguration conf = MaritimeCloudClientConfiguration.create("mmsi://1243");
         conf.setPositionReader(PositionReader.fixedPosition(PositionTime.create(1, 1, 1000)));
         MaritimeCloudClient cc = conf.build();
 
         BroadcastSendOptions options = new BroadcastSendOptions();
         options.setReceiverAckEnabled(true);
         options.setBroadcastRadius(10000);
+        IntendedRouteBroadcast irb = new IntendedRouteBroadcast();
 
-        BroadcastFuture f = cc.broadcast(new IntendedRouteService.IntendedRouteBroadcast(), options);
+        IntendedRoute ir = new IntendedRoute();
+        irb.setIndendedRoute(ir);
+        ir.setActiveWaypointIndex(2223);
+
+
+        BroadcastFuture f = cc.broadcast(irb, options);
 
         f.onReceived(new Consumer<BroadcastMessageReceived>() {
             public void accept(BroadcastMessageReceived t) {
                 System.out.println("Received by " + t.getId());
             }
         });
+
+        Thread.sleep(10000);
     }
 }
