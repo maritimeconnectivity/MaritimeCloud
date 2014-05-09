@@ -16,6 +16,11 @@ enum HeadingType {
     GreatCircle = 2;
 }
 
+message HelloWorld {
+  1: string msg;
+}
+
+
 message DateTime {
   1: float speed;
 }

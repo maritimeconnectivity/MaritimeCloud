@@ -42,7 +42,7 @@ public interface BroadcastMessage extends Message {
      * @return the broadcast channel on which the message should be sent
      */
     default String channel() {
-        return getClass().getCanonicalName();
+        return getClass().getName();
     }
 
     default BroadcastMessage immutable() {

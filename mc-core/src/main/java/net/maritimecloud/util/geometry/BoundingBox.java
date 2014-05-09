@@ -124,7 +124,7 @@ public final class BoundingBox extends Polygon {
 
     /**
      * Returns a random position within the box.
-     * 
+     *
      * @return a random position within the box
      */
     @Deprecated
@@ -156,7 +156,7 @@ public final class BoundingBox extends Polygon {
 
     /**
      * Returns a new bounding box that includes the specified bounding box.
-     * 
+     *
      * @param other
      *            the bounding box to include
      * @return a bounding box
@@ -237,15 +237,6 @@ public final class BoundingBox extends Polygon {
     private static int hashCode(double x) {
         long f = Double.doubleToLongBits(x);
         return (int) (f ^ f >>> 32);
-    }
-
-    public static void main(String[] args) {
-        Circle c = Circle.create(Position.create(0, 0), 1);
-
-        BoundingBox c2 = BoundingBox.create(Position.create(1, 1), Position.create(2, 2), CoordinateSystem.CARTESIAN);
-
-        System.out.println(c.intersects(c2));
-
     }
 
     /** {@inheritDoc} */

@@ -106,12 +106,12 @@ public class BroadcastManager {
         requireNonNull(messageType, "messageType is null");
         requireNonNull(listener, "listener is null");
 
-        String channelName = messageType.getCanonicalName();
+        String channelName = messageType.getName();
 
         BroadcastMessageSubscription sub = new BroadcastMessageSubscription(this, channelName, listener);
 
-        listeners.putIfAbsent(messageType.getCanonicalName(), new CopyOnWriteArraySet<BroadcastMessageSubscription>());
-        CopyOnWriteArraySet<BroadcastMessageSubscription> set = listeners.get(messageType.getCanonicalName());
+        listeners.putIfAbsent(messageType.getName(), new CopyOnWriteArraySet<BroadcastMessageSubscription>());
+        CopyOnWriteArraySet<BroadcastMessageSubscription> set = listeners.get(messageType.getName());
         set.add(sub);
         return sub;
     }

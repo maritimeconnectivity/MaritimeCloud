@@ -12,12 +12,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.net;
+package test;
 
+import imo.route.intendedroute.IntendedRouteService;
+import net.maritimecloud.net.MaritimeCloudClient;
+import net.maritimecloud.net.MaritimeCloudClientConfiguration;
 import net.maritimecloud.net.broadcast.BroadcastFuture;
 import net.maritimecloud.net.broadcast.BroadcastMessageReceived;
 import net.maritimecloud.net.broadcast.BroadcastSendOptions;
 import net.maritimecloud.util.function.Consumer;
+import net.maritimecloud.util.geometry.PositionReader;
+import net.maritimecloud.util.geometry.PositionTime;
 
 /**
  *
@@ -25,17 +30,21 @@ import net.maritimecloud.util.function.Consumer;
  */
 public class Main {
 
+    public static void madin(String[] args) throws ClassNotFoundException {
+        System.out.println(new IntendedRouteService.IntendedRouteBroadcast().getClass().getName());
+        Class.forName("imo.route.intendedroute.IntendedRouteService$IntendedRouteBroadcast");
+    }
 
     public static void main(String[] args) {
         MaritimeCloudClientConfiguration conf = MaritimeCloudClientConfiguration.create("mmsi://123");
+        conf.setPositionReader(PositionReader.fixedPosition(PositionTime.create(1, 1, 1000)));
         MaritimeCloudClient cc = conf.build();
-
 
         BroadcastSendOptions options = new BroadcastSendOptions();
         options.setReceiverAckEnabled(true);
         options.setBroadcastRadius(10000);
-        BroadcastFuture f = cc.broadcast(null, options);
 
+        BroadcastFuture f = cc.broadcast(new IntendedRouteService.IntendedRouteBroadcast(), options);
 
         f.onReceived(new Consumer<BroadcastMessageReceived>() {
             public void accept(BroadcastMessageReceived t) {
