@@ -138,6 +138,13 @@ public class Welcome implements Message, net.maritimecloud.internal.net.messages
         return MessageSerializers.writeToJSON(this);
     }
 
+    /**
+     * Creates a message of this type from a JSON throwing a runtime exception if the format of the message does not match
+     */
+    public static Welcome fromJSON(CharSequence c) {
+        return MessageSerializers.readFromJSON(PARSER, c);
+    }
+
     /** {@inheritDoc} */
     @Override
     public Welcome immutable() {

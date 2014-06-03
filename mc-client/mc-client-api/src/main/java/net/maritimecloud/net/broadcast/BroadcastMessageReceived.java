@@ -14,27 +14,12 @@
  */
 package net.maritimecloud.net.broadcast;
 
-import net.maritimecloud.core.id.MaritimeId;
-import net.maritimecloud.util.geometry.PositionTime;
 
 /**
  * An acknowledgment that can be send every time a broadcast is received by an actor.
- * 
+ *
  * @author Kasper Nielsen
  */
-public interface BroadcastMessageReceived {
+public interface BroadcastMessageReceived extends MessageContext {
 
-    /**
-     * Returns the id of the actor that received the broadcast.
-     *
-     * @return the id of the actor that received the broadcast
-     */
-    MaritimeId getId();
-
-    /**
-     * Returns the position and time when the actor received the message.
-     *
-     * @return the position and time when the actor received the message
-     */
-    PositionTime getPosition();
 }

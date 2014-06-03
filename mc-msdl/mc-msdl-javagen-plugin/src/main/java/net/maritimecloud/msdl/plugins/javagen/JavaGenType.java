@@ -76,6 +76,10 @@ public class JavaGenType {
         return StringUtil.capitalizeFirstLetter(s);
     }
 
+    public static String render(Type t) {
+        return new JavaGenType(t).render();
+    }
+
     public String render() {
         switch (t) {
         case INT32:

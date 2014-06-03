@@ -38,12 +38,12 @@ import java.util.NoSuchElementException;
  * {@link Binary#substring(int, int)}.
  * 
  * <p>
- * This class contains most of the overhead involved in creating a substring from a {@link LiteralByteString}. The
+ * This class contains most of the overhead involved in creating a substring from a {@link LiteralBinary}. The
  * overhead involves some range-checking and two extra fields.
  * 
  * @author carlanton@google.com (Carl Haverl)
  */
-class BoundedByteString extends LiteralByteString {
+class BoundedBinary extends LiteralBinary {
 
     private final int bytesOffset;
 
@@ -62,7 +62,7 @@ class BoundedByteString extends LiteralByteString {
      *             if {@code offset < 0}, {@code length < 0}, or if {@code offset + length >
      *                                  bytes.length}.
      */
-    BoundedByteString(byte[] bytes, int offset, int length) {
+    BoundedBinary(byte[] bytes, int offset, int length) {
         super(bytes);
         if (offset < 0) {
             throw new IllegalArgumentException("Offset too small: " + offset);

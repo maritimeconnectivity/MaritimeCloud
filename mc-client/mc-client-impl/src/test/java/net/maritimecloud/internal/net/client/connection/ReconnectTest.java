@@ -30,7 +30,7 @@ import net.maritimecloud.internal.net.messages.BroadcastRelay;
 import net.maritimecloud.internal.net.messages.spi.TransportMessage;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.broadcast.BroadcastListener;
-import net.maritimecloud.net.broadcast.BroadcastMessageHeader;
+import net.maritimecloud.net.broadcast.MessageContext;
 import net.maritimecloud.util.geometry.PositionTime;
 
 import org.junit.Ignore;
@@ -75,7 +75,7 @@ public class ReconnectTest extends AbstractClientConnectionTest {
         final CountDownLatch cdl1 = new CountDownLatch(1);
         final CountDownLatch cdl3 = new CountDownLatch(3);
         c.broadcastListen(HelloWorld.class, new BroadcastListener<HelloWorld>() {
-            public void onMessage(HelloWorld broadcast, BroadcastMessageHeader header) {
+            public void onMessage(HelloWorld broadcast, MessageContext header) {
                 cdl1.countDown();
                 cdl3.countDown();
             }
@@ -86,7 +86,7 @@ public class ReconnectTest extends AbstractClientConnectionTest {
         BroadcastRelay bm = new BroadcastRelay();
         bm.setLatestReceivedId(0L).setMessageId(0L);
         bm.setChannel(HelloWorld.class.getCanonicalName());
-        bm.setMsg(persist(new HelloWorld().setMsg("A")));
+        bm.setMsg(new HelloWorld().setMsg("A").toJSON());
         bm.setPositionTime(PositionTime.create(2, 1, 4));
         bm.setId(ID3.toString());
 
@@ -130,7 +130,7 @@ public class ReconnectTest extends AbstractClientConnectionTest {
                 BroadcastRelay bm = new BroadcastRelay();
                 bm.setLatestReceivedId(0L).setMessageId(0L);
                 bm.setChannel(HelloWorld.class.getCanonicalName());
-                bm.setMsg(persist(new HelloWorld().setMsg("A")));
+                bm.setMsg(new HelloWorld().setMsg("A").toJSON());
                 bm.setPositionTime(PositionTime.create(2, 1, 4));
                 bm.setId(ID3.toString());
 

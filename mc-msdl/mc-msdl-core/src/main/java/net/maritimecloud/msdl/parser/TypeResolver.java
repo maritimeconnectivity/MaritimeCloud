@@ -66,6 +66,17 @@ class TypeResolver {
                 resolveMessage1(m);
             }
         }
+        for (ParsedFile f : files) {
+            for (ParsedService ps : f.services) {
+                for (ParsedEndpoint e : ps.endpoints) {
+                    for (ParsedEndpointFunction fu : e.byName.values()) {
+                        if (fu.returnType != null) {
+                            resolveType1(fu.returnType);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private void resolveEnum0(ParsedEnum e) {

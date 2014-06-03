@@ -22,7 +22,7 @@ import net.maritimecloud.net.service.spi.ServiceInitiationPoint;
 import net.maritimecloud.net.service.spi.ServiceMessage;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class DefaultRemoteServiceEndpoint<T, E extends ServiceMessage<T>> implements ServiceEndpoint<E, T> {
@@ -50,5 +50,4 @@ public class DefaultRemoteServiceEndpoint<T, E extends ServiceMessage<T>> implem
     public ServiceInvocationFuture<T> invoke(E message) {
         return csm.invokeService(id, (ServiceMessage) message);
     }
-
 }

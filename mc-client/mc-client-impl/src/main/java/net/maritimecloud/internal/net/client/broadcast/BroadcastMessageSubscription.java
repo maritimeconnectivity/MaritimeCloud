@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import net.maritimecloud.net.broadcast.BroadcastListener;
 import net.maritimecloud.net.broadcast.BroadcastMessage;
-import net.maritimecloud.net.broadcast.BroadcastMessageHeader;
+import net.maritimecloud.net.broadcast.MessageContext;
 import net.maritimecloud.net.broadcast.BroadcastSubscription;
 import net.maritimecloud.util.geometry.Area;
 
@@ -64,7 +64,7 @@ class BroadcastMessageSubscription implements BroadcastSubscription {
 
     // invoked in another thread so never throw anything
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    void deliver(BroadcastMessageHeader broadcastHeader, BroadcastMessage message) {
+    void deliver(MessageContext broadcastHeader, BroadcastMessage message) {
         try {
             ((BroadcastListener) listener).onMessage(message, broadcastHeader);
             count.incrementAndGet();

@@ -35,6 +35,7 @@ public class JavaGenTest {
         g.addDependencyDirectory(Paths.get("/Users/kasperni/dma-workspace/MaritimeCloud/private/msdl/"));
         g.addFile("geometry.msdl");
         g.addFile("indentedrouted.msdl");
+        g.addFile("chat.msdl");
         g.addPlugin(JavaGenPlugin.create("/Users/kasperni/dma-workspace/MaritimeCloud/mc-msdl/generated"));
         g.process();
     }

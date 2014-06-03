@@ -45,7 +45,7 @@ import java.util.Stack;
 
 /**
  * Class to represent {@code ByteStrings} formed by concatenation of other ByteStrings, without copying the data in the
- * pieces. The concatenation is represented as a tree whose leaf nodes are each a {@link LiteralByteString}.
+ * pieces. The concatenation is represented as a tree whose leaf nodes are each a {@link LiteralBinary}.
  * 
  * <p>
  * Most of the operation here is inspired by the now-famous paper <a
@@ -65,11 +65,11 @@ import java.util.Stack;
  * 
  * @author carlanton@google.com (Carl Haverl)
  */
-class RopeByteString extends Binary {
+class RopeBinary extends Binary {
 
     /**
-     * BAP95. Let Fn be the nth Fibonacci number. A {@link RopeByteString} of depth n is "balanced", i.e flat enough, if
-     * its length is at least Fn+2, e.g. a "balanced" {@link RopeByteString} of depth 1 must have length at least 2, of
+     * BAP95. Let Fn be the nth Fibonacci number. A {@link RopeBinary} of depth n is "balanced", i.e flat enough, if
+     * its length is at least Fn+2, e.g. a "balanced" {@link RopeBinary} of depth 1 must have length at least 2, of
      * depth 4 must have length >= 8, etc.
      * 
      * <p>
@@ -130,7 +130,7 @@ class RopeByteString extends Binary {
      *            string on the right of this node, should have {@code size() >
      *              0}
      */
-    RopeByteString(Binary left, Binary right) {
+    RopeBinary(Binary left, Binary right) {
         this.left = left;
         this.right = right;
         leftLength = left.size();
@@ -140,7 +140,7 @@ class RopeByteString extends Binary {
 
     /**
      * Concatenate the given strings while performing various optimizations to slow the growth rate of tree depth and
-     * tree node count. The result is either a {@link LiteralByteString} or a {@link RopeByteString} depending on which
+     * tree node count. The result is either a {@link LiteralBinary} or a {@link RopeBinary} depending on which
      * optimizations, if any, were applied.
      * 
      * <p>
@@ -155,7 +155,7 @@ class RopeByteString extends Binary {
      */
     static Binary concatenate(Binary left, Binary right) {
         Binary result;
-        RopeByteString leftRope = left instanceof RopeByteString ? (RopeByteString) left : null;
+        RopeBinary leftRope = left instanceof RopeBinary ? (RopeBinary) left : null;
         if (right.size() == 0) {
             result = left;
         } else if (left.size() == 0) {
@@ -178,7 +178,7 @@ class RopeByteString extends Binary {
                 // new parent node so that the depth of the result is the same as the
                 // given left tree.
                 Binary newRight = concatenateBytes(leftRope.right, right);
-                result = new RopeByteString(leftRope.left, newRight);
+                result = new RopeBinary(leftRope.left, newRight);
             } else if (leftRope != null && leftRope.left.getTreeDepth() > leftRope.right.getTreeDepth()
                     && leftRope.getTreeDepth() > right.getTreeDepth()) {
                 // Typically for concatenate-built strings the left-side is deeper than
@@ -186,15 +186,15 @@ class RopeByteString extends Binary {
                 // increasing the tree depth. We'll redo the the node on the RHS. This
                 // is yet another optimization for building the string by repeatedly
                 // concatenating on the right.
-                Binary newRight = new RopeByteString(leftRope.right, right);
-                result = new RopeByteString(leftRope.left, newRight);
+                Binary newRight = new RopeBinary(leftRope.right, right);
+                result = new RopeBinary(leftRope.left, newRight);
             } else {
                 // Fine, we'll add a node and increase the tree depth--unless we
                 // rebalance ;^)
                 int newDepth = Math.max(left.getTreeDepth(), right.getTreeDepth()) + 1;
                 if (newLength >= minLengthByDepth[newDepth]) {
                     // The tree is shallow enough, so don't rebalance
-                    result = new RopeByteString(left, right);
+                    result = new RopeBinary(left, right);
                 } else {
                     result = new Balancer().balance(left, right);
                 }
@@ -213,13 +213,13 @@ class RopeByteString extends Binary {
      *            string on the right
      * @return string formed by copying data bytes
      */
-    private static LiteralByteString concatenateBytes(Binary left, Binary right) {
+    private static LiteralBinary concatenateBytes(Binary left, Binary right) {
         int leftSize = left.size();
         int rightSize = right.size();
         byte[] bytes = new byte[leftSize + rightSize];
         left.copyTo(bytes, 0, 0, leftSize);
         right.copyTo(bytes, 0, leftSize, rightSize);
-        return new LiteralByteString(bytes); // Constructor wraps bytes
+        return new LiteralBinary(bytes); // Constructor wraps bytes
     }
 
     /**
@@ -234,8 +234,8 @@ class RopeByteString extends Binary {
      *            string on the right of this node
      * @return an unsafe instance for testing only
      */
-    static RopeByteString newInstanceForTest(Binary left, Binary right) {
-        return new RopeByteString(left, right);
+    static RopeBinary newInstanceForTest(Binary left, Binary right) {
+        return new RopeBinary(left, right);
     }
 
     /**
@@ -299,7 +299,7 @@ class RopeByteString extends Binary {
      * 
      * <p>
      * Substrings of {@code length < 2} should result in at most a single recursive call chain, terminating at a leaf
-     * node. Thus the result will be a {@link LiteralByteString}. {@link #RopeByteString(Binary, Binary)}.
+     * node. Thus the result will be a {@link LiteralBinary}. {@link #RopeByteString(Binary, Binary)}.
      * 
      * @param beginIndex
      *            start at this index
@@ -343,7 +343,7 @@ class RopeByteString extends Binary {
                 // Intentionally not rebalancing, since in many cases these two
                 // substrings will already be less deep than the top-level
                 // RopeByteString we're taking a substring of.
-                result = new RopeByteString(leftSub, rightSub);
+                result = new RopeBinary(leftSub, rightSub);
             }
         }
         return result;
@@ -384,7 +384,7 @@ class RopeByteString extends Binary {
         List<ByteBuffer> result = new ArrayList<>();
         PieceIterator pieces = new PieceIterator(this);
         while (pieces.hasNext()) {
-            LiteralByteString byteString = pieces.next();
+            LiteralBinary byteString = pieces.next();
             result.add(byteString.asReadOnlyByteBuffer());
         }
         return result;
@@ -470,12 +470,12 @@ class RopeByteString extends Binary {
      */
     private boolean equalsFragments(Binary other) {
         int thisOffset = 0;
-        Iterator<LiteralByteString> thisIter = new PieceIterator(this);
-        LiteralByteString thisString = thisIter.next();
+        Iterator<LiteralBinary> thisIter = new PieceIterator(this);
+        LiteralBinary thisString = thisIter.next();
 
         int thatOffset = 0;
-        Iterator<LiteralByteString> thatIter = new PieceIterator(other);
-        LiteralByteString thatString = thatIter.next();
+        Iterator<LiteralBinary> thatIter = new PieceIterator(other);
+        LiteralBinary thatString = thatIter.next();
 
         int pos = 0;
         while (true) {
@@ -589,7 +589,7 @@ class RopeByteString extends Binary {
             Binary partialString = prefixesStack.pop();
             while (!prefixesStack.isEmpty()) {
                 Binary newLeft = prefixesStack.pop();
-                partialString = new RopeByteString(newLeft, partialString);
+                partialString = new RopeBinary(newLeft, partialString);
             }
             // We should end up with a RopeByteString since at a minimum we will
             // create one from concatenating left and right
@@ -603,8 +603,8 @@ class RopeByteString extends Binary {
             // relatively few calls to insert() result.
             if (root.isBalanced()) {
                 insert(root);
-            } else if (root instanceof RopeByteString) {
-                RopeByteString rbs = (RopeByteString) root;
+            } else if (root instanceof RopeBinary) {
+                RopeBinary rbs = (RopeBinary) root;
                 doBalance(rbs.left);
                 doBalance(rbs.right);
             } else {
@@ -643,11 +643,11 @@ class RopeByteString extends Binary {
                 Binary newTree = prefixesStack.pop();
                 while (!prefixesStack.isEmpty() && prefixesStack.peek().size() < binStart) {
                     Binary left = prefixesStack.pop();
-                    newTree = new RopeByteString(left, newTree);
+                    newTree = new RopeBinary(left, newTree);
                 }
 
                 // Concatenate the given string
-                newTree = new RopeByteString(newTree, byteString);
+                newTree = new RopeBinary(newTree, byteString);
 
                 // Continue concatenating until we land in an empty bin
                 while (!prefixesStack.isEmpty()) {
@@ -655,7 +655,7 @@ class RopeByteString extends Binary {
                     binEnd = minLengthByDepth[depthBin + 1];
                     if (prefixesStack.peek().size() < binEnd) {
                         Binary left = prefixesStack.pop();
-                        newTree = new RopeByteString(left, newTree);
+                        newTree = new RopeBinary(left, newTree);
                     } else {
                         break;
                     }
@@ -683,36 +683,36 @@ class RopeByteString extends Binary {
      * same as the depth of the tree being traversed.
      * 
      * <p>
-     * This iterator is used to implement {@link RopeByteString#equalsFragments(Binary)}.
+     * This iterator is used to implement {@link RopeBinary#equalsFragments(Binary)}.
      */
-    static class PieceIterator implements Iterator<LiteralByteString> {
+    static class PieceIterator implements Iterator<LiteralBinary> {
 
-        private final Stack<RopeByteString> breadCrumbs = new Stack<>();
+        private final Stack<RopeBinary> breadCrumbs = new Stack<>();
 
-        private LiteralByteString next;
+        private LiteralBinary next;
 
         PieceIterator(Binary root) {
             next = getLeafByLeft(root);
         }
 
-        private LiteralByteString getLeafByLeft(Binary root) {
+        private LiteralBinary getLeafByLeft(Binary root) {
             Binary pos = root;
-            while (pos instanceof RopeByteString) {
-                RopeByteString rbs = (RopeByteString) pos;
+            while (pos instanceof RopeBinary) {
+                RopeBinary rbs = (RopeBinary) pos;
                 breadCrumbs.push(rbs);
                 pos = rbs.left;
             }
-            return (LiteralByteString) pos;
+            return (LiteralBinary) pos;
         }
 
-        private LiteralByteString getNextNonEmptyLeaf() {
+        private LiteralBinary getNextNonEmptyLeaf() {
             while (true) {
                 // Almost always, we go through this loop exactly once. However, if
                 // we discover an empty string in the rope, we toss it and try again.
                 if (breadCrumbs.isEmpty()) {
                     return null;
                 } else {
-                    LiteralByteString result = getLeafByLeft(breadCrumbs.pop().right);
+                    LiteralBinary result = getLeafByLeft(breadCrumbs.pop().right);
                     if (!result.isEmpty()) {
                         return result;
                     }
@@ -729,11 +729,11 @@ class RopeByteString extends Binary {
          * 
          * @return next non-empty LiteralByteString or {@code null}
          */
-        public LiteralByteString next() {
+        public LiteralBinary next() {
             if (next == null) {
                 throw new NoSuchElementException();
             }
-            LiteralByteString result = next;
+            LiteralBinary result = next;
             next = getNextNonEmptyLeaf();
             return result;
         }
@@ -760,7 +760,7 @@ class RopeByteString extends Binary {
         int bytesRemaining;
 
         RopeByteIterator() {
-            pieces = new PieceIterator(RopeByteString.this);
+            pieces = new PieceIterator(RopeBinary.this);
             bytes = pieces.next().iterator();
             bytesRemaining = size();
         }
@@ -787,14 +787,14 @@ class RopeByteString extends Binary {
     }
 
     /**
-     * This class is the {@link RopeByteString} equivalent for {@link ByteArrayInputStream}.
+     * This class is the {@link RopeBinary} equivalent for {@link ByteArrayInputStream}.
      */
     private class RopeInputStream extends InputStream {
         // Iterates through the pieces of the rope
         private PieceIterator pieceIterator;
 
         // The current piece
-        private LiteralByteString currentPiece;
+        private LiteralBinary currentPiece;
 
         // The size of the current piece
         private int currentPieceSize;
@@ -881,7 +881,7 @@ class RopeByteString extends Binary {
         @Override
         public int available() throws IOException {
             int bytesRead = currentPieceOffsetInRope + currentPieceIndex;
-            return RopeByteString.this.size() - bytesRead;
+            return RopeBinary.this.size() - bytesRead;
         }
 
         @Override
@@ -904,7 +904,7 @@ class RopeByteString extends Binary {
 
         /** Common initialization code used by both the constructor and reset() */
         private void initialize() {
-            pieceIterator = new PieceIterator(RopeByteString.this);
+            pieceIterator = new PieceIterator(RopeBinary.this);
             currentPiece = pieceIterator.next();
             currentPieceSize = currentPiece.size();
             currentPieceIndex = 0;

@@ -92,9 +92,9 @@ public class JavaGenMessageGenerator {
         }
         generateHashCode();
         generateEquals();
-        generateWriteTo();
+        generateWriteTo(c, fields);
         generateAccessors();
-        generateTo();
+        generateToFrom();
         JavaGenMessageParserGenerator.generateParser(this);
         new JavaGenMessageImmutableGenerator(this).generate();
         return this;
@@ -249,12 +249,21 @@ public class JavaGenMessageGenerator {
         // }
     }
 
-    void generateTo() {
+    void generateToFrom() {
         c.addImport(MessageSerializers.class);
         CodegenMethod m = c.newMethod("public String toJSON()");
         m.addJavadoc("Returns a JSON representation of this message");
         m.add("return ", MessageSerializers.class, ".writeToJSON(this);");
+
+        CodegenMethod from = c.newMethod("public static ", c.getSimpleName(), " fromJSON(", CharSequence.class, " c)");
+        from.addJavadoc("Creates a message of this type from a JSON throwing a runtime exception if the format of the message does not match");
+        from.add("return ", MessageSerializers.class, ".readFromJSON(PARSER, c);");
     }
+
+    //
+    // public static HelloWorld fromJSON(CharSequence c) {
+    // return MessageSerializers.readFromJSON(PARSER, c);
+    // }
 
     void generateEquals() {
         CodegenMethod m = c.newMethod("public boolean equals(Object other)");
@@ -285,7 +294,7 @@ public class JavaGenMessageGenerator {
         m.add("return false;");
     }
 
-    void generateWriteTo() {
+    static void generateWriteTo(CodegenClass c, Iterable<FieldDeclaration> fields) {
         CodegenMethod m = c.newMethod("public void writeTo(", MessageWriter.class, " w) throws IOException");
         m.addAnnotation(Override.class).addJavadoc("{@inheritDoc}");
         m.addImport(IOException.class).addImport(MessageWriter.class);

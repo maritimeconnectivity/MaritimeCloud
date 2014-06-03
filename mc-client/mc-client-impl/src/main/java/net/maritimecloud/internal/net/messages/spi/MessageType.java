@@ -29,10 +29,14 @@ import net.maritimecloud.internal.net.messages.BroadcastPublish;
 import net.maritimecloud.internal.net.messages.BroadcastPublishAck;
 import net.maritimecloud.internal.net.messages.BroadcastRelay;
 import net.maritimecloud.internal.net.messages.Connected;
+import net.maritimecloud.internal.net.messages.FindEndpoint;
+import net.maritimecloud.internal.net.messages.FindEndpointAck;
 import net.maritimecloud.internal.net.messages.FindService;
 import net.maritimecloud.internal.net.messages.FindServiceAck;
 import net.maritimecloud.internal.net.messages.Hello;
 import net.maritimecloud.internal.net.messages.PositionReport;
+import net.maritimecloud.internal.net.messages.RegisterEndpoint;
+import net.maritimecloud.internal.net.messages.RegisterEndpointAck;
 import net.maritimecloud.internal.net.messages.RegisterService;
 import net.maritimecloud.internal.net.messages.RegisterServiceAck;
 import net.maritimecloud.internal.net.messages.ServiceInvoke;
@@ -80,6 +84,19 @@ public enum MessageType {
 
     FIND_SERVICE(120, FindService.class, FindService.PARSER), //
     FIND_SERVICE_ACK(121, FindServiceAck.class, FindServiceAck.PARSER), // throws ServiceFindException
+
+    // ENDPOINT
+    REGISTER_ENDPOINT(100, RegisterEndpoint.class, RegisterEndpoint.PARSER), // throws ServiceRegisterException
+    REGISTER_ENDPOINT_RESULT(101, RegisterEndpointAck.class, RegisterEndpointAck.PARSER), // just an ack of the
+    // service???
+
+    // servicen der skal unregistreres
+    UNREGISTER_ENDPOINT(110, RegisterEndpoint.class, RegisterEndpoint.PARSER), //
+    UNREGISTER_ENDPOINT_ACK(111, RegisterEndpointAck.class, RegisterEndpointAck.PARSER), // throws
+    // ServiceUnregisterException
+
+    FIND_ENDPOINT(120, FindEndpoint.class, FindEndpoint.PARSER), //
+    FIND_ENDPOINT_ACK(121, FindEndpointAck.class, FindEndpointAck.PARSER), // throws ServiceFindException
 
     /* Broadcast */
 

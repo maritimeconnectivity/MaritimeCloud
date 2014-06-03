@@ -251,6 +251,13 @@ public class ServiceInvoke implements Message, net.maritimecloud.internal.net.me
         return MessageSerializers.writeToJSON(this);
     }
 
+    /**
+     * Creates a message of this type from a JSON throwing a runtime exception if the format of the message does not match
+     */
+    public static ServiceInvoke fromJSON(CharSequence c) {
+        return MessageSerializers.readFromJSON(PARSER, c);
+    }
+
     /** {@inheritDoc} */
     @Override
     public ServiceInvoke immutable() {

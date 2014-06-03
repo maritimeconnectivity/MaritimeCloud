@@ -71,6 +71,22 @@ public enum BaseType {
         return !isComplexType() && !isReferenceType();
     }
 
+    /**
+     * Returns <tt>true</tt> if the state is any of the specified states, otherwise false.
+     *
+     * @param states
+     *            the states to check if this state is in
+     * @return <tt>true</tt> if the state is any of the specified states, otherwise false
+     */
+    public boolean isAnyOf(BaseType... states) {
+        for (BaseType s : states) {
+            if (s == this) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean isReferenceType() {
         return this == ENUM || this == MESSAGE;
     }

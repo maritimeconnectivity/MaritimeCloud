@@ -19,6 +19,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -29,7 +30,7 @@ import net.maritimecloud.util.function.BiConsumer;
 
 /**
  * The default implementation of ConnectionFuture.
- * 
+ *
  * @author Kasper Nielsen
  */
 public class DefaultConnectionFuture<T> implements NetworkFuture<T> {
@@ -170,7 +171,41 @@ public class DefaultConnectionFuture<T> implements NetworkFuture<T> {
         return cf;
     }
 
+    public CompletableFuture<T> timeout(ScheduledExecutorService ses, long timeout, TimeUnit unit) {
+        final CompletableFuture<T> cf = new CompletableFuture<>();
+        final Future<?> f;
+        try {
+            f = ses.schedule(new Runnable() {
+                public void run() {
+                    if (!isDone()) {
+                        cf.completeExceptionally(new TimeoutException("Timed out after " + timeout + " "
+                                + unit.toString().toLowerCase()));
+                    }
+                }
+            }, timeout, unit);
+        } catch (RejectedExecutionException e) {
+            // Unfortunately TimeoutException does not allow exceptions in its constructor
+            cf.completeExceptionally(new RuntimeException("Could not scedule task, ", e));
+            return cf;
+        }
+        delegate.handle(new BiFun<T, Throwable, Void>() {
+            public Void apply(T t, Throwable throwable) {
+                // Users must manually purge if many outstanding tasks
+                f.cancel(false);
+                if (throwable != null) {
+                    cf.completeExceptionally(throwable);
+                } else {
+                    cf.complete(t);
+                }
+                return null;
+            }
+        });
+        return cf;
+    }
+
+
     public interface Action<A> {
         void accept(A paramA);
     }
+
 }

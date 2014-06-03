@@ -28,7 +28,7 @@ import net.maritimecloud.internal.net.messages.spi.MessageHelpers;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.broadcast.BroadcastListener;
 import net.maritimecloud.net.broadcast.BroadcastMessage;
-import net.maritimecloud.net.broadcast.BroadcastMessageHeader;
+import net.maritimecloud.net.broadcast.MessageContext;
 import net.maritimecloud.util.geometry.PositionTime;
 
 import org.junit.Ignore;
@@ -58,7 +58,7 @@ public class BroadcastTest extends AbstractClientConnectionTest {
 
         final CountDownLatch cdl = new CountDownLatch(1);
         c.broadcastListen(HelloWorld.class, new BroadcastListener<HelloWorld>() {
-            public void onMessage(HelloWorld broadcast, BroadcastMessageHeader header) {
+            public void onMessage(HelloWorld broadcast, MessageContext header) {
                 assertEquals(ID2, header.getId());
                 assertEquals(PositionTime.create(1, 1, 1), header.getPosition());
                 assertEquals("foo$\\\n", broadcast.getMsg());
@@ -79,7 +79,7 @@ public class BroadcastTest extends AbstractClientConnectionTest {
         BroadcastRelay bm = new BroadcastRelay();
         bm.setLatestReceivedId(0L).setMessageId(0L);
         bm.setChannel(HelloWorld.class.getCanonicalName());
-        bm.setMsg(persist(hw));
+        bm.setMsg(hw.toJSON());
         bm.setPositionTime(PositionTime.create(1, 1, 1));
         bm.setId(ID2.toString());
 
@@ -98,7 +98,7 @@ public class BroadcastTest extends AbstractClientConnectionTest {
 
         final CountDownLatch cdl = new CountDownLatch(2);
         c.broadcastListen(BroadcastMessage.class, new BroadcastListener<BroadcastMessage>() {
-            public void onMessage(BroadcastMessage broadcast, BroadcastMessageHeader header) {
+            public void onMessage(BroadcastMessage broadcast, MessageContext header) {
                 if (cdl.getCount() == 2) {
                     // HelloWorld2 hw = (HelloWorld2) broadcast;
                     // assertEquals(ID3, header.getId());

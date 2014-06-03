@@ -24,10 +24,10 @@ import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.net.client.ClientContainer;
 import net.maritimecloud.internal.net.client.connection.ConnectionMessageBus;
 import net.maritimecloud.internal.net.client.connection.OnMessage;
-import net.maritimecloud.internal.net.client.service.PositionManager;
 import net.maritimecloud.internal.net.client.util.CustomConcurrentHashMap;
 import net.maritimecloud.internal.net.client.util.CustomConcurrentHashMap.Strength;
 import net.maritimecloud.internal.net.client.util.DefaultConnectionFuture;
+import net.maritimecloud.internal.net.client.util.PositionManager;
 import net.maritimecloud.internal.net.client.util.ThreadManager;
 import net.maritimecloud.internal.net.messages.BroadcastPublicRemoteAck;
 import net.maritimecloud.internal.net.messages.BroadcastPublish;
@@ -39,7 +39,7 @@ import net.maritimecloud.net.broadcast.BroadcastFuture;
 import net.maritimecloud.net.broadcast.BroadcastListenOptions;
 import net.maritimecloud.net.broadcast.BroadcastListener;
 import net.maritimecloud.net.broadcast.BroadcastMessage;
-import net.maritimecloud.net.broadcast.BroadcastMessageHeader;
+import net.maritimecloud.net.broadcast.MessageContext;
 import net.maritimecloud.net.broadcast.BroadcastSendOptions;
 import net.maritimecloud.net.broadcast.BroadcastSubscription;
 import net.maritimecloud.util.function.BiConsumer;
@@ -147,7 +147,7 @@ public class BroadcastManager {
             }
 
             final BroadcastMessage bmm = bm;
-            final BroadcastMessageHeader bp = new BroadcastMessageHeaderImpl(MaritimeId.create(broadcast.getId()),
+            final MessageContext bp = new BroadcastMessageHeaderImpl(MaritimeId.create(broadcast.getId()),
                     broadcast.getPositionTime());
 
             // Deliver to each listener

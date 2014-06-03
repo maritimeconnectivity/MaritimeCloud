@@ -27,10 +27,6 @@ import net.maritimecloud.net.MaritimeCloudClientConfiguration;
 import org.junit.After;
 import org.junit.Before;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
 /**
  *
  * @author Kasper Nielsen
@@ -92,24 +88,5 @@ public class AbstractClientConnectionTest {
             assertTrue(client.awaitTermination(5, TimeUnit.SECONDS));
         }
         ws.stop();
-    }
-
-
-    protected static String persist(Object o) {
-        ObjectMapper om = new ObjectMapper();
-        om.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-        try {
-            return om.writeValueAsString(o);
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("Could not be persisted", e);
-        }
-    }
-
-    protected static String escape(String s) {
-        return s.replace("\\", "\\\\").replace("\"", "\\\"");
-    }
-
-    protected static String persistAndEscape(Object o) {
-        return escape(persist(o));
     }
 }

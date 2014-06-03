@@ -27,8 +27,9 @@ import net.maritimecloud.internal.net.client.broadcast.BroadcastManager;
 import net.maritimecloud.internal.net.client.connection.ConnectionManager;
 import net.maritimecloud.internal.net.client.connection.ConnectionMessageBus;
 import net.maritimecloud.internal.net.client.connection.ConnectionTransportManager;
+import net.maritimecloud.internal.net.client.endpoint.ClientEndpointManager;
 import net.maritimecloud.internal.net.client.service.ClientServiceManager;
-import net.maritimecloud.internal.net.client.service.PositionManager;
+import net.maritimecloud.internal.net.client.util.PositionManager;
 import net.maritimecloud.internal.net.client.util.ThreadManager;
 import net.maritimecloud.net.MaritimeCloudClientConfiguration;
 import net.maritimecloud.util.geometry.PositionReader;
@@ -93,6 +94,7 @@ public class ClientContainer extends ReentrantLock {
         picoContainer.addComponent(PositionManager.class);
         picoContainer.addComponent(BroadcastManager.class);
         picoContainer.addComponent(ClientServiceManager.class);
+        picoContainer.addComponent(ClientEndpointManager.class);
         picoContainer.addComponent(ConnectionMessageBus.class);
         picoContainer.addComponent(ThreadManager.class);
         picoContainer.addComponent(ConnectionManager.class);

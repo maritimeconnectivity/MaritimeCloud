@@ -146,6 +146,13 @@ public class UnregisterService implements Message, net.maritimecloud.internal.ne
         return MessageSerializers.writeToJSON(this);
     }
 
+    /**
+     * Creates a message of this type from a JSON throwing a runtime exception if the format of the message does not match
+     */
+    public static UnregisterService fromJSON(CharSequence c) {
+        return MessageSerializers.readFromJSON(PARSER, c);
+    }
+
     /** {@inheritDoc} */
     @Override
     public UnregisterService immutable() {

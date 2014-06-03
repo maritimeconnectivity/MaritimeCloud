@@ -24,11 +24,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.maritimecloud.msdl.MsdlPlugin;
+import net.maritimecloud.msdl.model.BroadcastMessageDeclaration;
+import net.maritimecloud.msdl.model.EndpointDefinition;
 import net.maritimecloud.msdl.model.EnumDeclaration;
 import net.maritimecloud.msdl.model.FileDeclaration;
 import net.maritimecloud.msdl.model.MessageDeclaration;
 import net.maritimecloud.msdl.model.Project;
-import net.maritimecloud.msdl.model.ServiceDeclaration;
 import net.maritimecloud.msdl.plugins.javagen.annotation.JavaImplementation;
 
 import org.cakeframework.internal.codegen.CodegenClass;
@@ -80,9 +81,26 @@ public class JavaGenPlugin extends MsdlPlugin {
                 classes.add(new JavaGenMessageGenerator(null, md).generate().c);
             }
         }
-        for (ServiceDeclaration sd : definition.getServices()) {
-            classes.add(new JavaGenServiceGenerator(sd).generate().c);
+
+        for (MessageDeclaration md : definition.getMessages()) {
+            if (!md.isAnnotationPresent(JavaImplementation.class)) {
+                classes.add(new JavaGenMessageGenerator(null, md).generate().c);
+            }
         }
+        for (BroadcastMessageDeclaration bd : definition.getBroadcasts()) {
+            // if (!bd.isAnnotationPresent(JavaImplementation.class)) {
+            classes.add(new JavaGenBroadcastMessageGenerator(null, bd).generate().c);
+            // }
+        }
+        for (EndpointDefinition ed : definition.getEndpoints()) {
+            JavaGenEndpointGenerator g = new JavaGenEndpointGenerator(null, ed).generate();
+            classes.add(g.cClient);
+            classes.add(g.cServer);
+        }
+
+        // for (ServiceDeclaration sd : definition.getServices()) {
+        // classes.add(new JavaGenServiceGenerator(sd).generate().c);
+        // }
         for (CodegenClass cc : classes) {
             if (definition.getNamespace() != null) {
                 cc.setPackage(definition.getNamespace());

@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.net.client.broadcast.BroadcastManager;
+import net.maritimecloud.internal.net.client.endpoint.ClientEndpointManager;
 import net.maritimecloud.internal.net.client.service.ClientServiceManager;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.MaritimeCloudClientConfiguration;
@@ -28,6 +29,10 @@ import net.maritimecloud.net.broadcast.BroadcastListener;
 import net.maritimecloud.net.broadcast.BroadcastMessage;
 import net.maritimecloud.net.broadcast.BroadcastSendOptions;
 import net.maritimecloud.net.broadcast.BroadcastSubscription;
+import net.maritimecloud.net.endpoint.EndpointImplementation;
+import net.maritimecloud.net.endpoint.EndpointLocal;
+import net.maritimecloud.net.endpoint.EndpointLocator;
+import net.maritimecloud.net.endpoint.EndpointRegistration;
 import net.maritimecloud.net.service.ServiceInvocationFuture;
 import net.maritimecloud.net.service.ServiceLocator;
 import net.maritimecloud.net.service.invocation.InvocationCallback;
@@ -61,6 +66,10 @@ public class DefaultMaritimeCloudClient implements MaritimeCloudClient {
     /** Manages registration of services. */
     private final ClientServiceManager services;
 
+    /** Manages registration of services. */
+    private final ClientEndpointManager endpoints;
+
+
     /**
      * Creates a new instance of this class.
      *
@@ -73,6 +82,7 @@ public class DefaultMaritimeCloudClient implements MaritimeCloudClient {
         connection = pc.getComponent(MaritimeCloudConnection.class);
         internalClient = pc.getComponent(ClientContainer.class);
         services = pc.getComponent(ClientServiceManager.class);
+        endpoints = pc.getComponent(ClientEndpointManager.class);
         broadcastDefaultOptions = configuration.getDefaultBroadcastOptions().immutable();
         broadcastListenOptions = new BroadcastListenOptions();
     }
@@ -158,5 +168,23 @@ public class DefaultMaritimeCloudClient implements MaritimeCloudClient {
     public <T, E extends ServiceMessage<T>> ServiceRegistration serviceRegister(ServiceInitiationPoint<E> sip,
             InvocationCallback<E, T> callback) {
         return services.serviceRegister(sip, callback);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <T extends EndpointLocal> T endpointFind(MaritimeId id, Class<? extends T> endpointType) {
+        return endpoints.endpointFind(id, endpointType);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <T extends EndpointLocal> EndpointLocator<T> endpointFind(Class<? extends T> endpointType) {
+        return endpoints.endpointFind(endpointType);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public EndpointRegistration endpointRegister(EndpointImplementation implementation) {
+        return endpoints.endpointRegister(implementation);
     }
 }

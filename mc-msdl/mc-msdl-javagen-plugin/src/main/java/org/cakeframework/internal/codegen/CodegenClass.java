@@ -219,6 +219,12 @@ public class CodegenClass extends AbstractCodegenEntity {
         return type;
     }
 
+    public final CodegenClass newInnerClass(Object... definition) {
+        CodegenClass cc = newInnerClass();
+        cc.setDefinition(definition);
+        return cc;
+    }
+
     public final CodegenClass newInnerClass() {
         CodegenClass cc = new CodegenClass();
         addInnerClass(cc);

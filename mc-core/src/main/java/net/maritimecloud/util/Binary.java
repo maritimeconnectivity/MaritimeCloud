@@ -45,7 +45,7 @@ import java.util.NoSuchElementException;
 /**
  * Immutable sequence of bytes. Substring is supported by sharing the reference to the immutable underlying bytes, as
  * with {@link String} (previous to Java 7). Concatenation is likewise supported without copying (long strings) by
- * building a tree of pieces in {@link RopeByteString}.
+ * building a tree of pieces in {@link RopeBinary}.
  * <p>
  * Like {@link String}, the contents of a {@link Binary} can never be observed to change, not even in the presence of a
  * data race or incorrect API usage in the client code.
@@ -60,7 +60,7 @@ public abstract class Binary implements Iterable<Byte> {
     /**
      * When two strings to be concatenated have a combined length shorter than this, we just copy their bytes on
      * {@link #concat(Binary)}. The trade-off is copy size versus the overhead of creating tree nodes in
-     * {@link RopeByteString}.
+     * {@link RopeBinary}.
      */
     static final int CONCATENATE_BY_COPY_SIZE = 128;
 
@@ -75,7 +75,7 @@ public abstract class Binary implements Iterable<Byte> {
     /**
      * Empty {@code ByteString}.
      */
-    public static final Binary EMPTY = new LiteralByteString(new byte[0]);
+    public static final Binary EMPTY = new LiteralBinary(new byte[0]);
 
     // This constructor is here to prevent subclassing outside of this package,
     Binary() {}
@@ -189,7 +189,7 @@ public abstract class Binary implements Iterable<Byte> {
     public static Binary copyFrom(byte[] bytes, int offset, int size) {
         byte[] copy = new byte[size];
         System.arraycopy(bytes, offset, copy, 0, size);
-        return new LiteralByteString(copy);
+        return new LiteralBinary(copy);
     }
 
     /**
@@ -215,7 +215,7 @@ public abstract class Binary implements Iterable<Byte> {
     public static Binary copyFrom(ByteBuffer bytes, int size) {
         byte[] copy = new byte[size];
         bytes.get(copy);
-        return new LiteralByteString(copy);
+        return new LiteralBinary(copy);
     }
 
     /**
@@ -242,7 +242,7 @@ public abstract class Binary implements Iterable<Byte> {
      *             if the encoding isn't found
      */
     public static Binary copyFrom(String text, String charsetName) throws UnsupportedEncodingException {
-        return new LiteralByteString(text.getBytes(charsetName));
+        return new LiteralBinary(text.getBytes(charsetName));
     }
 
     /**
@@ -254,7 +254,7 @@ public abstract class Binary implements Iterable<Byte> {
      */
     public static Binary copyFromUtf8(String text) {
         try {
-            return new LiteralByteString(text.getBytes("UTF-8"));
+            return new LiteralBinary(text.getBytes("UTF-8"));
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException("UTF-8 not supported?", e);
         }
@@ -373,7 +373,7 @@ public abstract class Binary implements Iterable<Byte> {
             throw new IllegalArgumentException("ByteString would be too long: " + thisSize + "+" + otherSize);
         }
 
-        return RopeByteString.concatenate(this, other);
+        return RopeBinary.concatenate(this, other);
     }
 
     /**
@@ -828,7 +828,7 @@ public abstract class Binary implements Iterable<Byte> {
          * is at least the specified minimum size.
          */
         private void flushFullBuffer(int minSize) {
-            flushedBuffers.add(new LiteralByteString(buffer));
+            flushedBuffers.add(new LiteralBinary(buffer));
             flushedBuffersTotalBytes += buffer.length;
             // We want to increase our total capacity by 50%, but as a minimum,
             // the new buffer should also at least be >= minSize and
@@ -846,12 +846,12 @@ public abstract class Binary implements Iterable<Byte> {
             if (bufferPos < buffer.length) {
                 if (bufferPos > 0) {
                     byte[] bufferCopy = copyArray(buffer, bufferPos);
-                    flushedBuffers.add(new LiteralByteString(bufferCopy));
+                    flushedBuffers.add(new LiteralBinary(bufferCopy));
                 }
                 // We reuse this buffer for further writes.
             } else {
                 // Buffer is completely full. Huzzah.
-                flushedBuffers.add(new LiteralByteString(buffer));
+                flushedBuffers.add(new LiteralBinary(buffer));
                 // 99% of the time, we're not going to use this OutputStream again.
                 // We set buffer to an empty byte stream so that we're handling this
                 // case without wasting space. In the rare case that more writes
@@ -921,7 +921,7 @@ public abstract class Binary implements Iterable<Byte> {
 
     /**
      * Return {@code true} if this ByteString is literal (a leaf node) or a flat-enough tree in the sense of
-     * {@link RopeByteString}.
+     * {@link RopeBinary}.
      *
      * @return true if the tree is flat enough
      */

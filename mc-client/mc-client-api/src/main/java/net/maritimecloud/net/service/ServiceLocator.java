@@ -20,14 +20,14 @@ import net.maritimecloud.net.NetworkFuture;
 import net.maritimecloud.net.service.spi.ServiceMessage;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public interface ServiceLocator<T, E extends ServiceMessage<T>> {
 
     /**
      * Limits the result to services with the specified distance
-     * 
+     *
      * @param meters
      *            the distance in meters
      * @return a new service locator
@@ -36,18 +36,17 @@ public interface ServiceLocator<T, E extends ServiceMessage<T>> {
 
     /**
      * Returns the nearest service end point to the clients current position.
-     * 
+     *
      * @return the nearest service end point to the clients current position
      */
     NetworkFuture<ServiceEndpoint<E, T>> nearest();
 
     /**
      * Returns a list of multiple service end points to the clients current position.
-     * 
+     *
      * @param limit
      *            the maximum number of service end points to return
      * @return a list of multiple service end points to the clients current position
      */
     NetworkFuture<List<ServiceEndpoint<E, T>>> nearest(int limit);
-
 }

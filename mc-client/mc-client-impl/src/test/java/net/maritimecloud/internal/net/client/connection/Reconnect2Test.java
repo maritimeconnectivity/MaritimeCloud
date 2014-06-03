@@ -29,7 +29,7 @@ import net.maritimecloud.internal.net.messages.Hello;
 import net.maritimecloud.internal.net.messages.spi.MessageHelpers;
 import net.maritimecloud.net.MaritimeCloudClient;
 import net.maritimecloud.net.broadcast.BroadcastListener;
-import net.maritimecloud.net.broadcast.BroadcastMessageHeader;
+import net.maritimecloud.net.broadcast.MessageContext;
 import net.maritimecloud.util.geometry.PositionTime;
 
 import org.junit.Test;
@@ -87,7 +87,7 @@ public class Reconnect2Test extends AbstractClientConnectionTest {
 
         final CountDownLatch cdl = new CountDownLatch(1);
         c.broadcastListen(HelloWorld.class, new BroadcastListener<HelloWorld>() {
-            public void onMessage(HelloWorld broadcast, BroadcastMessageHeader header) {
+            public void onMessage(HelloWorld broadcast, MessageContext header) {
                 cdl.countDown();
             }
         });
@@ -96,7 +96,7 @@ public class Reconnect2Test extends AbstractClientConnectionTest {
         // HelloWorld.class.getCanonicalName(), persistAndEscape(new HelloWorld("foo")));
         BroadcastRelay bm = new BroadcastRelay();
         bm.setChannel(HelloWorld.class.getCanonicalName());
-        bm.setMsg(persist(new HelloWorld().setMsg("foo")));
+        bm.setMsg(new HelloWorld().setMsg("foo").toJSON());
         bm.setPositionTime(PositionTime.create(1, 1, 1));
         bm.setId(ID2.toString());
 
@@ -142,7 +142,7 @@ public class Reconnect2Test extends AbstractClientConnectionTest {
 
         final CountDownLatch cdl = new CountDownLatch(1);
         c.broadcastListen(HelloWorld.class, new BroadcastListener<HelloWorld>() {
-            public void onMessage(HelloWorld broadcast, BroadcastMessageHeader header) {
+            public void onMessage(HelloWorld broadcast, MessageContext header) {
                 cdl.countDown();
             }
         });
@@ -151,7 +151,7 @@ public class Reconnect2Test extends AbstractClientConnectionTest {
         // HelloWorld.class.getCanonicalName(), persistAndEscape(new HelloWorld("foo")));
         BroadcastRelay bm = new BroadcastRelay();
         bm.setChannel(HelloWorld.class.getCanonicalName());
-        bm.setMsg(persist(new HelloWorld().setMsg("foo")));
+        bm.setMsg(new HelloWorld().setMsg("foo").toJSON());
         bm.setPositionTime(PositionTime.create(1, 1, 1));
         bm.setId(ID2.toString());
 

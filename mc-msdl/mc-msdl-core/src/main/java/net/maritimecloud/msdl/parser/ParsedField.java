@@ -43,7 +43,6 @@ public class ParsedField implements FieldDeclaration {
         this.message = requireNonNull(message);
     }
 
-
     /** {@inheritDoc} */
     @Override
     public String getName() {

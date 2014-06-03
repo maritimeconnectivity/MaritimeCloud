@@ -19,7 +19,6 @@ import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.net.client.connection.ConnectionMessageBus;
 import net.maritimecloud.internal.net.messages.ServiceInvoke;
 import net.maritimecloud.internal.net.messages.ServiceInvokeAck;
-import net.maritimecloud.internal.net.messages.spi.MessageHelpers;
 import net.maritimecloud.net.service.invocation.InvocationCallback;
 
 import org.slf4j.Logger;
@@ -66,7 +65,7 @@ class DefaultLocalServiceInvocationContext2<T> implements InvocationCallback.Con
         sia.setDestination(is.getDestination());
         sia.setSource(is.getSource());
         sia.setUuid(is.getConversationId());
-        sia.setMsg(MessageHelpers.persist(message));
+        sia.setMsg(ClientServiceManager.persist(message));
         sia.setReplyType(message.getClass().getName());
 
         // String uuid, String message, String replyType

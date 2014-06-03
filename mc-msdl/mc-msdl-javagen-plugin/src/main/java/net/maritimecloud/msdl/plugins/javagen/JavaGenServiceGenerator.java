@@ -26,15 +26,17 @@ import org.cakeframework.internal.codegen.CodegenClass;
 public class JavaGenServiceGenerator {
     final CodegenClass c = new CodegenClass();
 
-    final ServiceDeclaration msg;
+    final ServiceDeclaration sd;
 
     JavaGenServiceGenerator(ServiceDeclaration msg) {
-        this.msg = msg;
+        this.sd = msg;
     }
 
     void generateClass() {
 
-        c.setDefinition("public class ", msg.getName());
+        c.setDefinition("public interface ", sd.getName());
+        String fullName = sd.getFile().getNamespace() + "." + sd.getName();
+        c.addFieldWithJavadoc("The full name of this service", "public static final String NAME =\"", fullName, "\";");
 
         // c.addFieldWithJavadoc("A message parser that can create new instances of this class.",
         // "public static final ",
@@ -44,12 +46,19 @@ public class JavaGenServiceGenerator {
     JavaGenServiceGenerator generate() {
         generateClass();
         generateBroadcastMessages();
+        // generateEndpoints();
         return this;
     }
 
     void generateBroadcastMessages() {
-        for (BroadcastMessageDeclaration d : msg.getBroadcastMessages()) {
-            new JavaGenBroadcastMessageGenerator(c, d).generate(msg);
+        for (BroadcastMessageDeclaration d : sd.getBroadcastMessages()) {
+            new JavaGenBroadcastMessageGenerator(c, d).generate(sd);
         }
     }
+
+    // void generateEndpoints() {
+    // for (EndpointDefinition d : sd.getEndpoints()) {
+    // new JavaGenEndpointGenerator(c, d).generate(sd);
+    // }
+    // }
 }

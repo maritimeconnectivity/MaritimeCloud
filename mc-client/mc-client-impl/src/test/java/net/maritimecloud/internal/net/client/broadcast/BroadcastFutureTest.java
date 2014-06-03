@@ -33,6 +33,7 @@ import net.maritimecloud.net.broadcast.BroadcastFuture;
 import net.maritimecloud.net.broadcast.BroadcastMessageReceived;
 import net.maritimecloud.net.broadcast.BroadcastMessage;
 import net.maritimecloud.net.broadcast.BroadcastSendOptions;
+import net.maritimecloud.net.broadcast.MessageContext;
 import net.maritimecloud.util.function.Consumer;
 import net.maritimecloud.util.geometry.PositionTime;
 
@@ -112,11 +113,11 @@ public class BroadcastFutureTest extends AbstractClientConnectionTest {
         ba.setLatestReceivedId(0L);
         t.send(ba);
 
-        BroadcastMessageReceived a3 = q.poll(1, TimeUnit.SECONDS);
+        MessageContext a3 = q.poll(1, TimeUnit.SECONDS);
         assertEquals(ID3, a3.getId());
         assertEquals(PositionTime.create(3, 3, 3), a3.getPosition());
 
-        BroadcastMessageReceived a4 = q.poll(1, TimeUnit.SECONDS);
+        MessageContext a4 = q.poll(1, TimeUnit.SECONDS);
         assertEquals(ID4, a4.getId());
         assertEquals(PositionTime.create(4, 4, 4), a4.getPosition());
 

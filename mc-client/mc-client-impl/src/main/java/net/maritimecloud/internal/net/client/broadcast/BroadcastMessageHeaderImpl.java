@@ -16,7 +16,7 @@ package net.maritimecloud.internal.net.client.broadcast;
 
 import static java.util.Objects.requireNonNull;
 import net.maritimecloud.core.id.MaritimeId;
-import net.maritimecloud.net.broadcast.BroadcastMessageHeader;
+import net.maritimecloud.net.broadcast.MessageContext;
 import net.maritimecloud.util.geometry.PositionTime;
 
 /**
@@ -24,7 +24,7 @@ import net.maritimecloud.util.geometry.PositionTime;
  *
  * @author Kasper Nielsen
  */
-class BroadcastMessageHeaderImpl implements BroadcastMessageHeader {
+class BroadcastMessageHeaderImpl implements MessageContext {
 
     /** The id of the ship sending the broadcast. */
     private final MaritimeId id;

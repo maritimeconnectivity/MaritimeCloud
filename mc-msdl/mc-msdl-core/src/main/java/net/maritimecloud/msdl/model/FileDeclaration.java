@@ -44,5 +44,10 @@ public interface FileDeclaration {
      */
     List<MessageDeclaration> getMessages();
 
+    List<BroadcastMessageDeclaration> getBroadcasts();
+
+    List<EndpointDefinition> getEndpoints();
+
+    @Deprecated
     List<ServiceDeclaration> getServices();
 }

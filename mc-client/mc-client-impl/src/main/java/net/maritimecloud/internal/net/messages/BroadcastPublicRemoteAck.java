@@ -168,6 +168,13 @@ public class BroadcastPublicRemoteAck implements Message, net.maritimecloud.inte
         return MessageSerializers.writeToJSON(this);
     }
 
+    /**
+     * Creates a message of this type from a JSON throwing a runtime exception if the format of the message does not match
+     */
+    public static BroadcastPublicRemoteAck fromJSON(CharSequence c) {
+        return MessageSerializers.readFromJSON(PARSER, c);
+    }
+
     /** {@inheritDoc} */
     @Override
     public BroadcastPublicRemoteAck immutable() {

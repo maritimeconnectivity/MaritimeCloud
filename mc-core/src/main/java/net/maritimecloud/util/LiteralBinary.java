@@ -41,13 +41,13 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
- * This class implements a {@link com.google.protobuf.Binary.ByteString} backed by a single array of bytes, contiguous in
+ * This class implements a {@link com.google.Binary.ByteString.ByteString} backed by a single array of bytes, contiguous in
  * memory. It supports substring by pointing to only a sub-range of the underlying byte array, meaning that a substring
  * will reference the full byte-array of the string it's made from, exactly as with {@link String}.
  * 
  * @author carlanton@google.com (Carl Haverl)
  */
-class LiteralByteString extends Binary {
+class LiteralBinary extends Binary {
 
     protected final byte[] bytes;
 
@@ -57,7 +57,7 @@ class LiteralByteString extends Binary {
      * @param bytes
      *            array to wrap
      */
-    LiteralByteString(byte[] bytes) {
+    LiteralBinary(byte[] bytes) {
         this.bytes = bytes;
     }
 
@@ -95,7 +95,7 @@ class LiteralByteString extends Binary {
         if (substringLength == 0) {
             result = Binary.EMPTY;
         } else {
-            result = new BoundedByteString(bytes, getOffsetIntoBytes() + beginIndex, substringLength);
+            result = new BoundedBinary(bytes, getOffsetIntoBytes() + beginIndex, substringLength);
         }
         return result;
     }
@@ -173,9 +173,9 @@ class LiteralByteString extends Binary {
             return true;
         }
 
-        if (other instanceof LiteralByteString) {
-            return equalsRange((LiteralByteString) other, 0, size());
-        } else if (other instanceof RopeByteString) {
+        if (other instanceof LiteralBinary) {
+            return equalsRange((LiteralBinary) other, 0, size());
+        } else if (other instanceof RopeBinary) {
             return other.equals(this);
         } else {
             throw new IllegalArgumentException("Has a new type of ByteString been created? Found " + other.getClass());
@@ -194,7 +194,7 @@ class LiteralByteString extends Binary {
      *            number of bytes to compare
      * @return true for equality of substrings, else false.
      */
-    boolean equalsRange(LiteralByteString other, int offset, int length) {
+    boolean equalsRange(LiteralBinary other, int offset, int length) {
         if (length > other.size()) {
             throw new IllegalArgumentException("Length too large: " + length + size());
         }

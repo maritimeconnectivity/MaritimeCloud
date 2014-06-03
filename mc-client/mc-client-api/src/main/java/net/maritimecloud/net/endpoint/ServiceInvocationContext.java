@@ -12,29 +12,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.net.broadcast;
+package net.maritimecloud.net.endpoint;
 
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.util.geometry.PositionTime;
 
 /**
- * Properties conveyed to receivers of broadcast messages.
  *
  * @author Kasper Nielsen
  */
-public interface BroadcastMessageHeader {
+public interface ServiceInvocationContext {
 
-    /**
-     * Returns the id of the ship sending the broadcast.
-     *
-     * @return the id of the ship sending the broadcast
-     */
-    MaritimeId getId();
+    MaritimeId getCaller();
 
-    /**
-     * Returns the position and time of the ship sending the broadcast.
-     *
-     * @return the position and time of the ship sending the broadcast
-     */
-    PositionTime getPosition();
+    PositionTime getTimestamp();
+
 }

@@ -27,10 +27,6 @@ import net.maritimecloud.util.geometry.Area;
 import net.maritimecloud.util.geometry.Circle;
 import net.maritimecloud.util.geometry.PositionTime;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
 /**
  *
  * @author Kasper Nielsen
@@ -46,16 +42,6 @@ public class MessageHelpers {
         // System.out.println("Got " + msg);
         TransportMessage tm = MessageSerializers.readFromJSON(p, msg);
         return tm;
-    }
-
-    public static String persist(Object o) {
-        ObjectMapper om = new ObjectMapper();
-        om.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-        try {
-            return om.writeValueAsString(o);
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("Could not be persisted", e);
-        }
     }
 
     @SuppressWarnings("unchecked")

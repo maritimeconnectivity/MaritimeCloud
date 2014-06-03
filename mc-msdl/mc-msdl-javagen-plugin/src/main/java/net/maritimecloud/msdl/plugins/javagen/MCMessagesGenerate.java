@@ -35,7 +35,7 @@ public class MCMessagesGenerate {
         g.addDependencyDirectory(Paths.get("/Users/kasperni/dma-workspace/MaritimeCloud/private/msdl/"));
         g.addFile("maritimecloud-messages.msdl");
         g.addPlugin(JavaGenPlugin
-                .create("/Users/kasperni/dma-workspace/MaritimeCloud/mc-net/mc-net-messages/src/main/java/"));
+                .create("/Users/kasperni/dma-workspace/MaritimeCloud/mc-client/mc-client-impl/src/main/java/"));
         g.process();
     }
 }

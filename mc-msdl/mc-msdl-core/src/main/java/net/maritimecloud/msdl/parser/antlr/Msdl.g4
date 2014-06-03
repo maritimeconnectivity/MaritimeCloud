@@ -24,19 +24,21 @@ typeDeclaration
     :   annotation* serviceDeclaration
     |   annotation* enumDeclaration
     |   annotation* messageDeclaration
+    |   annotation* broadcastDeclaration
+    |   annotation* endpointDeclaration
     |   ';'
     ;
     
 serviceDeclaration
     :   'service' Identifier
         '{'  (serviceBody)*  '}'
-        
     ;
 
 serviceBody
     :   messageDeclaration
     |   enumDeclaration
     |   broadcastDeclaration
+    |   endpointDeclaration
     ;
 
 messageDeclaration
@@ -47,9 +49,30 @@ messageDeclaration
 broadcastDeclaration
     :    'broadcast' Identifier
          fields
-         '=' Digits ';'
+       //  '=' Digits ';'
     ;
 
+endpointDeclaration
+    :   'endpoint' Identifier
+        '{'  (function)*  '}'
+    ;
+
+function
+    :    returnType Identifier
+        '('
+        functionArgument? (',' functionArgument)*
+         ')' ';'
+    ;
+    
+functionArgument
+    : Digits ':' type Identifier
+    ;
+    
+returnType
+    :   'void' |
+        type
+    ;
+    
 fields
     :   '{' field*  '}'
     ;
@@ -192,7 +215,8 @@ IMPORT : 'import';
 MESSAGE : 'message';
 REQUIRED : 'required';
 
-
+ENDPOINT : 'endpoint';
+VOID : 'void';
 
 LPAREN          : '(';
 RPAREN          : ')';

@@ -24,6 +24,8 @@ public interface ServiceDeclaration {
 
     List<BroadcastMessageDeclaration> getBroadcastMessages();
 
+    List<EndpointDefinition> getEndpoints();
+
     /**
      * Returns the file this enum is defined in.
      *

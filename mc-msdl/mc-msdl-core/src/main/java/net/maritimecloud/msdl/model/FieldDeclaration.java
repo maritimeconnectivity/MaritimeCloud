@@ -14,7 +14,6 @@
  */
 package net.maritimecloud.msdl.model;
 
-
 /**
  * The definition of a message field.
  *

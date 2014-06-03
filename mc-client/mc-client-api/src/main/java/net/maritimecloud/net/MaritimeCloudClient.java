@@ -23,6 +23,10 @@ import net.maritimecloud.net.broadcast.BroadcastListener;
 import net.maritimecloud.net.broadcast.BroadcastMessage;
 import net.maritimecloud.net.broadcast.BroadcastSendOptions;
 import net.maritimecloud.net.broadcast.BroadcastSubscription;
+import net.maritimecloud.net.endpoint.EndpointImplementation;
+import net.maritimecloud.net.endpoint.EndpointLocal;
+import net.maritimecloud.net.endpoint.EndpointLocator;
+import net.maritimecloud.net.endpoint.EndpointRegistration;
 import net.maritimecloud.net.service.ServiceInvocationFuture;
 import net.maritimecloud.net.service.ServiceLocator;
 import net.maritimecloud.net.service.invocation.InvocationCallback;
@@ -189,4 +193,32 @@ public interface MaritimeCloudClient extends AutoCloseable {
      */
     <T, S extends ServiceMessage<T>> ServiceRegistration serviceRegister(ServiceInitiationPoint<S> sip,
             InvocationCallback<S, T> callback);
+
+
+    /**
+     * Creates a ServiceLocator for a service of the specified type.
+     *
+     * @param sip
+     *            the service initiation point
+     * @return a service locator object
+     *
+     * @throws ConnectionClosedException
+     *             if the connection has been permanently closed
+     */
+    <T extends EndpointLocal> T endpointFind(MaritimeId id, Class<? extends T> endpointType);
+
+    <T extends EndpointLocal> EndpointLocator<T> endpointFind(Class<? extends T> endpointType);
+
+    /**
+     * Registers the specified endpoint with the maritime cloud. If a client is closed via
+     * {@link MaritimeCloudClient#close()} the server will automatically deregister all endpoints.
+     *
+     * @param implementation
+     *            the endpoint implementation
+     * @return an endpoint registration object
+     *
+     * @throws ConnectionClosedException
+     *             if the connection has been permanently closed
+     */
+    EndpointRegistration endpointRegister(EndpointImplementation implementation);
 }

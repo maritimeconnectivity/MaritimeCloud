@@ -14,22 +14,13 @@
  */
 package net.maritimecloud.net.service.spi;
 
-import static java.util.Objects.requireNonNull;
-
 import java.util.ServiceConfigurationError;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public abstract class ServiceMessage<T> {
-
-    private final transient Class<? extends Service> serviceType;
-
-    @SuppressWarnings("unchecked")
-    public ServiceMessage() {
-        this.serviceType = (Class<? extends Service>) requireNonNull(getClass().getDeclaringClass());
-    }
 
     public String messageName() {
         String name = getClass().getSimpleName();
@@ -47,7 +38,8 @@ public abstract class ServiceMessage<T> {
     /**
      * @return the serviceType
      */
+    @SuppressWarnings("unchecked")
     public Class<? extends Service> serviceType() {
-        return serviceType;
+        return (Class<? extends Service>) getClass().getDeclaringClass();
     }
 }

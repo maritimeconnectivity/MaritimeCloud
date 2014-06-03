@@ -14,10 +14,37 @@
  */
 package net.maritimecloud.msdl.model;
 
+import java.lang.annotation.Annotation;
+import java.util.List;
+
 /**
  *
  * @author Kasper Nielsen
  */
 public interface EndpointDefinition {
 
+    <T extends Annotation> T getAnnotation(Class<T> type);
+
+    boolean isAnnotationPresent(Class<? extends Annotation> annotation);
+
+    /**
+     * Returns the name of the message.
+     *
+     * @return the name of the message
+     */
+    String getName();
+
+    /**
+     * Returns a list of fields in the message.
+     *
+     * @return a list of fields in the message
+     */
+    List<EndpointFunction> getFunctions();
+
+    /**
+     * Returns the file this message is defined in.
+     *
+     * @return the file this message is defined in
+     */
+    FileDeclaration getFile();
 }

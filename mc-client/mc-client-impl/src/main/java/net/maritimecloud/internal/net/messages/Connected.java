@@ -104,6 +104,13 @@ public class Connected implements Message, net.maritimecloud.internal.net.messag
         return MessageSerializers.writeToJSON(this);
     }
 
+    /**
+     * Creates a message of this type from a JSON throwing a runtime exception if the format of the message does not match
+     */
+    public static Connected fromJSON(CharSequence c) {
+        return MessageSerializers.readFromJSON(PARSER, c);
+    }
+
     /** {@inheritDoc} */
     @Override
     public Connected immutable() {

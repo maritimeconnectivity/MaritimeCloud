@@ -12,14 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.internal.net.client.service;
+package net.maritimecloud.internal.net.client.util;
 
 import static java.util.Objects.requireNonNull;
 
 import java.util.concurrent.TimeUnit;
 
 import net.maritimecloud.internal.net.client.connection.ConnectionMessageBus;
-import net.maritimecloud.internal.net.client.util.ThreadManager;
 import net.maritimecloud.internal.net.messages.PositionReport;
 import net.maritimecloud.net.MaritimeCloudClientConfiguration;
 import net.maritimecloud.util.geometry.PositionReader;

@@ -28,5 +28,10 @@ public interface Message extends MessageSerializable {
      */
     Message immutable();
 
+    /**
+     * Returns a JSON representation of this message.
+     *
+     * @return a JSON representation of this message
+     */
     String toJSON();
 }

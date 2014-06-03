@@ -33,12 +33,6 @@
     <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>antlr4</artifactId>
-      <version>4.2-complete</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.antlr</groupId>
-      <artifactId>antlr4</artifactId>
       <version>4.2</version>
     </dependency>
     <dependency>

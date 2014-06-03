@@ -21,9 +21,11 @@ import java.util.Collections;
 import java.util.List;
 
 import net.maritimecloud.msdl.model.BroadcastMessageDeclaration;
+import net.maritimecloud.msdl.model.EndpointDefinition;
 import net.maritimecloud.msdl.model.FileDeclaration;
 import net.maritimecloud.msdl.model.ServiceDeclaration;
 import net.maritimecloud.msdl.parser.antlr.MsdlParser.BroadcastDeclarationContext;
+import net.maritimecloud.msdl.parser.antlr.MsdlParser.EndpointDeclarationContext;
 import net.maritimecloud.msdl.parser.antlr.MsdlParser.ServiceBodyContext;
 import net.maritimecloud.msdl.parser.antlr.MsdlParser.ServiceDeclarationContext;
 
@@ -38,6 +40,9 @@ public class ParsedService implements ServiceDeclaration {
     final AnnotationContainer ac;
 
     final ArrayList<ParsedBroadcastMessage> broadcastMessages = new ArrayList<>();
+
+    final ArrayList<ParsedEndpoint> endpoints = new ArrayList<>();
+
 
     final ParsedFile file;
 
@@ -86,9 +91,14 @@ public class ParsedService implements ServiceDeclaration {
                 bm.parse((BroadcastDeclarationContext) child);
                 broadcastMessages.add(bm);
                 // services.add(new ParsedService(this, ac).parse((ServiceDeclarationContext) child));
+            } else if (child instanceof EndpointDeclarationContext) {
+                ParsedEndpoint bm = new ParsedEndpoint(file, ac);
+                bm.parse((EndpointDeclarationContext) child);
+                endpoints.add(bm);
+                // services.add(new ParsedService(this, ac).parse((ServiceDeclarationContext) child));
             }
         }
-        //
+
         // for (FieldContext ec : c.fields().field()) {
         // ParsedField pf = new ParsedField(this);
         // pf.parse(ec);
@@ -107,5 +117,13 @@ public class ParsedService implements ServiceDeclaration {
         // }
 
         return this;
+    }
+
+
+    /** {@inheritDoc} */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
+    public List<EndpointDefinition> getEndpoints() {
+        return (List) Collections.unmodifiableList(endpoints);
     }
 }

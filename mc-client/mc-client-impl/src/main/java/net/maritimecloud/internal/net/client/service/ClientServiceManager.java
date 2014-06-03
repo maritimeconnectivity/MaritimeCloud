@@ -32,14 +32,15 @@ import net.maritimecloud.internal.net.messages.RegisterService;
 import net.maritimecloud.internal.net.messages.RegisterServiceAck;
 import net.maritimecloud.internal.net.messages.ServiceInvoke;
 import net.maritimecloud.internal.net.messages.ServiceInvokeAck;
-import net.maritimecloud.internal.net.messages.spi.MessageHelpers;
 import net.maritimecloud.net.service.ServiceLocator;
 import net.maritimecloud.net.service.invocation.InvocationCallback;
 import net.maritimecloud.net.service.registration.ServiceRegistration;
 import net.maritimecloud.net.service.spi.ServiceInitiationPoint;
 import net.maritimecloud.net.service.spi.ServiceMessage;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * Manages local and remote services.
@@ -74,13 +75,12 @@ public class ClientServiceManager {
 
     /** {@inheritDoc} */
     public <T, S extends ServiceMessage<T>> DefaultServiceInvocationFuture<T> invokeService(MaritimeId id, S msg) {
-
         ServiceInvoke is = new ServiceInvoke();
         is.setStatus(1);
         is.setConversationId(UUID.randomUUID().toString());
         is.setServiceType(msg.getClass().getName());
         is.setMessageType(msg.messageName());
-        is.setMsg(MessageHelpers.persist(msg));
+        is.setMsg(persist(msg));
         // public InvokeService(int status, String conversationId, String serviceType, String messageType, Object o) {
         // this(status, conversationId, serviceType, messageType, TMHelpers.persistAndEscape(o));
         // }
@@ -162,4 +162,16 @@ public class ClientServiceManager {
         });
         return reg;
     }
+
+
+    public static String persist(Object o) {
+        ObjectMapper om = new ObjectMapper();
+        om.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+        try {
+            return om.writeValueAsString(o);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("Could not be persisted", e);
+        }
+    }
+
 }

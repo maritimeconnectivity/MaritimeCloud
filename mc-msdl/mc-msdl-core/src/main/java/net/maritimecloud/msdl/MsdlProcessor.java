@@ -37,8 +37,8 @@ import java.util.logging.SimpleFormatter;
 import net.maritimecloud.msdl.model.Project;
 import net.maritimecloud.msdl.parser.ParsedProject;
 
-
 /**
+ * A processor of MSDL plugins.
  *
  * @author Kasper Nielsen
  */
@@ -159,7 +159,7 @@ public class MsdlProcessor {
                             throwable = sw.toString();
                         }
                         return new java.util.Date() + " " + record.getLevel() + " " + record.getMessage() + "\r\n"
-                        + throwable;
+                                + throwable;
                     }
                 });
             }
@@ -196,7 +196,6 @@ public class MsdlProcessor {
             if (errorCounter.get() > 0) {
                 return new MsdlProcessorResult("Plugin failed");
             }
-
         }
         return new MsdlProcessorResult(null); // success
     }

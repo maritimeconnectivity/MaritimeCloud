@@ -21,11 +21,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.maritimecloud.msdl.model.BroadcastMessageDeclaration;
+import net.maritimecloud.msdl.model.EndpointDefinition;
 import net.maritimecloud.msdl.model.EnumDeclaration;
 import net.maritimecloud.msdl.model.FileDeclaration;
 import net.maritimecloud.msdl.model.MessageDeclaration;
 import net.maritimecloud.msdl.model.ServiceDeclaration;
 import net.maritimecloud.msdl.parser.antlr.AntlrFile;
+import net.maritimecloud.msdl.parser.antlr.MsdlParser.BroadcastDeclarationContext;
+import net.maritimecloud.msdl.parser.antlr.MsdlParser.EndpointDeclarationContext;
 import net.maritimecloud.msdl.parser.antlr.MsdlParser.EnumDeclarationContext;
 import net.maritimecloud.msdl.parser.antlr.MsdlParser.ImportDeclarationContext;
 import net.maritimecloud.msdl.parser.antlr.MsdlParser.MessageDeclarationContext;
@@ -43,7 +47,15 @@ import org.antlr.v4.runtime.tree.ParseTree;
 class ParsedFile implements FileDeclaration {
     final AntlrFile antlrFile;
 
+    final List<ParsedBroadcastMessage> broadcasts = new ArrayList<>();
+
+    final List<ParsedEndpoint> endpoints = new ArrayList<>();
+
+    final List<ParsedEnum> enums = new ArrayList<>();
+
     final ArrayList<String> imports = new ArrayList<>();
+
+    final List<ParsedMessage> messages = new ArrayList<>();
 
     String namespace;
 
@@ -51,15 +63,67 @@ class ParsedFile implements FileDeclaration {
 
     final ArrayList<ParsedFile> resolvedImports = new ArrayList<>();
 
-    final List<ParsedEnum> enums = new ArrayList<>();
-
-    final List<ParsedMessage> messages = new ArrayList<>();
-
     final List<ParsedService> services = new ArrayList<>();
 
     ParsedFile(ParsedProject project, AntlrFile antlrFile) {
         this.antlrFile = requireNonNull(antlrFile);
         this.project = requireNonNull(project);
+    }
+
+    void error(ParserRuleContext context, String msg) {
+        String st = antlrFile.getPath() + ":[" + context.getStart().getLine() + ":"
+                + context.getStart().getCharPositionInLine() + "] ";
+        st += msg;
+        project.logger.error(st);
+    }
+
+    /**
+     * @return the broadcasts
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public List<BroadcastMessageDeclaration> getBroadcasts() {
+        return (List) Collections.unmodifiableList(broadcasts);
+    }
+
+    /**
+     * @return the endpoints
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public List<EndpointDefinition> getEndpoints() {
+        return (List) Collections.unmodifiableList(endpoints);
+    }
+
+    /** {@inheritDoc} */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
+    public List<EnumDeclaration> getEnums() {
+        return (List) Collections.unmodifiableList(enums);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public List<MessageDeclaration> getMessages() {
+        return (List) Collections.unmodifiableList(messages);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getNamespace() {
+        return namespace;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Path getPath() {
+        return antlrFile.getPath();
+    }
+
+    /** {@inheritDoc} */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Override
+    public List<ServiceDeclaration> getServices() {
+        return (List) Collections.unmodifiableList(services);
     }
 
     void parse() {
@@ -96,53 +160,17 @@ class ParsedFile implements FileDeclaration {
                 messages.add(new ParsedMessage(this, ac).parse((MessageDeclarationContext) child));
             } else if (child instanceof ServiceDeclarationContext) {
                 services.add(new ParsedService(this, ac).parse((ServiceDeclarationContext) child));
+            } else if (child instanceof BroadcastDeclarationContext) {
+                messages.add(new ParsedBroadcastMessage(this, ac).parse((BroadcastDeclarationContext) child));
+            } else if (child instanceof EndpointDeclarationContext) {
+                endpoints.add(new ParsedEndpoint(this, ac).parse((EndpointDeclarationContext) child));
             }
         }
-    }
-
-    void error(ParserRuleContext context, String msg) {
-        String st = antlrFile.getPath() + ":[" + context.getStart().getLine() + ":"
-                + context.getStart().getCharPositionInLine() + "] ";
-        st += msg;
-        project.logger.error(st);
-    }
-
-    void warn(ParserRuleContext context, String msg) {}
-
-    /** {@inheritDoc} */
-    @Override
-    public String getNamespace() {
-        return namespace;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Path getPath() {
-        return antlrFile.getPath();
-    }
-
-    /** {@inheritDoc} */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    @Override
-    public List<EnumDeclaration> getEnums() {
-        return (List) Collections.unmodifiableList(enums);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List<MessageDeclaration> getMessages() {
-        return (List) Collections.unmodifiableList(messages);
-    }
-
-    /** {@inheritDoc} */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    @Override
-    public List<ServiceDeclaration> getServices() {
-        return (List) Collections.unmodifiableList(services);
     }
 
     public String toString() {
         return antlrFile.getPath().toString();
     }
+
+    void warn(ParserRuleContext context, String msg) {}
 }
