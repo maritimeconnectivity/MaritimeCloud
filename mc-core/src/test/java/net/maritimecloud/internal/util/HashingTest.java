@@ -28,15 +28,15 @@ import org.junit.Test;
 
 /**
  * Test of {@link Hashing}.
- * 
+ *
  * @author Kasper Nielsen
  */
 public class HashingTest {
     static final byte[] A = new byte[] { 1 };
 
     static final byte[] B = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, -1, -2, -3, 1, 2, 3, 4, 5, 6, 7, 8, -1, -2, -3, 1, 2,
-            3, 4, 5, 6, 7, 8, -1, -2, -3, 1, 2, 3, 4, 5, 6, 7, 8, -1, -2, -3, 1, 2, 3, 4, 5, 6, 7, 8, -1, -2, -3, 1, 2,
-            3, 4, 5, 6, 7, 8, -1, -2, -3 };
+        3, 4, 5, 6, 7, 8, -1, -2, -3, 1, 2, 3, 4, 5, 6, 7, 8, -1, -2, -3, 1, 2, 3, 4, 5, 6, 7, 8, -1, -2, -3, 1, 2,
+        3, 4, 5, 6, 7, 8, -1, -2, -3 };
 
     @Test
     public void hashcode() {

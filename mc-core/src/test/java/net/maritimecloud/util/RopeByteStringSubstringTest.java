@@ -34,8 +34,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 
 /**
- * This class tests {@link RopeBinary#substring(int, int)} by inheriting the tests from
- * {@link LiteralByteStringTest}. Only a couple of methods are overridden.
+ * This class tests {@link RopeBinary#substring(int, int)} by inheriting the tests from {@link LiteralByteStringTest}.
+ * Only a couple of methods are overridden.
  *
  * @author carlanton@google.com (Carl Haverl)
  */
@@ -43,7 +43,7 @@ public class RopeByteStringSubstringTest extends LiteralByteStringTest {
 
     @Override
     protected void setUp() throws Exception {
-        classUnderTest = "RopeByteString";
+        classUnderTest = "RopeBinary";
         byte[] sourceBytes = ByteStringTest.getTestBytes(22341, 22337766L);
         Iterator<Binary> iter = ByteStringTest.makeConcretePieces(sourceBytes).iterator();
         Binary sourceString = iter.next();

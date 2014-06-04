@@ -14,7 +14,6 @@
  */
 package net.maritimecloud.internal.net.client.endpoint;
 
-import imo.route.intendedroute.AbstractHelloWorldEndpoint;
 import net.maritimecloud.net.broadcast.MessageContext;
 
 /**

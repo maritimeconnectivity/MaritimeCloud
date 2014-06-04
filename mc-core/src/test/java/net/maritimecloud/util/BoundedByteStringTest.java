@@ -44,7 +44,7 @@ public class BoundedByteStringTest extends LiteralByteStringTest {
 
     @Override
     protected void setUp() throws Exception {
-        classUnderTest = "BoundedByteString";
+        classUnderTest = "BoundedBinary";
         byte[] sourceBytes = ByteStringTest.getTestBytes(2341, 11337766L);
         int from = 100;
         int to = sourceBytes.length - 100;

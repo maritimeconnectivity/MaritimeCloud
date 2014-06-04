@@ -48,7 +48,7 @@ public class RopeByteStringTest extends LiteralByteStringTest {
 
     @Override
     protected void setUp() throws Exception {
-        classUnderTest = "RopeByteString";
+        classUnderTest = "RopeBinary";
         referenceBytes = ByteStringTest.getTestBytes(22341, 22337766L);
         Iterator<Binary> iter = ByteStringTest.makeConcretePieces(referenceBytes).iterator();
         stringUnderTest = iter.next();

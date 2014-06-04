@@ -34,6 +34,11 @@
       <artifactId>mc-client-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+        <dependency>
+      <groupId>org.cakeframework.codegen</groupId>
+      <artifactId>codegen</artifactId>
+      <version>0.1-SNAPSHOT</version>
+    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>mc-msdl-core</artifactId>

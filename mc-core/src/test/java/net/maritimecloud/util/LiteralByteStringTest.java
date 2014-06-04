@@ -62,7 +62,7 @@ public class LiteralByteStringTest extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
-        classUnderTest = "LiteralByteString";
+        classUnderTest = "LiteralBinary";
         referenceBytes = ByteStringTest.getTestBytes(1234, 11337766L);
         stringUnderTest = Binary.copyFrom(referenceBytes);
         expectedHashCode = 331161852;
