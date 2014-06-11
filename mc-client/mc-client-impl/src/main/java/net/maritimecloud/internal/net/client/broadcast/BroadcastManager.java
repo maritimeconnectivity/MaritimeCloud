@@ -171,7 +171,7 @@ public class BroadcastManager {
         // b.setId(client.getLocalId().toString());
         // b.setPositionTime(positionManager.getPositionTime());
         // b.setMsg(null)
-        BroadcastPublish b = MessageHelpers.create(client.getLocalId(), positionManager.getPositionTime(), broadcast,
+        BroadcastPublish b = MessageHelpers.createBroadcast(client.getLocalId(), positionManager.getPositionTime(), broadcast,
                 options);
 
         DefaultConnectionFuture<BroadcastPublishAck> response = connection.sendMessage(BroadcastPublishAck.class, b);

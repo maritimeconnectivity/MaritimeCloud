@@ -32,13 +32,13 @@ class JavaGenMessageImmutableGenerator {
 
     JavaGenMessageImmutableGenerator(JavaGenMessageGenerator g) {
         this.g = g;
-        this.c = g.c.newInnerClass();
+        this.c = g.c.addInnerClass();
         c.setDefinition("static class Immutable extends ", g.c.getSimpleName());
         c.addJavadoc("An immutable version of ", g.c.getSimpleName(), ".");
     }
 
     void generate() {
-        CodegenMethod m = g.c.newMethod("public ", g.c.getSimpleName(), " immutable()");
+        CodegenMethod m = g.c.addMethod("public ", g.c.getSimpleName(), " immutable()");
         m.addAnnotation(Override.class).addJavadoc("{@inheritDoc}");
         m.add("return new Immutable(this);");
         generateConstructor();
@@ -47,7 +47,7 @@ class JavaGenMessageImmutableGenerator {
 
     void generateConstructor() {
 
-        CodegenMethod m = c.newMethod("Immutable(", g.c.getSimpleName(), " instance)");
+        CodegenMethod m = c.addMethod("Immutable(", g.c.getSimpleName(), " instance)");
         m.addJavadoc("Creates a new Immutable instance.");
         m.addJavadocParameter("instance", "the instance to make an immutable copy of");
 
@@ -56,7 +56,7 @@ class JavaGenMessageImmutableGenerator {
 
     void generateImmutable() {
 
-        CodegenMethod m = c.newMethod("public ", g.c.getSimpleName(), " immutable()");
+        CodegenMethod m = c.addMethod("public ", g.c.getSimpleName(), " immutable()");
         m.addAnnotation(Override.class).addJavadoc("{@inheritDoc}");
         m.add("return this;");
 
@@ -69,7 +69,7 @@ class JavaGenMessageImmutableGenerator {
                 // HAS
 
                 // SETTER
-                m = c.newMethod("public ", g.c.getSimpleName(), " set", beanPrefix, "(",
+                m = c.addMethod("public ", g.c.getSimpleName(), " set", beanPrefix, "(",
                         new JavaGenType(f.getType()).render(), " ", f.getName(), ")");
             }
             m.addAnnotation(Override.class).addJavadoc("{@inheritDoc}");

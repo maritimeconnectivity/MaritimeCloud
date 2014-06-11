@@ -48,22 +48,18 @@ class JavaGenEnumGenerator {
                 MessageEnumParser.class, "<", def.getName(), "> PARSER = new Parser();");
 
         c.addField("private final int value;");
-        CodegenMethod m = c.addNewMethod();
-        m.setDeclaration("private ", def.getName(), "(int value)");
+        CodegenMethod m = c.addMethod("private ", def.getName(), "(int value)");
         m.add("this.value = value;");
 
-        CodegenMethod getValue = c.addNewMethod();
+        CodegenMethod getValue = c.addMethod("public int getValue()");
         getValue.addJavadoc("{@inheritDoc}").addAnnotation(Override.class);
-        getValue.setDeclaration("public int getValue()");
         getValue.add("return value;");
 
-        CodegenMethod getString = c.addNewMethod();
+        CodegenMethod getString = c.addMethod("public String getName()");
         getString.addJavadoc("{@inheritDoc}").addAnnotation(Override.class);
-        getString.setDeclaration("public String getName()");
         getString.add("return toString();");
 
-        CodegenMethod valueOf = c.addNewMethod();
-        valueOf.setDeclaration("public static ", def.getName(), " valueOf(int value)");
+        CodegenMethod valueOf = c.addMethod("public static ", def.getName(), " valueOf(int value)");
         valueOf.add("switch (value) {");
         for (EnumConstantDeclaration ed : def) {
             String s = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, ed.getName());
@@ -78,15 +74,15 @@ class JavaGenEnumGenerator {
     }
 
     private static void createEnumParser(CodegenEnum c) {
-        CodegenClass i = c.newInnerClass();
+        CodegenClass i = c.addInnerClass();
         i.addImport(MessageEnumParser.class);
         i.setDefinition("static class Parser extends ", MessageEnumParser.class, "<", c.getSimpleName(), ">");
 
-        CodegenMethod m = i.newMethod("public ", c.getSimpleName(), " from(int value)");
+        CodegenMethod m = i.addMethod("public ", c.getSimpleName(), " from(int value)");
         m.addJavadoc("{@inheritDoc}").addAnnotation(Override.class);
         m.add("return ", c.getSimpleName(), ".valueOf(value);");
 
-        m = i.newMethod("public ", c.getSimpleName(), " from(String name)");
+        m = i.addMethod("public ", c.getSimpleName(), " from(String name)");
         m.addJavadoc("{@inheritDoc}").addAnnotation(Override.class);
         m.throwNewUnsupportedOperationException("not implemented yet");
     }

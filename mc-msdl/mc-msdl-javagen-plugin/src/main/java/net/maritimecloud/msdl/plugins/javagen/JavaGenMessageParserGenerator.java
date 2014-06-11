@@ -27,11 +27,11 @@ import org.cakeframework.internal.codegen.CodegenMethod;
 class JavaGenMessageParserGenerator {
 
     static void generateParser(JavaGenMessageGenerator g) {
-        CodegenClass c = g.c.newInnerClass();
+        CodegenClass c = g.c.addInnerClass();
         c.setDefinition("static class Parser extends ", MessageParser.class, "<", g.c.getSimpleName(), ">");
         c.addJavadoc("A parser for parsing instances of ", g.c.getSimpleName(), ".");
 
-        CodegenMethod m = c.newMethod("public ", g.c.getSimpleName(), " parse(", MessageReader.class,
+        CodegenMethod m = c.addMethod("public ", g.c.getSimpleName(), " parse(", MessageReader.class,
                 " reader) throws IOException");
         m.addImport(MessageReader.class);
         m.addAnnotation(Override.class).addJavadoc("{@inheritDoc}");

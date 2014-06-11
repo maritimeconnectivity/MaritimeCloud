@@ -73,11 +73,11 @@ public class JavaGenEndpointGenerator {
         cClient.setDefinition("public final class ", ed.getName(), " extends ", EndpointLocal.class);// , "<",
 
         cClient.addField("public static final String NAME = \"", ed.getName(), "\";");
-        CodegenMethod con = cClient.newMethod("public ", cClient.getSimpleName(), "(EndpointInvocator ei)");
+        CodegenMethod con = cClient.addMethod("public ", cClient.getSimpleName(), "(EndpointInvocator ei)");
         con.add("super(ei);");
 
         for (EndpointFunction f : functions) {
-            CodegenMethod m = cClient.newMethod("public ", generateSignature(cClient, f, true));
+            CodegenMethod m = cClient.addMethod("public ", generateSignature(cClient, f, true));
             String className = StringUtil.capitalizeFirstLetter(f.getName());
             String args = f.getArguments().stream().map(e -> e.getName()).collect(Collectors.joining(", "));
             m.add("return invoke(\"", ed.getName(), ".", f.getName(), "\", new ", className, "(", args, "));");
@@ -87,7 +87,7 @@ public class JavaGenEndpointGenerator {
 
     void generateTmpClass(String className, EndpointFunction ef) {
         cClient.addImport(MessageSerializable.class);
-        CodegenClass cc = cClient.newInnerClass("static final class ", className, " implements ",
+        CodegenClass cc = cClient.addInnerClass("static final class ", className, " implements ",
                 MessageSerializable.class);
         for (FieldDeclaration f : ef.getArguments()) {
             JavaGenType ty = new JavaGenType(f.getType());
@@ -96,7 +96,7 @@ public class JavaGenEndpointGenerator {
         if (ef.getArguments().size() > 0) {
             String args = ef.getArguments().stream().map(e -> JavaGenType.render(e.getType()) + " " + e.getName())
                     .collect(Collectors.joining(", "));
-            CodegenMethod con = cc.newMethod(className, "(", args, ")");
+            CodegenMethod con = cc.addMethod(className, "(", args, ")");
             for (FieldDeclaration f : ef.getArguments()) {
                 con.add("this.", f.getName(), " = ", f.getName(), ";");
             }
@@ -109,13 +109,13 @@ public class JavaGenEndpointGenerator {
                 EndpointImplementation.class);
         cServer.addImport(EndpointImplementation.class);
         for (EndpointFunction f : functions) {
-            cServer.newMethod("protected abstract ", generateSignature(cServer, f, false));
+            cServer.addMethod("protected abstract ", generateSignature(cServer, f, false));
             // m.throwNewUnsupportedOperationException("Method is not supported");
         }
 
 
         cServer.addImport(MessageContext.class, MessageReader.class, IOException.class);
-        CodegenMethod m = cServer.newMethod("public final ", Object.class, " invoke(", String.class, " name, ",
+        CodegenMethod m = cServer.addMethod("public final ", Object.class, " invoke(", String.class, " name, ",
                 MessageContext.class, " context, ", MessageReader.class, " reader) throws ", IOException.class);
 
         for (EndpointFunction f : functions) {
@@ -135,7 +135,7 @@ public class JavaGenEndpointGenerator {
 
         m.throwNewUnsupportedOperationException("Unknown method '\" + name + \"'");
 
-        CodegenMethod name = cServer.newMethod("public final String getEndpointName()");
+        CodegenMethod name = cServer.addMethod("public final String getEndpointName()");
         name.add("return \"", ed.getName(), "\";");
 
         // /Object invoke(String name, MessageContext context, MessageReader reader) throws IOException;

@@ -57,7 +57,7 @@ public class JavaGenMessageGenerator {
         this.parent = parent;
         this.msg = msg;
         fields = msg.getFields();
-        this.c = parent == null ? new CodegenClass() : parent.newInnerClass();
+        this.c = parent == null ? new CodegenClass() : parent.addInnerClass();
     }
 
     void generateClass() {
@@ -101,7 +101,7 @@ public class JavaGenMessageGenerator {
     }
 
     void generateConstructorEmpty() {
-        CodegenMethod m = c.newMethod("public ", c.getSimpleName(), "()");
+        CodegenMethod m = c.addMethod("public ", c.getSimpleName(), "()");
         m.addJavadoc("Creates a new ", c.getSimpleName(), ".");
         for (FieldDeclaration f : fields) {
             BaseType t = f.getType().getBaseType();
@@ -116,7 +116,7 @@ public class JavaGenMessageGenerator {
     }
 
     void generateConstructorParser() {
-        CodegenMethod m = c.newMethod(c.getSimpleName(), "(", MessageReader.class, " reader) throws IOException");
+        CodegenMethod m = c.addMethod(c.getSimpleName(), "(", MessageReader.class, " reader) throws IOException");
         m.addJavadoc("Creates a new ", c.getSimpleName(), " by reading from a message reader.");
         m.addJavadocParameter("reader", "the message reader");
         for (FieldDeclaration f : fields) {
@@ -154,7 +154,7 @@ public class JavaGenMessageGenerator {
     }
 
     void generateConstructorImmutable() {
-        CodegenMethod m = c.newMethod(c.getSimpleName(), "(", c.getSimpleName(), " instance)");
+        CodegenMethod m = c.addMethod(c.getSimpleName(), "(", c.getSimpleName(), " instance)");
         m.addJavadoc("Creates a new ", c.getSimpleName(), " by copying an existing.");
         m.addJavadocParameter("instance", "the instance to copy all fields from");
         for (FieldDeclaration f : fields) {
@@ -225,7 +225,7 @@ public class JavaGenMessageGenerator {
     }
 
     void generateHashCode() {
-        CodegenMethod m = c.newMethod("public int hashCode()");
+        CodegenMethod m = c.addMethod("public int hashCode()");
         m.addAnnotation(Override.class).addJavadoc("{@inheritDoc}");
         if (fields.size() == 0) {
             m.add("return ", c.getSimpleName().hashCode(), " ;");
@@ -251,11 +251,11 @@ public class JavaGenMessageGenerator {
 
     void generateToFrom() {
         c.addImport(MessageSerializers.class);
-        CodegenMethod m = c.newMethod("public String toJSON()");
+        CodegenMethod m = c.addMethod("public String toJSON()");
         m.addJavadoc("Returns a JSON representation of this message");
         m.add("return ", MessageSerializers.class, ".writeToJSON(this);");
 
-        CodegenMethod from = c.newMethod("public static ", c.getSimpleName(), " fromJSON(", CharSequence.class, " c)");
+        CodegenMethod from = c.addMethod("public static ", c.getSimpleName(), " fromJSON(", CharSequence.class, " c)");
         from.addJavadoc("Creates a message of this type from a JSON throwing a runtime exception if the format of the message does not match");
         from.add("return ", MessageSerializers.class, ".readFromJSON(PARSER, c);");
     }
@@ -266,7 +266,7 @@ public class JavaGenMessageGenerator {
     // }
 
     void generateEquals() {
-        CodegenMethod m = c.newMethod("public boolean equals(Object other)");
+        CodegenMethod m = c.addMethod("public boolean equals(Object other)");
         m.addJavadoc("{@inheritDoc}").addAnnotation(Override.class);
         m.add("if (other == this) {");
         m.add("return true;");
@@ -295,7 +295,7 @@ public class JavaGenMessageGenerator {
     }
 
     static void generateWriteTo(CodegenClass c, Iterable<FieldDeclaration> fields) {
-        CodegenMethod m = c.newMethod("public void writeTo(", MessageWriter.class, " w) throws IOException");
+        CodegenMethod m = c.addMethod("public void writeTo(", MessageWriter.class, " w) throws IOException");
         m.addAnnotation(Override.class).addJavadoc("{@inheritDoc}");
         m.addImport(IOException.class).addImport(MessageWriter.class);
         for (FieldDeclaration f : fields) {
@@ -316,7 +316,7 @@ public class JavaGenMessageGenerator {
 
 
             // GETTER
-            CodegenMethod get = c.newMethod("public ", r, " get", beanPrefix, "()");
+            CodegenMethod get = c.addMethod("public ", r, " get", beanPrefix, "()");
             if (f.getComment().getMain() != null) {
                 get.addJavadoc("Returns " + f.getComment().getMainUncapitalized());
             }
@@ -330,7 +330,7 @@ public class JavaGenMessageGenerator {
                 get.add("return ", f.getName(), ";");
             }
             // HAS
-            CodegenMethod has = c.newMethod("public boolean has", beanPrefix, "()");
+            CodegenMethod has = c.addMethod("public boolean has", beanPrefix, "()");
             has.add("return ", f.getName(), " != null;");
 
             // SETTER
@@ -347,7 +347,7 @@ public class JavaGenMessageGenerator {
                 set.add("java.util.Objects.requireNonNull(value, \"value is null\");");
                 set.add("this.", f.getName(), ".put(key, value);");
             } else {
-                set = c.newMethod("public ", c.getSimpleName(), " set", beanPrefix, "(", r, " ", f.getName(), ")");
+                set = c.addMethod("public ", c.getSimpleName(), " set", beanPrefix, "(", r, " ", f.getName(), ")");
                 set.add("this.", f.getName(), " = ", f.getName(), ";");
             }
 
@@ -398,11 +398,11 @@ public class JavaGenMessageGenerator {
         if (f.getType().getBaseType() == BaseType.MAP) {
             JavaGenType key = new JavaGenType(((MapType) f.getType()).getKeyType());
             JavaGenType value = new JavaGenType(((MapType) f.getType()).getValueType());
-            return clazz.newMethod("public ", c.getSimpleName(), " put", beanPrefix2, "(", key.render(), " key, ",
+            return clazz.addMethod("public ", c.getSimpleName(), " put", beanPrefix2, "(", key.render(), " key, ",
                     value.render(), " value)");
         } else {
             JavaGenType element = new JavaGenType(((ListOrSetType) f.getType()).getElementType());
-            return clazz.newMethod("public ", c.getSimpleName(), " add", beanPrefix2, "(", element.render(), " ", name,
+            return clazz.addMethod("public ", c.getSimpleName(), " add", beanPrefix2, "(", element.render(), " ", name,
                     ")");
         }
     }

@@ -62,7 +62,7 @@ public class MessageHelpers {
     }
 
 
-    public static BroadcastPublish create(MaritimeId sender, PositionTime position, BroadcastMessage message,
+    public static BroadcastPublish createBroadcast(MaritimeId sender, PositionTime position, BroadcastMessage message,
             BroadcastSendOptions options) {
         Area broadcastArea = options.getBroadcastArea();
         if (broadcastArea == null) {

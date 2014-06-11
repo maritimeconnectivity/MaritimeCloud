@@ -14,6 +14,7 @@
  */
 package net.maritimecloud.net.endpoint;
 
+import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.core.message.MessageSerializable;
 
 /**
@@ -21,5 +22,8 @@ import net.maritimecloud.core.message.MessageSerializable;
  * @author Kasper Nielsen
  */
 public interface EndpointInvocator {
+
+    MaritimeId getRemote();
+
     <T> EndpointInvocationFuture<T> invoke(String endpoint, MessageSerializable parameters);
 }

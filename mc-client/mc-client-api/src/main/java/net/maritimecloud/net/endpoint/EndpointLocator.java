@@ -14,10 +14,25 @@
  */
 package net.maritimecloud.net.endpoint;
 
+import java.util.List;
+
+import net.maritimecloud.net.NetworkFuture;
+
 /**
  *
  * @author Kasper Nielsen
  */
 public interface EndpointLocator<T extends EndpointLocal> {
 
+    EndpointLocator<T> withinDistanceOf(int meters);
+
+    EndpointLocator<T> withMMSINumber(int mmsiNumber);
+
+    NetworkFuture<T> findAny();
+
+    NetworkFuture<T> findOne();
+
+    NetworkFuture<List<T>> findAll();
+
+    NetworkFuture<T> findNearest();
 }
