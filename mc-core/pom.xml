@@ -17,72 +17,111 @@
 
 
 
-  <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    
-    <parent>
-      <groupId>net.maritimecloud</groupId>
-      <artifactId>mc-parent</artifactId>
-      <version>0.2-SNAPSHOT</version>
-      <relativePath>../pom.xml</relativePath>
-    </parent>
-    
-    <artifactId>mc-core</artifactId>
-    <name>MaritimeCloud Core</name>
-    
-    <dependencies>
-      <dependency>
-        <groupId>org.glassfish</groupId>
-        <artifactId>javax.json</artifactId>
-        <version>1.0.4</version>
-      </dependency>
-    </dependencies>
-    
-    
-    <build>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.1</version>
-          <executions>
-            <execution>
-              <id>java-1.7-compile</id>
-              <phase>compile</phase>
-              <goals>
-                <goal>compile</goal>
-              </goals>
-              <configuration>
-                <source>1.7</source>
-                <target>1.7</target>
-                <encoding>UTF-8</encoding>
-                <optimize>false</optimize>
-                <debug>true</debug>
-                <showDeprecation>true</showDeprecation>
-                <compilerArgument>-Xlint:unchecked</compilerArgument>
-              </configuration>
-            </execution>
-            <execution>
-              <id>java-1.8-compile</id>
-              <phase>process-test-sources</phase>
-              <goals>
-                <goal>testCompile</goal>
-              </goals>
-              <configuration>
-                <source>1.8</source>
-                <target>1.8</target>
-                <encoding>UTF-8</encoding>
-                <optimize>false</optimize>
-                <debug>true</debug>
-                <showDeprecation>true</showDeprecation>
-                <compilerArgument>-Xlint:unchecked</compilerArgument>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </build>
-    
-  </project>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>net.maritimecloud</groupId>
+    <artifactId>mc-parent</artifactId>
+    <version>0.2-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  
+  <artifactId>mc-core</artifactId>
+  <name>MaritimeCloud Core</name>
+  
+  <dependencies>
+    <dependency>
+      <groupId>org.glassfish</groupId>
+      <artifactId>javax.json</artifactId>
+      <version>1.0.4</version>
+    </dependency>
+  </dependencies>
+  
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.3</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <createSourcesJar>true</createSourcesJar>
+              <relocations>
+                <relocation>
+                  <pattern>javax.json</pattern>
+                  <shadedPattern>net.maritimecloud.internal.core.javax.json</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.glassfish.json</pattern>
+                  <shadedPattern>net.maritimecloud.internal.core.org.glassfish.json</shadedPattern>
+                </relocation>
+              </relocations>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/**/pom.xml</exclude>
+                    <exclude>META-INF/**/pom.properties</exclude>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
+        <executions>
+          <execution>
+            <id>java-1.7-compile</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <source>1.7</source>
+              <target>1.7</target>
+              <encoding>UTF-8</encoding>
+              <optimize>false</optimize>
+              <debug>true</debug>
+              <showDeprecation>true</showDeprecation>
+              <compilerArgument>-Xlint:unchecked</compilerArgument>
+            </configuration>
+          </execution>
+          <execution>
+            <id>java-1.8-compile</id>
+            <phase>process-test-sources</phase>
+            <goals>
+              <goal>testCompile</goal>
+            </goals>
+            <configuration>
+              <source>1.8</source>
+              <target>1.8</target>
+              <encoding>UTF-8</encoding>
+              <optimize>false</optimize>
+              <debug>true</debug>
+              <showDeprecation>true</showDeprecation>
+              <compilerArgument>-Xlint:unchecked</compilerArgument>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  
+</project>
