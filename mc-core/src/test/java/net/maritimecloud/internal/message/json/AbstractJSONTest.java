@@ -19,20 +19,34 @@ import static org.junit.Assert.assertEquals;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.json.JsonReader;
+import javax.json.spi.JsonProvider;
+
+import net.maritimecloud.core.message.MessageParser;
+import net.maritimecloud.core.message.MessageReader;
 import net.maritimecloud.core.message.MessageSerializable;
 import net.maritimecloud.core.message.MessageSerializers;
 import net.maritimecloud.core.message.MessageWriter;
+import net.maritimecloud.util.Binary;
 
 /**
  *
  * @author Kasper Nielsen
  */
 public abstract class AbstractJSONTest {
+    static final Binary B1 = Binary.copyFrom(new byte[] { -1, 127, 4 });
 
-    static void assertJSON(IOConsumer<MessageWriter> c, String... lines) throws IOException {
+    static final Binary B2 = Binary.copyFrom(new byte[] { 0, 27, -1 });
+
+    static final Binary B3 = Binary.copyFrom(new byte[] { -4, -3, -2, -1 });
+
+    static void assertJSONWrite(IOConsumer<MessageWriter> c, String... lines) throws IOException {
         String s = MessageSerializers.writeToJSON(create(c));
-        System.out.println(s);
+        // System.out.println(s);
         BufferedReader lr = new BufferedReader(new StringReader(s));
         assertEquals("{", lr.readLine());
 
@@ -40,6 +54,21 @@ public abstract class AbstractJSONTest {
             assertEquals("  " + lines[i], lr.readLine());
         }
         assertEquals("}", lr.readLine());
+    }
+
+    static JSONMessageReader readerOf(String... lines) {
+        JsonReader reader = JsonProvider.provider().createReader(new StringReader(jsonWrite(lines)));
+        return new JSONMessageReader(reader);
+    }
+
+    static String jsonWrite(String... lines) {
+        StringWriter sw = new StringWriter();
+        sw.append("{").append("\n");
+        for (String l : lines) {
+            sw.write("  " + l + "\n");
+        }
+        sw.append("}").append("\n");
+        return sw.toString();
     }
 
     static MessageSerializable create(IOConsumer<MessageWriter> c) {
@@ -50,8 +79,50 @@ public abstract class AbstractJSONTest {
         };
     }
 
+    static <T extends MessageSerializable> MessageParser<T> create1(IOFunction<MessageReader, T> c) {
+        return new MessageParser<T>() {
+            @Override
+            public T parse(MessageReader reader) throws IOException {
+                return c.apply(reader);
+            }
+        };
+    }
 
     interface IOConsumer<T> {
         void accept(T t) throws IOException;
+    }
+
+    interface IOFunction<F, T> {
+        T apply(F t) throws IOException;
+    }
+
+    static class Msg1 extends MessageParser<Msg1> implements MessageSerializable {
+
+        int i1;
+
+        int i2;
+
+        long l1;
+
+        List<Msg1> list = new ArrayList<>();
+
+        /** {@inheritDoc} */
+        @Override
+        public Msg1 parse(MessageReader reader) throws IOException {
+            Msg1 ddd = new Msg1();
+            i1 = reader.readInt32(1, "i1", null);
+            i2 = reader.readInt32(2, "i2", null);
+            l1 = reader.readInt64(3, "l1", null);
+            return ddd;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void writeTo(MessageWriter w) throws IOException {
+            w.writeInt32(1, "i1", i1);
+            w.writeInt32(2, "i2", i2);
+            w.writeInt64(3, "l1", l1);
+            w.writeList(4, "list", list);
+        }
     }
 }

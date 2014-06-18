@@ -90,6 +90,13 @@ public abstract class ValueParser<T> {
      */
     public abstract T parse(ValueReader reader) throws IOException;
 
+    public static ValueParser<?> parserOf(Class<?> type) {
+        if (type == String.class) {
+            return STRING;
+        }
+        throw new UnsupportedOperationException();
+    }
+
     public final ValueParser<Set<T>> setOf() {
         return new SetParser<>(this);
     }

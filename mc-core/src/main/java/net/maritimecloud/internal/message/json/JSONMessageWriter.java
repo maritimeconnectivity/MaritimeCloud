@@ -18,6 +18,8 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +28,7 @@ import java.util.Set;
 import net.maritimecloud.core.message.MessageEnum;
 import net.maritimecloud.core.message.MessageSerializable;
 import net.maritimecloud.core.message.MessageWriter;
+import net.maritimecloud.core.message.ValueWriter;
 import net.maritimecloud.util.Binary;
 
 /**
@@ -337,5 +340,99 @@ public class JSONMessageWriter extends MessageWriter {
             }
         }
         return sb.toString();
+    }
+
+    public static String toString(Object o) throws IOException {
+        StringWriter sw = new StringWriter();
+        @SuppressWarnings("resource")
+        JSONMessageWriter w = new JSONMessageWriter(new PrintWriter(sw));
+        try {
+            w.writeElement(o);
+        } finally {
+            w.close();
+        }
+        return sw.toString();
+    }
+
+    public static class JSONValueWriter implements ValueWriter {
+        final Writer sw = new StringWriter();
+
+        JSONMessageWriter w = new JSONMessageWriter(new PrintWriter(sw));
+
+        /** {@inheritDoc} */
+        @Override
+        public void writeBinary(Binary binary) throws IOException {
+            w.writeBinary(binary);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void writeBool(Boolean value) throws IOException {
+            w.writeBool(value);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void writeDouble(Double value) throws IOException {
+            w.writeDouble(value);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void writeEnum(MessageEnum serializable) throws IOException {
+            w.writeEnum(serializable);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void writeFloat(Float value) throws IOException {
+            w.writeFloat(value);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void writeInt32(Integer value) throws IOException {
+            w.writeInt32(value);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void writeInt64(Long value) throws IOException {
+            w.writeInt64(value);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void writeList(List<?> list) throws IOException {
+            w.writeListOrSet(list);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void writeMap(Map<?, ?> map) throws IOException {
+            throw new UnsupportedOperationException();
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void writeMessage(MessageSerializable message) throws IOException {
+            w.writeMessage(message);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void writeSet(Set<?> set) throws IOException {
+            w.writeListOrSet(set);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void writeString(String value) throws IOException {
+            w.writeString(value);
+        }
+
+        public String toString() {
+            return sw.toString();
+        }
     }
 }

@@ -38,16 +38,22 @@ public abstract class MessageReader implements Closeable {
 
     public abstract Boolean readBool(int tag, String name, Boolean defaultValue) throws IOException;
 
+    // public abstract double readDouble(int tag, String name) throws IOException;
+
     public abstract Double readDouble(int tag, String name, Double defaultValue) throws IOException;
 
     public abstract <T extends Enum<T> & MessageEnum> T readEnum(int tag, String name, MessageEnumParser<T> factory)
             throws IOException;
+
+    // public abstract float readFloat(int tag, String name) throws IOException;
 
     public abstract Float readFloat(int tag, String name, Float defaultValue) throws IOException;
 
     public abstract int readInt32(int tag, String name) throws IOException;
 
     public abstract Integer readInt32(int tag, String name, Integer defaultValue) throws IOException;
+
+    public abstract long readInt64(int tag, String name) throws IOException;
 
     public abstract Long readInt64(int tag, String name, Long defaultValue) throws IOException;
 

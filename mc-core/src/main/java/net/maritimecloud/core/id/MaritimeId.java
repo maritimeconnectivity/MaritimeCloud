@@ -34,7 +34,7 @@ public abstract class MaritimeId implements Serializable {
 
     /**
      * Creates a id from the specified string based representation of the id.
-     * 
+     *
      * @param id
      *            the string based representation to create the id from
      * @return the id

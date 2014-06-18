@@ -17,6 +17,7 @@ package net.maritimecloud.internal.message.json;
 import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.JsonString;
 import javax.json.JsonValue;
+import javax.json.spi.JsonProvider;
 
 import net.maritimecloud.core.message.MessageEnum;
 import net.maritimecloud.core.message.MessageEnumParser;
@@ -100,6 +102,16 @@ public class JSONMessageReader extends MessageReader {
         return defaultValue;
     }
 
+    // A Quick hack
+    public static <T> T readFromString(String value, ValueParser<T> parser) throws IOException {
+        String ss = " { \"x\": " + value + "}";
+        JsonReader reader = JsonProvider.provider().createReader(new StringReader(ss));
+        JsonObject o = reader.readObject();
+        JsonValue val = o.get("x");
+        JsonValueReader r = new JsonValueReader(val);
+        return parser.parse(r);
+    }
+
     /** {@inheritDoc} */
     @Override
     public Double readDouble(int tag, String name, Double defaultValue) {
@@ -150,6 +162,15 @@ public class JSONMessageReader extends MessageReader {
             return Long.parseLong(iter.next().getValue().toString());
         }
         return defaultValue;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public long readInt64(int tag, String name) throws IOException {
+        if (isNext(-1, name)) {
+            return Long.parseLong(iter.next().getValue().toString());
+        }
+        throw new MessageSerializationException("Could not find tag '" + name + "'");
     }
 
     /**
@@ -335,7 +356,8 @@ public class JSONMessageReader extends MessageReader {
         /** {@inheritDoc} */
         @Override
         public String readString() throws IOException {
-            return value.toString();
+            String val = value.toString();
+            return val == null ? null : val.substring(1, val.length() - 1);
         }
 
         /** {@inheritDoc} */
