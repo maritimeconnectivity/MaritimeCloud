@@ -273,11 +273,11 @@ public class LiteralByteStringTest extends TestCase {
         // write the output stream to itself! This should cause it to double
         output.writeTo(output);
         assertEquals("Writing an output stream to itself is successful", stringUnderTest.concat(stringUnderTest),
-                output.toByteString());
+                output.toBinary());
 
         output.reset();
         assertEquals("Output.reset() resets the output", 0, output.size());
-        assertEquals("Output.reset() resets the output", Binary.EMPTY, output.toByteString());
+        assertEquals("Output.reset() resets the output", Binary.EMPTY, output.toBinary());
 
     }
 

@@ -402,7 +402,7 @@ public class ByteStringTest extends TestCase {
         byte[] bytes = getTestBytes();
         Binary.Output output = Binary.newOutput(bytes.length + 100);
         output.write(bytes);
-        Binary byteString = output.toByteString();
+        Binary byteString = output.toBinary();
         assertTrue("String built from newOutput(int) must contain the expected bytes",
                 isArrayRange(bytes, byteString.toByteArray(), 0, bytes.length));
     }
@@ -422,7 +422,7 @@ public class ByteStringTest extends TestCase {
                 for (int i = 0; i < length; i += writeSize) {
                     output.write(bytes, i, Math.min(writeSize, length - i));
                 }
-                Binary byteString = output.toByteString();
+                Binary byteString = output.toBinary();
                 assertTrue("String built from newOutput() must contain the expected bytes",
                         isArrayRange(bytes, byteString.toByteArray(), 0, bytes.length));
             }
@@ -440,7 +440,7 @@ public class ByteStringTest extends TestCase {
             for (byte byteValue : bytes) {
                 output.write(byteValue);
             }
-            Binary byteString = output.toByteString();
+            Binary byteString = output.toBinary();
             assertTrue("String built from newOutput() must contain the expected bytes",
                     isArrayRange(bytes, byteString.toByteArray(), 0, bytes.length));
         }
@@ -470,9 +470,9 @@ public class ByteStringTest extends TestCase {
                 }
                 assertEquals("size() returns the right value", position, output.size());
                 assertTrue("newOutput() substring must have correct bytes",
-                        isArrayRange(output.toByteString().toByteArray(), bytes, 0, position));
+                        isArrayRange(output.toBinary().toByteArray(), bytes, 0, position));
             }
-            Binary byteString = output.toByteString();
+            Binary byteString = output.toBinary();
             assertTrue("String built from newOutput() must contain the expected bytes",
                     isArrayRange(bytes, byteString.toByteArray(), 0, bytes.length));
         }
@@ -480,7 +480,7 @@ public class ByteStringTest extends TestCase {
 
     public void testNewOutputEmpty() {
         // Make sure newOutput() correctly builds empty byte strings
-        Binary byteString = Binary.newOutput().toByteString();
+        Binary byteString = Binary.newOutput().toBinary();
         assertEquals(Binary.EMPTY, byteString);
     }
 
@@ -490,7 +490,7 @@ public class ByteStringTest extends TestCase {
         EvilOutputStream eos = new EvilOutputStream();
         os.writeTo(eos);
         byte[] capturedArray = eos.capturedArray;
-        Binary byteString = os.toByteString();
+        Binary byteString = os.toBinary();
         byte[] oldValue = byteString.toByteArray();
         Arrays.fill(capturedArray, (byte) 0);
         byte[] newValue = byteString.toByteArray();

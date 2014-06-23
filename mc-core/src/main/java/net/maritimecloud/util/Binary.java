@@ -656,7 +656,7 @@ public abstract class Binary implements Iterable<Byte> {
     // Output stream
 
     /**
-     * Creates a new {@link Output} with the given initial capacity. Call {@link Output#toByteString()} to create the
+     * Creates a new {@link Output} with the given initial capacity. Call {@link Output#toBinary()} to create the
      * {@code ByteString} instance.
      * <p>
      * A {@link Binary.Output} offers the same functionality as a {@link ByteArrayOutputStream}, except that it returns
@@ -671,7 +671,7 @@ public abstract class Binary implements Iterable<Byte> {
     }
 
     /**
-     * Creates a new {@link Output}. Call {@link Output#toByteString()} to create the {@code ByteString} instance.
+     * Creates a new {@link Output}. Call {@link Output#toBinary()} to create the {@code ByteString} instance.
      * <p>
      * A {@link Binary.Output} offers the same functionality as a {@link ByteArrayOutputStream}, except that it returns
      * a {@link Binary} rather than a {@code byte array}.
@@ -683,7 +683,7 @@ public abstract class Binary implements Iterable<Byte> {
     }
 
     /**
-     * Outputs to a {@code ByteString} instance. Call {@link #toByteString()} to create the {@code ByteString} instance.
+     * Outputs to a {@code ByteString} instance. Call {@link #toBinary()} to create the {@code ByteString} instance.
      */
     public static final class Output extends OutputStream {
         // Implementation note.
@@ -758,7 +758,7 @@ public abstract class Binary implements Iterable<Byte> {
          *
          * @return the current contents of this output stream, as a byte string.
          */
-        public synchronized Binary toByteString() {
+        public synchronized Binary toBinary() {
             flushLastBuffer();
             return Binary.copyFrom(flushedBuffers);
         }
@@ -839,7 +839,7 @@ public abstract class Binary implements Iterable<Byte> {
         }
 
         /**
-         * Internal function used by {@link #toByteString()}. The current buffer may or may not be full, but it needs to
+         * Internal function used by {@link #toBinary()}. The current buffer may or may not be full, but it needs to
          * be flushed.
          */
         private void flushLastBuffer() {

@@ -14,6 +14,8 @@
  */
 package net.maritimecloud.internal.message.util;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -70,6 +72,7 @@ public class MessageHelper {
 
     public static <T> List<T> readList(MessageReader reader, int tag, String name, ValueParser<T> parser)
             throws IOException {
+        requireNonNull(reader, "reader is null");
         // TODO make sure it is a valid list.
         return reader.readList(tag, name, parser);
     }

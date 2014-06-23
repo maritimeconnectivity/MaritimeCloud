@@ -29,6 +29,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.json.JsonArray;
+import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.JsonString;
@@ -65,6 +66,10 @@ public class JSONMessageReader extends MessageReader {
         this.iter = new JsonIterator(o);
     }
 
+    public JSONMessageReader(String s) {
+        this(JsonProvider.provider().createReader(new StringReader(s)));
+    }
+
     public JSONMessageReader(JsonReader r) {
         this.r = requireNonNull(r);
         iter = new JsonIterator(r.readObject());
@@ -88,7 +93,8 @@ public class JSONMessageReader extends MessageReader {
     @Override
     public Binary readBinary(int tag, String name, Binary defaultValue) throws IOException {
         if (isNext(-1, name)) {
-            return Binary.copyFromBase64(iter.next().getValue().toString());
+            JsonString val = (JsonString) iter.next().getValue();
+            return Binary.copyFromBase64(val.getString());
         }
         return defaultValue;
     }
@@ -97,7 +103,8 @@ public class JSONMessageReader extends MessageReader {
     @Override
     public Boolean readBool(int tag, String name, Boolean defaultValue) {
         if (isNext(-1, name)) {
-            return Boolean.parseBoolean(iter.next().getValue().toString());
+            JsonString val = (JsonString) iter.next().getValue();
+            return Boolean.parseBoolean(val.getString());
         }
         return defaultValue;
     }
@@ -112,11 +119,20 @@ public class JSONMessageReader extends MessageReader {
         return parser.parse(r);
     }
 
+    public static JsonValueReader readFromString(String value) {
+        String ss = " { \"x\": " + value + "}";
+        JsonReader reader = JsonProvider.provider().createReader(new StringReader(ss));
+        JsonObject o = reader.readObject();
+        JsonValue val = o.get("x");
+        return new JsonValueReader(val);
+    }
+
     /** {@inheritDoc} */
     @Override
     public Double readDouble(int tag, String name, Double defaultValue) {
         if (isNext(-1, name)) {
-            return Double.parseDouble(iter.next().getValue().toString());
+            JsonNumber val = (JsonNumber) iter.next().getValue();
+            return val.doubleValue();
         }
         return defaultValue;
     }
@@ -132,7 +148,8 @@ public class JSONMessageReader extends MessageReader {
     @Override
     public Float readFloat(int tag, String name, Float defaultValue) {
         if (isNext(-1, name)) {
-            return Float.parseFloat(iter.next().getValue().toString());
+            JsonNumber val = (JsonNumber) iter.next().getValue();
+            return (float) val.doubleValue();
         }
         return defaultValue;
     }
@@ -141,7 +158,8 @@ public class JSONMessageReader extends MessageReader {
     @Override
     public int readInt32(int tag, String name) throws IOException {
         if (isNext(-1, name)) {
-            return Integer.parseInt(iter.next().getValue().toString());
+            JsonNumber val = (JsonNumber) iter.next().getValue();
+            return val.intValue();
         }
         throw new MessageSerializationException("Could not find tag '" + name + "'");
     }
@@ -150,7 +168,8 @@ public class JSONMessageReader extends MessageReader {
     @Override
     public Integer readInt32(int tag, String name, Integer defaultValue) throws IOException {
         if (isNext(-1, name)) {
-            return Integer.parseInt(iter.next().getValue().toString());
+            JsonNumber val = (JsonNumber) iter.next().getValue();
+            return val.intValue();
         }
         return defaultValue;
     }
@@ -159,7 +178,8 @@ public class JSONMessageReader extends MessageReader {
     @Override
     public Long readInt64(int tag, String name, Long defaultValue) throws IOException {
         if (isNext(-1, name)) {
-            return Long.parseLong(iter.next().getValue().toString());
+            JsonNumber val = (JsonNumber) iter.next().getValue();
+            return val.longValue();
         }
         return defaultValue;
     }
@@ -168,7 +188,8 @@ public class JSONMessageReader extends MessageReader {
     @Override
     public long readInt64(int tag, String name) throws IOException {
         if (isNext(-1, name)) {
-            return Long.parseLong(iter.next().getValue().toString());
+            JsonNumber val = (JsonNumber) iter.next().getValue();
+            return val.longValue();
         }
         throw new MessageSerializationException("Could not find tag '" + name + "'");
     }
@@ -236,7 +257,8 @@ public class JSONMessageReader extends MessageReader {
     @Override
     public double readRequiredDouble(int tag, String name) throws MessageSerializationException {
         if (isNext(-1, name)) {
-            return Double.parseDouble(iter.next().getValue().toString());
+            JsonNumber val = (JsonNumber) iter.next().getValue();
+            return val.doubleValue();
         }
         throw new MessageSerializationException("Could not find tag '" + tag + "'");
     }
@@ -244,7 +266,8 @@ public class JSONMessageReader extends MessageReader {
     @Override
     public float readRequiredFloat(int tag, String name) throws MessageSerializationException {
         if (isNext(-1, name)) {
-            return Float.parseFloat(iter.next().getValue().toString());
+            JsonNumber val = (JsonNumber) iter.next().getValue();
+            return (float) val.doubleValue();
         }
         throw new MessageSerializationException("Could not find tag '" + tag + "'");
     }
@@ -350,14 +373,14 @@ public class JSONMessageReader extends MessageReader {
         /** {@inheritDoc} */
         @Override
         public Binary readBinary() throws IOException {
-            return Binary.copyFromBase64(value.toString());
+            return Binary.copyFromBase64(((JsonString) value).getString());
         }
 
         /** {@inheritDoc} */
         @Override
         public String readString() throws IOException {
-            String val = value.toString();
-            return val == null ? null : val.substring(1, val.length() - 1);
+            String val = ((JsonString) value).getString();
+            return val;
         }
 
         /** {@inheritDoc} */
