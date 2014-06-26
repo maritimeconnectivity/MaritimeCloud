@@ -29,7 +29,7 @@ import net.maritimecloud.util.units.SpeedUnit;
 
 /**
  * A simple builder for creating position readers that simulate simple sailing patterns.
- * 
+ *
  * @author Kasper Nielsen
  */
 public final class PositionReaderSimulator {
@@ -52,7 +52,7 @@ public final class PositionReaderSimulator {
 
     /**
      * Creates a new PositionReaderSimulator.
-     * 
+     *
      * @param random
      *            the random source of data
      */
@@ -65,7 +65,7 @@ public final class PositionReaderSimulator {
      * Creates a new simulated position reader. The simulated vessel will start at random position within the specified
      * area. And travel to another random position within the area with a random speed. When it arrives at the position
      * it will choose another random position within the area to travel to and so on.
-     * 
+     *
      * @param area
      *            the area that vessel will return positions within
      * @return the simulated position reader
@@ -74,15 +74,15 @@ public final class PositionReaderSimulator {
      */
 
 
-    PositionReader forA(CoordinateSystem cs, Supplier<Position> supplier) {
-        return new AbtractSimulatedReader(this, cs, supplier);
+    PositionReader forA(Supplier<Position> supplier) {
+        return new AbtractSimulatedReader(this, supplier);
     }
 
     /**
      * Creates a new simulated position reader. The simulated vessel will start at random position within the specified
      * area. And then travel to another random position within the area. When it arrives at the position it will choose
      * another random position within the area to travel to and so on.
-     * 
+     *
      * @param area
      *            the area to travel within
      * @return a new position reader
@@ -91,7 +91,7 @@ public final class PositionReaderSimulator {
      */
     public PositionReader forArea(final Area area) {
         final Random r = random;
-        return forA(area.getCoordinateSystem(), new Supplier<Position>() {
+        return forA(new Supplier<Position>() {
             public Position get() {
                 return r == null ? area.getRandomPosition() : area.getRandomPosition(r);
             }
@@ -105,7 +105,7 @@ public final class PositionReaderSimulator {
      * If the first position and the last position is equivalent the positions will be delivered as if the vessel is
      * sailing in a circle. When the ship reaches the final position it will sail to position number 2 instead of
      * sailing the same route back.
-     * 
+     *
      * @param positions
      *            each position for route
      * @return a new simulated reader
@@ -129,7 +129,7 @@ public final class PositionReaderSimulator {
             l.addAll(l2);
         }
         final Position[] p = l.toArray(new Position[l.size()]);
-        return forA(CoordinateSystem.CARTESIAN, new Supplier<Position>() {
+        return forA(new Supplier<Position>() {
             int counter = p.length - 1;
 
             public Position get() {
@@ -142,7 +142,7 @@ public final class PositionReaderSimulator {
      * Sets a fixed speed for the vessel.
      * <p>
      * If no speed is set the simulated position reader will use a variable speed between 1 and 40 knots.
-     * 
+     *
      * @param speed
      *            the speed of the vessel
      * @param speedUnit
@@ -172,7 +172,7 @@ public final class PositionReaderSimulator {
      * to a random number between minimum speed and maximum speed.
      * <p>
      * If no speed is set the simulated position reader will use a variable speed between 1 and 40 knots.
-     * 
+     *
      * @param minSpeed
      *            the minimum speed of the vessel
      * @param maxSpeed
@@ -207,7 +207,7 @@ public final class PositionReaderSimulator {
      * Sets the time source that is used to determine how long duration has passed between succint invocations of
      * {@link PositionReader#getCurrentPosition()}. If no time source is set, {@link System#currentTimeMillis()} is
      * used.
-     * 
+     *
      * @param timeSource
      *            the time source
      * @return this builder
@@ -221,7 +221,7 @@ public final class PositionReaderSimulator {
 
     /**
      * Sets a deterministic time source that increment the time with the specified amount of milliseconds every time.
-     * 
+     *
      * @param milliesIncrement
      *            the number of milliseconds that the ship will sail every time
      *            {@link PositionReader#getCurrentPosition()} is invoked
@@ -241,7 +241,6 @@ public final class PositionReaderSimulator {
     }
 
     static class AbtractSimulatedReader extends PositionReader {
-        final CoordinateSystem cs;
 
         PositionTime currentPosition;
 
@@ -259,8 +258,7 @@ public final class PositionReaderSimulator {
         /** The time source. */
         final LongSupplier timeSource;
 
-        AbtractSimulatedReader(PositionReaderSimulator prs, CoordinateSystem cs, Supplier<Position> positionSupplier) {
-            this.cs = requireNonNull(cs);
+        AbtractSimulatedReader(PositionReaderSimulator prs, Supplier<Position> positionSupplier) {
             this.timeSource = requireNonNull(prs.timeSource);
             this.positionSupplier = requireNonNull(positionSupplier);
             this.currentPosition = positionSupplier.get().withTime(timeSource.getAsLong());
@@ -281,9 +279,9 @@ public final class PositionReaderSimulator {
 
             double distanceSailed = currentSpeed * (now - currentPosition.getTime()) / 1000;
             for (;;) {
-                double distanceToTarget = currentPosition.distanceTo(target, cs);
+                double distanceToTarget = currentPosition.rhumbLineDistanceTo(target);
                 if (distanceSailed <= distanceToTarget) {
-                    return currentPosition = cs.pointOnBearing(currentPosition, distanceSailed,
+                    return currentPosition = CoordinateSystem.CARTESIAN.pointOnBearing(currentPosition, distanceSailed,
                             currentPosition.rhumbLineBearingTo(target)).withTime(now);
                 } else {// okay we need to travel long than to target. Find the next point to travel to
                     distanceSailed -= distanceToTarget;

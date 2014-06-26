@@ -41,13 +41,3 @@ message Polygon {
 message AreaUnion {
    1: list<Area> area;
 }
-
-
-/*
-enum AreaType {
-   Circle = 1;
-   Box = 2;
-   Polygon = 3;
-   Union = 4;
-}
-*/

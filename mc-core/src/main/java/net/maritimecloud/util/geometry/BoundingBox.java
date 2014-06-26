@@ -21,11 +21,20 @@ import net.maritimecloud.core.message.MessageParser;
 import net.maritimecloud.core.message.MessageReader;
 import net.maritimecloud.core.message.MessageWriter;
 
-public final class BoundingBox extends Polygon {
+public final class BoundingBox extends Area {
 
     /** A bounding box encompassing all coordinates. */
-    public static final BoundingBox ALL = create(-90, 90, -180, 180, CoordinateSystem.GEODETIC);
+    public static final BoundingBox ALL = create(-90, 90, -180, 180);
 
+
+    public static final MessageParser<BoundingBox> PARSER = new MessageParser<BoundingBox>() {
+
+        /** {@inheritDoc} */
+        @Override
+        public BoundingBox parse(MessageReader reader) throws IOException {
+            return readFrom(reader);
+        }
+    };
 
     /** serialVersionUID */
     private static final long serialVersionUID = 1L;
@@ -38,32 +47,21 @@ public final class BoundingBox extends Polygon {
 
     private final double minLongitude;
 
-    public static final MessageParser<BoundingBox> PARSER = new MessageParser<BoundingBox>() {
-
-        /** {@inheritDoc} */
-        @Override
-        public BoundingBox parse(MessageReader reader) throws IOException {
-            return readFrom(reader);
-        }
-    };
-
-    private BoundingBox(double minLatitude, double maxLatitude, double minLongitude, double maxLongitude,
-            CoordinateSystem cs) {
-        super(cs);
+    private BoundingBox(double minLatitude, double maxLatitude, double minLongitude, double maxLongitude) {
         this.minLatitude = Position.verifyLatitude(minLatitude);
         this.maxLatitude = Position.verifyLatitude(maxLatitude);
         this.minLongitude = Position.verifyLongitude(minLongitude);
         this.maxLongitude = Position.verifyLongitude(maxLongitude);
     }
 
-    @Override
-    public boolean contains(Element element) {
-        if (element instanceof Position) {
-            return contains((Position) element);
-        } else {
-            return super.contains(element);
-        }
-    }
+    // @Override
+    // public boolean contains(Element element) {
+    // if (element instanceof Position) {
+    // return contains((Position) element);
+    // } else {
+    // return super.contains(element);
+    // }
+    // }
 
     public boolean contains(Position point) {
         return point.getLatitude() >= minLatitude && point.getLongitude() >= minLongitude
@@ -74,14 +72,22 @@ public final class BoundingBox extends Polygon {
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
-        }
-        if (obj instanceof BoundingBox) {
+        } else if (obj instanceof BoundingBox) {
             BoundingBox that = (BoundingBox) obj;
             return minLatitude == that.minLatitude && minLongitude == that.minLongitude
                     && maxLatitude == that.maxLatitude && maxLongitude == that.maxLongitude;
-        } else {
-            return false;
         }
+        return false;
+    }
+
+    public double getArea(/* DistanceUnit unit */) {
+        // CoordinateSystem.CARTESIAN.distanceBetween(minLatitude, minLongitude, maxLatitude, maxLongitude)
+        final Position a = new Position(maxLatitude, minLongitude);
+        final Position b = new Position(maxLatitude, maxLongitude);
+        final Position c = new Position(minLatitude, minLongitude);
+        final double ab = a.rhumbLineDistanceTo(b); // meters
+        final double ac = a.rhumbLineDistanceTo(c); // meters
+        return ab * ac;
     }
 
     /** {@inheritDoc} */
@@ -183,7 +189,7 @@ public final class BoundingBox extends Polygon {
             maxLat = other.maxLatitude;
             changed = true;
         }
-        return changed ? new BoundingBox(minLat, maxLat, minLon, maxLon, cs) : this;
+        return changed ? new BoundingBox(minLat, maxLat, minLon, maxLon) : this;
     }
 
     /** {@inheritDoc} */
@@ -226,19 +232,6 @@ public final class BoundingBox extends Polygon {
         return getUpperLeft() + " -> " + getLowerRight();
     }
 
-    static BoundingBox create(double y1, double y2, double x1, double x2, CoordinateSystem cs) {
-        return new BoundingBox(Math.min(y1, y2), Math.max(y1, y2), Math.min(x1, x2), Math.max(x1, x2), cs);
-    }
-
-    public static BoundingBox create(Position location, Position other, CoordinateSystem cs) {
-        return create(location.getLatitude(), other.getLatitude(), location.getLongitude(), other.getLongitude(), cs);
-    }
-
-    private static int hashCode(double x) {
-        long f = Double.doubleToLongBits(x);
-        return (int) (f ^ f >>> 32);
-    }
-
     /** {@inheritDoc} */
     @Override
     public void writeTo(MessageWriter w) throws IOException {
@@ -246,6 +239,20 @@ public final class BoundingBox extends Polygon {
         w.writeInt32(2, "topLeftLongitude", (int) (getUpperLeft().getLongitude() * 10_000_000d));
         w.writeInt32(3, "topLeftLatitude", (int) (getUpperLeft().getLatitude() * 10_000_000d));
         w.writeInt32(4, "topLeftLatitude", (int) (getUpperLeft().getLatitude() * 10_000_000d));
+    }
+
+    static BoundingBox create(double y1, double y2, double x1, double x2) {
+        return new BoundingBox(Math.min(y1, y2), Math.max(y1, y2), Math.min(x1, x2), Math.max(x1, x2));
+    }
+
+    public static BoundingBox create(Position topLeft, Position buttomRight) {
+        return create(topLeft.getLatitude(), buttomRight.getLatitude(), topLeft.getLongitude(),
+                buttomRight.getLongitude());
+    }
+
+    private static int hashCode(double x) {
+        long f = Double.doubleToLongBits(x);
+        return (int) (f ^ f >>> 32);
     }
 
     public static BoundingBox readFrom(MessageReader r) {

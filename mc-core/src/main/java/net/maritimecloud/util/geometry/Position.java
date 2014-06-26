@@ -14,10 +14,8 @@
  */
 package net.maritimecloud.util.geometry;
 
-import static java.util.Objects.requireNonNull;
-
 import java.io.IOException;
-import java.util.Locale;
+import java.io.Serializable;
 
 import net.maritimecloud.core.message.Message;
 import net.maritimecloud.core.message.MessageParser;
@@ -29,7 +27,7 @@ import net.maritimecloud.util.geometry.CoordinateSystem.VincentyCalculationType;
 /**
  * Representation of a WGS84 position and methods for calculating range and bearing between positions.
  */
-public class Position implements Element, Message {
+public class Position implements Message, Serializable {
 
     public static final MessageParser<Position> PARSER = new MessageParser<Position>() {
 
@@ -63,11 +61,6 @@ public class Position implements Element, Message {
         this.longitude = verifyLongitude(longitude);
     }
 
-    public double distanceTo(Element other, CoordinateSystem system) {
-        return requireNonNull(system) == CoordinateSystem.CARTESIAN ? rhumbLineDistanceTo(other)
-                : geodesicDistanceTo(other);
-    }
-
     /**
      * Equals method
      */
@@ -88,11 +81,8 @@ public class Position implements Element, Message {
      * @param location
      * @return distance in meters
      */
-    public double geodesicDistanceTo(Element other) {
-        if (other instanceof Position) {
-            return CoordinateSystem.GEODETIC.distanceBetween(this, (Position) other);
-        }
-        return other.geodesicDistanceTo(this);
+    public double geodesicDistanceTo(Position other) {
+        return CoordinateSystem.GEODETIC.distanceBetween(this, other);
     }
 
     /**
@@ -148,19 +138,21 @@ public class Position implements Element, Message {
 
     public String getLatitudeAsString() {
         double lat = latitude;
-        String ns = "N";
         if (lat < 0) {
-            ns = "S";
             lat *= -1;
         }
         int hours = (int) lat;
         lat -= hours;
         lat *= 60;
-        String latStr = String.format(Locale.US, "%3.3f", lat);
-        while (latStr.indexOf('.') < 2) {
-            latStr = "0" + latStr;
-        }
-        return String.format(Locale.US, "%02d %s%s", hours, latStr, ns);
+
+        StringBuilder latitudeAsString = new StringBuilder(16);
+        latitudeAsString.append(format00(hours));
+        latitudeAsString.append(" ");
+        latitudeAsString.append(format00((int) lat));
+        latitudeAsString.append(".");
+        latitudeAsString.append(format000((int) Math.round(1000 * (lat - (int) lat))));
+        latitudeAsString.append(latitude < 0 ? "S" : "N");
+        return latitudeAsString.toString();
     }
 
     /**
@@ -174,19 +166,21 @@ public class Position implements Element, Message {
 
     public String getLongitudeAsString() {
         double lon = longitude;
-        String ns = "E";
         if (lon < 0) {
-            ns = "W";
             lon *= -1;
         }
         int hours = (int) lon;
         lon -= hours;
         lon *= 60;
-        String lonStr = String.format(Locale.US, "%3.3f", lon);
-        while (lonStr.indexOf('.') < 2) {
-            lonStr = "0" + lonStr;
-        }
-        return String.format(Locale.US, "%03d %s%s", hours, lonStr, ns);
+
+        StringBuilder longitudeAsString = new StringBuilder(16);
+        longitudeAsString.append(format000(hours));
+        longitudeAsString.append(" ");
+        longitudeAsString.append(format00((int) lon));
+        longitudeAsString.append(".");
+        longitudeAsString.append(format000((int) Math.round(1000 * (lon - (int) lon))));
+        longitudeAsString.append(longitude < 0 ? "W" : "E");
+        return longitudeAsString.toString();
     }
 
     /**
@@ -227,11 +221,8 @@ public class Position implements Element, Message {
         return (Math.toDegrees(brng) + 360) % 360;
     }
 
-    public double rhumbLineDistanceTo(Element other) {
-        if (other instanceof Position) {
-            return CoordinateSystem.CARTESIAN.distanceBetween(this, (Position) other);
-        }
-        return other.rhumbLineDistanceTo(this);
+    public double rhumbLineDistanceTo(Position other) {
+        return CoordinateSystem.CARTESIAN.distanceBetween(this, other);
     }
 
     /** Returns a JSON representation of this message */
@@ -259,16 +250,35 @@ public class Position implements Element, Message {
         return "(" + getLatitudeAsString() + ", " + getLongitudeAsString() + ")";
     }
 
-    // we lose some pression
-
+    /**
+     * Returns a new position with the same longitude as this position but with the specified latitude.
+     *
+     * @param latitude
+     *            the new latitude for the new position
+     * @return the new position
+     */
     public Position withLatitude(double latitude) {
         return new Position(latitude, longitude);
     }
 
+    /**
+     * Returns a new position with the same latitude as this position but with the specified longitude.
+     *
+     * @param latitude
+     *            the new longitude for the new position
+     * @return the new position
+     */
     public Position withLongitude(double longitude) {
         return new Position(latitude, longitude);
     }
 
+    /**
+     * Returns a new position time with this position added with the current time.
+     *
+     * @param time
+     *            the time of the new position time object
+     * @return the new position time object
+     */
     public PositionTime withTime(long time) {
         return PositionTime.create(this, time);
     }
@@ -282,12 +292,8 @@ public class Position implements Element, Message {
      *             the position failed to be written
      */
     public void writeTo(MessageWriter w) throws IOException {
-        // if (w.isCompact()) {
-        // writeToPacked(w, 1, "latitude", 2, "longitude");
-        // } else {
         w.writeDouble(1, "latitude", latitude);
         w.writeDouble(2, "longitude", longitude);
-        // }
     }
 
     void writeToPacked(MessageWriter w, int latId, String latName, int lonId, String lonName) throws IOException {
@@ -310,19 +316,50 @@ public class Position implements Element, Message {
         return new Position(latitude, longitude);
     }
 
-    public static Position createFromPacked(int latitude, int longitude) {
-        return new Position(latitude / 10_000_000, longitude / 10_000_000);
+    /**
+     * Format the given integer value as a String of length 2 with leading zeros.
+     *
+     * @param value
+     * @return
+     */
+    private static String format00(int value) {
+        if (value < 10) {
+            return "0" + value;
+        }
+        return Integer.toString(value);
+    }
+
+    /**
+     * Format the given integer value as a String of length 3 with leading zeros.
+     *
+     * @param value
+     * @return
+     */
+    private static String format000(int value) {
+        if (value < 10) {
+            return "00" + value;
+        } else if (value < 100) {
+            return "0" + value;
+        }
+        return Integer.toString(value);
     }
 
     public static Position fromPackedLong(long l) {
         return new Position(Float.intBitsToFloat((int) (l >> 32)), Float.intBitsToFloat((int) l));
     }
 
+    /**
+     * @param latitude
+     *            the latitude
+     * @param longitude
+     *            the longitude
+     * @return
+     */
     public static boolean isValid(double latitude, double longitude) {
         return latitude <= 90 && latitude >= -90 && longitude <= 180 && longitude >= -180;
     }
 
-    public static Position readFrom(MessageReader r) throws IOException {
+    static Position readFrom(MessageReader r) throws IOException {
         // if (r.isCompact()) {
         // int lat = r.readInt32(1, "latitude");
         // int lon = r.readInt32(2, "longitude");
@@ -368,6 +405,13 @@ public class Position implements Element, Message {
         if (longitude > 180 || longitude < -180) {
             throw new IllegalArgumentException("Longitude must be between -180 and 180, was " + longitude);
         }
+        // We want simple equals and hashCode implementation. So we make sure
+        // that positions are never constructed with -0.0 as latitude or longitude.
         return longitude == -0.0 ? 0.0 : longitude;
     }
 }
+
+//
+// public static Position createFromPacked(int latitude, int longitude) {
+// return new Position(latitude / 10_000_000, longitude / 10_000_000);
+// }

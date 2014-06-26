@@ -34,11 +34,6 @@ import net.maritimecloud.core.message.MessageWriter;
  */
 class AreaUnion extends Area {
 
-    /** serialVersionUID. */
-    private static final long serialVersionUID = 1L;
-
-    final Area[] areas;
-
     public static final MessageParser<AreaUnion> PARSER = new MessageParser<AreaUnion>() {
 
         /** {@inheritDoc} */
@@ -47,6 +42,11 @@ class AreaUnion extends Area {
             return readFrom(reader);
         }
     };
+
+    /** serialVersionUID. */
+    private static final long serialVersionUID = 1L;
+
+    final Area[] areas;
 
     /**
      * @param cs
@@ -64,8 +64,15 @@ class AreaUnion extends Area {
         this.areas = areas.toArray(new Area[areas.size()]);
     }
 
-    public boolean equals(Object other) {
-        return other == this || other instanceof AreaUnion && equals((AreaUnion) other);
+    /** {@inheritDoc} */
+    @Override
+    public boolean contains(Position position) {
+        for (Area a : areas) {
+            if (a.contains(position)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean equals(AreaUnion other) {
@@ -90,37 +97,19 @@ class AreaUnion extends Area {
         return false;
     }
 
-    public int hashCode() {
-        if (areas.length == 0) {
-            return 0;
-        }
-        // hashCode is commutative
-        int hashCode = areas[0].hashCode();
-        for (int i = 1; i < areas.length; i++) {
-            hashCode = hashCode ^ areas[i].hashCode();
-        }
-        return hashCode;
+    public boolean equals(Object other) {
+        return other == this || other instanceof AreaUnion && equals((AreaUnion) other);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public double geodesicDistanceTo(Element other) {
-        double distance = Double.MAX_VALUE;
-        for (Area a : areas) {
-            distance = Math.min(distance, a.geodesicDistanceTo(other));
-        }
-        return distance;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public double rhumbLineDistanceTo(Element other) {
-        double distance = Double.MAX_VALUE;
-        for (Area a : areas) {
-            distance = Math.min(distance, a.rhumbLineDistanceTo(other));
-        }
-        return distance;
-    }
+    // /** {@inheritDoc} */
+    // @Override
+    // public double geodesicDistanceTo(Element other) {
+    // double distance = Double.MAX_VALUE;
+    // for (Area a : areas) {
+    // distance = Math.min(distance, a.geodesicDistanceTo(other));
+    // }
+    // return distance;
+    // }
 
     /** {@inheritDoc} */
     @Override
@@ -146,6 +135,18 @@ class AreaUnion extends Area {
         throw new UnsupportedOperationException("getRandomPosition is not current supported");
     }
 
+    public int hashCode() {
+        if (areas.length == 0) {
+            return 0;
+        }
+        // hashCode is commutative
+        int hashCode = areas[0].hashCode();
+        for (int i = 1; i < areas.length; i++) {
+            hashCode = hashCode ^ areas[i].hashCode();
+        }
+        return hashCode;
+    }
+
     /** {@inheritDoc} */
     @Override
     public boolean intersects(Area other) {
@@ -157,6 +158,16 @@ class AreaUnion extends Area {
         return false;
     }
 
+
+    // /** {@inheritDoc} */
+    // @Override
+    // public double rhumbLineDistanceTo(Element other) {
+    // double distance = Double.MAX_VALUE;
+    // for (Area a : areas) {
+    // distance = Math.min(distance, a.rhumbLineDistanceTo(other));
+    // }
+    // return distance;
+    // }
 
     /** {@inheritDoc} */
     @Override
@@ -172,16 +183,5 @@ class AreaUnion extends Area {
     public static AreaUnion readFrom(MessageReader r) throws IOException {
         List<Area> list = r.readList(1, "areas", Area.PARSER);
         return new AreaUnion(list.toArray(new Area[list.size()]));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean contains(Position position) {
-        for (Area a : areas) {
-            if (a.contains(position)) {
-                return true;
-            }
-        }
-        return false;
     }
 }

@@ -16,10 +16,10 @@ package net.maritimecloud.util.geometry;
 
 /**
  * A coordinate system.
- * 
+ *
  * @author Kasper Nielsen
  */
-public enum CoordinateSystem {
+enum CoordinateSystem {
 
     /** A Cartesian coordinate system. */
     CARTESIAN {
@@ -56,7 +56,7 @@ public enum CoordinateSystem {
             double endLon = startLonDegrees
                     + Math.atan2(
                             Math.sin(bearingDegrees) * Math.sin(distanceMeters / earthRadius)
-                                    * Math.cos(startLatDegrees),
+                            * Math.cos(startLatDegrees),
                             Math.cos(distanceMeters / earthRadius) - Math.sin(startLatDegrees) * Math.sin(endLat));
             return Position.create(Math.toDegrees(endLat), Math.toDegrees(endLon));
         }
@@ -87,7 +87,7 @@ public enum CoordinateSystem {
 
     /**
      * Returns the distance between the two positions in the given coordinate system.
-     * 
+     *
      * @param latitude1
      *            the latitude of the first position
      * @param longitude1
@@ -102,7 +102,7 @@ public enum CoordinateSystem {
 
     /**
      * Returns the distance between the two positions in the given coordinate system.
-     * 
+     *
      * @param p1
      *            the first position
      * @param p2

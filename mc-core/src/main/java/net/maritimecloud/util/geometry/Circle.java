@@ -30,13 +30,21 @@ import net.maritimecloud.core.message.MessageWriter;
  */
 public class Circle extends Area {
 
+    static final String NAME = "circle";
+
+    static final String NAME_CENTER_LATITIUDE = "center-latitude";
+
+    static final String NAME_CENTER_LONGITUDE = "center-longitude";
+
+    static final String NAME_RADIUS = "radius";
+
     public static final MessageParser<Circle> PARSER = new MessageParser<Circle>() {
 
         /** {@inheritDoc} */
         @Override
         public Circle parse(MessageReader r) throws IOException {
-            Position center = Position.readFromPacked(r, 1, "center-latitude", 2, "center-longitude");
-            float radius = r.readRequiredFloat(3, "radius");
+            Position center = Position.readFromPacked(r, 1, NAME_CENTER_LATITIUDE, 2, NAME_CENTER_LONGITUDE);
+            float radius = r.readRequiredFloat(3, NAME_RADIUS);
             return new Circle(center, radius);
         }
     };
@@ -58,46 +66,15 @@ public class Circle extends Area {
         this.radius = radius;
     }
 
-    /**
-     * Creates a new circle with the specified center and radius.
-     *
-     * @param center
-     *            the center of the circle
-     * @param radius
-     *            the radius in meters of the circle
-     * @return the new circle
-     * @throws NullPointerException
-     *             if the specified center is null
-     * @throws IllegalArgumentException
-     *             if the specified is not a positive number
-     */
-    public static Circle create(Position center, double radius) {
-        return new Circle(center, radius);
+    public boolean contains(Circle c) {
+        return center.rhumbLineDistanceTo(c.center) <= radius + c.radius;
     }
 
-    public static Circle create(double latitude, double longitude, double radius) {
-        return new Circle(Position.create(latitude, longitude), radius);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean contains(Element element) {
-        if (element instanceof Position) {
-            return center.distanceTo(element, cs) <= radius;
-        } else if (element instanceof Circle) {
-            Circle c = (Circle) element;
-            if (c.cs != cs) {
-                throw new IllegalArgumentException("Cannot compare circles in different coordinate systems");
-            }
-            return center.distanceTo(c.center, cs) <= radius + c.radius;
-        }
-        return super.contains(element);
-    }
 
     /** {@inheritDoc} */
     @Override
     public boolean contains(Position position) {
-        return center.distanceTo(position, cs) <= radius;
+        return center.rhumbLineDistanceTo(position) <= radius;
     }
 
     public boolean equals(Circle other) {
@@ -112,25 +89,20 @@ public class Circle extends Area {
         return other instanceof Circle && equals((Circle) other);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public double geodesicDistanceTo(Element other) {
-        if (other instanceof Position) {
-            return Math.max(0, center.geodesicDistanceTo(other) - radius);
-        }
-        return super.geodesicDistanceTo(other);
+    public double geodesicDistanceTo(Position other) {
+        return Math.max(0, center.geodesicDistanceTo(other) - radius);
     }
 
     /** {@inheritDoc} */
     @Override
     public BoundingBox getBoundingBox() {
-        double right = cs.pointOnBearing(center, radius, 0).latitude;
-        double left = cs.pointOnBearing(center, radius, 180).latitude;
-        double top = cs.pointOnBearing(center, radius, 90).longitude;
-        double buttom = cs.pointOnBearing(center, radius, 270).longitude;
+        double right = CoordinateSystem.CARTESIAN.pointOnBearing(center, radius, 0).latitude;
+        double left = CoordinateSystem.CARTESIAN.pointOnBearing(center, radius, 180).latitude;
+        double top = CoordinateSystem.CARTESIAN.pointOnBearing(center, radius, 90).longitude;
+        double buttom = CoordinateSystem.CARTESIAN.pointOnBearing(center, radius, 270).longitude;
         Position topLeft = Position.create(left, top);
         Position buttomRight = Position.create(right, buttom);
-        return BoundingBox.create(topLeft, buttomRight, cs);
+        return BoundingBox.create(topLeft, buttomRight);
     }
 
     /**
@@ -187,7 +159,7 @@ public class Circle extends Area {
     }
 
     public boolean intersects(Circle other) {
-        double centerDistance = getCoordinateSystem().distanceBetween(center, other.center);
+        double centerDistance = CoordinateSystem.CARTESIAN.distanceBetween(center, other.center);
         return radius + other.radius >= centerDistance;
     }
 
@@ -212,12 +184,12 @@ public class Circle extends Area {
         return disc >= 0;
     }
 
-    @Override
-    public double rhumbLineDistanceTo(Element other) {
-        if (other instanceof Position) {
-            return Math.max(0, center.rhumbLineDistanceTo(other) - radius);
-        }
-        return super.rhumbLineDistanceTo(other);
+    public double rhumbLineDistanceTo(Position position) {
+        return Math.max(0, center.rhumbLineDistanceTo(position) - radius);
+    }
+
+    public String toString() {
+        return "Circle: center = " + center + ", radius = " + radius;
     }
 
     /**
@@ -245,15 +217,32 @@ public class Circle extends Area {
     /** {@inheritDoc} */
     @Override
     public void writeTo(MessageWriter w) throws IOException {
-        w.writeMessage(1, "circle", new MessageSerializable() {
+        w.writeMessage(1, NAME, new MessageSerializable() {
             public void writeTo(MessageWriter w) throws IOException {
-                center.writeToPacked(w, 1, "center-latitude", 2, "center-longitude");
-                w.writeFloat(3, "radius", (float) radius);
+                center.writeToPacked(w, 1, NAME_CENTER_LATITIUDE, 2, NAME_CENTER_LONGITUDE);
+                w.writeFloat(3, NAME_RADIUS, (float) radius);
             }
         });
     }
 
-    public String toString() {
-        return "Circle: center = " + center + ", radius = " + radius;
+    public static Circle create(double latitude, double longitude, double radius) {
+        return new Circle(Position.create(latitude, longitude), radius);
+    }
+
+    /**
+     * Creates a new circle with the specified center and radius.
+     *
+     * @param center
+     *            the center of the circle
+     * @param radius
+     *            the radius in meters of the circle
+     * @return the new circle
+     * @throws NullPointerException
+     *             if the specified center is null
+     * @throws IllegalArgumentException
+     *             if the specified is not a positive number
+     */
+    public static Circle create(Position center, double radius) {
+        return new Circle(center, radius);
     }
 }

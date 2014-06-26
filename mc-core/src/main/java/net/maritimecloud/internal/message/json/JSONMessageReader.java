@@ -103,8 +103,8 @@ public class JSONMessageReader extends MessageReader {
     @Override
     public Boolean readBool(int tag, String name, Boolean defaultValue) {
         if (isNext(-1, name)) {
-            JsonString val = (JsonString) iter.next().getValue();
-            return Boolean.parseBoolean(val.getString());
+            JsonValue val = iter.next().getValue();
+            return Boolean.parseBoolean(val.toString());
         }
         return defaultValue;
     }

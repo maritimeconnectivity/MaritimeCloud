@@ -14,9 +14,8 @@
  */
 package net.maritimecloud.util.geometry;
 
-import static java.util.Objects.requireNonNull;
-
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -27,12 +26,11 @@ import net.maritimecloud.core.message.MessageReader;
 import net.maritimecloud.core.message.MessageSerializable;
 import net.maritimecloud.core.message.MessageSerializers;
 import net.maritimecloud.core.message.MessageWriter;
-import net.maritimecloud.util.function.Predicate;
 
 /**
  * A shape has an area
  **/
-public abstract class Area implements Element, Message {
+public abstract class Area implements Message, Serializable {
 
     /** A parser of areas. */
     public static final MessageParser<Area> PARSER = new MessageParser<Area>() {
@@ -46,19 +44,17 @@ public abstract class Area implements Element, Message {
     /** serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
-    final CoordinateSystem cs = CoordinateSystem.CARTESIAN;
-
     final MessageSerializable areaWriter() {
         return new Writer();
     }
 
-    public final Predicate<Element> contains() {
-        return new Predicate<Element>() {
-            public boolean test(Element element) {
-                return contains(element);
-            }
-        };
-    }
+    // public final Predicate<Element> contains() {
+    // return new Predicate<Element>() {
+    // public boolean test(Element element) {
+    // return contains(element);
+    // }
+    // };
+    // }
 
     /**
      * Returns <tt>true</tt> if the specified element is fully contained in the shape, otherwise <tt>false</tt>.
@@ -67,24 +63,24 @@ public abstract class Area implements Element, Message {
      *            the element to test
      * @return true if the specified element is fully contained in the shape, otherwise false
      */
-    public boolean contains(Element element) {
+    public boolean contains(Area area) {
         throw new UnsupportedOperationException();
     }
 
     public abstract boolean contains(Position position);
 
-    /** {@inheritDoc} */
-    @Override
-    public final double distanceTo(Element other, CoordinateSystem system) {
-        return requireNonNull(system) == CoordinateSystem.CARTESIAN ? rhumbLineDistanceTo(other)
-                : geodesicDistanceTo(other);
-    }
+    // /** {@inheritDoc} */
+    // @Override
+    // public final double distanceTo(Element other, CoordinateSystem system) {
+    // return requireNonNull(system) == CoordinateSystem.CARTESIAN ? rhumbLineDistanceTo(other)
+    // : geodesicDistanceTo(other);
+    // }
 
-    /** {@inheritDoc} */
-    @Override
-    public double geodesicDistanceTo(Element other) {
-        throw new UnsupportedOperationException();
-    }
+    // /** {@inheritDoc} */
+    // @Override
+    // public double geodesicDistanceTo(Element other) {
+    // throw new UnsupportedOperationException();
+    // }
 
     /**
      * Returns a bounding box of the area.
@@ -92,10 +88,6 @@ public abstract class Area implements Element, Message {
      * @return a bounding box of the area
      */
     public abstract BoundingBox getBoundingBox();
-
-    public final CoordinateSystem getCoordinateSystem() {
-        return cs;
-    }
 
     /**
      * Returns a random position within the area.
@@ -122,10 +114,10 @@ public abstract class Area implements Element, Message {
 
     public abstract boolean intersects(Area other);
 
-    @Override
-    public double rhumbLineDistanceTo(Element other) {
-        throw new UnsupportedOperationException();
-    }
+    // @Override
+    // public double rhumbLineDistanceTo(Position other) {
+    // throw new UnsupportedOperationException();
+    // }
 
     /** Returns a JSON representation of this message */
     public String toJSON() {

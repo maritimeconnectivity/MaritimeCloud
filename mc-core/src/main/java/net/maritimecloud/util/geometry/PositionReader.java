@@ -35,18 +35,6 @@ public abstract class PositionReader {
     public abstract PositionTime getCurrentPosition();
 
     /**
-     * Returns a position reader that will return the current position on a native devices.
-     * 
-     * @return a position reader that will return the current position on a native devices
-     * @throws UnsupportedOperationException
-     *             if a native position reader is not available
-     */
-    public static PositionReader nativeReader() {
-        // Taenker man saetter en System property, og saa cacher vi den
-        throw new UnsupportedOperationException("This method is not supported on the current platform");
-    }
-
-    /**
      * Returns a reader that returns the same position every time.
      * 
      * @param positionTime
@@ -60,5 +48,17 @@ public abstract class PositionReader {
                 return positionTime;
             }
         };
+    }
+
+    /**
+     * Returns a position reader that will return the current position on a native devices.
+     * 
+     * @return a position reader that will return the current position on a native devices
+     * @throws UnsupportedOperationException
+     *             if a native position reader is not available
+     */
+    public static PositionReader nativeReader() {
+        // Taenker man saetter en System property, og saa cacher vi den
+        throw new UnsupportedOperationException("This method is not supported on the current platform");
     }
 }

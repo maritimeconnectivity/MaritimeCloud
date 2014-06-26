@@ -36,9 +36,17 @@ public class Polygon extends Area {
     /** serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
-    private Position[] positions;
+    private final Position[] positions;
 
-    public Polygon(CoordinateSystem cs, Position... positions) {}
+    public Polygon(Position... positions) {
+        this.positions = positions;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean contains(Position position) {
+        throw new UnsupportedOperationException();
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -64,18 +72,12 @@ public class Polygon extends Area {
         w.writeList(1, "points", Arrays.asList(positions));
     }
 
-    public static Polygon from(Position... positions) {
-        return new Polygon(CoordinateSystem.CARTESIAN, positions);
+    public static Polygon create(Position... positions) {
+        return new Polygon(positions);
     }
 
     static Polygon readPolygonFrom(MessageReader r) throws IOException {
         List<Position> positions = r.readList(1, "points", Position.PARSER);
-        return Polygon.from(positions.toArray(new Position[positions.size()]));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean contains(Position position) {
-        throw new UnsupportedOperationException();
+        return Polygon.create(positions.toArray(new Position[positions.size()]));
     }
 }
