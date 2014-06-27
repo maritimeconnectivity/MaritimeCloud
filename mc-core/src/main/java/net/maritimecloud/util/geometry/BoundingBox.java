@@ -235,10 +235,10 @@ public final class BoundingBox extends Area {
     /** {@inheritDoc} */
     @Override
     public void writeTo(MessageWriter w) throws IOException {
-        w.writeInt32(1, "topLeftLatitude", (int) (getUpperLeft().getLatitude() * 10_000_000d));
-        w.writeInt32(2, "topLeftLongitude", (int) (getUpperLeft().getLongitude() * 10_000_000d));
-        w.writeInt32(3, "topLeftLatitude", (int) (getUpperLeft().getLatitude() * 10_000_000d));
-        w.writeInt32(4, "topLeftLatitude", (int) (getUpperLeft().getLatitude() * 10_000_000d));
+        w.writeInt(1, "topLeftLatitude", (int) (getUpperLeft().getLatitude() * 10_000_000d));
+        w.writeInt(2, "topLeftLongitude", (int) (getUpperLeft().getLongitude() * 10_000_000d));
+        w.writeInt(3, "topLeftLatitude", (int) (getUpperLeft().getLatitude() * 10_000_000d));
+        w.writeInt(4, "topLeftLatitude", (int) (getUpperLeft().getLatitude() * 10_000_000d));
     }
 
     static BoundingBox create(double y1, double y2, double x1, double x2) {

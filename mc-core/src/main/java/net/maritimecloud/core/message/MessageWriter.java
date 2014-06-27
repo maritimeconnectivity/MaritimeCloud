@@ -65,7 +65,7 @@ public abstract class MessageWriter implements Closeable, Flushable {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeBool(int tag, String name, Boolean value) throws IOException;
+    public abstract void writeBoolean(int tag, String name, Boolean value) throws IOException;
 
     /**
      * Writes a double.
@@ -109,7 +109,7 @@ public abstract class MessageWriter implements Closeable, Flushable {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeInt32(int tag, String name, Integer value) throws IOException;
+    public abstract void writeInt(int tag, String name, Integer value) throws IOException;
 
     /**
      * Writes a long.
@@ -193,7 +193,7 @@ public abstract class MessageWriter implements Closeable, Flushable {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeString(int tag, String name, String value) throws IOException;
+    public abstract void writeText(int tag, String name, String value) throws IOException;
 }
 //
 //

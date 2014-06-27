@@ -31,15 +31,15 @@ public class TestWriter extends AbstractJSONTest {
 
     @Test
     public void testPrimitives() throws IOException {
-        assertJSONWrite(w -> w.writeInt32(1, "i1", 100), "\"i1\": 100");
+        assertJSONWrite(w -> w.writeInt(1, "i1", 100), "\"i1\": 100");
         assertJSONWrite(w -> w.writeInt64(1, "1f1", -100L), "\"1f1\": -100");
 
         assertJSONWrite(w -> w.writeFloat(1, "i1", 1.2345f), "\"i1\": 1.2345");
         assertJSONWrite(w -> w.writeDouble(1, "1f1", -10.12123d), "\"1f1\": -10.12123");
 
-        assertJSONWrite(w -> w.writeBool(1, "i1", true), "\"i1\": true");
-        assertJSONWrite(w -> w.writeBool(1, "i1", false), "\"i1\": false");
-        assertJSONWrite(w -> w.writeString(1, "1f1", "hello"), "\"1f1\": \"hello\"");
+        assertJSONWrite(w -> w.writeBoolean(1, "i1", true), "\"i1\": true");
+        assertJSONWrite(w -> w.writeBoolean(1, "i1", false), "\"i1\": false");
+        assertJSONWrite(w -> w.writeText(1, "1f1", "hello"), "\"1f1\": \"hello\"");
     }
 
     @Test

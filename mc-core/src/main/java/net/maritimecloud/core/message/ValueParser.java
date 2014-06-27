@@ -17,6 +17,7 @@ package net.maritimecloud.core.message;
 import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,29 +36,29 @@ public abstract class ValueParser<T> {
         }
     };
 
-    public static final ValueParser<Boolean> BOOL = new ValueParser<Boolean>() {
+    public static final ValueParser<Boolean> BOOLEAN = new ValueParser<Boolean>() {
         public Boolean parse(ValueReader reader) throws IOException {
-            return reader.readBool();
+            return reader.readBoolean();
         }
-    };;
+    };
 
     public static final ValueParser<Double> DOUBLE = new ValueParser<Double>() {
         public Double parse(ValueReader reader) throws IOException {
             return reader.readDouble();
         }
-    };;
+    };
 
     public static final ValueParser<Float> FLOAT = new ValueParser<Float>() {
         public Float parse(ValueReader reader) throws IOException {
             return reader.readFloat();
         }
-    };;
+    };
 
-    public static final ValueParser<Integer> INT32 = new ValueParser<Integer>() {
+    public static final ValueParser<Integer> INT = new ValueParser<Integer>() {
         public Integer parse(ValueReader reader) throws IOException {
-            return reader.readInt32();
+            return reader.readInt();
         }
-    };;
+    };
 
     public static final ValueParser<Long> INT64 = new ValueParser<Long>() {
         public Long parse(ValueReader reader) throws IOException {
@@ -65,11 +66,42 @@ public abstract class ValueParser<T> {
         }
     };
 
-    public static final ValueParser<String> STRING = new ValueParser<String>() {
+    public static final ValueParser<String> TEXT = new ValueParser<String>() {
         public String parse(ValueReader reader) throws IOException {
-            return reader.readString();
+            return reader.readText();
         }
-    };;
+    };
+
+
+    public static final ValueParser<BigDecimal> VARINT = new ValueParser<BigDecimal>() {
+        public BigDecimal parse(ValueReader reader) throws IOException {
+            return null;// reader.readDouble();
+        }
+    };
+
+    public static final ValueParser<Float> DECIMAL = new ValueParser<Float>() {
+        public Float parse(ValueReader reader) throws IOException {
+            return reader.readFloat();
+        }
+    };
+
+    public static final ValueParser<Integer> POSITION = new ValueParser<Integer>() {
+        public Integer parse(ValueReader reader) throws IOException {
+            return reader.readInt();
+        }
+    };
+
+    public static final ValueParser<Long> POSITIONTIME = new ValueParser<Long>() {
+        public Long parse(ValueReader reader) throws IOException {
+            return reader.readInt64();
+        }
+    };
+
+    public static final ValueParser<String> TIMESTAMP = new ValueParser<String>() {
+        public String parse(ValueReader reader) throws IOException {
+            return reader.readText();
+        }
+    };
 
     public final ValueParser<List<T>> listOf() {
         return new ListParser<>(this);
@@ -90,15 +122,15 @@ public abstract class ValueParser<T> {
      */
     public abstract T parse(ValueReader reader) throws IOException;
 
-    public static ValueParser<?> parserOf(Class<?> type) {
-        if (type == String.class) {
-            return STRING;
-        }
-        throw new UnsupportedOperationException();
-    }
-
     public final ValueParser<Set<T>> setOf() {
         return new SetParser<>(this);
+    }
+
+    public static ValueParser<?> parserOf(Class<?> type) {
+        if (type == String.class) {
+            return TEXT;
+        }
+        throw new UnsupportedOperationException();
     }
 
     static class ListParser<E> extends ValueParser<List<E>> {

@@ -101,7 +101,7 @@ public class JSONMessageReader extends MessageReader {
 
     /** {@inheritDoc} */
     @Override
-    public Boolean readBool(int tag, String name, Boolean defaultValue) {
+    public Boolean readBoolean(int tag, String name, Boolean defaultValue) {
         if (isNext(-1, name)) {
             JsonValue val = iter.next().getValue();
             return Boolean.parseBoolean(val.toString());
@@ -156,7 +156,7 @@ public class JSONMessageReader extends MessageReader {
 
     /** {@inheritDoc} */
     @Override
-    public int readInt32(int tag, String name) throws IOException {
+    public int readInt(int tag, String name) throws IOException {
         if (isNext(-1, name)) {
             JsonNumber val = (JsonNumber) iter.next().getValue();
             return val.intValue();
@@ -166,7 +166,7 @@ public class JSONMessageReader extends MessageReader {
 
     /** {@inheritDoc} */
     @Override
-    public Integer readInt32(int tag, String name, Integer defaultValue) throws IOException {
+    public Integer readInt(int tag, String name, Integer defaultValue) throws IOException {
         if (isNext(-1, name)) {
             JsonNumber val = (JsonNumber) iter.next().getValue();
             return val.intValue();
@@ -290,7 +290,7 @@ public class JSONMessageReader extends MessageReader {
 
     /** {@inheritDoc} */
     @Override
-    public String readString(int tag, String name, String defaultValue) throws IOException {
+    public String readText(int tag, String name, String defaultValue) throws IOException {
         if (isNext(-1, name)) {
             JsonString val = (JsonString) iter.next().getValue();
             return val.getString();
@@ -342,7 +342,7 @@ public class JSONMessageReader extends MessageReader {
 
         /** {@inheritDoc} */
         @Override
-        public Boolean readBool() throws IOException {
+        public Boolean readBoolean() throws IOException {
             return Boolean.parseBoolean(value.toString());
         }
 
@@ -360,7 +360,7 @@ public class JSONMessageReader extends MessageReader {
 
         /** {@inheritDoc} */
         @Override
-        public Integer readInt32() throws IOException {
+        public Integer readInt() throws IOException {
             return Integer.parseInt(value.toString());
         }
 
@@ -378,7 +378,7 @@ public class JSONMessageReader extends MessageReader {
 
         /** {@inheritDoc} */
         @Override
-        public String readString() throws IOException {
+        public String readText() throws IOException {
             String val = ((JsonString) value).getString();
             return val;
         }

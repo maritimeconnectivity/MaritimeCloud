@@ -297,8 +297,8 @@ public class Position implements Message, Serializable {
     }
 
     void writeToPacked(MessageWriter w, int latId, String latName, int lonId, String lonName) throws IOException {
-        w.writeInt32(latId, latName, (int) (latitude * 10_000_000d));
-        w.writeInt32(lonId, lonName, (int) (longitude * 10_000_000d));
+        w.writeInt(latId, latName, (int) (latitude * 10_000_000d));
+        w.writeInt(lonId, lonName, (int) (longitude * 10_000_000d));
     }
 
     /**
@@ -373,8 +373,8 @@ public class Position implements Message, Serializable {
 
     static Position readFromPacked(MessageReader r, int latId, String latName, int lonId, String lonName)
             throws IOException {
-        int lat = r.readInt32(latId, latName);
-        int lon = r.readInt32(lonId, lonName);
+        int lat = r.readInt(latId, latName);
+        int lon = r.readInt(lonId, lonName);
         return Position.create(lat / 10_000_000d, lon / 10_000_000d);
     }
 

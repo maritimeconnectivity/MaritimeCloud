@@ -36,7 +36,7 @@ public abstract class MessageReader implements Closeable {
 
     public abstract Binary readBinary(int tag, String name, Binary defaultValue) throws IOException;
 
-    public abstract Boolean readBool(int tag, String name, Boolean defaultValue) throws IOException;
+    public abstract Boolean readBoolean(int tag, String name, Boolean defaultValue) throws IOException;
 
     // public abstract double readDouble(int tag, String name) throws IOException;
 
@@ -49,9 +49,9 @@ public abstract class MessageReader implements Closeable {
 
     public abstract Float readFloat(int tag, String name, Float defaultValue) throws IOException;
 
-    public abstract int readInt32(int tag, String name) throws IOException;
+    public abstract int readInt(int tag, String name) throws IOException;
 
-    public abstract Integer readInt32(int tag, String name, Integer defaultValue) throws IOException;
+    public abstract Integer readInt(int tag, String name, Integer defaultValue) throws IOException;
 
     public abstract long readInt64(int tag, String name) throws IOException;
 
@@ -71,7 +71,7 @@ public abstract class MessageReader implements Closeable {
 
     public abstract <T> Set<T> readSet(int tag, String name, ValueParser<T> parser) throws IOException;
 
-    public abstract String readString(int tag, String name, String defaultValue) throws IOException;
+    public abstract String readText(int tag, String name, String defaultValue) throws IOException;
 }
 
 // public abstract int readInt32(int tag, String name, int defaultValue) throws IOException;

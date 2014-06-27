@@ -27,19 +27,19 @@ import net.maritimecloud.util.Binary;
  */
 public abstract class ValueReader {
 
-    public abstract Boolean readBool() throws IOException;
+    public abstract Boolean readBoolean() throws IOException;
 
     public abstract Float readFloat() throws IOException;
 
     public abstract Double readDouble() throws IOException;
 
-    public abstract Integer readInt32() throws IOException;
+    public abstract Integer readInt() throws IOException;
 
     public abstract Long readInt64() throws IOException;
 
     public abstract Binary readBinary() throws IOException;
 
-    public abstract String readString() throws IOException;
+    public abstract String readText() throws IOException;
 
     public abstract <T extends Enum<T> & MessageEnum> T readEnum(MessageEnumParser<T> factory) throws IOException;
 

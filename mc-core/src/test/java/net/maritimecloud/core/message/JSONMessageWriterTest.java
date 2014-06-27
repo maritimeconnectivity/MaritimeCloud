@@ -49,10 +49,10 @@ public class JSONMessageWriterTest {
 
     @Test
     public void simpleTypes() throws IOException {
-        newW().writeBool(1000, "foo", true);
+        newW().writeBoolean(1000, "foo", true);
         assertEquals("\"foo\": true", sw.toString());
 
-        newW().writeBool(1000, "foo", false);
+        newW().writeBoolean(1000, "foo", false);
         assertEquals("\"foo\": false", sw.toString());
 
         newW().writeDouble(1, "aa", 232.23);
@@ -61,13 +61,13 @@ public class JSONMessageWriterTest {
         newW().writeFloat(1, "ba", -231.23f);
         assertEquals("\"ba\": -231.23", sw.toString());
 
-        newW().writeInt32(1, "ba", Integer.MAX_VALUE);
+        newW().writeInt(1, "ba", Integer.MAX_VALUE);
         assertEquals("\"ba\": 2147483647", sw.toString());
 
         newW().writeInt64(1, "ba", Long.MIN_VALUE);
         assertEquals("\"ba\": -9223372036854775808", sw.toString());
 
-        newW().writeString(1000, "foo", "boo");
+        newW().writeText(1000, "foo", "boo");
         assertEquals("\"foo\": \"boo\"", sw.toString());
 
         // enum
@@ -119,7 +119,7 @@ public class JSONMessageWriterTest {
     public void simpleStrings() throws IOException {
         StringWriter sw = new StringWriter();
         try (MessageWriter w = new JSONMessageWriter(new PrintWriter(sw))) {
-            w.writeString(1000, "foo", "boo");
+            w.writeText(1000, "foo", "boo");
         }
         assertEquals("\"foo\": \"boo\"", sw.toString());
         JsonParser p = Json.createParser(new StringReader("{" + sw.toString() + "}"));

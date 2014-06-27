@@ -41,7 +41,7 @@ public class TestSerializers {
         /** {@inheritDoc} */
         @Override
         public void writeTo(MessageWriter w) throws IOException {
-            w.writeInt32(1, "ivalue", i);
+            w.writeInt(1, "ivalue", i);
         }
     }
 }

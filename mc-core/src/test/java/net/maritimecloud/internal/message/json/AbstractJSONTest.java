@@ -110,8 +110,8 @@ public abstract class AbstractJSONTest {
         @Override
         public Msg1 parse(MessageReader reader) throws IOException {
             Msg1 ddd = new Msg1();
-            i1 = reader.readInt32(1, "i1", null);
-            i2 = reader.readInt32(2, "i2", null);
+            i1 = reader.readInt(1, "i1", null);
+            i2 = reader.readInt(2, "i2", null);
             l1 = reader.readInt64(3, "l1", null);
             return ddd;
         }
@@ -119,8 +119,8 @@ public abstract class AbstractJSONTest {
         /** {@inheritDoc} */
         @Override
         public void writeTo(MessageWriter w) throws IOException {
-            w.writeInt32(1, "i1", i1);
-            w.writeInt32(2, "i2", i2);
+            w.writeInt(1, "i1", i1);
+            w.writeInt(2, "i2", i2);
             w.writeInt64(3, "l1", l1);
             w.writeList(4, "list", list);
         }

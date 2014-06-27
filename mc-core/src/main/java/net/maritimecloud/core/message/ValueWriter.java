@@ -37,7 +37,7 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeBool(Boolean value) throws IOException;
+    public abstract void writeBoolean(Boolean value) throws IOException;
 
     /**
      * Writes a double.
@@ -81,7 +81,7 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeInt32(Integer value) throws IOException;
+    public abstract void writeInt(Integer value) throws IOException;
 
     /**
      * Writes a long.
@@ -165,5 +165,5 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeString(String value) throws IOException;
+    public abstract void writeText(String value) throws IOException;
 }

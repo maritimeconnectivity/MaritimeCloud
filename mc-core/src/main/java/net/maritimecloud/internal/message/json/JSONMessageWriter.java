@@ -98,7 +98,7 @@ public class JSONMessageWriter extends MessageWriter {
 
     /** {@inheritDoc} */
     @Override
-    public void writeBool(int tag, String name, Boolean value) throws IOException {
+    public void writeBoolean(int tag, String name, Boolean value) throws IOException {
         if (value != null) {
             writeTag(tag, name);
             writeBool(value);
@@ -182,7 +182,7 @@ public class JSONMessageWriter extends MessageWriter {
 
     /** {@inheritDoc} */
     @Override
-    public void writeInt32(int tag, String name, Integer value) throws IOException {
+    public void writeInt(int tag, String name, Integer value) throws IOException {
         if (value != null) {
             writeTag(tag, name);
             writeInt32(value);
@@ -271,7 +271,7 @@ public class JSONMessageWriter extends MessageWriter {
 
     /** {@inheritDoc} */
     @Override
-    public void writeString(int tag, String name, String value) throws IOException {
+    public void writeText(int tag, String name, String value) throws IOException {
         if (value != null) {
             writeTag(tag, name);
             writeString(value);
@@ -367,7 +367,7 @@ public class JSONMessageWriter extends MessageWriter {
 
         /** {@inheritDoc} */
         @Override
-        public void writeBool(Boolean value) throws IOException {
+        public void writeBoolean(Boolean value) throws IOException {
             w.writeBool(value);
         }
 
@@ -391,7 +391,7 @@ public class JSONMessageWriter extends MessageWriter {
 
         /** {@inheritDoc} */
         @Override
-        public void writeInt32(Integer value) throws IOException {
+        public void writeInt(Integer value) throws IOException {
             w.writeInt32(value);
         }
 
@@ -427,7 +427,7 @@ public class JSONMessageWriter extends MessageWriter {
 
         /** {@inheritDoc} */
         @Override
-        public void writeString(String value) throws IOException {
+        public void writeText(String value) throws IOException {
             w.writeString(value);
         }
 
