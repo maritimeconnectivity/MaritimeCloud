@@ -17,12 +17,17 @@ package net.maritimecloud.core.message;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import net.maritimecloud.util.Binary;
+import net.maritimecloud.util.geometry.Position;
+import net.maritimecloud.util.geometry.PositionTime;
 
 
 /**
@@ -110,6 +115,18 @@ public abstract class MessageWriter implements Closeable, Flushable {
      *             If an I/O error occurs
      */
     public abstract void writeInt(int tag, String name, Integer value) throws IOException;
+
+
+    public abstract void writeVarInt(int tag, String name, BigInteger value) throws IOException;
+
+    public abstract void writeDecimal(int tag, String name, BigDecimal value) throws IOException;
+
+    public abstract void writePosition(int tag, String name, Position value) throws IOException;
+
+    public abstract void writePositionTime(int tag, String name, PositionTime value) throws IOException;
+
+    public abstract void writeTimestamp(int tag, String name, Date value) throws IOException;
+
 
     /**
      * Writes a long.

@@ -18,8 +18,11 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -45,6 +48,8 @@ import net.maritimecloud.core.message.MessageSerializationException;
 import net.maritimecloud.core.message.ValueParser;
 import net.maritimecloud.core.message.ValueReader;
 import net.maritimecloud.util.Binary;
+import net.maritimecloud.util.geometry.Position;
+import net.maritimecloud.util.geometry.PositionTime;
 
 /**
  *
@@ -428,6 +433,66 @@ public class JSONMessageReader extends MessageReader {
             }
             return result;
         }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public BigInteger readVarInt(int tag, String name) throws IOException {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public BigDecimal readDecimal(int tag, String name) throws IOException {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Position readPostion(int tag, String name) throws IOException {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public PositionTime readPositionTime(int tag, String name) throws IOException {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Date readTimestamp(int tag, String name) throws IOException {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public BigDecimal readDecimal(int tag, String name, BigDecimal defaultValue) throws IOException {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Date readTimestamp(int tag, String name, Date defaultValue) throws IOException {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Position readPosition(int tag, String name, Position defaultValue) throws IOException {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public PositionTime readPositionTime(int tag, String name, PositionTime defaultValue) throws IOException {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public BigInteger readVarInt(int tag, String name, BigInteger defaultValue) throws IOException {
+        return null;
     }
 }
 

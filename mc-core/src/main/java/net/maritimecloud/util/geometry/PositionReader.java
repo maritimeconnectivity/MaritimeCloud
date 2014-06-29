@@ -20,7 +20,7 @@ import static java.util.Objects.requireNonNull;
  * A interface describing a way to get the current position (and timestamp of the reading) for an object.
  * <p>
  * Any implementations are not required to be thread safe.
- * 
+ *
  * @see PositionReaderSimulator
  * @author Kasper Nielsen
  */
@@ -29,14 +29,14 @@ public abstract class PositionReader {
     /**
      * Returns the current position and a timestamp for when the position was read. The timestamp, measured in
      * milliseconds, must be the difference between the current time and midnight, January 1, 1970 UTC.
-     * 
+     *
      * @return the current position and time
      */
     public abstract PositionTime getCurrentPosition();
 
     /**
-     * Returns a reader that returns the same position every time.
-     * 
+     * Returns a reader that returns the same position and time every time.
+     *
      * @param positionTime
      *            the position time to return every time
      * @return a new fixed position reader
@@ -51,8 +51,24 @@ public abstract class PositionReader {
     }
 
     /**
+     * Returns a reader that returns the same position every time.
+     *
+     * @param positionTime
+     *            the position time to return every time
+     * @return a new fixed position reader
+     */
+    public static PositionReader fixedPosition(final Position position) {
+        requireNonNull(position, "position is null");
+        return new PositionReader() {
+            public PositionTime getCurrentPosition() {
+                return position.withTime(System.currentTimeMillis());
+            }
+        };
+    }
+
+    /**
      * Returns a position reader that will return the current position on a native devices.
-     * 
+     *
      * @return a position reader that will return the current position on a native devices
      * @throws UnsupportedOperationException
      *             if a native position reader is not available

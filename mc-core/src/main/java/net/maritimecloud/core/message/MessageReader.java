@@ -16,11 +16,16 @@ package net.maritimecloud.core.message;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import net.maritimecloud.util.Binary;
+import net.maritimecloud.util.geometry.Position;
+import net.maritimecloud.util.geometry.PositionTime;
 
 /**
  * Abstract class for reading message streams.
@@ -42,6 +47,9 @@ public abstract class MessageReader implements Closeable {
 
     public abstract Double readDouble(int tag, String name, Double defaultValue) throws IOException;
 
+
+    public abstract BigDecimal readDecimal(int tag, String name, BigDecimal defaultValue) throws IOException;
+
     public abstract <T extends Enum<T> & MessageEnum> T readEnum(int tag, String name, MessageEnumParser<T> factory)
             throws IOException;
 
@@ -49,9 +57,27 @@ public abstract class MessageReader implements Closeable {
 
     public abstract Float readFloat(int tag, String name, Float defaultValue) throws IOException;
 
+    public abstract BigInteger readVarInt(int tag, String name) throws IOException;
+
+    public abstract BigDecimal readDecimal(int tag, String name) throws IOException;
+
+    public abstract Position readPostion(int tag, String name) throws IOException;
+
+    public abstract PositionTime readPositionTime(int tag, String name) throws IOException;
+
+    public abstract Date readTimestamp(int tag, String name) throws IOException;
+
+    public abstract Date readTimestamp(int tag, String name, Date defaultValue) throws IOException;
+
+    public abstract Position readPosition(int tag, String name, Position defaultValue) throws IOException;
+
+    public abstract PositionTime readPositionTime(int tag, String name, PositionTime defaultValue) throws IOException;
+
     public abstract int readInt(int tag, String name) throws IOException;
 
     public abstract Integer readInt(int tag, String name, Integer defaultValue) throws IOException;
+
+    public abstract BigInteger readVarInt(int tag, String name, BigInteger defaultValue) throws IOException;
 
     public abstract long readInt64(int tag, String name) throws IOException;
 

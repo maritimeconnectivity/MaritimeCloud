@@ -15,11 +15,16 @@
 package net.maritimecloud.core.message;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import net.maritimecloud.util.Binary;
+import net.maritimecloud.util.geometry.Position;
+import net.maritimecloud.util.geometry.PositionTime;
 
 /**
  *
@@ -31,7 +36,7 @@ public interface ValueWriter {
 
     /**
      * Writes a boolean.
-     * 
+     *
      * @param value
      *            the boolean value to write
      * @throws IOException
@@ -96,6 +101,17 @@ public interface ValueWriter {
      *             If an I/O error occurs
      */
     public abstract void writeInt64(Long value) throws IOException;
+
+    public abstract void writeVarInt(BigInteger value) throws IOException;
+
+    public abstract void writeDecimal(BigDecimal value) throws IOException;
+
+    public abstract void writePosition(Position value) throws IOException;
+
+    public abstract void writePositionTime(PositionTime value) throws IOException;
+
+    public abstract void writeTimestamp(Date value) throws IOException;
+
 
     /**
      * Writes a list.

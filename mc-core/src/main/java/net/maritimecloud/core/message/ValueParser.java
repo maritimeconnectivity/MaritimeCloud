@@ -18,11 +18,15 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import net.maritimecloud.util.Binary;
+import net.maritimecloud.util.geometry.Position;
+import net.maritimecloud.util.geometry.PositionTime;
 
 /**
  *
@@ -73,33 +77,33 @@ public abstract class ValueParser<T> {
     };
 
 
-    public static final ValueParser<BigDecimal> VARINT = new ValueParser<BigDecimal>() {
+    public static final ValueParser<BigInteger> VARINT = new ValueParser<BigInteger>() {
+        public BigInteger parse(ValueReader reader) throws IOException {
+            throw new UnsupportedOperationException();
+        }
+    };
+
+    public static final ValueParser<BigDecimal> DECIMAL = new ValueParser<BigDecimal>() {
         public BigDecimal parse(ValueReader reader) throws IOException {
-            return null;// reader.readDouble();
+            throw new UnsupportedOperationException();
         }
     };
 
-    public static final ValueParser<Float> DECIMAL = new ValueParser<Float>() {
-        public Float parse(ValueReader reader) throws IOException {
-            return reader.readFloat();
+    public static final ValueParser<Position> POSITION = new ValueParser<Position>() {
+        public Position parse(ValueReader reader) throws IOException {
+            throw new UnsupportedOperationException();
         }
     };
 
-    public static final ValueParser<Integer> POSITION = new ValueParser<Integer>() {
-        public Integer parse(ValueReader reader) throws IOException {
-            return reader.readInt();
+    public static final ValueParser<PositionTime> POSITION_TIME = new ValueParser<PositionTime>() {
+        public PositionTime parse(ValueReader reader) throws IOException {
+            throw new UnsupportedOperationException();
         }
     };
 
-    public static final ValueParser<Long> POSITIONTIME = new ValueParser<Long>() {
-        public Long parse(ValueReader reader) throws IOException {
-            return reader.readInt64();
-        }
-    };
-
-    public static final ValueParser<String> TIMESTAMP = new ValueParser<String>() {
-        public String parse(ValueReader reader) throws IOException {
-            return reader.readText();
+    public static final ValueParser<Date> TIMESTAMP = new ValueParser<Date>() {
+        public Date parse(ValueReader reader) throws IOException {
+            return null;
         }
     };
 

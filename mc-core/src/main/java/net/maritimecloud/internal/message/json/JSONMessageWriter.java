@@ -20,7 +20,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,6 +33,8 @@ import net.maritimecloud.core.message.MessageSerializable;
 import net.maritimecloud.core.message.MessageWriter;
 import net.maritimecloud.core.message.ValueWriter;
 import net.maritimecloud.util.Binary;
+import net.maritimecloud.util.geometry.Position;
+import net.maritimecloud.util.geometry.PositionTime;
 
 /**
  *
@@ -87,9 +92,11 @@ public class JSONMessageWriter extends MessageWriter {
 
     /** {@inheritDoc} */
     @Override
-    public void writeBinary(int tag, String name, Binary binary) throws IOException {
-        writeTag(tag, name);
-        writeBinary(binary);
+    public void writeBinary(int tag, String name, Binary value) throws IOException {
+        if (value != null) {
+            writeTag(tag, name);
+            writeBinary(value);
+        }
     }
 
     void writeBool(boolean value) {
@@ -120,6 +127,27 @@ public class JSONMessageWriter extends MessageWriter {
             writeDouble(value);
         }
     }
+
+    void writeVarInt(BigInteger value) {
+        pw.write(value.toString());
+    }
+
+    void writeDecimal(BigDecimal value) {
+        pw.write(value.toString());
+    }
+
+    void writeTimestamp(Date value) {
+        writeInt64(value.getTime());
+    }
+
+    void writePosition(Position value) {
+        pw.write(value.toString());
+    }
+
+    void writePositionTime(PositionTime value) {
+        pw.write(value.toString());
+    }
+
 
     void writeElement(Object value) throws IOException {
         if (value instanceof MessageSerializable) {
@@ -327,7 +355,7 @@ public class JSONMessageWriter extends MessageWriter {
                 break;
             default:
                 if (ch >= '\u0000' && ch <= '\u001F' || ch >= '\u007F' && ch <= '\u009F' || ch >= '\u2000'
-                && ch <= '\u20FF') {
+                        && ch <= '\u20FF') {
                     String ss = Integer.toHexString(ch);
                     sb.append("\\u");
                     for (int k = 0; k < 4 - ss.length(); k++) {
@@ -434,5 +462,55 @@ public class JSONMessageWriter extends MessageWriter {
         public String toString() {
             return sw.toString();
         }
+
+        /** {@inheritDoc} */
+        @Override
+        public void writeVarInt(BigInteger value) throws IOException {
+            w.writeVarInt(value);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void writeDecimal(BigDecimal value) throws IOException {
+            w.writeDecimal(value);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void writePosition(Position value) throws IOException {
+            w.writePosition(value);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void writePositionTime(PositionTime value) throws IOException {
+            w.writePositionTime(value);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void writeTimestamp(Date value) throws IOException {
+            w.writeTimestamp(value);
+        }
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public void writeVarInt(int tag, String name, BigInteger value) throws IOException {}
+
+    /** {@inheritDoc} */
+    @Override
+    public void writeDecimal(int tag, String name, BigDecimal value) throws IOException {}
+
+    /** {@inheritDoc} */
+    @Override
+    public void writePosition(int tag, String name, Position value) throws IOException {}
+
+    /** {@inheritDoc} */
+    @Override
+    public void writePositionTime(int tag, String name, PositionTime value) throws IOException {}
+
+    /** {@inheritDoc} */
+    @Override
+    public void writeTimestamp(int tag, String name, Date value) throws IOException {}
 }
