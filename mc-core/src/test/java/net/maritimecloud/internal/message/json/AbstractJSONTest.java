@@ -44,6 +44,11 @@ public abstract class AbstractJSONTest {
 
     static final Binary B3 = Binary.copyFrom(new byte[] { -4, -3, -2, -1 });
 
+
+    static final String BIG_INT = "1234567898765432112345678987654321";
+
+    static final String BIG_DECIMAL = "1234567898765432112345678987654321.123456789";
+
     static void assertJSONWrite(IOConsumer<MessageWriter> c, String... lines) throws IOException {
         String s = MessageSerializers.writeToJSON(create(c));
         // System.out.println(s);
@@ -56,9 +61,9 @@ public abstract class AbstractJSONTest {
         assertEquals("}", lr.readLine());
     }
 
-    static JSONMessageReader readerOf(String... lines) {
+    static JsonMessageReader readerOf(String... lines) {
         JsonReader reader = JsonProvider.provider().createReader(new StringReader(jsonWrite(lines)));
-        return new JSONMessageReader(reader);
+        return new JsonMessageReader(reader);
     }
 
     static String jsonWrite(String... lines) {

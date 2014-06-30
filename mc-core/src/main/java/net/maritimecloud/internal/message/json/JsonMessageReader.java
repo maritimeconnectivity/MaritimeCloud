@@ -20,18 +20,14 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.json.JsonArray;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
@@ -46,7 +42,6 @@ import net.maritimecloud.core.message.MessageReader;
 import net.maritimecloud.core.message.MessageSerializable;
 import net.maritimecloud.core.message.MessageSerializationException;
 import net.maritimecloud.core.message.ValueParser;
-import net.maritimecloud.core.message.ValueReader;
 import net.maritimecloud.util.Binary;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
@@ -55,29 +50,29 @@ import net.maritimecloud.util.geometry.PositionTime;
  *
  * @author Kasper Nielsen
  */
-public class JSONMessageReader extends MessageReader {
+public class JsonMessageReader extends MessageReader {
 
-    JsonIterator iter;
+    final JsonIterator iter;
 
     final JsonReader r;
 
-    JSONMessageReader(JSONMessageReader r, JsonObject o) {
+    JsonMessageReader(JsonMessageReader r, JsonObject o) {
         this.r = r.r;
         iter = new JsonIterator(o);
     }
 
-    JSONMessageReader(JsonObject o) {
+    JsonMessageReader(JsonObject o) {
         this.r = null;
         this.iter = new JsonIterator(o);
     }
 
-    public JSONMessageReader(String s) {
-        this(JsonProvider.provider().createReader(new StringReader(s)));
-    }
-
-    public JSONMessageReader(JsonReader r) {
+    public JsonMessageReader(JsonReader r) {
         this.r = requireNonNull(r);
         iter = new JsonIterator(r.readObject());
+    }
+
+    public JsonMessageReader(CharSequence s) {
+        this(JsonProvider.provider().createReader(new StringReader(s.toString())));
     }
 
     /** {@inheritDoc} */
@@ -94,52 +89,46 @@ public class JSONMessageReader extends MessageReader {
         return false;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Binary readBinary(int tag, String name, Binary defaultValue) throws IOException {
+    private JsonValueReader read(String name) throws MessageSerializationException {
         if (isNext(-1, name)) {
-            JsonString val = (JsonString) iter.next().getValue();
-            return Binary.copyFromBase64(val.getString());
+            return new JsonValueReader(iter.next().getValue());
         }
-        return defaultValue;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Boolean readBoolean(int tag, String name, Boolean defaultValue) {
-        if (isNext(-1, name)) {
-            JsonValue val = iter.next().getValue();
-            return Boolean.parseBoolean(val.toString());
-        }
-        return defaultValue;
-    }
-
-    // A Quick hack
-    public static <T> T readFromString(String value, ValueParser<T> parser) throws IOException {
-        String ss = " { \"x\": " + value + "}";
-        JsonReader reader = JsonProvider.provider().createReader(new StringReader(ss));
-        JsonObject o = reader.readObject();
-        JsonValue val = o.get("x");
-        JsonValueReader r = new JsonValueReader(val);
-        return parser.parse(r);
-    }
-
-    public static JsonValueReader readFromString(String value) {
-        String ss = " { \"x\": " + value + "}";
-        JsonReader reader = JsonProvider.provider().createReader(new StringReader(ss));
-        JsonObject o = reader.readObject();
-        JsonValue val = o.get("x");
-        return new JsonValueReader(val);
+        throw new MessageSerializationException("Could not find tag '" + name + "'");
     }
 
     /** {@inheritDoc} */
     @Override
-    public Double readDouble(int tag, String name, Double defaultValue) {
-        if (isNext(-1, name)) {
-            JsonNumber val = (JsonNumber) iter.next().getValue();
-            return val.doubleValue();
-        }
-        return defaultValue;
+    public Binary readBinary(int tag, String name, Binary defaultValue) throws IOException {
+        JsonValueReader r = readOpt(name);
+        return r == null ? defaultValue : r.readBinary();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Boolean readBoolean(int tag, String name, Boolean defaultValue) throws IOException {
+        JsonValueReader r = readOpt(name);
+        return r == null ? defaultValue : r.readBoolean();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public BigDecimal readDecimal(int tag, String name) throws IOException {
+        return read(name).readDecimal();
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public BigDecimal readDecimal(int tag, String name, BigDecimal defaultValue) throws IOException {
+        JsonValueReader r = readOpt(name);
+        return r == null ? defaultValue : r.readDecimal();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Double readDouble(int tag, String name, Double defaultValue) throws IOException {
+        JsonValueReader r = readOpt(name);
+        return r == null ? defaultValue : r.readDouble();
     }
 
     /** {@inheritDoc} */
@@ -151,66 +140,41 @@ public class JSONMessageReader extends MessageReader {
 
     /** {@inheritDoc} */
     @Override
-    public Float readFloat(int tag, String name, Float defaultValue) {
-        if (isNext(-1, name)) {
-            JsonNumber val = (JsonNumber) iter.next().getValue();
-            return (float) val.doubleValue();
-        }
-        return defaultValue;
+    public Float readFloat(int tag, String name, Float defaultValue) throws MessageSerializationException, IOException {
+        return read(name).readFloat();
     }
 
     /** {@inheritDoc} */
     @Override
     public int readInt(int tag, String name) throws IOException {
-        if (isNext(-1, name)) {
-            JsonNumber val = (JsonNumber) iter.next().getValue();
-            return val.intValue();
-        }
-        throw new MessageSerializationException("Could not find tag '" + name + "'");
+        return read(name).readInt();
     }
 
     /** {@inheritDoc} */
     @Override
     public Integer readInt(int tag, String name, Integer defaultValue) throws IOException {
-        if (isNext(-1, name)) {
-            JsonNumber val = (JsonNumber) iter.next().getValue();
-            return val.intValue();
-        }
-        return defaultValue;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Long readInt64(int tag, String name, Long defaultValue) throws IOException {
-        if (isNext(-1, name)) {
-            JsonNumber val = (JsonNumber) iter.next().getValue();
-            return val.longValue();
-        }
-        return defaultValue;
+        JsonValueReader r = readOpt(name);
+        return r == null ? defaultValue : r.readInt();
     }
 
     /** {@inheritDoc} */
     @Override
     public long readInt64(int tag, String name) throws IOException {
-        if (isNext(-1, name)) {
-            JsonNumber val = (JsonNumber) iter.next().getValue();
-            return val.longValue();
-        }
-        throw new MessageSerializationException("Could not find tag '" + name + "'");
+        return read(name).readInt64();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @throws IOException
-     */
+    /** {@inheritDoc} */
+    @Override
+    public Long readInt64(int tag, String name, Long defaultValue) throws IOException {
+        JsonValueReader r = readOpt(name);
+        return r == null ? defaultValue : r.readInt64();
+    }
+
+    /** {@inheritDoc} */
     @Override
     public <T> List<T> readList(int tag, String name, ValueParser<T> parser) throws IOException {
-        if (isNext(-1, name)) {
-            Entry<String, JsonValue> next = iter.next();
-            return new JsonValueReader(next.getValue()).readList(parser);
-        }
-        return Collections.emptyList();
+        JsonValueReader r = readOpt(name);
+        return r == null ? Collections.emptyList() : r.readList(parser);
     }
 
     /**
@@ -254,6 +218,41 @@ public class JSONMessageReader extends MessageReader {
         // return result;
     }
 
+    private JsonValueReader readOpt(String name) {
+        if (isNext(-1, name)) {
+            return new JsonValueReader(iter.next().getValue());
+        }
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Position readPosition(int tag, String name, Position defaultValue) throws IOException {
+        JsonValueReader r = readOpt(name);
+        return r == null ? defaultValue : r.readPosition();
+
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public PositionTime readPositionTime(int tag, String name) throws IOException {
+        return read(name).readPositionTime();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public PositionTime readPositionTime(int tag, String name, PositionTime defaultValue) throws IOException {
+        JsonValueReader r = readOpt(name);
+        return r == null ? defaultValue : r.readPositionTime();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Position readPostion(int tag, String name) throws IOException {
+        return read(name).readPosition();
+    }
+
+
     /**
      * {@inheritDoc}
      *
@@ -296,13 +295,53 @@ public class JSONMessageReader extends MessageReader {
     /** {@inheritDoc} */
     @Override
     public String readText(int tag, String name, String defaultValue) throws IOException {
-        if (isNext(-1, name)) {
-            JsonString val = (JsonString) iter.next().getValue();
-            return val.getString();
-        }
-        return defaultValue;
+        JsonValueReader r = readOpt(name);
+        return r == null ? defaultValue : r.readText();
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public Date readTimestamp(int tag, String name) throws IOException {
+        return read(name).readTimestamp();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Date readTimestamp(int tag, String name, Date defaultValue) throws IOException {
+        JsonValueReader r = readOpt(name);
+        return r == null ? defaultValue : r.readTimestamp();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public BigInteger readVarInt(int tag, String name) throws IOException {
+        return read(name).readVarInt();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public BigInteger readVarInt(int tag, String name, BigInteger defaultValue) throws IOException {
+        JsonValueReader r = readOpt(name);
+        return r == null ? defaultValue : r.readVarInt();
+    }
+
+    public static JsonValueReader readFromString(String value) {
+        String ss = " { \"x\": " + value + "}";
+        JsonReader reader = JsonProvider.provider().createReader(new StringReader(ss));
+        JsonObject o = reader.readObject();
+        JsonValue val = o.get("x");
+        return new JsonValueReader(val);
+    }
+
+    // A Quick hack
+    public static <T> T readFromString(String value, ValueParser<T> parser) throws IOException {
+        String ss = " { \"x\": " + value + "}";
+        JsonReader reader = JsonProvider.provider().createReader(new StringReader(ss));
+        JsonObject o = reader.readObject();
+        JsonValue val = o.get("x");
+        JsonValueReader r = new JsonValueReader(val);
+        return parser.parse(r);
+    }
 
     static class JsonIterator {
         Iterator<Entry<String, javax.json.JsonValue>> iter;
@@ -337,163 +376,6 @@ public class JSONMessageReader extends MessageReader {
             return next;
         }
     }
-
-    static class JsonValueReader extends ValueReader {
-        JsonValue value;
-
-        JsonValueReader(JsonValue value) {
-            this.value = requireNonNull(value);
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Boolean readBoolean() throws IOException {
-            return Boolean.parseBoolean(value.toString());
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Float readFloat() throws IOException {
-            return Float.parseFloat(value.toString());
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Double readDouble() throws IOException {
-            return Double.parseDouble(value.toString());
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Integer readInt() throws IOException {
-            return Integer.parseInt(value.toString());
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Long readInt64() throws IOException {
-            return Long.parseLong(value.toString());
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Binary readBinary() throws IOException {
-            return Binary.copyFromBase64(((JsonString) value).getString());
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public String readText() throws IOException {
-            String val = ((JsonString) value).getString();
-            return val;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public <T extends Enum<T> & MessageEnum> T readEnum(MessageEnumParser<T> factory) throws IOException {
-            return factory.from(value.toString());
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public <T extends MessageSerializable> T readMessage(MessageParser<T> parser) throws IOException {
-            JsonObject o = (JsonObject) value;
-            JSONMessageReader r = new JSONMessageReader(o);
-            return parser.parse(r);
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public <T> List<T> readList(ValueParser<T> parser) throws IOException {
-            ArrayList<T> result = new ArrayList<>();
-            JsonArray a = (JsonArray) value;
-            for (int i = 0; i < a.size(); i++) {
-                T t = parser.parse(new JsonValueReader(a.get(i)));
-                result.add(t);
-            }
-            return result;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public <T> Set<T> readSet(ValueParser<T> parser) throws IOException {
-            return new HashSet<>(readList(parser));
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public <K, V> Map<K, V> readMap(ValueParser<K> keyParser, ValueParser<V> valueParser) throws IOException {
-            Map<K, V> result = new HashMap<>();
-            JsonObject a = (JsonObject) value;
-            for (Map.Entry<String, JsonValue> e : a.entrySet()) {
-                JsonStringImpl kImpl = new JsonStringImpl(e.getKey());
-                K key = keyParser.parse(new JsonValueReader(kImpl));
-                V value = valueParser.parse(new JsonValueReader(e.getValue()));
-                result.put(key, value);
-            }
-            return result;
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public BigInteger readVarInt(int tag, String name) throws IOException {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public BigDecimal readDecimal(int tag, String name) throws IOException {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Position readPostion(int tag, String name) throws IOException {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PositionTime readPositionTime(int tag, String name) throws IOException {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Date readTimestamp(int tag, String name) throws IOException {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public BigDecimal readDecimal(int tag, String name, BigDecimal defaultValue) throws IOException {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Date readTimestamp(int tag, String name, Date defaultValue) throws IOException {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Position readPosition(int tag, String name, Position defaultValue) throws IOException {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PositionTime readPositionTime(int tag, String name, PositionTime defaultValue) throws IOException {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public BigInteger readVarInt(int tag, String name, BigInteger defaultValue) throws IOException {
-        return null;
-    }
 }
 
 final class JsonStringImpl implements JsonString {
@@ -503,11 +385,19 @@ final class JsonStringImpl implements JsonString {
         this.value = value;
     }
 
-    public String getString() {
-        return this.value;
+    public boolean equals(Object obj) {
+        if (!(obj instanceof JsonString)) {
+            return false;
+        }
+        JsonString other = (JsonString) obj;
+        return getString().equals(other.getString());
     }
 
     public CharSequence getChars() {
+        return this.value;
+    }
+
+    public String getString() {
         return this.value;
     }
 
@@ -517,14 +407,6 @@ final class JsonStringImpl implements JsonString {
 
     public int hashCode() {
         return getString().hashCode();
-    }
-
-    public boolean equals(Object obj) {
-        if (!(obj instanceof JsonString)) {
-            return false;
-        }
-        JsonString other = (JsonString) obj;
-        return getString().equals(other.getString());
     }
 
     public String toString() {

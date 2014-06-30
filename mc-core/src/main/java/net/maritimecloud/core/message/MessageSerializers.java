@@ -15,17 +15,11 @@
 package net.maritimecloud.core.message;
 
 import java.io.IOException;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import javax.json.JsonReader;
-import javax.json.spi.JsonProvider;
-
-import net.maritimecloud.internal.message.json.JSONMessageReader;
-import net.maritimecloud.internal.message.json.JSONMessageWriter;
+import net.maritimecloud.internal.message.json.JsonMessageReader;
+import net.maritimecloud.internal.message.json.JsonValueWriter;
 
 /**
  *
@@ -35,32 +29,46 @@ public class MessageSerializers {
 
     // Almindelig vil skrive { som det foerste. og } naar den bliver closed.
 
-    /**
-     * Creates a message writer that will serialize messages as JSON. The serialized message can be read by a reader
-     * created by {@link MessageSerializers#newJSONReader(CharSequence)}. The writer created by this method will not
-     * include starting (<code>{</code>) and ending (<code>}</code>) tags. This tags are not added to allow for easier
-     * embedding of fragments of JSON.
-     *
-     * @param ps
-     *            the print stream to write to
-     * @return a message writer that will write to the given print stream
-     */
-    public static MessageWriter newJSONFragmentWriter(PrintStream ps) {
-        return newJSONFragmentWriter(new PrintWriter(ps));
-    }
+    // /**
+    // * Creates a message writer that will serialize messages as JSON. The serialized message can be read by a reader
+    // * created by {@link MessageSerializers#newJSONReader(CharSequence)}. The writer created by this method will not
+    // * include starting (<code>{</code>) and ending (<code>}</code>) tags. This tags are not added to allow for easier
+    // * embedding of fragments of JSON.
+    // *
+    // * @param ps
+    // * the print stream to write to
+    // * @return a message writer that will write to the given print stream
+    // */
+    // public static MessageWriter newJSONFragmentWriter(PrintStream ps) {
+    // return newJSONFragmentWriter(new PrintWriter(ps));
+    // }
 
-    /**
-     * Creates a message writer that can serialize messages as JSON. The serialized message can be read by a reader
-     * created by {@link MessageReader#createJSONReader(CharSequence)}.
-     *
-     * @param ps
-     *            the writer to write to
-     * @return a message writer that will write to the given print stream
-     */
-    public static MessageWriter newJSONFragmentWriter(Writer w) {
-        PrintWriter pw = w instanceof PrintWriter ? (PrintWriter) w : new PrintWriter(w);
-        return new JSONMessageWriter(pw);
-    }
+    // /**
+    // * Creates a message writer that can serialize messages as JSON. The serialized message can be read by a reader
+    // * created by {@link MessageReader#createJSONReader(CharSequence)}.
+    // *
+    // * @param ps
+    // * the writer to write to
+    // * @return a message writer that will write to the given print stream
+    // */
+    // public static MessageWriter newJSONFragmentWriter(Writer w) {
+    // PrintWriter pw = w instanceof PrintWriter ? (PrintWriter) w : new PrintWriter(w);
+    // return new JSONMessageWriter(pw);
+    // }
+
+    // public static void main(String[] args) {
+    // System.out.println(Position.create(1, 1).toJSON());
+    // }
+
+    // public static String writeToJSONOld(MessageSerializable message) {
+    // StringWriter sw = new StringWriter();
+    // try {
+    // writeToJSON(message, sw);
+    // } catch (IOException e) {
+    // throw new RuntimeException("Failed to write message as JSON", e);
+    // }
+    // return sw.toString();
+    // }
 
     public static String writeToJSON(MessageSerializable message) {
         StringWriter sw = new StringWriter();
@@ -72,16 +80,13 @@ public class MessageSerializers {
         return sw.toString();
     }
 
+    @SuppressWarnings("resource")
     public static void writeToJSON(MessageSerializable message, Writer w) throws IOException {
-        PrintWriter pw = w instanceof PrintWriter ? (PrintWriter) w : new PrintWriter(w);
-        try (JSONMessageWriter jw = new JSONMessageWriter(pw)) {
-            jw.writeMessage(message);
-        }
+        new JsonValueWriter(w).writeMessage(message);
     }
 
     public static <T extends MessageSerializable> T readFromJSON(MessageParser<T> parser, CharSequence cs) {
-        JsonReader reader = JsonProvider.provider().createReader(new StringReader(cs.toString()));
-        JSONMessageReader r = new JSONMessageReader(reader);
+        JsonMessageReader r = new JsonMessageReader(cs);
         try {
             return parser.parse(r);
         } catch (IOException e) {
@@ -89,27 +94,27 @@ public class MessageSerializers {
         }
     }
 
-    public static MessageReader newJSONReader(CharSequence cs, boolean readStartStopTags) {
-        if (!readStartStopTags) {
-            cs = "{" + cs + "}";
-        }
-        // return new JSONMessageReader(new JSONTokener(cs.toString()));
-        return null;
-    }
+    // public static MessageReader newJSONReader(CharSequence cs, boolean readStartStopTags) {
+    // if (!readStartStopTags) {
+    // cs = "{" + cs + "}";
+    // }
+    // // return new JSONMessageReader(new JSONTokener(cs.toString()));
+    // return null;
+    // }
 
-    /**
-     * Returns a JSON string from the specified message serializable.
-     *
-     * @param rootName
-     * @param serializable
-     * @return
-     * @throws IOException
-     */
-    public static String toJSONString(String rootName, MessageSerializable serializable) throws IOException {
-        StringWriter sw = new StringWriter();
-        sw.append('{');
-        newJSONFragmentWriter(sw).writeMessage(1, rootName, serializable);
-        sw.append('}');
-        return sw.toString();
-    }
+    // /**
+    // * Returns a JSON string from the specified message serializable.
+    // *
+    // * @param rootName
+    // * @param serializable
+    // * @return
+    // * @throws IOException
+    // */
+    // public static String toJSONString(String rootName, MessageSerializable serializable) throws IOException {
+    // StringWriter sw = new StringWriter();
+    // sw.append('{');
+    // newJSONFragmentWriter(sw).writeMessage(1, rootName, serializable);
+    // sw.append('}');
+    // return sw.toString();
+    // }
 }

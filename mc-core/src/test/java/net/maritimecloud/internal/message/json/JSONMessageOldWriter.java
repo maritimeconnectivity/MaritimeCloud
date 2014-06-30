@@ -31,7 +31,6 @@ import java.util.Set;
 import net.maritimecloud.core.message.MessageEnum;
 import net.maritimecloud.core.message.MessageSerializable;
 import net.maritimecloud.core.message.MessageWriter;
-import net.maritimecloud.core.message.ValueWriter;
 import net.maritimecloud.util.Binary;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
@@ -40,7 +39,8 @@ import net.maritimecloud.util.geometry.PositionTime;
  *
  * @author Kasper Nielsen
  */
-public class JSONMessageWriter extends MessageWriter {
+@Deprecated
+public class JSONMessageOldWriter extends MessageWriter {
 
     /** The Unix line separator. */
     static final String LS = "\n";
@@ -49,11 +49,11 @@ public class JSONMessageWriter extends MessageWriter {
     private int indent;
 
     /** The print writer to write to */
-    private final PrintWriter pw;
+    private final Writer pw;
 
     boolean isFirst = true;
 
-    public JSONMessageWriter(PrintWriter pw) {
+    public JSONMessageOldWriter(PrintWriter pw) {
         this.pw = requireNonNull(pw);
     }
 
@@ -77,14 +77,15 @@ public class JSONMessageWriter extends MessageWriter {
      * @param count
      *            the number of spaces to add
      * @return the specified string builder
+     * @throws IOException
      */
-    private void indent() {
+    private void indent() throws IOException {
         for (int i = 0; i < indent; i++) {
             pw.append("  ");
         }
     }
 
-    void writeBinary(Binary binary) {
+    void writeBinary(Binary binary) throws IOException {
         pw.append("\"");
         pw.write(binary.base64encode());
         pw.append("\"");
@@ -99,7 +100,7 @@ public class JSONMessageWriter extends MessageWriter {
         }
     }
 
-    void writeBool(boolean value) {
+    void writeBool(boolean value) throws IOException {
         pw.write(Boolean.toString(value));
     }
 
@@ -128,23 +129,23 @@ public class JSONMessageWriter extends MessageWriter {
         }
     }
 
-    void writeVarInt(BigInteger value) {
+    void writeVarInt(BigInteger value) throws IOException {
         pw.write(value.toString());
     }
 
-    void writeDecimal(BigDecimal value) {
+    void writeDecimal(BigDecimal value) throws IOException {
         pw.write(value.toString());
     }
 
-    void writeTimestamp(Date value) {
+    void writeTimestamp(Date value) throws IOException {
         writeInt64(value.getTime());
     }
 
-    void writePosition(Position value) {
+    void writePosition(Position value) throws IOException {
         pw.write(value.toString());
     }
 
-    void writePositionTime(PositionTime value) {
+    void writePositionTime(PositionTime value) throws IOException {
         pw.write(value.toString());
     }
 
@@ -184,7 +185,7 @@ public class JSONMessageWriter extends MessageWriter {
         }
     }
 
-    void writeEnum(MessageEnum enumValue) {
+    void writeEnum(MessageEnum enumValue) throws IOException {
         writeString(enumValue.getName());
     }
 
@@ -204,7 +205,7 @@ public class JSONMessageWriter extends MessageWriter {
         }
     }
 
-    void writeInt32(int value) {
+    void writeInt32(int value) throws IOException {
         pw.write(Integer.toString(value));
     }
 
@@ -226,7 +227,7 @@ public class JSONMessageWriter extends MessageWriter {
         }
     }
 
-    void writeInt64(long value) {
+    void writeInt64(long value) throws IOException {
         pw.write(Long.toString(value));
     }
 
@@ -244,20 +245,19 @@ public class JSONMessageWriter extends MessageWriter {
     }
 
     void writeListOrSet(Collection<?> list) throws IOException {
-        pw.print("[");
+        pw.write("[");
         indent++;
         boolean isFirst = true;
         for (Object o : list) {
             if (!isFirst) {
-                pw.println(",");
-            } else {
-                pw.println();
+                pw.write(",");
             }
+            pw.write(LS);
             indent();
             writeElement(o);
             isFirst = false;
         }
-        pw.println();
+        pw.write(LS);
         indent--;
         indent();
         pw.append("]");
@@ -277,16 +277,16 @@ public class JSONMessageWriter extends MessageWriter {
     }
 
     public void writeMessage(MessageSerializable message) throws IOException {
-        pw.print("{");
+        pw.write("{");
         indent++;
         boolean isFirst = this.isFirst;
         this.isFirst = true;
         message.writeTo(this);
         this.isFirst = isFirst;
         indent--;
-        pw.println();
+        pw.write(LS);
         indent();
-        pw.print("}");
+        pw.write("}");
     }
 
     @Override
@@ -306,23 +306,24 @@ public class JSONMessageWriter extends MessageWriter {
         }
     }
 
-    void writeString(String value) {
+    void writeString(String value) throws IOException {
         pw.write('"');
         pw.write(escapeString(value));
         pw.write('"');
     }
 
-    private JSONMessageWriter writeTag(int tag, String name) {
+    private JSONMessageOldWriter writeTag(int tag, String name) throws IOException {
         if (!isFirst) {
-            pw.print(",");
+            pw.write(",");
         }
         isFirst = false;
-        pw.println();
+        pw.write(LS);
         indent();
-        pw.print("\"" + name + "\": ");
+        pw.write("\"" + name + "\": ");
         return this;
     }
 
+    // There are no methods for unescaping JSON strings, we leave that to javax.json
     static String escapeString(String string) {
         StringBuilder sb = new StringBuilder();
         int len = string.length();
@@ -355,7 +356,7 @@ public class JSONMessageWriter extends MessageWriter {
                 break;
             default:
                 if (ch >= '\u0000' && ch <= '\u001F' || ch >= '\u007F' && ch <= '\u009F' || ch >= '\u2000'
-                        && ch <= '\u20FF') {
+                && ch <= '\u20FF') {
                     String ss = Integer.toHexString(ch);
                     sb.append("\\u");
                     for (int k = 0; k < 4 - ss.length(); k++) {
@@ -373,125 +374,13 @@ public class JSONMessageWriter extends MessageWriter {
     public static String toString(Object o) throws IOException {
         StringWriter sw = new StringWriter();
         @SuppressWarnings("resource")
-        JSONMessageWriter w = new JSONMessageWriter(new PrintWriter(sw));
+        JSONMessageOldWriter w = new JSONMessageOldWriter(new PrintWriter(sw));
         try {
             w.writeElement(o);
         } finally {
             w.close();
         }
         return sw.toString();
-    }
-
-    public static class JSONValueWriter implements ValueWriter {
-        final Writer sw = new StringWriter();
-
-        JSONMessageWriter w = new JSONMessageWriter(new PrintWriter(sw));
-
-        /** {@inheritDoc} */
-        @Override
-        public void writeBinary(Binary binary) throws IOException {
-            w.writeBinary(binary);
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void writeBoolean(Boolean value) throws IOException {
-            w.writeBool(value);
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void writeDouble(Double value) throws IOException {
-            w.writeDouble(value);
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void writeEnum(MessageEnum serializable) throws IOException {
-            w.writeEnum(serializable);
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void writeFloat(Float value) throws IOException {
-            w.writeFloat(value);
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void writeInt(Integer value) throws IOException {
-            w.writeInt32(value);
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void writeInt64(Long value) throws IOException {
-            w.writeInt64(value);
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void writeList(List<?> list) throws IOException {
-            w.writeListOrSet(list);
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void writeMap(Map<?, ?> map) throws IOException {
-            throw new UnsupportedOperationException();
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void writeMessage(MessageSerializable message) throws IOException {
-            w.writeMessage(message);
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void writeSet(Set<?> set) throws IOException {
-            w.writeListOrSet(set);
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void writeText(String value) throws IOException {
-            w.writeString(value);
-        }
-
-        public String toString() {
-            return sw.toString();
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void writeVarInt(BigInteger value) throws IOException {
-            w.writeVarInt(value);
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void writeDecimal(BigDecimal value) throws IOException {
-            w.writeDecimal(value);
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void writePosition(Position value) throws IOException {
-            w.writePosition(value);
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void writePositionTime(PositionTime value) throws IOException {
-            w.writePositionTime(value);
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void writeTimestamp(Date value) throws IOException {
-            w.writeTimestamp(value);
-        }
     }
 
     /** {@inheritDoc} */

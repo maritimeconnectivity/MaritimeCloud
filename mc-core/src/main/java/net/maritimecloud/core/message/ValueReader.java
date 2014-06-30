@@ -15,11 +15,16 @@
 package net.maritimecloud.core.message;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import net.maritimecloud.util.Binary;
+import net.maritimecloud.util.geometry.Position;
+import net.maritimecloud.util.geometry.PositionTime;
 
 /**
  *
@@ -27,19 +32,31 @@ import net.maritimecloud.util.Binary;
  */
 public abstract class ValueReader {
 
-    public abstract Boolean readBoolean() throws IOException;
+    public abstract Integer readInt() throws IOException;
+
+    public abstract Long readInt64() throws IOException;
+
+    public abstract BigInteger readVarInt() throws IOException;
 
     public abstract Float readFloat() throws IOException;
 
     public abstract Double readDouble() throws IOException;
 
-    public abstract Integer readInt() throws IOException;
+    public abstract BigDecimal readDecimal() throws IOException;
 
-    public abstract Long readInt64() throws IOException;
+
+    public abstract Boolean readBoolean() throws IOException;
 
     public abstract Binary readBinary() throws IOException;
 
     public abstract String readText() throws IOException;
+
+    public abstract Date readTimestamp() throws IOException;
+
+    public abstract Position readPosition() throws IOException;
+
+    public abstract PositionTime readPositionTime() throws IOException;
+
 
     public abstract <T extends Enum<T> & MessageEnum> T readEnum(MessageEnumParser<T> factory) throws IOException;
 

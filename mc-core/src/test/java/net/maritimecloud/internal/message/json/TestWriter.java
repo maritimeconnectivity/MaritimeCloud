@@ -15,10 +15,14 @@
 package net.maritimecloud.internal.message.json;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedHashSet;
 
 import net.maritimecloud.internal.message.TestEnum;
+import net.maritimecloud.util.geometry.Position;
+import net.maritimecloud.util.geometry.PositionTime;
 
 import org.junit.Test;
 
@@ -33,18 +37,23 @@ public class TestWriter extends AbstractJSONTest {
     public void testPrimitives() throws IOException {
         assertJSONWrite(w -> w.writeInt(1, "i1", 100), "\"i1\": 100");
         assertJSONWrite(w -> w.writeInt64(1, "1f1", -100L), "\"1f1\": -100");
+        assertJSONWrite(w -> w.writeVarInt(1, "f", new BigInteger(BIG_INT)), "\"f\": " + BIG_INT);
 
         assertJSONWrite(w -> w.writeFloat(1, "i1", 1.2345f), "\"i1\": 1.2345");
         assertJSONWrite(w -> w.writeDouble(1, "1f1", -10.12123d), "\"1f1\": -10.12123");
+        assertJSONWrite(w -> w.writeVarInt(1, "f", new BigInteger(BIG_INT)), "\"f\": " + BIG_INT);
 
         assertJSONWrite(w -> w.writeBoolean(1, "i1", true), "\"i1\": true");
         assertJSONWrite(w -> w.writeBoolean(1, "i1", false), "\"i1\": false");
-        assertJSONWrite(w -> w.writeText(1, "1f1", "hello"), "\"1f1\": \"hello\"");
-    }
-
-    @Test
-    public void testBinary() throws IOException {
         assertJSONWrite(w -> w.writeBinary(1, "i1", B1), "\"i1\": \"/38E\"");
+        assertJSONWrite(w -> w.writeText(1, "1f1", "hello"), "\"1f1\": \"hello\"");
+        assertJSONWrite(w -> w.writeTimestamp(1, "1f1", new Date(32112)), "\"1f1\": 32112");
+
+        assertJSONWrite(w -> w.writePosition(1, "f", Position.create(10, -10)), "\"f\": {", "  \"latitude\": 10.0,",
+                "  \"longitude\": -10.0", "}");
+
+        assertJSONWrite(w -> w.writePositionTime(1, "f", PositionTime.create(10, -10, 123456)), "\"f\": {",
+                "  \"latitude\": 10.0,", "  \"longitude\": -10.0,", "  \"time\": 123456", "}");
     }
 
     @Test

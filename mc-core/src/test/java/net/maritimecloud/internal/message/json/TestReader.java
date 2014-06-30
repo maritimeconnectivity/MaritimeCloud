@@ -17,9 +17,15 @@ package net.maritimecloud.internal.message.json;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Date;
 
 import net.maritimecloud.core.message.ValueParser;
+import net.maritimecloud.util.Binary;
+import net.maritimecloud.util.geometry.Position;
+import net.maritimecloud.util.geometry.PositionTime;
 
 import org.junit.Test;
 
@@ -30,14 +36,31 @@ import org.junit.Test;
 public class TestReader extends AbstractJSONTest {
 
     @Test
-    public void testEnum() throws IOException {
-        assertEquals(100, readerOf("\"i1\": 100").readInt(1, "i1", -1).intValue());
-        assertEquals(-100L, readerOf("\"1f1\": -100").readInt64(1, "1f1", -1L).longValue());
-        assertEquals(1.2345f, readerOf("\"i1\": 1.2345").readFloat(1, "i1", 0f).floatValue(), 0);
-        assertEquals(-10.12123d, readerOf("\"1f1\": -10.12123").readDouble(1, "1f1", 0d).doubleValue(), 0);
+    public void primitives() throws IOException {
+        assertEquals(100, readerOf("\"f\": 100").readInt(1, "f", null).intValue());
+        assertEquals(-100L, readerOf("\"f\": -100").readInt64(1, "f", null).longValue());
+        assertEquals(new BigInteger(BIG_INT), readerOf("\"f\": " + BIG_INT).readVarInt(1, "f", null));
+
+        assertEquals(1.2345f, readerOf("\"f\": 1.2345").readFloat(1, "f", null).floatValue(), 0);
+        assertEquals(-10.12123d, readerOf("\"f\": -10.12123").readDouble(1, "f", null).doubleValue(), 0);
+        assertEquals(new BigDecimal(BIG_DECIMAL), readerOf("\"f\": " + BIG_DECIMAL).readDecimal(1, "f", null));
+
         assertEquals(true, readerOf("\"i1\": true").readBoolean(1, "i1", null).booleanValue());
         assertEquals(false, readerOf("\"i1\": false").readBoolean(1, "i1", null).booleanValue());
-        assertEquals("hello", readerOf("\"1f1\": \"hello\"").readText(1, "1f1", null));
+        assertEquals(Binary.EMPTY, readerOf("\"f\": \"\"").readBinary(1, "f", null));
+        assertEquals(Binary.copyFromUtf8("er"), readerOf("\"f\": \"ZXI=\"").readBinary(1, "f", null));
+        assertEquals(new Date(32123), readerOf("\"f\": 32123").readTimestamp(1, "f", null));
+        assertEquals("hello", readerOf("\"f\": \"hello\"").readText(1, "f", null));
+        assertEquals("\\/\"", readerOf("\"f\": \"\\\\\\/\\\"\"").readText(1, "f", null));
+
+
+        assertEquals(Position.create(10, -10), readerOf("\"f\": {\"latitude\": 10, \"longitude\": -10}  ")
+                .readPosition(1, "f", null));
+
+        assertEquals(
+                PositionTime.create(10, -10, 12345),
+                readerOf("\"f\": {\"latitude\": 10, \"longitude\": -10, \"time\": 12345}  ").readPositionTime(1, "f",
+                        null));
     }
 
     @Test
