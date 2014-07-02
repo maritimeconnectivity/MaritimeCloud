@@ -39,7 +39,7 @@ public class JsonValueWriter implements ValueWriter, Closeable {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws IOException
      */
     @Override
@@ -197,7 +197,8 @@ public class JsonValueWriter implements ValueWriter, Closeable {
     /** {@inheritDoc} */
     @Override
     public void writeMap(Map<?, ?> map) throws IOException {
-        throw new UnsupportedOperationException();
+        pw.write("{}");
+        // throw new UnsupportedOperationException();
     }
 
     /** {@inheritDoc} */

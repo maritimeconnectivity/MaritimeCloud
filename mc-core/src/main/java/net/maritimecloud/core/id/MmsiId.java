@@ -16,7 +16,7 @@ package net.maritimecloud.core.id;
 
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class MmsiId extends MaritimeId {
@@ -52,7 +52,7 @@ public class MmsiId extends MaritimeId {
     }
 
     public String toString() {
-        return "mmsi://" + mmsi;
+        return "mmsi:" + mmsi;
     }
 
     // mmsi://102323233

@@ -91,9 +91,9 @@ public abstract class MessageReader implements Closeable {
     public abstract <T extends MessageSerializable> T readMessage(int tag, String name, MessageParser<T> parser)
             throws IOException;
 
-    public abstract double readRequiredDouble(int tag, String name) throws IOException;
+    public abstract double readDouble(int tag, String name) throws IOException;
 
-    public abstract float readRequiredFloat(int tag, String name) throws IOException;
+    public abstract float readFloat(int tag, String name) throws IOException;
 
     public abstract <T> Set<T> readSet(int tag, String name, ValueParser<T> parser) throws IOException;
 

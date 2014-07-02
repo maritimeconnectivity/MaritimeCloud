@@ -215,8 +215,8 @@ public class PositionTime extends Position {
         // int lon = r.readInt32(2, "longitude");
         // return Position.create(lat / 10_000_000d, lon / 10_000_000d);
         // } else {
-        double lat = r.readRequiredDouble(1, "latitude");
-        double lon = r.readRequiredDouble(2, "longitude");
+        double lat = r.readDouble(1, "latitude");
+        double lon = r.readDouble(2, "longitude");
         long time = r.readInt64(3, "time", 0L);
 
         return PositionTime.create(lat, lon, time);

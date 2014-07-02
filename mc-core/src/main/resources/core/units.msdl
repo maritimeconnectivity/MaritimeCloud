@@ -1,5 +1,4 @@
-namespace core.units;
-
+namespace core;
 
 @JavaImplementation("net.maritimecloud.util.units.Distance")
 message Distance {
@@ -10,3 +9,5 @@ message Distance {
 message Temperatur {
    1: float kelvin;
 }
+
+//32 bit -> 4.000.000.000 -> 4000.000.000

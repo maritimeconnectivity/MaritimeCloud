@@ -142,15 +142,17 @@ public abstract class Area implements Message, Serializable {
         // Box = 2;
         // Polygon = 3;
         // Union = 4;
-        if (r.isNext(1, "circle")) {
-            return r.readMessage(1, "circle", Circle.PARSER);
-        } else if (r.isNext(2, "box")) {
-            return r.readMessage(2, "box", BoundingBox.PARSER);
-        } else if (r.isNext(3, "polygon")) {
-            return r.readMessage(3, "polygon", BoundingBox.PARSER);
-        } else {
-            List<AreaUnion> readList = r.readList(4, "areas", AreaUnion.PARSER);
+        if (r.isNext(1, "areas")) {
+            List<AreaUnion> readList = r.readList(1, "areas", AreaUnion.PARSER);
             return new AreaUnion(readList.toArray(new AreaUnion[0]));
+        } else if (r.isNext(2, "circle")) {
+            return r.readMessage(1, "circle", Circle.PARSER);
+        } else if (r.isNext(3, "boundingbox")) {
+            return r.readMessage(2, "boundingbox", BoundingBox.PARSER);
+        } else if (r.isNext(4, "polygon")) {
+            return r.readMessage(3, "polygon", Polygon.PARSER);
+        } else {
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -160,14 +162,16 @@ public abstract class Area implements Message, Serializable {
         @Override
         public void writeTo(MessageWriter w) throws IOException {
             Area a = Area.this;
-            if (a instanceof Circle) {
-                w.writeMessage(1, "circle", a);
+            if (a instanceof AreaUnion) {
+                w.writeMessage(1, "areas", a);
+            } else if (a instanceof Circle) {
+                w.writeMessage(2, "circle", a);
             } else if (a instanceof BoundingBox) {
-                throw new UnsupportedOperationException();
+                w.writeMessage(3, "boundingbox", a);
             } else if (a instanceof Polygon) {
-                throw new UnsupportedOperationException();
+                w.writeMessage(4, "polygon", a);
             } else {
-                w.writeMessage(4, "areas", a);
+                throw new UnsupportedOperationException();
             }
         }
     }

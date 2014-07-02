@@ -1,40 +1,29 @@
-namespace core.geometry;
+namespace core;
 
-/** 
- * A position
- */
- @JavaImplementation("net.maritimecloud.util.geometry.Position")
-message Position {
-   1: int32 lat;
-   2: int32 lon;
-}
-
-/** 
- * The type of shapes that are supported for the build in area shapes.
- */
+/**  The type of shapes that are supported. */
 @JavaImplementation("net.maritimecloud.util.geometry.Area")
 message Area {
-  1: Circle circle;
-  2: Box box;
-  3: Polygon polygon;
-  4: AreaUnion union;
+  1: AreaUnion union;
+  2: Circle circle;
+  3: BoundingBox box;
+  4: Polygon polygon;
 } 
 
 @JavaImplementation("net.maritimecloud.util.geometry.Circle")
 message Circle {
-  1: Position center;
+  1: position center;
   2: float radius;
 }
 
 @JavaImplementation("net.maritimecloud.util.geometry.BoundingBox")
-message Box {
-  1: Position topLeft;
-  2: Position buttomRight;
+message BoundingBox {
+  1: position topLeft;
+  2: position buttomRight;
 }
 
 @JavaImplementation("net.maritimecloud.util.geometry.Polygon")
 message Polygon {
-   1: list<Position> points;
+   1: list<position> points;
 }
 
 @JavaImplementation("net.maritimecloud.util.geometry.AreaUnion")

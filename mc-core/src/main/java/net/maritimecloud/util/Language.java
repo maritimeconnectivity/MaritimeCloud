@@ -37,7 +37,7 @@ public class Language {
         }
     }
 
-    public Language(String code) {
+    Language(String code) {
         if (!CODE_NAME_MAP.containsKey(code)) {
             throw new IllegalArgumentException("Unknown language code: " + code);
         }

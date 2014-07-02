@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.JsonString;
@@ -141,7 +140,8 @@ public class JsonMessageReader extends MessageReader {
     /** {@inheritDoc} */
     @Override
     public Float readFloat(int tag, String name, Float defaultValue) throws MessageSerializationException, IOException {
-        return read(name).readFloat();
+        JsonValueReader r = readOpt(name);
+        return r == null ? defaultValue : r.readFloat();
     }
 
     /** {@inheritDoc} */
@@ -171,17 +171,15 @@ public class JsonMessageReader extends MessageReader {
     }
 
     /** {@inheritDoc} */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public <T> List<T> readList(int tag, String name, ValueParser<T> parser) throws IOException {
         JsonValueReader r = readOpt(name);
-        return r == null ? Collections.emptyList() : r.readList(parser);
+        // The list cast shoudn't be necessary but javac complains for some reason
+        return r == null ? (List) Collections.emptyList() : r.readList(parser);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @throws IOException
-     */
+    /** {@inheritDoc} */
     @Override
     public <K, V> Map<K, V> readMap(int tag, String name, ValueParser<K> keyParser, ValueParser<V> valueParser)
             throws IOException {
@@ -253,27 +251,16 @@ public class JsonMessageReader extends MessageReader {
     }
 
 
-    /**
-     * {@inheritDoc}
-     *
-     * @throws MessageSerializationException
-     */
+    /** {@inheritDoc} */
     @Override
-    public double readRequiredDouble(int tag, String name) throws MessageSerializationException {
-        if (isNext(-1, name)) {
-            JsonNumber val = (JsonNumber) iter.next().getValue();
-            return val.doubleValue();
-        }
-        throw new MessageSerializationException("Could not find tag '" + tag + "'");
+    public double readDouble(int tag, String name) throws IOException {
+        return read(name).readDouble();
     }
 
+    /** {@inheritDoc} */
     @Override
-    public float readRequiredFloat(int tag, String name) throws MessageSerializationException {
-        if (isNext(-1, name)) {
-            JsonNumber val = (JsonNumber) iter.next().getValue();
-            return (float) val.doubleValue();
-        }
-        throw new MessageSerializationException("Could not find tag '" + tag + "'");
+    public float readFloat(int tag, String name) throws IOException {
+        return read(name).readFloat();
     }
 
     /**

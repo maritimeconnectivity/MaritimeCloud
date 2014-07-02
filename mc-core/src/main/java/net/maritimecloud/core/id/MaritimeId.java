@@ -56,7 +56,7 @@ public abstract class MaritimeId implements Serializable {
             throw new IllegalArgumentException("Illegal id, must start with 'some_scheme://', was " + id);
         }
         if (uri.getScheme().equals("mmsi")) {
-            int mmsi = Integer.parseInt(uri.getHost());
+            int mmsi = Integer.parseInt(uri.getSchemeSpecificPart());
             return new MmsiId(mmsi);
         }
         throw new IllegalArgumentException("Unknown schenme " + uri.getScheme());

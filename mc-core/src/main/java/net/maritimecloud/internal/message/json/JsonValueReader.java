@@ -61,7 +61,6 @@ public class JsonValueReader extends ValueReader {
     public Binary readBinary() throws IOException {
         if (value instanceof JsonString) {
             JsonString v = (JsonString) value;
-            System.out.println("XXX");
             return Binary.copyFromBase64(v.getString());
         }
         throw new MessageSerializationException("Was not a string");

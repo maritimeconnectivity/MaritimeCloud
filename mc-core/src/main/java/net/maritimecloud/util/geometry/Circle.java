@@ -43,9 +43,15 @@ public class Circle extends Area {
         /** {@inheritDoc} */
         @Override
         public Circle parse(MessageReader r) throws IOException {
-            Position center = Position.readFromPacked(r, 1, NAME_CENTER_LATITIUDE, 2, NAME_CENTER_LONGITUDE);
-            float radius = r.readRequiredFloat(3, NAME_RADIUS);
-            return new Circle(center, radius);
+            return r.readMessage(1, NAME, new MessageParser<Circle>() {
+                @Override
+                public Circle parse(MessageReader reader) throws IOException {
+                    double lat = reader.readDouble(1, NAME_CENTER_LATITIUDE);
+                    double lon = reader.readDouble(2, NAME_CENTER_LONGITUDE);
+                    float radius = reader.readFloat(3, NAME_RADIUS);
+                    return new Circle(Position.create(lat, lon), radius);
+                }
+            });
         }
     };
 
@@ -219,7 +225,8 @@ public class Circle extends Area {
     public void writeTo(MessageWriter w) throws IOException {
         w.writeMessage(1, NAME, new MessageSerializable() {
             public void writeTo(MessageWriter w) throws IOException {
-                center.writeToPacked(w, 1, NAME_CENTER_LATITIUDE, 2, NAME_CENTER_LONGITUDE);
+                w.writeDouble(1, NAME_CENTER_LATITIUDE, center.latitude);
+                w.writeDouble(2, NAME_CENTER_LONGITUDE, center.longitude);
                 w.writeFloat(3, NAME_RADIUS, (float) radius);
             }
         });
