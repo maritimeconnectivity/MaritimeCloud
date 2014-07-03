@@ -55,7 +55,7 @@ public class MmsiId extends MaritimeId {
         return "mmsi:" + mmsi;
     }
 
-    // mmsi://102323233
+    // mmsi:102323233
 
     // enid://
 

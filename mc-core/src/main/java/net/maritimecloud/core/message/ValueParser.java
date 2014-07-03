@@ -35,74 +35,74 @@ import net.maritimecloud.util.geometry.PositionTime;
 public abstract class ValueParser<T> {
 
     public static final ValueParser<Binary> BINARY = new ValueParser<Binary>() {
-        public Binary parse(ValueReader reader) throws IOException {
+        public Binary read(ValueReader reader) throws IOException {
             return reader.readBinary();
         }
     };
 
     public static final ValueParser<Boolean> BOOLEAN = new ValueParser<Boolean>() {
-        public Boolean parse(ValueReader reader) throws IOException {
+        public Boolean read(ValueReader reader) throws IOException {
             return reader.readBoolean();
         }
     };
 
     public static final ValueParser<Double> DOUBLE = new ValueParser<Double>() {
-        public Double parse(ValueReader reader) throws IOException {
+        public Double read(ValueReader reader) throws IOException {
             return reader.readDouble();
         }
     };
 
     public static final ValueParser<Float> FLOAT = new ValueParser<Float>() {
-        public Float parse(ValueReader reader) throws IOException {
+        public Float read(ValueReader reader) throws IOException {
             return reader.readFloat();
         }
     };
 
     public static final ValueParser<Integer> INT = new ValueParser<Integer>() {
-        public Integer parse(ValueReader reader) throws IOException {
+        public Integer read(ValueReader reader) throws IOException {
             return reader.readInt();
         }
     };
 
     public static final ValueParser<Long> INT64 = new ValueParser<Long>() {
-        public Long parse(ValueReader reader) throws IOException {
+        public Long read(ValueReader reader) throws IOException {
             return reader.readInt64();
         }
     };
 
     public static final ValueParser<String> TEXT = new ValueParser<String>() {
-        public String parse(ValueReader reader) throws IOException {
+        public String read(ValueReader reader) throws IOException {
             return reader.readText();
         }
     };
 
 
     public static final ValueParser<BigInteger> VARINT = new ValueParser<BigInteger>() {
-        public BigInteger parse(ValueReader reader) throws IOException {
+        public BigInteger read(ValueReader reader) throws IOException {
             throw new UnsupportedOperationException();
         }
     };
 
     public static final ValueParser<BigDecimal> DECIMAL = new ValueParser<BigDecimal>() {
-        public BigDecimal parse(ValueReader reader) throws IOException {
+        public BigDecimal read(ValueReader reader) throws IOException {
             throw new UnsupportedOperationException();
         }
     };
 
     public static final ValueParser<Position> POSITION = new ValueParser<Position>() {
-        public Position parse(ValueReader reader) throws IOException {
+        public Position read(ValueReader reader) throws IOException {
             throw new UnsupportedOperationException();
         }
     };
 
     public static final ValueParser<PositionTime> POSITION_TIME = new ValueParser<PositionTime>() {
-        public PositionTime parse(ValueReader reader) throws IOException {
+        public PositionTime read(ValueReader reader) throws IOException {
             throw new UnsupportedOperationException();
         }
     };
 
     public static final ValueParser<Date> TIMESTAMP = new ValueParser<Date>() {
-        public Date parse(ValueReader reader) throws IOException {
+        public Date read(ValueReader reader) throws IOException {
             return null;
         }
     };
@@ -124,7 +124,7 @@ public abstract class ValueParser<T> {
      * @throws IOException
      *             if the message could not be read
      */
-    public abstract T parse(ValueReader reader) throws IOException;
+    public abstract T read(ValueReader reader) throws IOException;
 
     public final ValueParser<Set<T>> setOf() {
         return new SetParser<>(this);
@@ -146,7 +146,7 @@ public abstract class ValueParser<T> {
 
         /** {@inheritDoc} */
         @Override
-        public List<E> parse(ValueReader reader) throws IOException {
+        public List<E> read(ValueReader reader) throws IOException {
             return reader.readList(parser);
         }
     }
@@ -163,7 +163,7 @@ public abstract class ValueParser<T> {
 
         /** {@inheritDoc} */
         @Override
-        public Map<K, V> parse(ValueReader reader) throws IOException {
+        public Map<K, V> read(ValueReader reader) throws IOException {
             return reader.readMap(keyParser, valueParser);
         }
     }
@@ -177,7 +177,7 @@ public abstract class ValueParser<T> {
 
         /** {@inheritDoc} */
         @Override
-        public Set<E> parse(ValueReader reader) throws IOException {
+        public Set<E> read(ValueReader reader) throws IOException {
             return reader.readSet(parser);
         }
     }

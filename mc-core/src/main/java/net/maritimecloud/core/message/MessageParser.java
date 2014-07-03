@@ -35,9 +35,14 @@ public abstract class MessageParser<T extends MessageSerializable> extends Value
 
     /** {@inheritDoc} */
     @Override
-    public final T parse(ValueReader reader) throws IOException {
+    public final T read(ValueReader reader) throws IOException {
         return reader.readMessage(this);
     }
+
+    public void write(MessageWriter writer, T value) throws IOException {
+        value.writeTo(writer);
+    }
+
 }
 
 // public static final MessageParser<Long> OF_INT64 = null;

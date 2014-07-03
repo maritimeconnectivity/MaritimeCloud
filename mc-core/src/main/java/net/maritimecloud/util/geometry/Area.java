@@ -137,6 +137,23 @@ public abstract class Area implements Message, Serializable {
         return r.nextDouble() * (bound - least) + least;
     }
 
+
+    public static void write(Area a, MessageWriter w) throws IOException {
+        if (a != null) {
+            if (a instanceof AreaUnion) {
+                w.writeMessage(1, "areas", a);
+            } else if (a instanceof Circle) {
+                w.writeMessage(2, "circle", a);
+            } else if (a instanceof BoundingBox) {
+                w.writeMessage(3, "boundingbox", a);
+            } else if (a instanceof Polygon) {
+                w.writeMessage(4, "polygon", a);
+            } else {
+                throw new UnsupportedOperationException();
+            }
+        }
+    }
+
     public static Area readFrom(MessageReader r) throws IOException {
         // Circle = 1;
         // Box = 2;

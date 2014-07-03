@@ -327,7 +327,7 @@ public class JsonMessageReader extends MessageReader {
         JsonObject o = reader.readObject();
         JsonValue val = o.get("x");
         JsonValueReader r = new JsonValueReader(val);
-        return parser.parse(r);
+        return parser.read(r);
     }
 
     static class JsonIterator {

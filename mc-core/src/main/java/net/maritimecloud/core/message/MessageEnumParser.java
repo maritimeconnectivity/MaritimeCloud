@@ -43,7 +43,7 @@ public abstract class MessageEnumParser<T extends Enum<T> & MessageEnum> extends
 
     /** {@inheritDoc} */
     @Override
-    public final T parse(ValueReader reader) throws IOException {
+    public final T read(ValueReader reader) throws IOException {
         return reader.readEnum(this);
     }
 }

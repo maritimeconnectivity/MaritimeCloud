@@ -139,7 +139,7 @@ public class JsonValueReader extends ValueReader {
         ArrayList<T> result = new ArrayList<>();
         JsonArray a = (JsonArray) value;
         for (int i = 0; i < a.size(); i++) {
-            T t = parser.parse(new JsonValueReader(a.get(i)));
+            T t = parser.read(new JsonValueReader(a.get(i)));
             result.add(t);
         }
         return result;
@@ -152,8 +152,8 @@ public class JsonValueReader extends ValueReader {
         JsonObject a = (JsonObject) value;
         for (Map.Entry<String, JsonValue> e : a.entrySet()) {
             JsonStringImpl kImpl = new JsonStringImpl(e.getKey());
-            K key = keyParser.parse(new JsonValueReader(kImpl));
-            V value = valueParser.parse(new JsonValueReader(e.getValue()));
+            K key = keyParser.read(new JsonValueReader(kImpl));
+            V value = valueParser.read(new JsonValueReader(e.getValue()));
             result.put(key, value);
         }
         return result;
