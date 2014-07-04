@@ -19,9 +19,8 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 import java.util.Random;
 
-import net.maritimecloud.core.message.MessageParser;
 import net.maritimecloud.core.message.MessageReader;
-import net.maritimecloud.core.message.MessageSerializable;
+import net.maritimecloud.core.message.MessageSerializer;
 import net.maritimecloud.core.message.MessageWriter;
 
 /**
@@ -38,20 +37,15 @@ public class Circle extends Area {
 
     static final String NAME_RADIUS = "radius";
 
-    public static final MessageParser<Circle> PARSER = new MessageParser<Circle>() {
+    public static final MessageSerializer<Circle> SERIALIZER = new MessageSerializer<Circle>() {
 
         /** {@inheritDoc} */
         @Override
-        public Circle parse(MessageReader r) throws IOException {
-            return r.readMessage(1, NAME, new MessageParser<Circle>() {
-                @Override
-                public Circle parse(MessageReader reader) throws IOException {
-                    double lat = reader.readDouble(1, NAME_CENTER_LATITIUDE);
-                    double lon = reader.readDouble(2, NAME_CENTER_LONGITUDE);
-                    float radius = reader.readFloat(3, NAME_RADIUS);
-                    return new Circle(Position.create(lat, lon), radius);
-                }
-            });
+        public Circle read(MessageReader reader) throws IOException {
+            double lat = reader.readDouble(1, NAME_CENTER_LATITIUDE);
+            double lon = reader.readDouble(2, NAME_CENTER_LONGITUDE);
+            float radius = reader.readFloat(3, NAME_RADIUS);
+            return new Circle(Position.create(lat, lon), radius);
         }
     };
 
@@ -223,13 +217,9 @@ public class Circle extends Area {
     /** {@inheritDoc} */
     @Override
     public void writeTo(MessageWriter w) throws IOException {
-        w.writeMessage(1, NAME, new MessageSerializable() {
-            public void writeTo(MessageWriter w) throws IOException {
-                w.writeDouble(1, NAME_CENTER_LATITIUDE, center.latitude);
-                w.writeDouble(2, NAME_CENTER_LONGITUDE, center.longitude);
-                w.writeFloat(3, NAME_RADIUS, (float) radius);
-            }
-        });
+        w.writeDouble(1, NAME_CENTER_LATITIUDE, center.latitude);
+        w.writeDouble(2, NAME_CENTER_LONGITUDE, center.longitude);
+        w.writeFloat(3, NAME_RADIUS, (float) radius);
     }
 
     public static Circle create(double latitude, double longitude, double radius) {

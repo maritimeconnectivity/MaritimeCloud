@@ -18,8 +18,8 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import net.maritimecloud.core.message.Message;
-import net.maritimecloud.core.message.MessageParser;
 import net.maritimecloud.core.message.MessageReader;
+import net.maritimecloud.core.message.MessageSerializer;
 import net.maritimecloud.core.message.MessageSerializers;
 import net.maritimecloud.core.message.MessageWriter;
 import net.maritimecloud.util.geometry.CoordinateSystem.VincentyCalculationType;
@@ -29,11 +29,11 @@ import net.maritimecloud.util.geometry.CoordinateSystem.VincentyCalculationType;
  */
 public class Position implements Message, Serializable {
 
-    public static final MessageParser<Position> PARSER = new MessageParser<Position>() {
+    public static final MessageSerializer<Position> SERIALIZER = new MessageSerializer<Position>() {
 
         /** {@inheritDoc} */
         @Override
-        public Position parse(MessageReader reader) throws IOException {
+        public Position read(MessageReader reader) throws IOException {
             return readFrom(reader);
         }
     };
@@ -227,7 +227,7 @@ public class Position implements Message, Serializable {
 
     /** Returns a JSON representation of this message */
     public String toJSON() {
-        return MessageSerializers.writeToJSON(this);
+        return MessageSerializers.writeToJSON(this, SERIALIZER);
     }
 
     /**

@@ -36,11 +36,11 @@ import javax.json.spi.JsonProvider;
 
 import net.maritimecloud.core.message.MessageEnum;
 import net.maritimecloud.core.message.MessageEnumParser;
-import net.maritimecloud.core.message.MessageParser;
+import net.maritimecloud.core.message.MessageSerializer;
 import net.maritimecloud.core.message.MessageReader;
 import net.maritimecloud.core.message.MessageSerializable;
 import net.maritimecloud.core.message.MessageSerializationException;
-import net.maritimecloud.core.message.ValueParser;
+import net.maritimecloud.core.message.ValueSerializer;
 import net.maritimecloud.util.Binary;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
@@ -173,7 +173,7 @@ public class JsonMessageReader extends MessageReader {
     /** {@inheritDoc} */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    public <T> List<T> readList(int tag, String name, ValueParser<T> parser) throws IOException {
+    public <T> List<T> readList(int tag, String name, ValueSerializer<T> parser) throws IOException {
         JsonValueReader r = readOpt(name);
         // The list cast shoudn't be necessary but javac complains for some reason
         return r == null ? (List) Collections.emptyList() : r.readList(parser);
@@ -181,7 +181,7 @@ public class JsonMessageReader extends MessageReader {
 
     /** {@inheritDoc} */
     @Override
-    public <K, V> Map<K, V> readMap(int tag, String name, ValueParser<K> keyParser, ValueParser<V> valueParser)
+    public <K, V> Map<K, V> readMap(int tag, String name, ValueSerializer<K> keyParser, ValueSerializer<V> valueParser)
             throws IOException {
         if (isNext(-1, name)) {
             Entry<String, JsonValue> next = iter.next();
@@ -192,7 +192,7 @@ public class JsonMessageReader extends MessageReader {
 
     /** {@inheritDoc} */
     @Override
-    public <T extends MessageSerializable> T readMessage(int tag, String name, MessageParser<T> parser)
+    public <T extends MessageSerializable> T readMessage(int tag, String name, MessageSerializer<T> parser)
             throws IOException {
         if (isNext(-1, name)) {
             Entry<String, JsonValue> next = iter.next();
@@ -269,7 +269,7 @@ public class JsonMessageReader extends MessageReader {
      * @throws IOException
      */
     @Override
-    public <T> Set<T> readSet(int tag, String name, ValueParser<T> parser) throws IOException {
+    public <T> Set<T> readSet(int tag, String name, ValueSerializer<T> parser) throws IOException {
         // parser.
         //
         // for (xxxx) {
@@ -321,7 +321,7 @@ public class JsonMessageReader extends MessageReader {
     }
 
     // A Quick hack
-    public static <T> T readFromString(String value, ValueParser<T> parser) throws IOException {
+    public static <T> T readFromString(String value, ValueSerializer<T> parser) throws IOException {
         String ss = " { \"x\": " + value + "}";
         JsonReader reader = JsonProvider.provider().createReader(new StringReader(ss));
         JsonObject o = reader.readObject();

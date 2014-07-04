@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashSet;
 
+import net.maritimecloud.core.message.ValueSerializer;
 import net.maritimecloud.internal.message.TestEnum;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
@@ -63,31 +64,38 @@ public class TestWriter extends AbstractJSONTest {
 
     @Test
     public void testListAndSet() throws IOException {
-        assertJSONWrite(w -> w.writeList(1, "i1", Arrays.asList()));
-        assertJSONWrite(w -> w.writeList(1, "i1", Arrays.asList(1, 3, 2, -4, 1)), "\"i1\": [", "  1,", "  3,", "  2,",
-                "  -4,", "  1", "]");
-        assertJSONWrite(w -> w.writeSet(1, "i1", new LinkedHashSet<>(Arrays.asList(1, 3, 2, -4, 1))), "\"i1\": [",
-                "  1,", "  3,", "  2,", "  -4", "]");
-        assertJSONWrite(w -> w.writeList(1, "i1", Arrays.asList(TestEnum.T2, TestEnum.T3, TestEnum.T1)), "\"i1\": [",
-                "  \"T2\",", "  \"T3\",", "  \"T1\"", "]");
-        assertJSONWrite(w -> w.writeList(1, "i1", Arrays.asList(B1, B2, B3)), "\"i1\": [", "  \"/38E\",",
-                "  \"ABv/\",", "  \"/P3+/w==\"", "]");
-        assertJSONWrite(w -> w.writeList(1, "i1", Arrays.asList(Arrays.asList(1, 3, 2), Arrays.asList(-4, 1))),
-                "\"i1\": [", "  [", "    1,", "    3,", "    2", "  ],", "  [", "    -4,", "    1", "  ]", "]");
+
+        assertJSONWrite(w -> w.writeList(1, "i1", Arrays.asList(), ValueSerializer.INT));
+        assertJSONWrite(w -> w.writeList(1, "i1", Arrays.asList(1, 3, 2, -4, 1), ValueSerializer.INT), "\"i1\": [",
+                "  1,", "  3,", "  2,", "  -4,", "  1", "]");
+        assertJSONWrite(
+                w -> w.writeSet(1, "i1", new LinkedHashSet<>(Arrays.asList(1, 3, 2, -4, 1)), ValueSerializer.INT),
+                "\"i1\": [", "  1,", "  3,", "  2,", "  -4", "]");
+        assertJSONWrite(
+                w -> w.writeList(1, "i1", Arrays.asList(TestEnum.T2, TestEnum.T3, TestEnum.T1), TestEnum.PARSER),
+                "\"i1\": [", "  \"T2\",", "  \"T3\",", "  \"T1\"", "]");
+        assertJSONWrite(w -> w.writeList(1, "i1", Arrays.asList(B1, B2, B3), ValueSerializer.BINARY), "\"i1\": [",
+                "  \"/38E\",", "  \"ABv/\",", "  \"/P3+/w==\"", "]");
+        assertJSONWrite(w -> w.writeList(1, "i1", Arrays.asList(Arrays.asList(1, 3, 2), Arrays.asList(-4, 1)),
+                ValueSerializer.INT.listOf()), "\"i1\": [", "  [", "    1,", "    3,", "    2", "  ],", "  [",
+                "    -4,", "    1", "  ]", "]");
     }
 
     @Test
     public void testMap() throws IOException {
-        assertJSONWrite(w -> w.writeList(1, "i1", Arrays.asList(1, 3, 2, -4, 1)), "\"i1\": [", "  1,", "  3,", "  2,",
-                "  -4,", "  1", "]");
-        assertJSONWrite(w -> w.writeSet(1, "i1", new LinkedHashSet<>(Arrays.asList(1, 3, 2, -4, 1))), "\"i1\": [",
-                "  1,", "  3,", "  2,", "  -4", "]");
-        assertJSONWrite(w -> w.writeList(1, "i1", Arrays.asList(TestEnum.T2, TestEnum.T3, TestEnum.T1)), "\"i1\": [",
-                "  \"T2\",", "  \"T3\",", "  \"T1\"", "]");
-        assertJSONWrite(w -> w.writeList(1, "i1", Arrays.asList(B1, B2, B3)), "\"i1\": [", "  \"/38E\",",
-                "  \"ABv/\",", "  \"/P3+/w==\"", "]");
-        assertJSONWrite(w -> w.writeList(1, "i1", Arrays.asList(Arrays.asList(1, 3, 2), Arrays.asList(-4, 1))),
-                "\"i1\": [", "  [", "    1,", "    3,", "    2", "  ],", "  [", "    -4,", "    1", "  ]", "]");
+        assertJSONWrite(w -> w.writeList(1, "i1", Arrays.asList(1, 3, 2, -4, 1), ValueSerializer.INT), "\"i1\": [",
+                "  1,", "  3,", "  2,", "  -4,", "  1", "]");
+        assertJSONWrite(
+                w -> w.writeSet(1, "i1", new LinkedHashSet<>(Arrays.asList(1, 3, 2, -4, 1)), ValueSerializer.INT),
+                "\"i1\": [", "  1,", "  3,", "  2,", "  -4", "]");
+        assertJSONWrite(
+                w -> w.writeList(1, "i1", Arrays.asList(TestEnum.T2, TestEnum.T3, TestEnum.T1), TestEnum.PARSER),
+                "\"i1\": [", "  \"T2\",", "  \"T3\",", "  \"T1\"", "]");
+        assertJSONWrite(w -> w.writeList(1, "i1", Arrays.asList(B1, B2, B3), ValueSerializer.BINARY), "\"i1\": [",
+                "  \"/38E\",", "  \"ABv/\",", "  \"/P3+/w==\"", "]");
+        assertJSONWrite(w -> w.writeList(1, "i1", Arrays.asList(Arrays.asList(1, 3, 2), Arrays.asList(-4, 1)),
+                ValueSerializer.INT.listOf()), "\"i1\": [", "  [", "    1,", "    3,", "    2", "  ],", "  [",
+                "    -4,", "    1", "  ]", "]");
     }
 
     @Test
@@ -96,7 +104,7 @@ public class TestWriter extends AbstractJSONTest {
         m.i1 = 123;
         m.i2 = 1234;
         m.l1 = -123;
-        assertJSONWrite(w -> w.writeMessage(1, "m", m), "\"m\": {", "  \"i1\": 123,", "  \"i2\": 1234,",
+        assertJSONWrite(w -> w.writeMessage(1, "m", m, new Msg1()), "\"m\": {", "  \"i1\": 123,", "  \"i2\": 1234,",
                 "  \"l1\": -123", "}");
 
         Msg1 m2 = new Msg1();
@@ -104,9 +112,8 @@ public class TestWriter extends AbstractJSONTest {
         m2.i2 = 1234;
         m2.l1 = -123;
         m2.list.add(m);
-        assertJSONWrite(w -> w.writeMessage(1, "m", m2), "\"m\": {", "  \"i1\": 123,", "  \"i2\": 1234,",
+        assertJSONWrite(w -> w.writeMessage(1, "m", m2, new Msg1()), "\"m\": {", "  \"i1\": 123,", "  \"i2\": 1234,",
                 "  \"l1\": -123,", "  \"list\": [", "    {", "      \"i1\": 123,", "      \"i2\": 1234,",
                 "      \"l1\": -123", "    }", "  ]", "}");
     }
-
 }

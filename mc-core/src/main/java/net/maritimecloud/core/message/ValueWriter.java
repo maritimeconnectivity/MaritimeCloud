@@ -125,7 +125,7 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeList(List<?> list) throws IOException;
+    public abstract <T> void writeList(List<T> list, ValueSerializer<T> serializer) throws IOException;
 
     /**
      * Writes a map.
@@ -139,7 +139,8 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeMap(Map<?, ?> map) throws IOException;
+    public abstract <K, V> void writeMap(Map<K, V> map, ValueSerializer<K> keySerializer,
+            ValueSerializer<V> valueSerializer) throws IOException;
 
     /**
      * Writes the specified message if it is non-null.
@@ -153,7 +154,8 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeMessage(MessageSerializable message) throws IOException;
+    public abstract <T extends MessageSerializable> void writeMessage(T message, MessageSerializer<T> serializer)
+            throws IOException;
 
     /**
      * Writes a set.
@@ -167,7 +169,8 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeSet(Set<?> set) throws IOException;
+    public abstract <T> void writeSet(Set<T> set, ValueSerializer<T> serializer) throws IOException;
+
 
     /**
      * Writes a string.

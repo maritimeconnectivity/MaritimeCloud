@@ -83,19 +83,19 @@ public abstract class MessageReader implements Closeable {
 
     public abstract Long readInt64(int tag, String name, Long defaultValue) throws IOException;
 
-    public abstract <T> List<T> readList(int tag, String name, ValueParser<T> parser) throws IOException;
+    public abstract <T> List<T> readList(int tag, String name, ValueSerializer<T> parser) throws IOException;
 
-    public abstract <K, V> Map<K, V> readMap(int tag, String name, ValueParser<K> keyParser, ValueParser<V> valueParser)
+    public abstract <K, V> Map<K, V> readMap(int tag, String name, ValueSerializer<K> keyParser, ValueSerializer<V> valueParser)
             throws IOException;
 
-    public abstract <T extends MessageSerializable> T readMessage(int tag, String name, MessageParser<T> parser)
+    public abstract <T extends MessageSerializable> T readMessage(int tag, String name, MessageSerializer<T> parser)
             throws IOException;
 
     public abstract double readDouble(int tag, String name) throws IOException;
 
     public abstract float readFloat(int tag, String name) throws IOException;
 
-    public abstract <T> Set<T> readSet(int tag, String name, ValueParser<T> parser) throws IOException;
+    public abstract <T> Set<T> readSet(int tag, String name, ValueSerializer<T> parser) throws IOException;
 
     public abstract String readText(int tag, String name, String defaultValue) throws IOException;
 }

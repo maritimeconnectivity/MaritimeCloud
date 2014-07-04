@@ -154,7 +154,8 @@ public abstract class MessageWriter implements Closeable, Flushable {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeList(int tag, String name, List<?> list) throws IOException;
+    public abstract <T> void writeList(int tag, String name, List<T> list, ValueSerializer<T> serializer)
+            throws IOException;
 
     /**
      * Writes a map.
@@ -168,7 +169,8 @@ public abstract class MessageWriter implements Closeable, Flushable {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeMap(int tag, String name, Map<?, ?> map) throws IOException;
+    public abstract <K, V> void writeMap(int tag, String name, Map<K, V> map, ValueSerializer<K> keySerializer,
+            ValueSerializer<V> valueSerializer) throws IOException;
 
     /**
      * Writes the specified message if it is non-null.
@@ -182,7 +184,8 @@ public abstract class MessageWriter implements Closeable, Flushable {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeMessage(int tag, String name, MessageSerializable message) throws IOException;
+    public abstract <T extends MessageSerializable> void writeMessage(int tag, String name, T message,
+            MessageSerializer<T> serializer) throws IOException;
 
     /**
      * Writes a set.
@@ -196,7 +199,8 @@ public abstract class MessageWriter implements Closeable, Flushable {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeSet(int tag, String name, Set<?> set) throws IOException;
+    public abstract <T> void writeSet(int tag, String name, Set<T> set, ValueSerializer<T> serializer)
+            throws IOException;
 
     /**
      * Writes a string.

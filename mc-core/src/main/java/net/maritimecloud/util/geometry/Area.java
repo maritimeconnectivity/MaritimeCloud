@@ -21,9 +21,9 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import net.maritimecloud.core.message.Message;
-import net.maritimecloud.core.message.MessageParser;
 import net.maritimecloud.core.message.MessageReader;
 import net.maritimecloud.core.message.MessageSerializable;
+import net.maritimecloud.core.message.MessageSerializer;
 import net.maritimecloud.core.message.MessageSerializers;
 import net.maritimecloud.core.message.MessageWriter;
 
@@ -33,10 +33,10 @@ import net.maritimecloud.core.message.MessageWriter;
 public abstract class Area implements Message, Serializable {
 
     /** A parser of areas. */
-    public static final MessageParser<Area> PARSER = new MessageParser<Area>() {
+    public static final MessageSerializer<Area> SERIALIZER = new MessageSerializer<Area>() {
         /** {@inheritDoc} */
         @Override
-        public Area parse(MessageReader reader) throws IOException {
+        public Area read(MessageReader reader) throws IOException {
             return readFrom(reader);
         }
     };
@@ -121,7 +121,7 @@ public abstract class Area implements Message, Serializable {
 
     /** Returns a JSON representation of this message */
     public String toJSON() {
-        return MessageSerializers.writeToJSON(this);
+        return MessageSerializers.writeToJSON(this, SERIALIZER);
     }
 
     public Area unionWith(Area other) {
@@ -141,13 +141,13 @@ public abstract class Area implements Message, Serializable {
     public static void write(Area a, MessageWriter w) throws IOException {
         if (a != null) {
             if (a instanceof AreaUnion) {
-                w.writeMessage(1, "areas", a);
+                w.writeMessage(1, "areas", (AreaUnion) a, AreaUnion.SERIALIZER);
             } else if (a instanceof Circle) {
-                w.writeMessage(2, "circle", a);
+                w.writeMessage(2, "circle", (Circle) a, Circle.SERIALIZER);
             } else if (a instanceof BoundingBox) {
-                w.writeMessage(3, "boundingbox", a);
+                w.writeMessage(3, "boundingbox", (BoundingBox) a, BoundingBox.SERIALIZER);
             } else if (a instanceof Polygon) {
-                w.writeMessage(4, "polygon", a);
+                w.writeMessage(4, "polygon", (Polygon) a, Polygon.SERIALIZER);
             } else {
                 throw new UnsupportedOperationException();
             }
@@ -160,14 +160,14 @@ public abstract class Area implements Message, Serializable {
         // Polygon = 3;
         // Union = 4;
         if (r.isNext(1, "areas")) {
-            List<AreaUnion> readList = r.readList(1, "areas", AreaUnion.PARSER);
+            List<AreaUnion> readList = r.readList(1, "areas", AreaUnion.SERIALIZER);
             return new AreaUnion(readList.toArray(new AreaUnion[0]));
         } else if (r.isNext(2, "circle")) {
-            return r.readMessage(1, "circle", Circle.PARSER);
+            return r.readMessage(1, "circle", Circle.SERIALIZER);
         } else if (r.isNext(3, "boundingbox")) {
-            return r.readMessage(2, "boundingbox", BoundingBox.PARSER);
+            return r.readMessage(2, "boundingbox", BoundingBox.SERIALIZER);
         } else if (r.isNext(4, "polygon")) {
-            return r.readMessage(3, "polygon", Polygon.PARSER);
+            return r.readMessage(3, "polygon", Polygon.SERIALIZER);
         } else {
             throw new UnsupportedOperationException();
         }
@@ -180,13 +180,13 @@ public abstract class Area implements Message, Serializable {
         public void writeTo(MessageWriter w) throws IOException {
             Area a = Area.this;
             if (a instanceof AreaUnion) {
-                w.writeMessage(1, "areas", a);
+                w.writeMessage(1, "areas", (AreaUnion) a, AreaUnion.SERIALIZER);
             } else if (a instanceof Circle) {
-                w.writeMessage(2, "circle", a);
+                w.writeMessage(2, "circle", (Circle) a, Circle.SERIALIZER);
             } else if (a instanceof BoundingBox) {
-                w.writeMessage(3, "boundingbox", a);
+                w.writeMessage(3, "boundingbox", (BoundingBox) a, BoundingBox.SERIALIZER);
             } else if (a instanceof Polygon) {
-                w.writeMessage(4, "polygon", a);
+                w.writeMessage(4, "polygon", (Polygon) a, Polygon.SERIALIZER);
             } else {
                 throw new UnsupportedOperationException();
             }

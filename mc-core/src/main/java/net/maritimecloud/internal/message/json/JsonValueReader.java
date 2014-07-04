@@ -35,10 +35,10 @@ import javax.json.JsonValue;
 
 import net.maritimecloud.core.message.MessageEnum;
 import net.maritimecloud.core.message.MessageEnumParser;
-import net.maritimecloud.core.message.MessageParser;
+import net.maritimecloud.core.message.MessageSerializer;
 import net.maritimecloud.core.message.MessageSerializable;
 import net.maritimecloud.core.message.MessageSerializationException;
-import net.maritimecloud.core.message.ValueParser;
+import net.maritimecloud.core.message.ValueSerializer;
 import net.maritimecloud.core.message.ValueReader;
 import net.maritimecloud.util.Binary;
 import net.maritimecloud.util.geometry.Position;
@@ -135,7 +135,7 @@ public class JsonValueReader extends ValueReader {
 
     /** {@inheritDoc} */
     @Override
-    public <T> List<T> readList(ValueParser<T> parser) throws IOException {
+    public <T> List<T> readList(ValueSerializer<T> parser) throws IOException {
         ArrayList<T> result = new ArrayList<>();
         JsonArray a = (JsonArray) value;
         for (int i = 0; i < a.size(); i++) {
@@ -147,7 +147,7 @@ public class JsonValueReader extends ValueReader {
 
     /** {@inheritDoc} */
     @Override
-    public <K, V> Map<K, V> readMap(ValueParser<K> keyParser, ValueParser<V> valueParser) throws IOException {
+    public <K, V> Map<K, V> readMap(ValueSerializer<K> keyParser, ValueSerializer<V> valueParser) throws IOException {
         Map<K, V> result = new HashMap<>();
         JsonObject a = (JsonObject) value;
         for (Map.Entry<String, JsonValue> e : a.entrySet()) {
@@ -161,27 +161,27 @@ public class JsonValueReader extends ValueReader {
 
     /** {@inheritDoc} */
     @Override
-    public <T extends MessageSerializable> T readMessage(MessageParser<T> parser) throws IOException {
+    public <T extends MessageSerializable> T readMessage(MessageSerializer<T> parser) throws IOException {
         JsonObject o = (JsonObject) value;
         JsonMessageReader r = new JsonMessageReader(o);
-        return parser.parse(r);
+        return parser.read(r);
     }
 
     /** {@inheritDoc} */
     @Override
     public Position readPosition() throws IOException {
-        return readMessage(Position.PARSER);
+        return readMessage(Position.SERIALIZER);
     }
 
     /** {@inheritDoc} */
     @Override
     public PositionTime readPositionTime() throws IOException {
-        return readMessage(PositionTime.PARSER);
+        return readMessage(PositionTime.SERIALIZER);
     }
 
     /** {@inheritDoc} */
     @Override
-    public <T> Set<T> readSet(ValueParser<T> parser) throws IOException {
+    public <T> Set<T> readSet(ValueSerializer<T> parser) throws IOException {
         return new HashSet<>(readList(parser));
     }
 

@@ -24,7 +24,9 @@ import java.util.Set;
 
 import net.maritimecloud.core.message.MessageEnum;
 import net.maritimecloud.core.message.MessageSerializable;
+import net.maritimecloud.core.message.MessageSerializer;
 import net.maritimecloud.core.message.MessageWriter;
+import net.maritimecloud.core.message.ValueSerializer;
 import net.maritimecloud.util.Binary;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
@@ -117,25 +119,28 @@ class JsonMessageWriter extends MessageWriter {
 
     /** {@inheritDoc} */
     @Override
-    public void writeList(int tag, String name, List<?> value) throws IOException {
-        if (value != null && value.size() > 0) {
-            w.writeTag(tag, name).writeList(value);
+    public <T> void writeList(int tag, String name, List<T> list, ValueSerializer<T> serializer) throws IOException {
+        if (list != null && list.size() > 0) {
+            w.writeTag(tag, name).writeList(list, serializer);
         }
     }
 
     /** {@inheritDoc} */
     @Override
-    public void writeMap(int tag, String name, Map<?, ?> value) throws IOException {
-        if (value != null && value.size() > 0) {
-            w.writeTag(tag, name).writeMap(value);
+    public <K, V> void writeMap(int tag, String name, Map<K, V> map, ValueSerializer<K> keySerializer,
+            ValueSerializer<V> valueSerializer) throws IOException {
+        if (map != null && map.size() > 0) {
+            w.writeTag(tag, name).writeMap(map, keySerializer, valueSerializer);
         }
     }
 
+
     /** {@inheritDoc} */
     @Override
-    public void writeMessage(int tag, String name, MessageSerializable value) throws IOException {
-        if (value != null) {
-            w.writeTag(tag, name).writeMessage(value);
+    public <T extends MessageSerializable> void writeMessage(int tag, String name, T message,
+            MessageSerializer<T> serializer) throws IOException {
+        if (message != null) {
+            w.writeTag(tag, name).writeMessage(message, serializer);
         }
     }
 
@@ -157,9 +162,9 @@ class JsonMessageWriter extends MessageWriter {
 
     /** {@inheritDoc} */
     @Override
-    public void writeSet(int tag, String name, Set<?> value) throws IOException {
+    public <T> void writeSet(int tag, String name, Set<T> value, ValueSerializer<T> serializer) throws IOException {
         if (value != null && value.size() > 0) {
-            w.writeTag(tag, name).writeSet(value);
+            w.writeTag(tag, name).writeSet(value, serializer);
         }
     }
 
@@ -186,4 +191,6 @@ class JsonMessageWriter extends MessageWriter {
             w.writeTag(tag, name).writeVarInt(value);
         }
     }
+
+
 }

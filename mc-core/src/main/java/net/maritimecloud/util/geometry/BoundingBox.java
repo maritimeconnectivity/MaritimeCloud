@@ -17,7 +17,7 @@ package net.maritimecloud.util.geometry;
 import java.io.IOException;
 import java.util.Random;
 
-import net.maritimecloud.core.message.MessageParser;
+import net.maritimecloud.core.message.MessageSerializer;
 import net.maritimecloud.core.message.MessageReader;
 import net.maritimecloud.core.message.MessageWriter;
 
@@ -27,11 +27,11 @@ public final class BoundingBox extends Area {
     public static final BoundingBox ALL = create(-90, 90, -180, 180);
 
 
-    public static final MessageParser<BoundingBox> PARSER = new MessageParser<BoundingBox>() {
+    public static final MessageSerializer<BoundingBox> SERIALIZER = new MessageSerializer<BoundingBox>() {
 
         /** {@inheritDoc} */
         @Override
-        public BoundingBox parse(MessageReader reader) throws IOException {
+        public BoundingBox read(MessageReader reader) throws IOException {
             return readFrom(reader);
         }
     };

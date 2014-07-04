@@ -21,7 +21,7 @@ import java.io.IOException;
  *
  * @author Kasper Nielsen
  */
-public abstract class MessageEnumParser<T extends Enum<T> & MessageEnum> extends ValueParser<T> {
+public abstract class MessageEnumParser<T extends Enum<T> & MessageEnum> extends ValueSerializer<T> {
 
     /**
      * Creates the enum from the specified integer value.
@@ -45,5 +45,11 @@ public abstract class MessageEnumParser<T extends Enum<T> & MessageEnum> extends
     @Override
     public final T read(ValueReader reader) throws IOException {
         return reader.readEnum(this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public final void write(T value, ValueWriter writer) throws IOException {
+        writer.writeEnum(value);
     }
 }

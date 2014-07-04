@@ -27,7 +27,7 @@ import java.util.Set;
 
 import net.maritimecloud.core.message.Message;
 import net.maritimecloud.core.message.MessageReader;
-import net.maritimecloud.core.message.ValueParser;
+import net.maritimecloud.core.message.ValueSerializer;
 
 /**
  * Various utility method that are used by generated messages.
@@ -70,20 +70,20 @@ public class MessageHelper {
         return Collections.unmodifiableSet(l);
     }
 
-    public static <T> List<T> readList(int tag, String name, MessageReader reader, ValueParser<T> parser)
+    public static <T> List<T> readList(int tag, String name, MessageReader reader, ValueSerializer<T> parser)
             throws IOException {
         requireNonNull(reader, "reader is null");
         // TODO make sure it is a valid list.
         return reader.readList(tag, name, parser);
     }
 
-    public static <K, V> Map<K, V> readMap(int tag, String name, MessageReader reader, ValueParser<K> keyParser,
-            ValueParser<V> valueParser) throws IOException {
+    public static <K, V> Map<K, V> readMap(int tag, String name, MessageReader reader, ValueSerializer<K> keyParser,
+            ValueSerializer<V> valueParser) throws IOException {
         // TODO make sure it is a valid list.
         return reader.readMap(tag, name, keyParser, valueParser);
     }
 
-    public static <T> Set<T> readSet(int tag, String name, MessageReader reader, ValueParser<T> parser)
+    public static <T> Set<T> readSet(int tag, String name, MessageReader reader, ValueSerializer<T> parser)
             throws IOException {
         // TODO make sure it is a valid list.
         return reader.readSet(tag, name, parser);

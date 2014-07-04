@@ -22,9 +22,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import net.maritimecloud.core.message.MessageParser;
 import net.maritimecloud.core.message.MessageReader;
-import net.maritimecloud.core.message.MessageSerializable;
+import net.maritimecloud.core.message.MessageSerializer;
 import net.maritimecloud.core.message.MessageWriter;
 
 /**
@@ -34,11 +33,11 @@ import net.maritimecloud.core.message.MessageWriter;
  */
 class AreaUnion extends Area {
 
-    public static final MessageParser<AreaUnion> PARSER = new MessageParser<AreaUnion>() {
+    public static final MessageSerializer<AreaUnion> SERIALIZER = new MessageSerializer<AreaUnion>() {
 
         /** {@inheritDoc} */
         @Override
-        public AreaUnion parse(MessageReader reader) throws IOException {
+        public AreaUnion read(MessageReader reader) throws IOException {
             return readFrom(reader);
         }
     };
@@ -172,16 +171,16 @@ class AreaUnion extends Area {
     /** {@inheritDoc} */
     @Override
     public void writeTo(MessageWriter w) throws IOException {
-        ArrayList<MessageSerializable> l = new ArrayList<>(areas.length);
+        ArrayList<Area> l = new ArrayList<>(areas.length);
         for (Area a : areas) {
-            l.add(a.areaWriter());
+            l.add((Area) a.areaWriter());
         }
-        w.writeList(1, "areas", l);
+        w.writeList(1, "areas", l, Area.SERIALIZER);
     }
 
     /** {@inheritDoc} */
     public static AreaUnion readFrom(MessageReader r) throws IOException {
-        List<Area> list = r.readList(1, "areas", Area.PARSER);
+        List<Area> list = r.readList(1, "areas", Area.SERIALIZER);
         return new AreaUnion(list.toArray(new Area[list.size()]));
     }
 }

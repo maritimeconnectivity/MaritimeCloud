@@ -22,7 +22,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Date;
 
-import net.maritimecloud.core.message.ValueParser;
+import net.maritimecloud.core.message.ValueSerializer;
 import net.maritimecloud.util.Binary;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
@@ -65,12 +65,12 @@ public class TestReader extends AbstractJSONTest {
 
     @Test
     public void readListAndSet() throws IOException {
-        assertEquals(Arrays.asList(), readerOf("\"i1\": []").readList(1, "i1", ValueParser.INT));
+        assertEquals(Arrays.asList(), readerOf("\"i1\": []").readList(1, "i1", ValueSerializer.INT));
         assertEquals(Arrays.asList(1, 3, 2, -4, 1), readerOf("\"i1\": [", "  1,", "  3,", "  2,", "  -4,", "  1", "]")
-                .readList(1, "i1", ValueParser.INT));
+                .readList(1, "i1", ValueSerializer.INT));
         assertEquals(
                 Arrays.asList("1", "3", "2", "-4", "1"),
                 readerOf("\"i1\": [", "  \"1\",", "  \"3\",", "  \"2\",", "  \"-4\",", "  \"1\"", "]").readList(1,
-                        "i1", ValueParser.TEXT));
+                        "i1", ValueSerializer.TEXT));
     }
 }

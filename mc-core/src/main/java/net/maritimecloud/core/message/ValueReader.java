@@ -60,11 +60,11 @@ public abstract class ValueReader {
 
     public abstract <T extends Enum<T> & MessageEnum> T readEnum(MessageEnumParser<T> factory) throws IOException;
 
-    public abstract <T extends MessageSerializable> T readMessage(MessageParser<T> parser) throws IOException;
+    public abstract <T extends MessageSerializable> T readMessage(MessageSerializer<T> parser) throws IOException;
 
-    public abstract <T> List<T> readList(ValueParser<T> parser) throws IOException;
+    public abstract <T> List<T> readList(ValueSerializer<T> parser) throws IOException;
 
-    public abstract <T> Set<T> readSet(ValueParser<T> parser) throws IOException;
+    public abstract <T> Set<T> readSet(ValueSerializer<T> parser) throws IOException;
 
-    public abstract <K, V> Map<K, V> readMap(ValueParser<K> keyParser, ValueParser<V> valueParser) throws IOException;
+    public abstract <K, V> Map<K, V> readMap(ValueSerializer<K> keyParser, ValueSerializer<V> valueParser) throws IOException;
 }

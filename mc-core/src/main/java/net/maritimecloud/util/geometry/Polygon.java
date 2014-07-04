@@ -19,16 +19,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import net.maritimecloud.core.message.MessageParser;
 import net.maritimecloud.core.message.MessageReader;
+import net.maritimecloud.core.message.MessageSerializer;
 import net.maritimecloud.core.message.MessageWriter;
 
 public class Polygon extends Area {
-    public static final MessageParser<Polygon> PARSER = new MessageParser<Polygon>() {
+    public static final MessageSerializer<Polygon> SERIALIZER = new MessageSerializer<Polygon>() {
 
         /** {@inheritDoc} */
         @Override
-        public Polygon parse(MessageReader reader) throws IOException {
+        public Polygon read(MessageReader reader) throws IOException {
             return readPolygonFrom(reader);
         }
     };
@@ -69,7 +69,7 @@ public class Polygon extends Area {
     /** {@inheritDoc} */
     @Override
     public void writeTo(MessageWriter w) throws IOException {
-        w.writeList(1, "points", Arrays.asList(positions));
+        w.writeList(1, "points", Arrays.asList(positions), Position.SERIALIZER);
     }
 
     public static Polygon create(Position... positions) {
@@ -77,7 +77,7 @@ public class Polygon extends Area {
     }
 
     static Polygon readPolygonFrom(MessageReader r) throws IOException {
-        List<Position> positions = r.readList(1, "points", Position.PARSER);
+        List<Position> positions = r.readList(1, "points", Position.SERIALIZER);
         return Polygon.create(positions.toArray(new Position[positions.size()]));
     }
 }
