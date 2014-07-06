@@ -28,9 +28,7 @@ import javax.json.spi.JsonProvider;
 
 import net.maritimecloud.core.message.Message;
 import net.maritimecloud.core.message.MessageReader;
-import net.maritimecloud.core.message.MessageSerializable;
 import net.maritimecloud.core.message.MessageSerializer;
-import net.maritimecloud.core.message.MessageSerializers;
 import net.maritimecloud.core.message.MessageWriter;
 import net.maritimecloud.util.Binary;
 
@@ -51,7 +49,7 @@ public abstract class AbstractJSONTest {
     static final String BIG_DECIMAL = "1234567898765432112345678987654321.123456789";
 
     static void assertJSONWrite(IOConsumer<MessageWriter> c, String... lines) throws IOException {
-        String s = MessageSerializers.writeToJSON(create(c), create3(c));
+        String s = MessageSerializer.writeToJSON(create(c), create3(c));
         // System.out.println(s);
         BufferedReader lr = new BufferedReader(new StringReader(s));
         assertEquals("{", lr.readLine());
@@ -77,7 +75,7 @@ public abstract class AbstractJSONTest {
         return sw.toString();
     }
 
-    static MessageSerializable create(IOConsumer<MessageWriter> c) {
+    static Message create(IOConsumer<MessageWriter> c) {
         return new Message() {
             public void writeTo(MessageWriter w) throws IOException {
                 c.accept(w);
@@ -95,18 +93,27 @@ public abstract class AbstractJSONTest {
         };
     }
 
-    static MessageSerializer<MessageSerializable> create3(IOConsumer<MessageWriter> c) {
-        return new MessageSerializer<MessageSerializable>() {
+    static MessageSerializer<Message> create3(IOConsumer<MessageWriter> c) {
+        return new MessageSerializer<Message>() {
+
+            public void write(Message message, MessageWriter writer) throws IOException {
+                message.writeTo(writer);
+            }
 
             @Override
-            public MessageSerializable read(MessageReader reader) throws IOException {
+            public Message read(MessageReader reader) throws IOException {
                 throw new UnsupportedOperationException();
             }
         };
     }
 
-    static <T extends MessageSerializable> MessageSerializer<T> create1(IOFunction<MessageReader, T> c) {
+    static <T extends Message> MessageSerializer<T> create1(IOFunction<MessageReader, T> c) {
         return new MessageSerializer<T>() {
+
+            public void write(T message, MessageWriter writer) throws IOException {
+                message.writeTo(writer);
+            }
+
             @Override
             public T read(MessageReader reader) throws IOException {
                 return c.apply(reader);
@@ -131,6 +138,10 @@ public abstract class AbstractJSONTest {
         long l1;
 
         List<Msg1> list = new ArrayList<>();
+
+        public void write(Msg1 message, MessageWriter writer) throws IOException {
+            message.writeTo(writer);
+        }
 
         /** {@inheritDoc} */
         @Override

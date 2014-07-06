@@ -19,7 +19,6 @@ import java.util.Random;
 
 import net.maritimecloud.core.message.MessageReader;
 import net.maritimecloud.core.message.MessageSerializer;
-import net.maritimecloud.core.message.MessageSerializers;
 import net.maritimecloud.core.message.MessageWriter;
 
 public final class Rectangle extends Area {
@@ -29,6 +28,10 @@ public final class Rectangle extends Area {
 
 
     public static final MessageSerializer<Rectangle> SERIALIZER = new MessageSerializer<Rectangle>() {
+
+        public void write(Rectangle message, MessageWriter writer) throws IOException {
+            message.writeTo(writer);
+        }
 
         /** {@inheritDoc} */
         @Override
@@ -73,7 +76,7 @@ public final class Rectangle extends Area {
      * match
      */
     public static Rectangle fromJSON(CharSequence c) {
-        return MessageSerializers.readFromJSON(SERIALIZER, c);
+        return MessageSerializer.readFromJSON(SERIALIZER, c);
     }
 
     public boolean contains(Position point) {

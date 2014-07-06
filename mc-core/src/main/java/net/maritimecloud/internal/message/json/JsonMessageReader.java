@@ -34,12 +34,12 @@ import javax.json.JsonString;
 import javax.json.JsonValue;
 import javax.json.spi.JsonProvider;
 
+import net.maritimecloud.core.message.Message;
 import net.maritimecloud.core.message.MessageEnum;
-import net.maritimecloud.core.message.MessageEnumParser;
-import net.maritimecloud.core.message.MessageSerializer;
+import net.maritimecloud.core.message.MessageEnumSerializer;
 import net.maritimecloud.core.message.MessageReader;
-import net.maritimecloud.core.message.MessageSerializable;
-import net.maritimecloud.core.message.MessageSerializationException;
+import net.maritimecloud.core.message.MessageSerializer;
+import net.maritimecloud.core.message.SerializationException;
 import net.maritimecloud.core.message.ValueSerializer;
 import net.maritimecloud.util.Binary;
 import net.maritimecloud.util.geometry.Position;
@@ -88,11 +88,11 @@ public class JsonMessageReader extends MessageReader {
         return false;
     }
 
-    private JsonValueReader read(String name) throws MessageSerializationException {
+    private JsonValueReader read(String name) throws SerializationException {
         if (isNext(-1, name)) {
             return new JsonValueReader(iter.next().getValue());
         }
-        throw new MessageSerializationException("Could not find tag '" + name + "'");
+        throw new SerializationException("Could not find tag '" + name + "'");
     }
 
     /** {@inheritDoc} */
@@ -132,14 +132,14 @@ public class JsonMessageReader extends MessageReader {
 
     /** {@inheritDoc} */
     @Override
-    public <T extends Enum<T> & MessageEnum> T readEnum(int tag, String name, MessageEnumParser<T> factory)
+    public <T extends Enum<T> & MessageEnum> T readEnum(int tag, String name, MessageEnumSerializer<T> factory)
             throws IOException {
         return factory.from(name);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Float readFloat(int tag, String name, Float defaultValue) throws MessageSerializationException, IOException {
+    public Float readFloat(int tag, String name, Float defaultValue) throws SerializationException, IOException {
         JsonValueReader r = readOpt(name);
         return r == null ? defaultValue : r.readFloat();
     }
@@ -192,7 +192,7 @@ public class JsonMessageReader extends MessageReader {
 
     /** {@inheritDoc} */
     @Override
-    public <T extends MessageSerializable> T readMessage(int tag, String name, MessageSerializer<T> parser)
+    public <T extends Message> T readMessage(int tag, String name, MessageSerializer<T> parser)
             throws IOException {
         if (isNext(-1, name)) {
             Entry<String, JsonValue> next = iter.next();

@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * Class to represent an ISO 639 2-letter language
  */
-// TODO make MessageSerializable
+// TODO make Message
 public class Language {
 
     private final String code;

@@ -33,13 +33,13 @@ import javax.json.JsonObject;
 import javax.json.JsonString;
 import javax.json.JsonValue;
 
+import net.maritimecloud.core.message.Message;
 import net.maritimecloud.core.message.MessageEnum;
-import net.maritimecloud.core.message.MessageEnumParser;
+import net.maritimecloud.core.message.MessageEnumSerializer;
 import net.maritimecloud.core.message.MessageSerializer;
-import net.maritimecloud.core.message.MessageSerializable;
-import net.maritimecloud.core.message.MessageSerializationException;
-import net.maritimecloud.core.message.ValueSerializer;
+import net.maritimecloud.core.message.SerializationException;
 import net.maritimecloud.core.message.ValueReader;
+import net.maritimecloud.core.message.ValueSerializer;
 import net.maritimecloud.util.Binary;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
@@ -63,7 +63,7 @@ public class JsonValueReader extends ValueReader {
             JsonString v = (JsonString) value;
             return Binary.copyFromBase64(v.getString());
         }
-        throw new MessageSerializationException("Was not a string");
+        throw new SerializationException("Was not a string");
     }
 
     /** {@inheritDoc} */
@@ -74,7 +74,7 @@ public class JsonValueReader extends ValueReader {
         } else if (value == JsonValue.FALSE) {
             return Boolean.FALSE;
         }
-        throw new MessageSerializationException("Was not a boolean " + value.getClass());
+        throw new SerializationException("Was not a boolean " + value.getClass());
     }
 
     /** {@inheritDoc} */
@@ -84,7 +84,7 @@ public class JsonValueReader extends ValueReader {
             JsonNumber v = (JsonNumber) value;
             return v.bigDecimalValue();
         }
-        throw new MessageSerializationException("Was not a number");
+        throw new SerializationException("Was not a number");
     }
 
     /** {@inheritDoc} */
@@ -94,12 +94,12 @@ public class JsonValueReader extends ValueReader {
             JsonNumber v = (JsonNumber) value;
             return v.doubleValue();
         }
-        throw new MessageSerializationException("Was not a number");
+        throw new SerializationException("Was not a number");
     }
 
     /** {@inheritDoc} */
     @Override
-    public <T extends Enum<T> & MessageEnum> T readEnum(MessageEnumParser<T> factory) throws IOException {
+    public <T extends Enum<T> & MessageEnum> T readEnum(MessageEnumSerializer<T> factory) throws IOException {
         return factory.from(value.toString());
     }
 
@@ -110,7 +110,7 @@ public class JsonValueReader extends ValueReader {
             JsonNumber v = (JsonNumber) value;
             return (float) v.doubleValue();
         }
-        throw new MessageSerializationException("Was not a number");
+        throw new SerializationException("Was not a number");
     }
 
     /** {@inheritDoc} */
@@ -120,7 +120,7 @@ public class JsonValueReader extends ValueReader {
             JsonNumber v = (JsonNumber) value;
             return v.intValue();
         }
-        throw new MessageSerializationException("Was not a number");
+        throw new SerializationException("Was not a number");
     }
 
     /** {@inheritDoc} */
@@ -130,7 +130,7 @@ public class JsonValueReader extends ValueReader {
             JsonNumber v = (JsonNumber) value;
             return v.longValue();
         }
-        throw new MessageSerializationException("Was not a number");
+        throw new SerializationException("Was not a number");
     }
 
     /** {@inheritDoc} */
@@ -161,7 +161,7 @@ public class JsonValueReader extends ValueReader {
 
     /** {@inheritDoc} */
     @Override
-    public <T extends MessageSerializable> T readMessage(MessageSerializer<T> parser) throws IOException {
+    public <T extends Message> T readMessage(MessageSerializer<T> parser) throws IOException {
         JsonObject o = (JsonObject) value;
         JsonMessageReader r = new JsonMessageReader(o);
         return parser.read(r);
@@ -192,7 +192,7 @@ public class JsonValueReader extends ValueReader {
             JsonString v = (JsonString) value;
             return v.getString();
         }
-        throw new MessageSerializationException("Was not a string");
+        throw new SerializationException("Was not a string");
     }
 
     /** {@inheritDoc} */
@@ -208,6 +208,6 @@ public class JsonValueReader extends ValueReader {
             JsonNumber v = (JsonNumber) value;
             return v.bigIntegerValue();
         }
-        throw new MessageSerializationException("Was not a number");
+        throw new SerializationException("Was not a number");
     }
 }

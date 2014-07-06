@@ -40,6 +40,10 @@ class AreaUnion extends Area {
         public AreaUnion read(MessageReader reader) throws IOException {
             return readFrom(reader);
         }
+
+        public void write(AreaUnion message, MessageWriter writer) throws IOException {
+            message.writeTo(writer);
+        }
     };
 
     /** {@inheritDoc} */

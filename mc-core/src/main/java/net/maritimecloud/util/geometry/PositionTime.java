@@ -21,8 +21,8 @@ import static net.maritimecloud.util.geometry.CoordinateConverter.compass2cartes
 
 import java.io.IOException;
 
-import net.maritimecloud.core.message.MessageSerializer;
 import net.maritimecloud.core.message.MessageReader;
+import net.maritimecloud.core.message.MessageSerializer;
 import net.maritimecloud.core.message.MessageWriter;
 
 /**
@@ -39,6 +39,10 @@ public class PositionTime extends Position {
         @Override
         public PositionTime read(MessageReader reader) throws IOException {
             return readFrom(reader);
+        }
+
+        public void write(PositionTime message, MessageWriter writer) throws IOException {
+            message.writeTo(writer);
         }
     };
 

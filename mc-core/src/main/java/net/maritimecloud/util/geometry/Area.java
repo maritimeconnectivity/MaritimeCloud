@@ -22,7 +22,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import net.maritimecloud.core.message.Message;
 import net.maritimecloud.core.message.MessageReader;
 import net.maritimecloud.core.message.MessageSerializer;
-import net.maritimecloud.core.message.MessageSerializers;
 import net.maritimecloud.core.message.MessageWriter;
 
 /**
@@ -129,7 +128,7 @@ public abstract class Area implements Message, Serializable {
 
     /** Returns a JSON representation of this message */
     public String toJSON() {
-        return MessageSerializers.writeToJSON(this, SERIALIZER);
+        return MessageSerializer.writeToJSON(this, SERIALIZER);
     }
 
     public final Area unionWith(Area other) {
@@ -141,7 +140,7 @@ public abstract class Area implements Message, Serializable {
      * match
      */
     public static Area fromJSON(CharSequence c) {
-        return MessageSerializers.readFromJSON(SERIALIZER, c);
+        return MessageSerializer.readFromJSON(SERIALIZER, c);
     }
 
     static double nextDouble(Random r, double least, double bound) {

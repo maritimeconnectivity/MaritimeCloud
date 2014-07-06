@@ -15,7 +15,7 @@
 package net.maritimecloud.internal.message;
 
 import net.maritimecloud.core.message.MessageEnum;
-import net.maritimecloud.core.message.MessageEnumParser;
+import net.maritimecloud.core.message.MessageEnumSerializer;
 
 /**
  *
@@ -25,7 +25,7 @@ public enum TestEnum implements MessageEnum {
     T1(1), T2(2), T3(3), T4(4);
 
     /** An enum parser that can create new instances of this class. */
-    public static final MessageEnumParser<TestEnum> PARSER = new Parser();
+    public static final MessageEnumSerializer<TestEnum> PARSER = new Parser();
 
     private final int value;
 
@@ -60,7 +60,7 @@ public enum TestEnum implements MessageEnum {
         }
     }
 
-    static class Parser extends MessageEnumParser<TestEnum> {
+    static class Parser extends MessageEnumSerializer<TestEnum> {
 
         /** {@inheritDoc} */
         @Override

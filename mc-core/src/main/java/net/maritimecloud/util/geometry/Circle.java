@@ -22,7 +22,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import net.maritimecloud.core.message.MessageReader;
 import net.maritimecloud.core.message.MessageSerializer;
-import net.maritimecloud.core.message.MessageSerializers;
 import net.maritimecloud.core.message.MessageWriter;
 
 /**
@@ -46,6 +45,10 @@ public class Circle extends Area {
             double lon = reader.readDouble(2, NAME_CENTER_LONGITUDE);
             double radius = reader.readDouble(3, NAME_RADIUS);
             return new Circle(Position.create(lat, lon), radius);
+        }
+
+        public void write(Circle message, MessageWriter writer) throws IOException {
+            message.writeTo(writer);
         }
     };
 
@@ -253,7 +256,7 @@ public class Circle extends Area {
      * match
      */
     public static Circle fromJSON(CharSequence c) {
-        return MessageSerializers.readFromJSON(SERIALIZER, c);
+        return MessageSerializer.readFromJSON(SERIALIZER, c);
     }
 
     /**

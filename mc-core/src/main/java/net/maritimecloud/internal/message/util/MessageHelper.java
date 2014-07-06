@@ -28,7 +28,6 @@ import java.util.Set;
 
 import net.maritimecloud.core.message.Message;
 import net.maritimecloud.core.message.MessageReader;
-import net.maritimecloud.core.message.MessageSerializable;
 import net.maritimecloud.core.message.MessageSerializer;
 import net.maritimecloud.core.message.ValueSerializer;
 
@@ -92,12 +91,12 @@ public class MessageHelper {
         return reader.readSet(tag, name, parser);
     }
 
-    public static <T extends MessageSerializable> MessageSerializer<T> getSerializer(T message) {
+    public static <T extends Message> MessageSerializer<T> getSerializer(T message) {
         return getSerializer(message.getClass());
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends MessageSerializable> MessageSerializer<T> getSerializer(Class<?> c) {
+    public static <T extends Message> MessageSerializer<T> getSerializer(Class<?> c) {
         try {
             Field field = c.getField("SERIALIZER");
             return (MessageSerializer<T>) field.get(null);

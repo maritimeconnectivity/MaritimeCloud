@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.maritimecloud.core.message.Message;
 import net.maritimecloud.core.message.MessageEnum;
-import net.maritimecloud.core.message.MessageSerializable;
 import net.maritimecloud.core.message.MessageSerializer;
 import net.maritimecloud.core.message.MessageWriter;
 import net.maritimecloud.core.message.ValueSerializer;
@@ -137,7 +137,7 @@ class JsonMessageWriter extends MessageWriter {
 
     /** {@inheritDoc} */
     @Override
-    public <T extends MessageSerializable> void writeMessage(int tag, String name, T message,
+    public <T extends Message> void writeMessage(int tag, String name, T message,
             MessageSerializer<T> serializer) throws IOException {
         if (message != null) {
             w.writeTag(tag, name).writeMessage(message, serializer);

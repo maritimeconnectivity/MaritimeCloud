@@ -21,7 +21,7 @@ import java.io.IOException;
  *
  * @author Kasper Nielsen
  */
-public abstract class MessageEnumParser<T extends Enum<T> & MessageEnum> extends ValueSerializer<T> {
+public abstract class MessageEnumSerializer<T extends Enum<T> & MessageEnum> extends ValueSerializer<T> {
 
     /**
      * Creates the enum from the specified integer value.

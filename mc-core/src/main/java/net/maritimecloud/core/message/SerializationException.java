@@ -20,7 +20,7 @@ import java.io.IOException;
  *
  * @author Kasper Nielsen
  */
-public class MessageSerializationException extends IOException {
+public class SerializationException extends IOException {
 
     /**  */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class MessageSerializationException extends IOException {
     /**
      * @param message
      */
-    public MessageSerializationException(String message) {
+    public SerializationException(String message) {
         super(message);
     }
 
@@ -36,7 +36,7 @@ public class MessageSerializationException extends IOException {
      * @param message
      * @param cause
      */
-    public MessageSerializationException(String message, Throwable cause) {
+    public SerializationException(String message, Throwable cause) {
         super(message, cause);
     }
 

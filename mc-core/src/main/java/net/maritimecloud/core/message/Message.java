@@ -14,12 +14,21 @@
  */
 package net.maritimecloud.core.message;
 
+import java.io.IOException;
+
 /**
  * The basic message interface that all messages must be implement. Messages are normally generated from MSDL files.
  *
  * @author Kasper Nielsen
  */
-public interface Message extends MessageSerializable {
+/**
+ * Implemented by classes that can be serialized by a {@link MessageWriter}. Any class implementing this interface
+ * should also have a <code>public static final MessageParser<T> PARSER</code> field. To allow for reading the
+ * serialized message back again.
+ *
+ * @author Kasper Nielsen
+ */
+public interface Message {
 
     /**
      * Returns an immutable copy of this message.
@@ -34,4 +43,14 @@ public interface Message extends MessageSerializable {
      * @return a JSON representation of this message
      */
     String toJSON();
+
+    /**
+     * Serializes the implementing class.
+     *
+     * @param w
+     *            the writer to use for serialization
+     * @throws IOException
+     *             any exception occurred while serializing
+     */
+    void writeTo(MessageWriter w) throws IOException;
 }

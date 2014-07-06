@@ -58,9 +58,9 @@ public abstract class ValueReader {
     public abstract PositionTime readPositionTime() throws IOException;
 
 
-    public abstract <T extends Enum<T> & MessageEnum> T readEnum(MessageEnumParser<T> factory) throws IOException;
+    public abstract <T extends Enum<T> & MessageEnum> T readEnum(MessageEnumSerializer<T> factory) throws IOException;
 
-    public abstract <T extends MessageSerializable> T readMessage(MessageSerializer<T> parser) throws IOException;
+    public abstract <T extends Message> T readMessage(MessageSerializer<T> parser) throws IOException;
 
     public abstract <T> List<T> readList(ValueSerializer<T> parser) throws IOException;
 

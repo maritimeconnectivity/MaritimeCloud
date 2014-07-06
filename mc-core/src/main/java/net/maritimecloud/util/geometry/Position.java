@@ -22,7 +22,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import net.maritimecloud.core.message.Message;
 import net.maritimecloud.core.message.MessageReader;
 import net.maritimecloud.core.message.MessageSerializer;
-import net.maritimecloud.core.message.MessageSerializers;
 import net.maritimecloud.core.message.MessageWriter;
 import net.maritimecloud.util.geometry.CoordinateSystem.VincentyCalculationType;
 
@@ -32,6 +31,10 @@ import net.maritimecloud.util.geometry.CoordinateSystem.VincentyCalculationType;
 public class Position implements Message, Serializable {
 
     public static final MessageSerializer<Position> SERIALIZER = new MessageSerializer<Position>() {
+
+        public void write(Position message, MessageWriter writer) throws IOException {
+            message.writeTo(writer);
+        }
 
         /** {@inheritDoc} */
         @Override
@@ -229,7 +232,7 @@ public class Position implements Message, Serializable {
 
     /** Returns a JSON representation of this message */
     public String toJSON() {
-        return MessageSerializers.writeToJSON(this, SERIALIZER);
+        return MessageSerializer.writeToJSON(this, SERIALIZER);
     }
 
     /**

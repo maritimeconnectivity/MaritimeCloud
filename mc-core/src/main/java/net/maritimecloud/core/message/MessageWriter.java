@@ -184,7 +184,7 @@ public abstract class MessageWriter implements Closeable, Flushable {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract <T extends MessageSerializable> void writeMessage(int tag, String name, T message,
+    public abstract <T extends Message> void writeMessage(int tag, String name, T message,
             MessageSerializer<T> serializer) throws IOException;
 
     /**

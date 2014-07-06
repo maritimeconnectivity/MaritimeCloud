@@ -50,7 +50,7 @@ public abstract class MessageReader implements Closeable {
 
     public abstract BigDecimal readDecimal(int tag, String name, BigDecimal defaultValue) throws IOException;
 
-    public abstract <T extends Enum<T> & MessageEnum> T readEnum(int tag, String name, MessageEnumParser<T> factory)
+    public abstract <T extends Enum<T> & MessageEnum> T readEnum(int tag, String name, MessageEnumSerializer<T> factory)
             throws IOException;
 
     // public abstract float readFloat(int tag, String name) throws IOException;
@@ -88,7 +88,7 @@ public abstract class MessageReader implements Closeable {
     public abstract <K, V> Map<K, V> readMap(int tag, String name, ValueSerializer<K> keyParser, ValueSerializer<V> valueParser)
             throws IOException;
 
-    public abstract <T extends MessageSerializable> T readMessage(int tag, String name, MessageSerializer<T> parser)
+    public abstract <T extends Message> T readMessage(int tag, String name, MessageSerializer<T> parser)
             throws IOException;
 
     public abstract double readDouble(int tag, String name) throws IOException;
@@ -109,7 +109,7 @@ public abstract class MessageReader implements Closeable {
 //
 // public abstract double readRequiredDouble(int tag, String name) throws IOException;
 //
-// public abstract <T extends MessageSerializable> T readRequiredMessage(int tag, String name, MessageParser<T> parser)
+// public abstract <T extends Message> T readRequiredMessage(int tag, String name, MessageParser<T> parser)
 // throws IOException;
 
 // <K, V> Map<K, V> readMap(int tag, String name, MsdlParser<K> keyParser, MsdlParser<K> valueParser);

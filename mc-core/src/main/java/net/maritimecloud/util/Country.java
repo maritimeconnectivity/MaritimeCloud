@@ -35,7 +35,7 @@ import java.util.Properties;
  * See {@link http://en.wikipedia.org/wiki/Maritime_Mobile_Service_Identity}
  *
  */
-// TODO make MessageSerializable
+// TODO make Message
 public final class Country implements Serializable, Comparable<Country> {
 
     private static final long serialVersionUID = 1L;

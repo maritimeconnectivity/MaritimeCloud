@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.maritimecloud.core.message.Message;
 import net.maritimecloud.core.message.MessageEnum;
-import net.maritimecloud.core.message.MessageSerializable;
 import net.maritimecloud.core.message.MessageSerializer;
 import net.maritimecloud.core.message.ValueSerializer;
 import net.maritimecloud.core.message.ValueWriter;
@@ -155,7 +155,7 @@ public class JsonValueWriter implements ValueWriter, Closeable {
 
     /** {@inheritDoc} */
     @Override
-    public <T extends MessageSerializable> void writeMessage(T message, MessageSerializer<T> serializer)
+    public <T extends Message> void writeMessage(T message, MessageSerializer<T> serializer)
             throws IOException {
         if (message != null) {
             pw.write("{");

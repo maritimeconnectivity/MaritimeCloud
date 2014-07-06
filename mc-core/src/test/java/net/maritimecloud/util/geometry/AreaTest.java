@@ -16,7 +16,7 @@ package net.maritimecloud.util.geometry;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import net.maritimecloud.core.message.MessageSerializers;
+import net.maritimecloud.core.message.MessageSerializer;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -31,8 +31,8 @@ public class AreaTest {
     public void circle() {
         for (int i = 0; i < 100; i++) {
             Circle c = Circle.random();
-            String fromCircle = MessageSerializers.writeToJSON(c, Circle.SERIALIZER);
-            String fromArea = MessageSerializers.writeToJSON(c, Area.SERIALIZER);
+            String fromCircle = MessageSerializer.writeToJSON(c, Circle.SERIALIZER);
+            String fromArea = MessageSerializer.writeToJSON(c, Area.SERIALIZER);
             assertNotEquals(fromCircle, fromArea);
             assertEquals(c, Circle.fromJSON(fromCircle));
             assertEquals(c, Area.fromJSON(fromArea));
@@ -43,8 +43,8 @@ public class AreaTest {
     @Ignore
     public void boundingBox() {
         Circle c = new Circle(Position.create(1, -1), 123);
-        String fromCircle = MessageSerializers.writeToJSON(c, Circle.SERIALIZER);
-        String fromArea = MessageSerializers.writeToJSON(c, Area.SERIALIZER);
+        String fromCircle = MessageSerializer.writeToJSON(c, Circle.SERIALIZER);
+        String fromArea = MessageSerializer.writeToJSON(c, Area.SERIALIZER);
         assertNotEquals(fromCircle, fromArea);
 
         assertEquals(c, Circle.fromJSON(fromCircle));

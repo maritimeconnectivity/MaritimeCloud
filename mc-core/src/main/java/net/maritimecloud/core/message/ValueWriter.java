@@ -154,7 +154,7 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract <T extends MessageSerializable> void writeMessage(T message, MessageSerializer<T> serializer)
+    public abstract <T extends Message> void writeMessage(T message, MessageSerializer<T> serializer)
             throws IOException;
 
     /**

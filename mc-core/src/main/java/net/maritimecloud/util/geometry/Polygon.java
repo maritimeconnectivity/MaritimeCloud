@@ -31,6 +31,10 @@ public class Polygon extends Area {
         public Polygon read(MessageReader reader) throws IOException {
             return readPolygonFrom(reader);
         }
+
+        public void write(Polygon message, MessageWriter writer) throws IOException {
+            message.writeTo(writer);
+        }
     };
 
     /** serialVersionUID. */
