@@ -34,133 +34,193 @@ import net.maritimecloud.util.geometry.PositionTime;
  */
 public abstract class ValueSerializer<T> {
 
+    /** A value serializer that can serialize instances of {@link Binary}. */
     public static final ValueSerializer<Binary> BINARY = new ValueSerializer<Binary>() {
+
+        /** {@inheritDoc} */
+        @Override
         public Binary read(ValueReader reader) throws IOException {
             return reader.readBinary();
         }
 
+        /** {@inheritDoc} */
         @Override
         public void write(Binary t, ValueWriter writer) throws IOException {
             writer.writeBinary(t);
         }
     };
 
+    /** A value serializer that can serialize booleans. */
     public static final ValueSerializer<Boolean> BOOLEAN = new ValueSerializer<Boolean>() {
+
+        /** {@inheritDoc} */
+        @Override
         public Boolean read(ValueReader reader) throws IOException {
             return reader.readBoolean();
         }
 
+
+        /** {@inheritDoc} */
         @Override
         public void write(Boolean t, ValueWriter writer) throws IOException {
             writer.writeBoolean(t);
         }
     };
 
+    /** A value serializer that can serialize instances of {@link BigDecimal}. */
     public static final ValueSerializer<BigDecimal> DECIMAL = new ValueSerializer<BigDecimal>() {
+
+        /** {@inheritDoc} */
+        @Override
         public BigDecimal read(ValueReader reader) throws IOException {
             return reader.readDecimal();
         }
 
+        /** {@inheritDoc} */
         @Override
         public void write(BigDecimal t, ValueWriter writer) throws IOException {
             writer.writeDecimal(t);
         }
     };
 
+    /** A value serializer that can serialize doubles. */
     public static final ValueSerializer<Double> DOUBLE = new ValueSerializer<Double>() {
+
+        /** {@inheritDoc} */
+        @Override
         public Double read(ValueReader reader) throws IOException {
             return reader.readDouble();
         }
 
+        /** {@inheritDoc} */
         @Override
         public void write(Double t, ValueWriter writer) throws IOException {
             writer.writeDouble(t);
         }
     };
 
+    /** A value serializer that can serialize floats. */
     public static final ValueSerializer<Float> FLOAT = new ValueSerializer<Float>() {
+
+        /** {@inheritDoc} */
+        @Override
         public Float read(ValueReader reader) throws IOException {
             return reader.readFloat();
         }
 
+        /** {@inheritDoc} */
         @Override
         public void write(Float t, ValueWriter writer) throws IOException {
             writer.writeFloat(t);
         }
     };
 
+    /** A value serializer that can serialize ints. */
     public static final ValueSerializer<Integer> INT = new ValueSerializer<Integer>() {
+
+        /** {@inheritDoc} */
+        @Override
         public Integer read(ValueReader reader) throws IOException {
             return reader.readInt();
         }
 
+        /** {@inheritDoc} */
         @Override
         public void write(Integer t, ValueWriter writer) throws IOException {
             writer.writeInt(t);
         }
     };
 
+    /** A value serializer that can serialize longs. */
     public static final ValueSerializer<Long> INT64 = new ValueSerializer<Long>() {
+
+        /** {@inheritDoc} */
+        @Override
         public Long read(ValueReader reader) throws IOException {
             return reader.readInt64();
         }
 
+        /** {@inheritDoc} */
         @Override
         public void write(Long t, ValueWriter writer) throws IOException {
             writer.writeInt64(t);
         }
     };
 
-
+    /** A value serializer that can serialize instances of {@link POSITION}. */
     public static final ValueSerializer<Position> POSITION = new ValueSerializer<Position>() {
+
+        /** {@inheritDoc} */
+        @Override
         public Position read(ValueReader reader) throws IOException {
             return reader.readPosition();
         }
 
+        /** {@inheritDoc} */
         @Override
         public void write(Position t, ValueWriter writer) throws IOException {
             writer.writePosition(t);
         }
     };
 
+    /** A value serializer that can serialize instances of {@link POSITION_TIME}. */
     public static final ValueSerializer<PositionTime> POSITION_TIME = new ValueSerializer<PositionTime>() {
+
+        /** {@inheritDoc} */
+        @Override
         public PositionTime read(ValueReader reader) throws IOException {
             return reader.readPositionTime();
         }
 
+        /** {@inheritDoc} */
         @Override
         public void write(PositionTime t, ValueWriter writer) throws IOException {
             writer.writePositionTime(t);
         }
     };
 
+    /** A value serializer that can serialize strings. */
     public static final ValueSerializer<String> TEXT = new ValueSerializer<String>() {
+
+        /** {@inheritDoc} */
+        @Override
         public String read(ValueReader reader) throws IOException {
             return reader.readText();
         }
 
+        /** {@inheritDoc} */
         @Override
         public void write(String t, ValueWriter writer) throws IOException {
             writer.writeText(t);
         }
     };
 
+    /** A value serializer that can serialize instances of {@link Date}. */
     public static final ValueSerializer<Date> TIMESTAMP = new ValueSerializer<Date>() {
+
+        /** {@inheritDoc} */
+        @Override
         public Date read(ValueReader reader) throws IOException {
             return reader.readTimestamp();
         }
 
+        /** {@inheritDoc} */
         @Override
         public void write(Date t, ValueWriter writer) throws IOException {
             writer.writeTimestamp(t);
         }
     };
 
+    /** A value serializer that can serialize instances of {@link BigInteger}. */
     public static final ValueSerializer<BigInteger> VARINT = new ValueSerializer<BigInteger>() {
+
+        /** {@inheritDoc} */
+        @Override
         public BigInteger read(ValueReader reader) throws IOException {
             return reader.readVarInt();
         }
 
+        /** {@inheritDoc} */
         @Override
         public void write(BigInteger t, ValueWriter writer) throws IOException {
             writer.writeVarInt(t);
@@ -191,13 +251,6 @@ public abstract class ValueSerializer<T> {
     }
 
     public abstract void write(T t, ValueWriter writer) throws IOException;
-
-    // public static ValueSerializer<?> serializerOf(Class<?> type) {
-    // if (type == String.class) {
-    // return TEXT;
-    // }
-    // throw new UnsupportedOperationException();
-    // }
 
     static class ListSerializer<E> extends ValueSerializer<List<E>> {
         final ValueSerializer<E> serializer;
@@ -262,17 +315,3 @@ public abstract class ValueSerializer<T> {
         }
     }
 }
-//
-// static class MessageValueParser<T extends MessageSerializable> extends ValueParser<T> {
-// private final MessageParser<T> serializer;
-//
-// MessageValueParser(MessageParser<T> serializer) {
-// this.serializer = requireNonNull(serializer);
-// }
-//
-// /** {@inheritDoc} */
-// @Override
-// public T parse(ValueReader reader) throws IOException {
-// return reader.readMessage(serializer);
-// }
-// }

@@ -42,10 +42,19 @@ class AreaUnion extends Area {
         }
     };
 
+    /** {@inheritDoc} */
+    public AreaUnion immutable() {
+        return this;
+    }
+
     /** serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
     final Area[] areas;
+
+    AreaUnion(List<? extends Area> areas) {
+        this(areas.toArray(new Area[areas.size()]));
+    }
 
     /**
      * @param cs
@@ -112,7 +121,7 @@ class AreaUnion extends Area {
 
     /** {@inheritDoc} */
     @Override
-    public BoundingBox getBoundingBox() {
+    public Rectangle getBoundingBox() {
         // make boundry boxes for everyone
         // calculate vertical distances between each boundary box.
         // Combine boxes that are closes, recalculate
@@ -171,11 +180,11 @@ class AreaUnion extends Area {
     /** {@inheritDoc} */
     @Override
     public void writeTo(MessageWriter w) throws IOException {
-        ArrayList<Area> l = new ArrayList<>(areas.length);
-        for (Area a : areas) {
-            l.add((Area) a.areaWriter());
-        }
-        w.writeList(1, "areas", l, Area.SERIALIZER);
+        // ArrayList<Area> l = new ArrayList<>(areas.length);
+        // for (Area a : areas) {
+        // l.add((Area) a.areaWriter());
+        // }
+        w.writeList(1, "areas", Arrays.asList(areas), Area.SERIALIZER);
     }
 
     /** {@inheritDoc} */

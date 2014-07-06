@@ -14,6 +14,8 @@
  */
 package net.maritimecloud.core.message;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -40,6 +42,7 @@ public class MessageSerializers {
     @SuppressWarnings("resource")
     public static <T extends MessageSerializable> void writeToJSON(T message, MessageSerializer<T> serializer, Writer w)
             throws IOException {
+        requireNonNull(serializer);
         new JsonValueWriter(w).writeMessage(message, serializer);
     }
 

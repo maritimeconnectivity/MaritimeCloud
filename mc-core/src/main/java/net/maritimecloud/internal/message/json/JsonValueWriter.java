@@ -92,58 +92,6 @@ public class JsonValueWriter implements ValueWriter, Closeable {
         pw.write(value.toString());
     }
 
-    // void writeElement(Object value) throws IOException {
-    // if (value instanceof MessageSerializable) {
-    // writeMessage((MessageSerializable) value);
-    // }
-    //
-    // else if (value instanceof Integer) {
-    // writeInt((Integer) value);
-    // } else if (value instanceof Long) {
-    // writeInt64((Long) value);
-    // } else if (value instanceof BigInteger) {
-    // writeVarInt((BigInteger) value);
-    // }
-    //
-    //
-    // else if (value instanceof Float) {
-    // writeFloat((Float) value);
-    // } else if (value instanceof Double) {
-    // writeDouble((Double) value);
-    // } else if (value instanceof BigDecimal) {
-    // writeDecimal((BigDecimal) value);
-    // }
-    //
-    // else if (value instanceof Boolean) {
-    // writeBoolean((Boolean) value);
-    // } else if (value instanceof Binary) {
-    // writeBinary((Binary) value);
-    // } else if (value instanceof String) {
-    // writeText((String) value);
-    // } else if (value instanceof Date) {
-    // writeTimestamp((Date) value);
-    // }
-    //
-    // else if (value instanceof Position) {
-    // writePosition((Position) value);
-    // } else if (value instanceof PositionTime) {
-    // writePositionTime((PositionTime) value);
-    // }
-    //
-    //
-    // else if (value instanceof List) {
-    // writeList((List<?>) value);
-    // } else if (value instanceof Set) {
-    // writeSet((Set<?>) value);
-    // } else if (value instanceof Map) {
-    // writeMap((Map<?, ?>) value);
-    // } else if (value instanceof MessageEnum) {
-    // writeEnum((MessageEnum) value);
-    // } else {
-    // throw new IOException("Don't know how to write instances of " + value.getClass());
-    // }
-    // }
-
     /** {@inheritDoc} */
     @Override
     public void writeEnum(MessageEnum enumValue) throws IOException {
@@ -209,21 +157,24 @@ public class JsonValueWriter implements ValueWriter, Closeable {
     @Override
     public <T extends MessageSerializable> void writeMessage(T message, MessageSerializer<T> serializer)
             throws IOException {
-        pw.write("{");
-        indent++;
-        boolean isFirst = this.isFirst;
-        this.isFirst = true;
-        message.writeTo(w);
-        this.isFirst = isFirst;
-        indent--;
-        pw.write(LS);
-        indent();
-        pw.write("}");
+        if (message != null) {
+            pw.write("{");
+            indent++;
+            boolean isFirst = this.isFirst;
+            this.isFirst = true;
+            serializer.write(message, w);
+            this.isFirst = isFirst;
+            indent--;
+            pw.write(LS);
+            indent();
+            pw.write("}");
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public void writePosition(Position value) throws IOException {
+        // pw.write("{ \"latitude\" = " + value.getLatitude() + ", \"longitude\"" + value.getLongitude() + "}");
         writeMessage(value, Position.SERIALIZER);
     }
 

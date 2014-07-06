@@ -5,7 +5,7 @@ namespace core;
 message Area {
   1: AreaUnion union;
   2: Circle circle;
-  3: BoundingBox box;
+  3: Rectangle box;
   4: Polygon polygon;
 } 
 
@@ -15,8 +15,8 @@ message Circle {
   2: float radius;
 }
 
-@JavaImplementation("net.maritimecloud.util.geometry.BoundingBox")
-message BoundingBox {
+@JavaImplementation("net.maritimecloud.util.geometry.Rectangle")
+message Rectangle {
   1: position topLeft;
   2: position buttomRight;
 }

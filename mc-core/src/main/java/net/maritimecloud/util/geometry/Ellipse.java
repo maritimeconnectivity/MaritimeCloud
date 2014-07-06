@@ -50,6 +50,11 @@ public final class Ellipse extends Area {
     /** Location offset of X coordinate from geodetic reference (in meters). */
     private final double dx;
 
+    /** {@inheritDoc} */
+    public Ellipse immutable() {
+        return this;
+    }
+
     /** Location offset of Y coordinate from geodetic reference (in meters). */
     private final double dy;
 
@@ -130,7 +135,7 @@ public final class Ellipse extends Area {
 
     /** {@inheritDoc} */
     @Override
-    public BoundingBox getBoundingBox() {
+    public Rectangle getBoundingBox() {
         throw new UnsupportedOperationException();
     }
 

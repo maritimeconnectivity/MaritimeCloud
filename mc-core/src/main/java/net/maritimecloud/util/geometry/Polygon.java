@@ -49,8 +49,13 @@ public class Polygon extends Area {
     }
 
     /** {@inheritDoc} */
+    public Polygon immutable() {
+        return this;
+    }
+
+    /** {@inheritDoc} */
     @Override
-    public BoundingBox getBoundingBox() {
+    public Rectangle getBoundingBox() {
         throw new UnsupportedOperationException();
     }
 

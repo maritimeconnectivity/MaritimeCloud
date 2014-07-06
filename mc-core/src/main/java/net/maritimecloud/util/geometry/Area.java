@@ -16,13 +16,11 @@ package net.maritimecloud.util.geometry;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import net.maritimecloud.core.message.Message;
 import net.maritimecloud.core.message.MessageReader;
-import net.maritimecloud.core.message.MessageSerializable;
 import net.maritimecloud.core.message.MessageSerializer;
 import net.maritimecloud.core.message.MessageSerializers;
 import net.maritimecloud.core.message.MessageWriter;
@@ -32,29 +30,62 @@ import net.maritimecloud.core.message.MessageWriter;
  **/
 public abstract class Area implements Message, Serializable {
 
+    static final String CIRCLE = "circle";
+
+    static final int CIRCLE_TAG = 2;
+
+    static final String POLYGON = "polygon";
+
+    static final int POLYGON_TAG = 4;
+
+    static final String RECTANGLE = "rectangle";
+
+    static final int RECTANGLE_TAG = 3;
+
     /** A parser of areas. */
     public static final MessageSerializer<Area> SERIALIZER = new MessageSerializer<Area>() {
+
         /** {@inheritDoc} */
         @Override
-        public Area read(MessageReader reader) throws IOException {
-            return readFrom(reader);
+        public Area read(MessageReader r) throws IOException {
+            if (r.isNext(UNION_TAG, UNION)) {
+                return new AreaUnion(r.readList(UNION_TAG, UNION, AreaUnion.SERIALIZER));
+            } else if (r.isNext(CIRCLE_TAG, CIRCLE)) {
+                return r.readMessage(CIRCLE_TAG, CIRCLE, Circle.SERIALIZER);
+            } else if (r.isNext(RECTANGLE_TAG, RECTANGLE)) {
+                return r.readMessage(RECTANGLE_TAG, RECTANGLE, Rectangle.SERIALIZER);
+            } else if (r.isNext(POLYGON_TAG, POLYGON)) {
+                return r.readMessage(POLYGON_TAG, POLYGON, Polygon.SERIALIZER);
+            } else {
+                throw new UnsupportedOperationException();
+            }
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void write(Area a, MessageWriter w) throws IOException {
+            if (a != null) {
+                if (a instanceof AreaUnion) {
+                    w.writeMessage(UNION_TAG, UNION, (AreaUnion) a, AreaUnion.SERIALIZER);
+                } else if (a instanceof Circle) {
+                    w.writeMessage(CIRCLE_TAG, CIRCLE, (Circle) a, Circle.SERIALIZER);
+                } else if (a instanceof Rectangle) {
+                    w.writeMessage(RECTANGLE_TAG, RECTANGLE, (Rectangle) a, Rectangle.SERIALIZER);
+                } else if (a instanceof Polygon) {
+                    w.writeMessage(POLYGON_TAG, POLYGON, (Polygon) a, Polygon.SERIALIZER);
+                } else {
+                    throw new UnsupportedOperationException();
+                }
+            }
         }
     };
 
     /** serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
-    final MessageSerializable areaWriter() {
-        return new Writer();
-    }
+    static final String UNION = "union";
 
-    // public final Predicate<Element> contains() {
-    // return new Predicate<Element>() {
-    // public boolean test(Element element) {
-    // return contains(element);
-    // }
-    // };
-    // }
+    static final int UNION_TAG = 1;
 
     /**
      * Returns <tt>true</tt> if the specified element is fully contained in the shape, otherwise <tt>false</tt>.
@@ -69,25 +100,12 @@ public abstract class Area implements Message, Serializable {
 
     public abstract boolean contains(Position position);
 
-    // /** {@inheritDoc} */
-    // @Override
-    // public final double distanceTo(Element other, CoordinateSystem system) {
-    // return requireNonNull(system) == CoordinateSystem.CARTESIAN ? rhumbLineDistanceTo(other)
-    // : geodesicDistanceTo(other);
-    // }
-
-    // /** {@inheritDoc} */
-    // @Override
-    // public double geodesicDistanceTo(Element other) {
-    // throw new UnsupportedOperationException();
-    // }
-
     /**
      * Returns a bounding box of the area.
      *
      * @return a bounding box of the area
      */
-    public abstract BoundingBox getBoundingBox();
+    public abstract Rectangle getBoundingBox();
 
     /**
      * Returns a random position within the area.
@@ -107,89 +125,48 @@ public abstract class Area implements Message, Serializable {
      */
     public abstract Position getRandomPosition(Random random);
 
-    /** {@inheritDoc} */
-    public Area immutable() {
-        return this;
-    }
-
     public abstract boolean intersects(Area other);
-
-    // @Override
-    // public double rhumbLineDistanceTo(Position other) {
-    // throw new UnsupportedOperationException();
-    // }
 
     /** Returns a JSON representation of this message */
     public String toJSON() {
         return MessageSerializers.writeToJSON(this, SERIALIZER);
     }
 
-    public Area unionWith(Area other) {
+    public final Area unionWith(Area other) {
         return new AreaUnion(this, other);
     }
 
-    public static Area createUnion(Area... areas) {
-        Area[] a = areas.clone();
-        return new AreaUnion(a);
+    /**
+     * Creates a message of this type from a JSON throwing a runtime exception if the format of the message does not
+     * match
+     */
+    public static Area fromJSON(CharSequence c) {
+        return MessageSerializers.readFromJSON(SERIALIZER, c);
     }
 
     static double nextDouble(Random r, double least, double bound) {
         return r.nextDouble() * (bound - least) + least;
     }
 
-
-    public static void write(Area a, MessageWriter w) throws IOException {
-        if (a != null) {
-            if (a instanceof AreaUnion) {
-                w.writeMessage(1, "areas", (AreaUnion) a, AreaUnion.SERIALIZER);
-            } else if (a instanceof Circle) {
-                w.writeMessage(2, "circle", (Circle) a, Circle.SERIALIZER);
-            } else if (a instanceof BoundingBox) {
-                w.writeMessage(3, "boundingbox", (BoundingBox) a, BoundingBox.SERIALIZER);
-            } else if (a instanceof Polygon) {
-                w.writeMessage(4, "polygon", (Polygon) a, Polygon.SERIALIZER);
-            } else {
-                throw new UnsupportedOperationException();
-            }
-        }
-    }
-
-    public static Area readFrom(MessageReader r) throws IOException {
-        // Circle = 1;
-        // Box = 2;
-        // Polygon = 3;
-        // Union = 4;
-        if (r.isNext(1, "areas")) {
-            List<AreaUnion> readList = r.readList(1, "areas", AreaUnion.SERIALIZER);
-            return new AreaUnion(readList.toArray(new AreaUnion[0]));
-        } else if (r.isNext(2, "circle")) {
-            return r.readMessage(1, "circle", Circle.SERIALIZER);
-        } else if (r.isNext(3, "boundingbox")) {
-            return r.readMessage(2, "boundingbox", BoundingBox.SERIALIZER);
-        } else if (r.isNext(4, "polygon")) {
-            return r.readMessage(3, "polygon", Polygon.SERIALIZER);
-        } else {
-            throw new UnsupportedOperationException();
-        }
-    }
-
-    class Writer implements MessageSerializable {
-
-        /** {@inheritDoc} */
-        @Override
-        public void writeTo(MessageWriter w) throws IOException {
-            Area a = Area.this;
-            if (a instanceof AreaUnion) {
-                w.writeMessage(1, "areas", (AreaUnion) a, AreaUnion.SERIALIZER);
-            } else if (a instanceof Circle) {
-                w.writeMessage(2, "circle", (Circle) a, Circle.SERIALIZER);
-            } else if (a instanceof BoundingBox) {
-                w.writeMessage(3, "boundingbox", (BoundingBox) a, BoundingBox.SERIALIZER);
-            } else if (a instanceof Polygon) {
-                w.writeMessage(4, "polygon", (Polygon) a, Polygon.SERIALIZER);
-            } else {
-                throw new UnsupportedOperationException();
-            }
-        }
+    public static Area unionOf(Area... areas) {
+        Area[] a = areas.clone();
+        return new AreaUnion(a);
     }
 }
+
+// @Override
+// public double rhumbLineDistanceTo(Position other) {
+// throw new UnsupportedOperationException();
+// }
+// /** {@inheritDoc} */
+// @Override
+// public final double distanceTo(Element other, CoordinateSystem system) {
+// return requireNonNull(system) == CoordinateSystem.CARTESIAN ? rhumbLineDistanceTo(other)
+// : geodesicDistanceTo(other);
+// }
+
+// /** {@inheritDoc} */
+// @Override
+// public double geodesicDistanceTo(Element other) {
+// throw new UnsupportedOperationException();
+// }

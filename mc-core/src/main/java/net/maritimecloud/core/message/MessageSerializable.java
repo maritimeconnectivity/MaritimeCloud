@@ -20,14 +20,14 @@ import java.io.IOException;
  * Implemented by classes that can be serialized by a {@link MessageWriter}. Any class implementing this interface
  * should also have a <code>public static final MessageParser<T> PARSER</code> field. To allow for reading the
  * serialized message back again.
- * 
+ *
  * @author Kasper Nielsen
  */
 public interface MessageSerializable {
 
     /**
      * Serializes the implementing class.
-     * 
+     *
      * @param w
      *            the writer to use for serialization
      * @throws IOException

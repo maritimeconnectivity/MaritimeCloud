@@ -26,6 +26,7 @@ import java.util.List;
 import javax.json.JsonReader;
 import javax.json.spi.JsonProvider;
 
+import net.maritimecloud.core.message.Message;
 import net.maritimecloud.core.message.MessageReader;
 import net.maritimecloud.core.message.MessageSerializable;
 import net.maritimecloud.core.message.MessageSerializer;
@@ -77,9 +78,19 @@ public abstract class AbstractJSONTest {
     }
 
     static MessageSerializable create(IOConsumer<MessageWriter> c) {
-        return new MessageSerializable() {
+        return new Message() {
             public void writeTo(MessageWriter w) throws IOException {
                 c.accept(w);
+            }
+
+            @Override
+            public Message immutable() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public String toJSON() {
+                throw new UnsupportedOperationException();
             }
         };
     }
@@ -111,7 +122,7 @@ public abstract class AbstractJSONTest {
         T apply(F t) throws IOException;
     }
 
-    static class Msg1 extends MessageSerializer<Msg1> implements MessageSerializable {
+    static class Msg1 extends MessageSerializer<Msg1> implements Message {
 
         int i1;
 
@@ -138,6 +149,18 @@ public abstract class AbstractJSONTest {
             w.writeInt(2, "i2", i2);
             w.writeInt64(3, "l1", l1);
             w.writeList(4, "list", list, this);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Message immutable() {
+            return this;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public String toJSON() {
+            throw new UnsupportedOperationException();
         }
     }
 }

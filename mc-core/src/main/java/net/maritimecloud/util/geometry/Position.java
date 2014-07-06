@@ -16,6 +16,8 @@ package net.maritimecloud.util.geometry;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import net.maritimecloud.core.message.Message;
 import net.maritimecloud.core.message.MessageReader;
@@ -314,6 +316,26 @@ public class Position implements Message, Serializable {
      */
     public static Position create(double latitude, double longitude) {
         return new Position(latitude, longitude);
+    }
+
+    /**
+     * Returns a random valid position.
+     *
+     * @return the random position
+     */
+    public static Position random() {
+        return random(ThreadLocalRandom.current());
+    }
+
+    /**
+     * Returns a random valid position.
+     *
+     * @param rnd
+     *            the source of randomness
+     * @return the random position
+     */
+    public static Position random(Random rnd) {
+        return Position.create(rnd.nextDouble() * 180 - 90, rnd.nextDouble() * 360 - 180);
     }
 
     /**

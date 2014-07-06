@@ -17,6 +17,7 @@ package net.maritimecloud.internal.message.util;
 import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -27,6 +28,8 @@ import java.util.Set;
 
 import net.maritimecloud.core.message.Message;
 import net.maritimecloud.core.message.MessageReader;
+import net.maritimecloud.core.message.MessageSerializable;
+import net.maritimecloud.core.message.MessageSerializer;
 import net.maritimecloud.core.message.ValueSerializer;
 
 /**
@@ -87,5 +90,23 @@ public class MessageHelper {
             throws IOException {
         // TODO make sure it is a valid list.
         return reader.readSet(tag, name, parser);
+    }
+
+    public static <T extends MessageSerializable> MessageSerializer<T> getSerializer(T message) {
+        return getSerializer(message.getClass());
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends MessageSerializable> MessageSerializer<T> getSerializer(Class<?> c) {
+        try {
+            Field field = c.getField("SERIALIZER");
+            return (MessageSerializer<T>) field.get(null);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(
+                    "All messages must have a public static final SERIALIZER field, offending class = "
+                            + c.getCanonicalName());
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -18,9 +18,11 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import net.maritimecloud.core.message.MessageReader;
 import net.maritimecloud.core.message.MessageSerializer;
+import net.maritimecloud.core.message.MessageSerializers;
 import net.maritimecloud.core.message.MessageWriter;
 
 /**
@@ -28,8 +30,6 @@ import net.maritimecloud.core.message.MessageWriter;
  *
  */
 public class Circle extends Area {
-
-    static final String NAME = "circle";
 
     static final String NAME_CENTER_LATITIUDE = "center-latitude";
 
@@ -44,7 +44,7 @@ public class Circle extends Area {
         public Circle read(MessageReader reader) throws IOException {
             double lat = reader.readDouble(1, NAME_CENTER_LATITIUDE);
             double lon = reader.readDouble(2, NAME_CENTER_LONGITUDE);
-            float radius = reader.readFloat(3, NAME_RADIUS);
+            double radius = reader.readDouble(3, NAME_RADIUS);
             return new Circle(Position.create(lat, lon), radius);
         }
     };
@@ -57,6 +57,11 @@ public class Circle extends Area {
 
     /** The radius of the circle. */
     final double radius;
+
+    /** {@inheritDoc} */
+    public Circle immutable() {
+        return this;
+    }
 
     Circle(Position center, double radius) {
         this.center = requireNonNull(center, "center is null");
@@ -95,14 +100,14 @@ public class Circle extends Area {
 
     /** {@inheritDoc} */
     @Override
-    public BoundingBox getBoundingBox() {
+    public Rectangle getBoundingBox() {
         double right = CoordinateSystem.CARTESIAN.pointOnBearing(center, radius, 0).latitude;
         double left = CoordinateSystem.CARTESIAN.pointOnBearing(center, radius, 180).latitude;
         double top = CoordinateSystem.CARTESIAN.pointOnBearing(center, radius, 90).longitude;
         double buttom = CoordinateSystem.CARTESIAN.pointOnBearing(center, radius, 270).longitude;
         Position topLeft = Position.create(left, top);
         Position buttomRight = Position.create(right, buttom);
-        return BoundingBox.create(topLeft, buttomRight);
+        return Rectangle.create(topLeft, buttomRight);
     }
 
     /**
@@ -126,7 +131,7 @@ public class Circle extends Area {
     /** {@inheritDoc} */
     @Override
     public Position getRandomPosition(Random r) {
-        BoundingBox bb = getBoundingBox();
+        Rectangle bb = getBoundingBox();
         for (int i = 0; i < 10000; i++) {
             Position p = bb.getRandomPosition(r);
             if (contains(p)) {
@@ -147,14 +152,14 @@ public class Circle extends Area {
     public boolean intersects(Area other) {
         if (other instanceof Circle) {
             return intersects((Circle) other);
-        } else if (other instanceof BoundingBox) {
-            return intersects((BoundingBox) other);
+        } else if (other instanceof Rectangle) {
+            return intersects((Rectangle) other);
         } else {
             throw new UnsupportedOperationException("Only circles and BoundingBoxes supported");
         }
     }
 
-    public boolean intersects(BoundingBox other) {
+    public boolean intersects(Rectangle other) {
         return other.intersects(this);
     }
 
@@ -219,7 +224,7 @@ public class Circle extends Area {
     public void writeTo(MessageWriter w) throws IOException {
         w.writeDouble(1, NAME_CENTER_LATITIUDE, center.latitude);
         w.writeDouble(2, NAME_CENTER_LONGITUDE, center.longitude);
-        w.writeFloat(3, NAME_RADIUS, (float) radius);
+        w.writeDouble(3, NAME_RADIUS, radius);
     }
 
     public static Circle create(double latitude, double longitude, double radius) {
@@ -241,5 +246,33 @@ public class Circle extends Area {
      */
     public static Circle create(Position center, double radius) {
         return new Circle(center, radius);
+    }
+
+    /**
+     * Creates a message of this type from a JSON throwing a runtime exception if the format of the message does not
+     * match
+     */
+    public static Circle fromJSON(CharSequence c) {
+        return MessageSerializers.readFromJSON(SERIALIZER, c);
+    }
+
+    /**
+     * Returns a random valid circle.
+     *
+     * @return the random circle
+     */
+    public static Circle random() {
+        return random(ThreadLocalRandom.current());
+    }
+
+    /**
+     * Returns a random valid circle.
+     *
+     * @param rnd
+     *            the source of randomness
+     * @return the random circle
+     */
+    public static Circle random(Random rnd) {
+        return new Circle(Position.random(), (1 - rnd.nextDouble()) * 10000);
     }
 }

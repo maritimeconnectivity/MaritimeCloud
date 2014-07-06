@@ -17,21 +17,22 @@ package net.maritimecloud.util.geometry;
 import java.io.IOException;
 import java.util.Random;
 
-import net.maritimecloud.core.message.MessageSerializer;
 import net.maritimecloud.core.message.MessageReader;
+import net.maritimecloud.core.message.MessageSerializer;
+import net.maritimecloud.core.message.MessageSerializers;
 import net.maritimecloud.core.message.MessageWriter;
 
-public final class BoundingBox extends Area {
+public final class Rectangle extends Area {
 
     /** A bounding box encompassing all coordinates. */
-    public static final BoundingBox ALL = create(-90, 90, -180, 180);
+    public static final Rectangle ALL = create(-90, 90, -180, 180);
 
 
-    public static final MessageSerializer<BoundingBox> SERIALIZER = new MessageSerializer<BoundingBox>() {
+    public static final MessageSerializer<Rectangle> SERIALIZER = new MessageSerializer<Rectangle>() {
 
         /** {@inheritDoc} */
         @Override
-        public BoundingBox read(MessageReader reader) throws IOException {
+        public Rectangle read(MessageReader reader) throws IOException {
             return readFrom(reader);
         }
     };
@@ -47,11 +48,16 @@ public final class BoundingBox extends Area {
 
     private final double minLongitude;
 
-    private BoundingBox(double minLatitude, double maxLatitude, double minLongitude, double maxLongitude) {
+    private Rectangle(double minLatitude, double maxLatitude, double minLongitude, double maxLongitude) {
         this.minLatitude = Position.verifyLatitude(minLatitude);
         this.maxLatitude = Position.verifyLatitude(maxLatitude);
         this.minLongitude = Position.verifyLongitude(minLongitude);
         this.maxLongitude = Position.verifyLongitude(maxLongitude);
+    }
+
+    /** {@inheritDoc} */
+    public Rectangle immutable() {
+        return this;
     }
 
     // @Override
@@ -62,6 +68,13 @@ public final class BoundingBox extends Area {
     // return super.contains(element);
     // }
     // }
+    /**
+     * Creates a message of this type from a JSON throwing a runtime exception if the format of the message does not
+     * match
+     */
+    public static Rectangle fromJSON(CharSequence c) {
+        return MessageSerializers.readFromJSON(SERIALIZER, c);
+    }
 
     public boolean contains(Position point) {
         return point.getLatitude() >= minLatitude && point.getLongitude() >= minLongitude
@@ -72,8 +85,8 @@ public final class BoundingBox extends Area {
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
-        } else if (obj instanceof BoundingBox) {
-            BoundingBox that = (BoundingBox) obj;
+        } else if (obj instanceof Rectangle) {
+            Rectangle that = (Rectangle) obj;
             return minLatitude == that.minLatitude && minLongitude == that.minLongitude
                     && maxLatitude == that.maxLatitude && maxLongitude == that.maxLongitude;
         }
@@ -92,7 +105,7 @@ public final class BoundingBox extends Area {
 
     /** {@inheritDoc} */
     @Override
-    public BoundingBox getBoundingBox() {
+    public Rectangle getBoundingBox() {
         return this;
     }
 
@@ -167,7 +180,7 @@ public final class BoundingBox extends Area {
      *            the bounding box to include
      * @return a bounding box
      */
-    public BoundingBox include(BoundingBox other) {
+    public Rectangle include(Rectangle other) {
         double minLon = this.minLongitude;
         double maxLon = this.maxLongitude;
         double minLat = this.minLatitude;
@@ -189,7 +202,7 @@ public final class BoundingBox extends Area {
             maxLat = other.maxLatitude;
             changed = true;
         }
-        return changed ? new BoundingBox(minLat, maxLat, minLon, maxLon) : this;
+        return changed ? new Rectangle(minLat, maxLat, minLon, maxLon) : this;
     }
 
     /** {@inheritDoc} */
@@ -197,17 +210,17 @@ public final class BoundingBox extends Area {
     public boolean intersects(Area other) {
         if (other instanceof Circle) {
             return intersects((Circle) other);
-        } else if (other instanceof BoundingBox) {
-            return intersects((BoundingBox) other);
+        } else if (other instanceof Rectangle) {
+            return intersects((Rectangle) other);
         } else {
             throw new UnsupportedOperationException("Only circles and BoundingBoxes supported");
         }
     }
 
-    public boolean intersects(BoundingBox other) {
+    public boolean intersects(Rectangle other) {
         // If the bounding box of this and other is shorter than the sum of the heights AND skinnier than the sum of the
         // widths, they must intersect
-        BoundingBox common = include(other);
+        Rectangle common = include(other);
         return common.getLatitudeSize() < getLatitudeSize() + other.getLatitudeSize()
                 && common.getLongitudeSize() < getLongitudeSize() + other.getLongitudeSize();
     }
@@ -241,11 +254,11 @@ public final class BoundingBox extends Area {
         w.writeDouble(4, "buttomRightLongiture", getMaxLon());
     }
 
-    static BoundingBox create(double y1, double y2, double x1, double x2) {
-        return new BoundingBox(Math.min(y1, y2), Math.max(y1, y2), Math.min(x1, x2), Math.max(x1, x2));
+    static Rectangle create(double y1, double y2, double x1, double x2) {
+        return new Rectangle(Math.min(y1, y2), Math.max(y1, y2), Math.min(x1, x2), Math.max(x1, x2));
     }
 
-    public static BoundingBox create(Position topLeft, Position buttomRight) {
+    public static Rectangle create(Position topLeft, Position buttomRight) {
         return create(topLeft.getLatitude(), buttomRight.getLatitude(), topLeft.getLongitude(),
                 buttomRight.getLongitude());
     }
@@ -255,11 +268,11 @@ public final class BoundingBox extends Area {
         return (int) (f ^ f >>> 32);
     }
 
-    public static BoundingBox readFrom(MessageReader r) throws IOException {
+    public static Rectangle readFrom(MessageReader r) throws IOException {
         double tlLat = r.readDouble(1, "topLeftLatitude");
         double tlLon = r.readDouble(2, "topLeftLongitude");
         double brLat = r.readDouble(3, "buttomRightLatitude");
         double brLon = r.readDouble(4, "buttomRightLongiture");
-        return BoundingBox.create(tlLat, brLat, tlLon, brLon);
+        return Rectangle.create(tlLat, brLat, tlLon, brLon);
     }
 }
