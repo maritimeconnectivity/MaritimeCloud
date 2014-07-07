@@ -265,7 +265,6 @@ public final class PositionReaderSimulator {
             this.target = positionSupplier.get();
             this.distanceSupplier = prs.speedSource;
             this.currentSpeed = distanceSupplier.getAsDouble();
-            // System.out.println("Going to target " + target);
         }
 
         /** {@inheritDoc} */
@@ -288,7 +287,6 @@ public final class PositionReaderSimulator {
                     currentPosition = target.withTime(0);// not going to use the time parameter
                     target = positionSupplier.get();
                     this.currentSpeed = distanceSupplier.getAsDouble();
-                    // System.out.println("Going to target " + target);
                 }
             }
         }

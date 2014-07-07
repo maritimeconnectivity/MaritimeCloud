@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.internal.util;
+package net.maritimecloud.internal.serialization;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -22,7 +22,7 @@ import java.lang.ref.SoftReference;
 import java.lang.reflect.Field;
 import java.security.MessageDigest;
 
-import net.maritimecloud.internal.serialization.util.Hashing;
+import net.maritimecloud.internal.serialization.Hashing;
 
 import org.junit.Test;
 

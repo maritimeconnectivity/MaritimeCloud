@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.internal.message;
+package net.maritimecloud.serialization;
 
 import net.maritimecloud.core.serialization.MessageEnum;
 import net.maritimecloud.core.serialization.MessageEnumSerializer;

@@ -77,7 +77,6 @@ public class JSONMessageWriterTest {
     // assertEquals(
     // linesOf("\"list\": [", "  {", "    \"ivalue\": 1", "  },", "  {", "    \"ivalue\": 4", "  }", "]"),
     // sw.toString());
-    // System.out.println(sw.toString());
     //
     // newW().writeSet(1, "set", new HashSet<>(Arrays.asList(TestSerializers.intOf(1))));
     // assertEquals(linesOf("\"set\": [", "  {", "    \"ivalue\": 1", "  }", "]"), sw.toString());

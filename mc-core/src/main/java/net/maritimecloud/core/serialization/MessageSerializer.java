@@ -125,7 +125,6 @@ public abstract class MessageSerializer<T extends Message> extends ValueSerializ
 // }
 
 // public static void main(String[] args) {
-// System.out.println(Position.create(1, 1).toJSON());
 // }
 
 // public static String writeToJSONOld(Message message) {

@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 
 import net.maritimecloud.core.serialization.ValueSerializer;
-import net.maritimecloud.internal.message.TestEnum;
+import net.maritimecloud.serialization.TestEnum;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
 
