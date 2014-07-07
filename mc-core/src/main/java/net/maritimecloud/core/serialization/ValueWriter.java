@@ -12,14 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.core.message;
+package net.maritimecloud.core.serialization;
 
-import java.io.Closeable;
-import java.io.Flushable;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -29,48 +26,23 @@ import net.maritimecloud.util.Binary;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
 
-
 /**
- * Abstract class for writing to message streams.
  *
  * @author Kasper Nielsen
  */
-public abstract class MessageWriter implements Closeable, Flushable {
+public interface ValueWriter {
 
-    /** {@inheritDoc} */
-    public void flush() throws IOException {}
-
-    public boolean isCompact() {
-        return true;
-    }
-
-    public abstract void writeBinary(int tag, String name, Binary binary) throws IOException;
-
-    public final void writeBinary(int tag, String name, byte[] bytes) throws IOException {
-        writeBinary(tag, name, bytes, 0, bytes.length);
-    }
-
-    public void writeBinary(int tag, String name, byte[] bytes, int offset, int length) throws IOException {
-        writeBinary(tag, name, Binary.copyFrom(bytes, offset, length));
-    }
-
-    public void writeBinary(int tag, String name, ByteBuffer buffer) throws IOException {
-        writeBinary(tag, name, Binary.copyFrom(buffer));
-    }
+    public abstract void writeBinary(Binary binary) throws IOException;
 
     /**
      * Writes a boolean.
      *
-     * @param tag
-     *            the tag value
-     * @param name
-     *            the tag name
      * @param value
      *            the boolean value to write
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeBoolean(int tag, String name, Boolean value) throws IOException;
+    public abstract void writeBoolean(Boolean value) throws IOException;
 
     /**
      * Writes a double.
@@ -84,9 +56,9 @@ public abstract class MessageWriter implements Closeable, Flushable {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeDouble(int tag, String name, Double value) throws IOException;
+    public abstract void writeDouble(Double value) throws IOException;
 
-    public abstract void writeEnum(int tag, String name, MessageEnum serializable) throws IOException;
+    public abstract void writeEnum(MessageEnum serializable) throws IOException;
 
     /**
      * Writes a float.
@@ -100,7 +72,7 @@ public abstract class MessageWriter implements Closeable, Flushable {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeFloat(int tag, String name, Float value) throws IOException;
+    public abstract void writeFloat(Float value) throws IOException;
 
     /**
      * Writes an integer.
@@ -114,19 +86,7 @@ public abstract class MessageWriter implements Closeable, Flushable {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeInt(int tag, String name, Integer value) throws IOException;
-
-
-    public abstract void writeVarInt(int tag, String name, BigInteger value) throws IOException;
-
-    public abstract void writeDecimal(int tag, String name, BigDecimal value) throws IOException;
-
-    public abstract void writePosition(int tag, String name, Position value) throws IOException;
-
-    public abstract void writePositionTime(int tag, String name, PositionTime value) throws IOException;
-
-    public abstract void writeTimestamp(int tag, String name, Date value) throws IOException;
-
+    public abstract void writeInt(Integer value) throws IOException;
 
     /**
      * Writes a long.
@@ -140,7 +100,18 @@ public abstract class MessageWriter implements Closeable, Flushable {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeInt64(int tag, String name, Long value) throws IOException;
+    public abstract void writeInt64(Long value) throws IOException;
+
+    public abstract void writeVarInt(BigInteger value) throws IOException;
+
+    public abstract void writeDecimal(BigDecimal value) throws IOException;
+
+    public abstract void writePosition(Position value) throws IOException;
+
+    public abstract void writePositionTime(PositionTime value) throws IOException;
+
+    public abstract void writeTimestamp(Date value) throws IOException;
+
 
     /**
      * Writes a list.
@@ -154,8 +125,7 @@ public abstract class MessageWriter implements Closeable, Flushable {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract <T> void writeList(int tag, String name, List<T> list, ValueSerializer<T> serializer)
-            throws IOException;
+    public abstract <T> void writeList(List<T> list, ValueSerializer<T> serializer) throws IOException;
 
     /**
      * Writes a map.
@@ -169,7 +139,7 @@ public abstract class MessageWriter implements Closeable, Flushable {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract <K, V> void writeMap(int tag, String name, Map<K, V> map, ValueSerializer<K> keySerializer,
+    public abstract <K, V> void writeMap(Map<K, V> map, ValueSerializer<K> keySerializer,
             ValueSerializer<V> valueSerializer) throws IOException;
 
     /**
@@ -184,8 +154,8 @@ public abstract class MessageWriter implements Closeable, Flushable {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract <T extends Message> void writeMessage(int tag, String name, T message,
-            MessageSerializer<T> serializer) throws IOException;
+    public abstract <T extends Message> void writeMessage(T message, MessageSerializer<T> serializer)
+            throws IOException;
 
     /**
      * Writes a set.
@@ -199,8 +169,8 @@ public abstract class MessageWriter implements Closeable, Flushable {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract <T> void writeSet(int tag, String name, Set<T> set, ValueSerializer<T> serializer)
-            throws IOException;
+    public abstract <T> void writeSet(Set<T> set, ValueSerializer<T> serializer) throws IOException;
+
 
     /**
      * Writes a string.
@@ -214,17 +184,5 @@ public abstract class MessageWriter implements Closeable, Flushable {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeText(int tag, String name, String value) throws IOException;
+    public abstract void writeText(String value) throws IOException;
 }
-//
-//
-// public <T extends List<?> & MessageList> void writeList2(int tag, String name, T t) {
-//
-// }
-//
-// public <T> void writeList(int tag, String name, List<? extends T> list, MLS<T> mls) {
-//
-// List<Integer> ll = new ArrayList<>();
-// writeList(tag, name, ll, MLS.TO_INT);
-// }
-

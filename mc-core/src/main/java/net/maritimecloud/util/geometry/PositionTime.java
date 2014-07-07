@@ -21,9 +21,9 @@ import static net.maritimecloud.util.geometry.CoordinateConverter.compass2cartes
 
 import java.io.IOException;
 
-import net.maritimecloud.core.message.MessageReader;
-import net.maritimecloud.core.message.MessageSerializer;
-import net.maritimecloud.core.message.MessageWriter;
+import net.maritimecloud.core.serialization.MessageReader;
+import net.maritimecloud.core.serialization.MessageSerializer;
+import net.maritimecloud.core.serialization.MessageWriter;
 
 /**
  * A position couple with a timestamp.

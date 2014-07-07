@@ -22,9 +22,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import net.maritimecloud.core.message.MessageReader;
-import net.maritimecloud.core.message.MessageSerializer;
-import net.maritimecloud.core.message.MessageWriter;
+import net.maritimecloud.core.serialization.MessageReader;
+import net.maritimecloud.core.serialization.MessageSerializer;
+import net.maritimecloud.core.serialization.MessageWriter;
 
 /**
  * A union of multiple areas
@@ -33,32 +33,26 @@ import net.maritimecloud.core.message.MessageWriter;
  */
 class AreaUnion extends Area {
 
+    /** A serializer for area unions. */
     public static final MessageSerializer<AreaUnion> SERIALIZER = new MessageSerializer<AreaUnion>() {
 
         /** {@inheritDoc} */
         @Override
         public AreaUnion read(MessageReader reader) throws IOException {
-            return readFrom(reader);
+            List<Area> list = reader.readList(1, "areas", Area.SERIALIZER);
+            return new AreaUnion(list.toArray(new Area[list.size()]));
         }
 
         public void write(AreaUnion message, MessageWriter writer) throws IOException {
-            message.writeTo(writer);
+            writer.writeList(1, "areas", Arrays.asList(message.areas), Area.SERIALIZER);
         }
     };
-
-    /** {@inheritDoc} */
-    public AreaUnion immutable() {
-        return this;
-    }
 
     /** serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
+    /** The combined areas. */
     final Area[] areas;
-
-    AreaUnion(List<? extends Area> areas) {
-        this(areas.toArray(new Area[areas.size()]));
-    }
 
     /**
      * @param cs
@@ -76,6 +70,10 @@ class AreaUnion extends Area {
         this.areas = areas.toArray(new Area[areas.size()]);
     }
 
+    AreaUnion(List<? extends Area> areas) {
+        this(areas.toArray(new Area[areas.size()]));
+    }
+
     /** {@inheritDoc} */
     @Override
     public boolean contains(Position position) {
@@ -90,7 +88,6 @@ class AreaUnion extends Area {
     private boolean equals(AreaUnion other) {
         if (areas.length == other.areas.length) {
             List<Area> others = Arrays.asList(other.areas.clone());
-            System.out.println(others);
             for (Area area : areas) {
                 boolean found = false;
                 for (int i = 0; i < others.size(); i++) {
@@ -109,19 +106,11 @@ class AreaUnion extends Area {
         return false;
     }
 
+    /** {@inheritDoc} */
+    @Override
     public boolean equals(Object other) {
         return other == this || other instanceof AreaUnion && equals((AreaUnion) other);
     }
-
-    // /** {@inheritDoc} */
-    // @Override
-    // public double geodesicDistanceTo(Element other) {
-    // double distance = Double.MAX_VALUE;
-    // for (Area a : areas) {
-    // distance = Math.min(distance, a.geodesicDistanceTo(other));
-    // }
-    // return distance;
-    // }
 
     /** {@inheritDoc} */
     @Override
@@ -133,20 +122,26 @@ class AreaUnion extends Area {
 
         // for each boundry box
         // Mht til dato linjen. Maa det vaere den mindste box der kan laves
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     /** {@inheritDoc} */
     @Override
     public Position getRandomPosition(Random random) {
+        // Implementations
+        // 1)
         // bounding box og saa blev ved indtil vi finder en position
         // Den er svaerd fordi det skal vaere i forhold til arealet.
-        // Vi skal have en getAreaSize//
+
+        // 2)
+        // Vi skal have en getAreaSize og saa bruge en
         // AliasedMethodTable http://www.keithschwarz.com/darts-dice-coins/
-        // bliver noedt til at have et volatile temp object her der gemmer da shit
+        // We lazy calculater bliver noedt til at have et volatile temp object her der gemmer da shit
         throw new UnsupportedOperationException("getRandomPosition is not current supported");
     }
 
+    /** {@inheritDoc} */
+    @Override
     public int hashCode() {
         if (areas.length == 0) {
             return 0;
@@ -160,6 +155,11 @@ class AreaUnion extends Area {
     }
 
     /** {@inheritDoc} */
+    public AreaUnion immutable() {
+        return this;
+    }
+
+    /** {@inheritDoc} */
     @Override
     public boolean intersects(Area other) {
         for (Area a : areas) {
@@ -169,31 +169,24 @@ class AreaUnion extends Area {
         }
         return false;
     }
-
-
-    // /** {@inheritDoc} */
-    // @Override
-    // public double rhumbLineDistanceTo(Element other) {
-    // double distance = Double.MAX_VALUE;
-    // for (Area a : areas) {
-    // distance = Math.min(distance, a.rhumbLineDistanceTo(other));
-    // }
-    // return distance;
-    // }
-
-    /** {@inheritDoc} */
-    @Override
-    public void writeTo(MessageWriter w) throws IOException {
-        // ArrayList<Area> l = new ArrayList<>(areas.length);
-        // for (Area a : areas) {
-        // l.add((Area) a.areaWriter());
-        // }
-        w.writeList(1, "areas", Arrays.asList(areas), Area.SERIALIZER);
-    }
-
-    /** {@inheritDoc} */
-    public static AreaUnion readFrom(MessageReader r) throws IOException {
-        List<Area> list = r.readList(1, "areas", Area.SERIALIZER);
-        return new AreaUnion(list.toArray(new Area[list.size()]));
-    }
 }
+
+
+// /** {@inheritDoc} */
+// @Override
+// public double geodesicDistanceTo(Element other) {
+// double distance = Double.MAX_VALUE;
+// for (Area a : areas) {
+// distance = Math.min(distance, a.geodesicDistanceTo(other));
+// }
+// return distance;
+// }
+// /** {@inheritDoc} */
+// @Override
+// public double rhumbLineDistanceTo(Element other) {
+// double distance = Double.MAX_VALUE;
+// for (Area a : areas) {
+// distance = Math.min(distance, a.rhumbLineDistanceTo(other));
+// }
+// return distance;
+// }

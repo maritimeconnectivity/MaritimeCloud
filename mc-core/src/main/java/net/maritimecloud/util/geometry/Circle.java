@@ -20,9 +20,9 @@ import java.io.IOException;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-import net.maritimecloud.core.message.MessageReader;
-import net.maritimecloud.core.message.MessageSerializer;
-import net.maritimecloud.core.message.MessageWriter;
+import net.maritimecloud.core.serialization.MessageReader;
+import net.maritimecloud.core.serialization.MessageSerializer;
+import net.maritimecloud.core.serialization.MessageWriter;
 
 /**
  * A circle
@@ -30,13 +30,13 @@ import net.maritimecloud.core.message.MessageWriter;
  */
 public class Circle extends Area {
 
-    static final String NAME_CENTER_LATITIUDE = "center-latitude";
-
-    static final String NAME_CENTER_LONGITUDE = "center-longitude";
-
-    static final String NAME_RADIUS = "radius";
-
     public static final MessageSerializer<Circle> SERIALIZER = new MessageSerializer<Circle>() {
+
+        private static final String NAME_CENTER_LATITIUDE = "center-latitude";
+
+        private static final String NAME_CENTER_LONGITUDE = "center-longitude";
+
+        private static final String NAME_RADIUS = "radius";
 
         /** {@inheritDoc} */
         @Override
@@ -47,8 +47,12 @@ public class Circle extends Area {
             return new Circle(Position.create(lat, lon), radius);
         }
 
-        public void write(Circle message, MessageWriter writer) throws IOException {
-            message.writeTo(writer);
+        /** {@inheritDoc} */
+        @Override
+        public void write(Circle message, MessageWriter w) throws IOException {
+            w.writeDouble(1, NAME_CENTER_LATITIUDE, message.center.latitude);
+            w.writeDouble(2, NAME_CENTER_LONGITUDE, message.center.longitude);
+            w.writeDouble(3, NAME_RADIUS, message.radius);
         }
     };
 
@@ -60,11 +64,6 @@ public class Circle extends Area {
 
     /** The radius of the circle. */
     final double radius;
-
-    /** {@inheritDoc} */
-    public Circle immutable() {
-        return this;
-    }
 
     Circle(Position center, double radius) {
         this.center = requireNonNull(center, "center is null");
@@ -78,12 +77,12 @@ public class Circle extends Area {
         return center.rhumbLineDistanceTo(c.center) <= radius + c.radius;
     }
 
-
     /** {@inheritDoc} */
     @Override
     public boolean contains(Position position) {
         return center.rhumbLineDistanceTo(position) <= radius;
     }
+
 
     public boolean equals(Circle other) {
         return other == this || other != null && center.equals(other.center) && radius == other.radius;
@@ -151,6 +150,11 @@ public class Circle extends Area {
     }
 
     /** {@inheritDoc} */
+    public Circle immutable() {
+        return this;
+    }
+
+    /** {@inheritDoc} */
     @Override
     public boolean intersects(Area other) {
         if (other instanceof Circle) {
@@ -160,10 +164,6 @@ public class Circle extends Area {
         } else {
             throw new UnsupportedOperationException("Only circles and BoundingBoxes supported");
         }
-    }
-
-    public boolean intersects(Rectangle other) {
-        return other.intersects(this);
     }
 
     public boolean intersects(Circle other) {
@@ -190,6 +190,10 @@ public class Circle extends Area {
 
         double disc = pBy2 * pBy2 - q;
         return disc >= 0;
+    }
+
+    public boolean intersects(Rectangle other) {
+        return other.intersects(this);
     }
 
     public double rhumbLineDistanceTo(Position position) {
@@ -222,14 +226,6 @@ public class Circle extends Area {
         return new Circle(center, radius);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public void writeTo(MessageWriter w) throws IOException {
-        w.writeDouble(1, NAME_CENTER_LATITIUDE, center.latitude);
-        w.writeDouble(2, NAME_CENTER_LONGITUDE, center.longitude);
-        w.writeDouble(3, NAME_RADIUS, radius);
-    }
-
     public static Circle create(double latitude, double longitude, double radius) {
         return new Circle(Position.create(latitude, longitude), radius);
     }
@@ -252,8 +248,8 @@ public class Circle extends Area {
     }
 
     /**
-     * Creates a message of this type from a JSON throwing a runtime exception if the format of the message does not
-     * match
+     * Creates a message of this type from a JSON. Throwing a runtime exception if the format of the message does not
+     * match.
      */
     public static Circle fromJSON(CharSequence c) {
         return MessageSerializer.readFromJSON(SERIALIZER, c);

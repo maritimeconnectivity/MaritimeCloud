@@ -17,66 +17,51 @@ package net.maritimecloud.util.geometry;
 import java.io.IOException;
 import java.util.Random;
 
-import net.maritimecloud.core.message.MessageReader;
-import net.maritimecloud.core.message.MessageSerializer;
-import net.maritimecloud.core.message.MessageWriter;
+import net.maritimecloud.core.serialization.MessageReader;
+import net.maritimecloud.core.serialization.MessageSerializer;
+import net.maritimecloud.core.serialization.MessageWriter;
 
 public final class Rectangle extends Area {
 
     /** A bounding box encompassing all coordinates. */
     public static final Rectangle ALL = create(-90, 90, -180, 180);
 
-
     public static final MessageSerializer<Rectangle> SERIALIZER = new MessageSerializer<Rectangle>() {
-
-        public void write(Rectangle message, MessageWriter writer) throws IOException {
-            message.writeTo(writer);
-        }
 
         /** {@inheritDoc} */
         @Override
         public Rectangle read(MessageReader reader) throws IOException {
-            return readFrom(reader);
+            double tlLat = reader.readDouble(1, "topLeftLatitude");
+            double tlLon = reader.readDouble(2, "topLeftLongitude");
+            double brLat = reader.readDouble(3, "buttomRightLatitude");
+            double brLon = reader.readDouble(4, "buttomRightLongiture");
+            return Rectangle.create(tlLat, brLat, tlLon, brLon);
+        }
+
+        public void write(Rectangle message, MessageWriter w) throws IOException {
+            w.writeDouble(1, "topLeftLatitude", message.getMinLat());
+            w.writeDouble(2, "topLeftLongitude", message.getMinLon());
+            w.writeDouble(3, "buttomRightLatitude", message.getMaxLat());
+            w.writeDouble(4, "buttomRightLongiture", message.getMaxLon());
         }
     };
 
     /** serialVersionUID */
     private static final long serialVersionUID = 1L;
 
-    private final double maxLatitude;
+    final double maxLatitude;
 
-    private final double maxLongitude;
+    final double maxLongitude;
 
-    private final double minLatitude;
+    final double minLatitude;
 
-    private final double minLongitude;
+    final double minLongitude;
 
     private Rectangle(double minLatitude, double maxLatitude, double minLongitude, double maxLongitude) {
         this.minLatitude = Position.verifyLatitude(minLatitude);
         this.maxLatitude = Position.verifyLatitude(maxLatitude);
         this.minLongitude = Position.verifyLongitude(minLongitude);
         this.maxLongitude = Position.verifyLongitude(maxLongitude);
-    }
-
-    /** {@inheritDoc} */
-    public Rectangle immutable() {
-        return this;
-    }
-
-    // @Override
-    // public boolean contains(Element element) {
-    // if (element instanceof Position) {
-    // return contains((Position) element);
-    // } else {
-    // return super.contains(element);
-    // }
-    // }
-    /**
-     * Creates a message of this type from a JSON throwing a runtime exception if the format of the message does not
-     * match
-     */
-    public static Rectangle fromJSON(CharSequence c) {
-        return MessageSerializer.readFromJSON(SERIALIZER, c);
     }
 
     public boolean contains(Position point) {
@@ -164,7 +149,6 @@ public final class Rectangle extends Area {
         return Position.create(maxLatitude, minLongitude);
     }
 
-
     @Override
     public int hashCode() {
         int result = 17;
@@ -173,6 +157,11 @@ public final class Rectangle extends Area {
         result = 37 * result + hashCode(minLongitude);
         result = 37 * result + hashCode(maxLongitude);
         return result;
+    }
+
+    /** {@inheritDoc} */
+    public Rectangle immutable() {
+        return this;
     }
 
 
@@ -208,6 +197,7 @@ public final class Rectangle extends Area {
         return changed ? new Rectangle(minLat, maxLat, minLon, maxLon) : this;
     }
 
+
     /** {@inheritDoc} */
     @Override
     public boolean intersects(Area other) {
@@ -218,14 +208,6 @@ public final class Rectangle extends Area {
         } else {
             throw new UnsupportedOperationException("Only circles and BoundingBoxes supported");
         }
-    }
-
-    public boolean intersects(Rectangle other) {
-        // If the bounding box of this and other is shorter than the sum of the heights AND skinnier than the sum of the
-        // widths, they must intersect
-        Rectangle common = include(other);
-        return common.getLatitudeSize() < getLatitudeSize() + other.getLatitudeSize()
-                && common.getLongitudeSize() < getLongitudeSize() + other.getLongitudeSize();
     }
 
     public boolean intersects(Circle other) {
@@ -243,18 +225,17 @@ public final class Rectangle extends Area {
                 || other.intersects(topLeft, buttomLeft) || other.intersects(buttomLeft, buttomRight);
     }
 
+    public boolean intersects(Rectangle other) {
+        // If the bounding box of this and other is shorter than the sum of the heights AND skinnier than the sum of the
+        // widths, they must intersect
+        Rectangle common = include(other);
+        return common.getLatitudeSize() < getLatitudeSize() + other.getLatitudeSize()
+                && common.getLongitudeSize() < getLongitudeSize() + other.getLongitudeSize();
+    }
+
     @Override
     public String toString() {
         return getUpperLeft() + " -> " + getLowerRight();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void writeTo(MessageWriter w) throws IOException {
-        w.writeDouble(1, "topLeftLatitude", getMinLat());
-        w.writeDouble(2, "topLeftLongitude", getMinLon());
-        w.writeDouble(3, "buttomRightLatitude", getMaxLat());
-        w.writeDouble(4, "buttomRightLongiture", getMaxLon());
     }
 
     static Rectangle create(double y1, double y2, double x1, double x2) {
@@ -266,16 +247,24 @@ public final class Rectangle extends Area {
                 buttomRight.getLongitude());
     }
 
+    // @Override
+    // public boolean contains(Element element) {
+    // if (element instanceof Position) {
+    // return contains((Position) element);
+    // } else {
+    // return super.contains(element);
+    // }
+    // }
+    /**
+     * Creates a message of this type from a JSON throwing a runtime exception if the format of the message does not
+     * match
+     */
+    public static Rectangle fromJSON(CharSequence c) {
+        return MessageSerializer.readFromJSON(SERIALIZER, c);
+    }
+
     private static int hashCode(double x) {
         long f = Double.doubleToLongBits(x);
         return (int) (f ^ f >>> 32);
-    }
-
-    public static Rectangle readFrom(MessageReader r) throws IOException {
-        double tlLat = r.readDouble(1, "topLeftLatitude");
-        double tlLon = r.readDouble(2, "topLeftLongitude");
-        double brLat = r.readDouble(3, "buttomRightLatitude");
-        double brLon = r.readDouble(4, "buttomRightLongiture");
-        return Rectangle.create(tlLat, brLat, tlLon, brLon);
     }
 }

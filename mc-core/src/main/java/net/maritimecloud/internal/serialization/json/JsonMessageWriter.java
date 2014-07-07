@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.internal.message.json;
+package net.maritimecloud.internal.serialization.json;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -22,11 +22,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.maritimecloud.core.message.Message;
-import net.maritimecloud.core.message.MessageEnum;
-import net.maritimecloud.core.message.MessageSerializer;
-import net.maritimecloud.core.message.MessageWriter;
-import net.maritimecloud.core.message.ValueSerializer;
+import net.maritimecloud.core.serialization.Message;
+import net.maritimecloud.core.serialization.MessageEnum;
+import net.maritimecloud.core.serialization.MessageSerializer;
+import net.maritimecloud.core.serialization.ValueSerializer;
 import net.maritimecloud.util.Binary;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
@@ -35,7 +34,7 @@ import net.maritimecloud.util.geometry.PositionTime;
  *
  * @author Kasper Nielsen
  */
-class JsonMessageWriter extends MessageWriter {
+class JsonMessageWriter extends AbstractMessageWriter {
 
     final JsonValueWriter w;
 
@@ -137,8 +136,8 @@ class JsonMessageWriter extends MessageWriter {
 
     /** {@inheritDoc} */
     @Override
-    public <T extends Message> void writeMessage(int tag, String name, T message,
-            MessageSerializer<T> serializer) throws IOException {
+    public <T extends Message> void writeMessage(int tag, String name, T message, MessageSerializer<T> serializer)
+            throws IOException {
         if (message != null) {
             w.writeTag(tag, name).writeMessage(message, serializer);
         }

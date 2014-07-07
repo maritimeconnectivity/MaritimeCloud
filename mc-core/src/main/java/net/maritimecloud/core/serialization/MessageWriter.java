@@ -12,8 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.core.message;
+package net.maritimecloud.core.serialization;
 
+import java.io.Closeable;
+import java.io.Flushable;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -26,23 +28,29 @@ import net.maritimecloud.util.Binary;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
 
+
 /**
+ * Abstract class for writing to message streams.
  *
  * @author Kasper Nielsen
  */
-public interface ValueWriter {
+public interface MessageWriter extends Closeable, Flushable {
 
-    public abstract void writeBinary(Binary binary) throws IOException;
+    void writeBinary(int tag, String name, Binary binary) throws IOException;
 
     /**
      * Writes a boolean.
      *
+     * @param tag
+     *            the tag value
+     * @param name
+     *            the tag name
      * @param value
      *            the boolean value to write
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeBoolean(Boolean value) throws IOException;
+    void writeBoolean(int tag, String name, Boolean value) throws IOException;
 
     /**
      * Writes a double.
@@ -56,9 +64,9 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeDouble(Double value) throws IOException;
+    void writeDouble(int tag, String name, Double value) throws IOException;
 
-    public abstract void writeEnum(MessageEnum serializable) throws IOException;
+    void writeEnum(int tag, String name, MessageEnum serializable) throws IOException;
 
     /**
      * Writes a float.
@@ -72,7 +80,7 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeFloat(Float value) throws IOException;
+    void writeFloat(int tag, String name, Float value) throws IOException;
 
     /**
      * Writes an integer.
@@ -86,7 +94,19 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeInt(Integer value) throws IOException;
+    void writeInt(int tag, String name, Integer value) throws IOException;
+
+
+    void writeVarInt(int tag, String name, BigInteger value) throws IOException;
+
+    void writeDecimal(int tag, String name, BigDecimal value) throws IOException;
+
+    void writePosition(int tag, String name, Position value) throws IOException;
+
+    void writePositionTime(int tag, String name, PositionTime value) throws IOException;
+
+    void writeTimestamp(int tag, String name, Date value) throws IOException;
+
 
     /**
      * Writes a long.
@@ -100,18 +120,7 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeInt64(Long value) throws IOException;
-
-    public abstract void writeVarInt(BigInteger value) throws IOException;
-
-    public abstract void writeDecimal(BigDecimal value) throws IOException;
-
-    public abstract void writePosition(Position value) throws IOException;
-
-    public abstract void writePositionTime(PositionTime value) throws IOException;
-
-    public abstract void writeTimestamp(Date value) throws IOException;
-
+    void writeInt64(int tag, String name, Long value) throws IOException;
 
     /**
      * Writes a list.
@@ -125,7 +134,7 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract <T> void writeList(List<T> list, ValueSerializer<T> serializer) throws IOException;
+    <T> void writeList(int tag, String name, List<T> list, ValueSerializer<T> serializer) throws IOException;
 
     /**
      * Writes a map.
@@ -139,7 +148,7 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract <K, V> void writeMap(Map<K, V> map, ValueSerializer<K> keySerializer,
+    <K, V> void writeMap(int tag, String name, Map<K, V> map, ValueSerializer<K> keySerializer,
             ValueSerializer<V> valueSerializer) throws IOException;
 
     /**
@@ -154,7 +163,7 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract <T extends Message> void writeMessage(T message, MessageSerializer<T> serializer)
+    <T extends Message> void writeMessage(int tag, String name, T message, MessageSerializer<T> serializer)
             throws IOException;
 
     /**
@@ -169,8 +178,7 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract <T> void writeSet(Set<T> set, ValueSerializer<T> serializer) throws IOException;
-
+    <T> void writeSet(int tag, String name, Set<T> set, ValueSerializer<T> serializer) throws IOException;
 
     /**
      * Writes a string.
@@ -184,5 +192,17 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeText(String value) throws IOException;
+    void writeText(int tag, String name, String value) throws IOException;
 }
+//
+//
+// public <T extends List<?> & MessageList> void writeList2(int tag, String name, T t) {
+//
+// }
+//
+// public <T> void writeList(int tag, String name, List<? extends T> list, MLS<T> mls) {
+//
+// List<Integer> ll = new ArrayList<>();
+// writeList(tag, name, ll, MLS.TO_INT);
+// }
+

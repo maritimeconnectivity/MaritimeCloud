@@ -19,9 +19,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import net.maritimecloud.core.message.MessageReader;
-import net.maritimecloud.core.message.MessageSerializer;
-import net.maritimecloud.core.message.MessageWriter;
+import net.maritimecloud.core.serialization.MessageReader;
+import net.maritimecloud.core.serialization.MessageSerializer;
+import net.maritimecloud.core.serialization.MessageWriter;
 
 public class Polygon extends Area {
     public static final MessageSerializer<Polygon> SERIALIZER = new MessageSerializer<Polygon>() {
@@ -29,18 +29,19 @@ public class Polygon extends Area {
         /** {@inheritDoc} */
         @Override
         public Polygon read(MessageReader reader) throws IOException {
-            return readPolygonFrom(reader);
+            List<Position> positions = reader.readList(1, "points", Position.SERIALIZER);
+            return Polygon.create(positions.toArray(new Position[positions.size()]));
         }
 
         public void write(Polygon message, MessageWriter writer) throws IOException {
-            message.writeTo(writer);
+            writer.writeList(1, "points", Arrays.asList(message.positions), Position.SERIALIZER);
         }
     };
 
     /** serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
-    private final Position[] positions;
+    final Position[] positions;
 
     public Polygon(Position... positions) {
         this.positions = positions;
@@ -50,11 +51,6 @@ public class Polygon extends Area {
     @Override
     public boolean contains(Position position) {
         throw new UnsupportedOperationException();
-    }
-
-    /** {@inheritDoc} */
-    public Polygon immutable() {
-        return this;
     }
 
     /** {@inheritDoc} */
@@ -70,23 +66,17 @@ public class Polygon extends Area {
     }
 
     /** {@inheritDoc} */
+    public Polygon immutable() {
+        return this;
+    }
+
+    /** {@inheritDoc} */
     @Override
     public boolean intersects(Area other) {
         throw new UnsupportedOperationException();
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public void writeTo(MessageWriter w) throws IOException {
-        w.writeList(1, "points", Arrays.asList(positions), Position.SERIALIZER);
-    }
-
     public static Polygon create(Position... positions) {
         return new Polygon(positions);
-    }
-
-    static Polygon readPolygonFrom(MessageReader r) throws IOException {
-        List<Position> positions = r.readList(1, "points", Position.SERIALIZER);
-        return Polygon.create(positions.toArray(new Position[positions.size()]));
     }
 }

@@ -35,22 +35,6 @@ public abstract class PositionReader {
     public abstract PositionTime getCurrentPosition();
 
     /**
-     * Returns a reader that returns the same position and time every time.
-     *
-     * @param positionTime
-     *            the position time to return every time
-     * @return a new fixed position reader
-     */
-    public static PositionReader fixedPosition(final PositionTime positionTime) {
-        requireNonNull(positionTime, "positionTime is null");
-        return new PositionReader() {
-            public PositionTime getCurrentPosition() {
-                return positionTime;
-            }
-        };
-    }
-
-    /**
      * Returns a reader that returns the same position every time.
      *
      * @param positionTime
@@ -62,6 +46,22 @@ public abstract class PositionReader {
         return new PositionReader() {
             public PositionTime getCurrentPosition() {
                 return position.withTime(System.currentTimeMillis());
+            }
+        };
+    }
+
+    /**
+     * Returns a reader that returns the same position and time every time.
+     *
+     * @param positionTime
+     *            the position time to return every time
+     * @return a new fixed position reader
+     */
+    public static PositionReader fixedPosition(final PositionTime positionTime) {
+        requireNonNull(positionTime, "positionTime is null");
+        return new PositionReader() {
+            public PositionTime getCurrentPosition() {
+                return positionTime;
             }
         };
     }

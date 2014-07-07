@@ -19,10 +19,10 @@ import java.io.Serializable;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-import net.maritimecloud.core.message.Message;
-import net.maritimecloud.core.message.MessageReader;
-import net.maritimecloud.core.message.MessageSerializer;
-import net.maritimecloud.core.message.MessageWriter;
+import net.maritimecloud.core.serialization.Message;
+import net.maritimecloud.core.serialization.MessageReader;
+import net.maritimecloud.core.serialization.MessageSerializer;
+import net.maritimecloud.core.serialization.MessageWriter;
 import net.maritimecloud.util.geometry.CoordinateSystem.VincentyCalculationType;
 
 /**
@@ -32,14 +32,36 @@ public class Position implements Message, Serializable {
 
     public static final MessageSerializer<Position> SERIALIZER = new MessageSerializer<Position>() {
 
-        public void write(Position message, MessageWriter writer) throws IOException {
-            message.writeTo(writer);
-        }
-
         /** {@inheritDoc} */
         @Override
         public Position read(MessageReader reader) throws IOException {
-            return readFrom(reader);
+            double lat = reader.readDouble(1, "latitude");
+            double lon = reader.readDouble(2, "longitude");
+            return Position.create(lat, lon);
+        }
+
+        //
+        // static Position readFrom(MessageReader r) throws IOException {
+        // // if (r.isCompact()) {
+        // // int lat = r.readInt32(1, "latitude");
+        // // int lon = r.readInt32(2, "longitude");
+        // // return Position.create(lat / 10_000_000d, lon / 10_000_000d);
+        // // } else {
+        // double lat = r.readDouble(1, "latitude");
+        // double lon = r.readDouble(2, "longitude");
+        // return Position.create(lat, lon);
+        // // }
+        // }
+        //
+        // static Position readFromPacked(MessageReader r, int latId, String latName, int lonId, String lonName)
+        // throws IOException {
+        // int lat = r.readInt(latId, latName);
+        // int lon = r.readInt(lonId, lonName);
+        // return Position.create(lat / 10_000_000d, lon / 10_000_000d);
+        // }
+
+        public void write(Position message, MessageWriter writer) throws IOException {
+            message.writeTo(writer);
         }
     };
 
@@ -322,26 +344,6 @@ public class Position implements Message, Serializable {
     }
 
     /**
-     * Returns a random valid position.
-     *
-     * @return the random position
-     */
-    public static Position random() {
-        return random(ThreadLocalRandom.current());
-    }
-
-    /**
-     * Returns a random valid position.
-     *
-     * @param rnd
-     *            the source of randomness
-     * @return the random position
-     */
-    public static Position random(Random rnd) {
-        return Position.create(rnd.nextDouble() * 180 - 90, rnd.nextDouble() * 360 - 180);
-    }
-
-    /**
      * Format the given integer value as a String of length 2 with leading zeros.
      *
      * @param value
@@ -384,24 +386,26 @@ public class Position implements Message, Serializable {
         return latitude <= 90 && latitude >= -90 && longitude <= 180 && longitude >= -180;
     }
 
-    static Position readFrom(MessageReader r) throws IOException {
-        // if (r.isCompact()) {
-        // int lat = r.readInt32(1, "latitude");
-        // int lon = r.readInt32(2, "longitude");
-        // return Position.create(lat / 10_000_000d, lon / 10_000_000d);
-        // } else {
-        double lat = r.readDouble(1, "latitude");
-        double lon = r.readDouble(2, "longitude");
-        return Position.create(lat, lon);
-        // }
+    /**
+     * Returns a random valid position.
+     *
+     * @return the random position
+     */
+    public static Position random() {
+        return random(ThreadLocalRandom.current());
     }
 
-    static Position readFromPacked(MessageReader r, int latId, String latName, int lonId, String lonName)
-            throws IOException {
-        int lat = r.readInt(latId, latName);
-        int lon = r.readInt(lonId, lonName);
-        return Position.create(lat / 10_000_000d, lon / 10_000_000d);
+    /**
+     * Returns a random valid position.
+     *
+     * @param rnd
+     *            the source of randomness
+     * @return the random position
+     */
+    public static Position random(Random rnd) {
+        return Position.create(rnd.nextDouble() * 180 - 90, rnd.nextDouble() * 360 - 180);
     }
+
 
     /**
      * Verify that latitude is within the interval [-90:90].

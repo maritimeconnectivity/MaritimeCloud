@@ -12,9 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.core.message;
+package net.maritimecloud.core.serialization;
 
-import java.io.IOException;
 
 /**
  * The basic message interface that all messages must be implement. Messages are normally generated from MSDL files.
@@ -28,6 +27,7 @@ import java.io.IOException;
  *
  * @author Kasper Nielsen
  */
+// TODO rename to serialization
 public interface Message {
 
     /**
@@ -52,5 +52,5 @@ public interface Message {
      * @throws IOException
      *             any exception occurred while serializing
      */
-    void writeTo(MessageWriter w) throws IOException;
+    // void writeTo(MessageWriter w) throws IOException;
 }

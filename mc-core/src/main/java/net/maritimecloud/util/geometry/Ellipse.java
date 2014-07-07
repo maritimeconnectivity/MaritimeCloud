@@ -22,12 +22,11 @@ import static java.lang.StrictMath.sin;
 import static java.lang.StrictMath.sqrt;
 import static java.lang.StrictMath.toRadians;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import net.maritimecloud.core.message.MessageWriter;
+import net.maritimecloud.core.serialization.MessageWriter;
 
 /**
  * This class holds the defining parameters for en ellipse.
@@ -49,11 +48,6 @@ public final class Ellipse extends Area {
 
     /** Location offset of X coordinate from geodetic reference (in meters). */
     private final double dx;
-
-    /** {@inheritDoc} */
-    public Ellipse immutable() {
-        return this;
-    }
 
     /** Location offset of Y coordinate from geodetic reference (in meters). */
     private final double dy;
@@ -166,6 +160,11 @@ public final class Ellipse extends Area {
     }
 
     /** {@inheritDoc} */
+    public Ellipse immutable() {
+        return this;
+    }
+
+    /** {@inheritDoc} */
     @Override
     public boolean intersects(Area other) {
         throw new UnsupportedOperationException();
@@ -270,6 +269,7 @@ public final class Ellipse extends Area {
     }
 
     /** {@inheritDoc} */
-    @Override
-    public void writeTo(MessageWriter w) throws IOException {}
+    public void writeTo(MessageWriter w) {
+        throw new UnsupportedOperationException();
+    }
 }

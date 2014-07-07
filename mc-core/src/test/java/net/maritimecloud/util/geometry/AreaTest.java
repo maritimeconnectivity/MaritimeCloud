@@ -16,7 +16,7 @@ package net.maritimecloud.util.geometry;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import net.maritimecloud.core.message.MessageSerializer;
+import net.maritimecloud.core.serialization.MessageSerializer;
 
 import org.junit.Ignore;
 import org.junit.Test;

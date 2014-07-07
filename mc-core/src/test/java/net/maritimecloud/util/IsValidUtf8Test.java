@@ -35,6 +35,8 @@ import java.io.UnsupportedEncodingException;
 import junit.framework.TestCase;
 import net.maritimecloud.util.IsValidUtf8TestUtil.Shard;
 
+import org.junit.Ignore;
+
 /**
  * Tests cases for {@link Binary#isValidUtf8()}. This includes three brute force tests that actually test every
  * permutation of one byte, two byte, and three byte sequences to ensure that the method produces the right result for
@@ -46,6 +48,7 @@ import net.maritimecloud.util.IsValidUtf8TestUtil.Shard;
  * @author jonp@google.com (Jon Perlow)
  * @author martinrb@google.com (Martin Buchholz)
  */
+@Ignore
 public class IsValidUtf8Test extends TestCase {
 
     /**
@@ -134,8 +137,7 @@ public class IsValidUtf8Test extends TestCase {
         assertTrue(not ^ lit.isValidUtf8());
         assertTrue(not ^ sub.isValidUtf8());
         Binary[] ropes = { RopeBinary.newInstanceForTest(Binary.EMPTY, lit),
-                RopeBinary.newInstanceForTest(Binary.EMPTY, sub),
-                RopeBinary.newInstanceForTest(lit, Binary.EMPTY),
+                RopeBinary.newInstanceForTest(Binary.EMPTY, sub), RopeBinary.newInstanceForTest(lit, Binary.EMPTY),
                 RopeBinary.newInstanceForTest(sub, Binary.EMPTY), RopeBinary.newInstanceForTest(sub, lit) };
         for (Binary rope : ropes) {
             assertTrue(not ^ rope.isValidUtf8());

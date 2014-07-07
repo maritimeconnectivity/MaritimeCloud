@@ -14,8 +14,8 @@
  */
 package net.maritimecloud.internal.message;
 
-import net.maritimecloud.core.message.MessageEnum;
-import net.maritimecloud.core.message.MessageEnumSerializer;
+import net.maritimecloud.core.serialization.MessageEnum;
+import net.maritimecloud.core.serialization.MessageEnumSerializer;
 
 /**
  *

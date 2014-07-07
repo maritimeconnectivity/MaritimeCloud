@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.core.message;
+package net.maritimecloud.core.serialization;
 
 /**
  * An enumeration of values. All enums that can be serializes must implement this interface.

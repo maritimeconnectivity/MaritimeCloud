@@ -1,4 +1,4 @@
-package net.maritimecloud.internal.message.json;
+package net.maritimecloud.internal.serialization.json;
 
 import static java.util.Objects.requireNonNull;
 
@@ -13,11 +13,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.maritimecloud.core.message.Message;
-import net.maritimecloud.core.message.MessageEnum;
-import net.maritimecloud.core.message.MessageSerializer;
-import net.maritimecloud.core.message.ValueSerializer;
-import net.maritimecloud.core.message.ValueWriter;
+import net.maritimecloud.core.serialization.Message;
+import net.maritimecloud.core.serialization.MessageEnum;
+import net.maritimecloud.core.serialization.MessageSerializer;
+import net.maritimecloud.core.serialization.ValueSerializer;
+import net.maritimecloud.core.serialization.ValueWriter;
 import net.maritimecloud.util.Binary;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
@@ -155,8 +155,7 @@ public class JsonValueWriter implements ValueWriter, Closeable {
 
     /** {@inheritDoc} */
     @Override
-    public <T extends Message> void writeMessage(T message, MessageSerializer<T> serializer)
-            throws IOException {
+    public <T extends Message> void writeMessage(T message, MessageSerializer<T> serializer) throws IOException {
         if (message != null) {
             pw.write("{");
             indent++;
@@ -198,6 +197,7 @@ public class JsonValueWriter implements ValueWriter, Closeable {
         pw.write(LS);
         indent();
         pw.write("\"" + name + "\": ");
+
         return this;
     }
 

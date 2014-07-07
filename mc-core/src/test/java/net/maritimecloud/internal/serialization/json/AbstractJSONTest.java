@@ -12,9 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.internal.message.json;
+package net.maritimecloud.internal.serialization.json;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,10 +27,13 @@ import java.util.List;
 import javax.json.JsonReader;
 import javax.json.spi.JsonProvider;
 
-import net.maritimecloud.core.message.Message;
-import net.maritimecloud.core.message.MessageReader;
-import net.maritimecloud.core.message.MessageSerializer;
-import net.maritimecloud.core.message.MessageWriter;
+import net.maritimecloud.core.serialization.Message;
+import net.maritimecloud.core.serialization.MessageReader;
+import net.maritimecloud.core.serialization.MessageSerializer;
+import net.maritimecloud.core.serialization.MessageWriter;
+import net.maritimecloud.internal.serialization.json.JsonMessageReader;
+import net.maritimecloud.internal.serialization.json.JsonMessageWriter;
+import net.maritimecloud.internal.serialization.json.JsonValueWriter;
 import net.maritimecloud.util.Binary;
 
 /**
@@ -49,15 +53,19 @@ public abstract class AbstractJSONTest {
     static final String BIG_DECIMAL = "1234567898765432112345678987654321.123456789";
 
     static void assertJSONWrite(IOConsumer<MessageWriter> c, String... lines) throws IOException {
-        String s = MessageSerializer.writeToJSON(create(c), create3(c));
-        // System.out.println(s);
-        BufferedReader lr = new BufferedReader(new StringReader(s));
-        assertEquals("{", lr.readLine());
+        StringWriter sw = new StringWriter();
+        c.accept(new JsonMessageWriter(new JsonValueWriter(sw)));
+        String s = sw.toString();// MessageSerializer.writeToJSON(create(c), create3(c));
 
-        for (int i = 0; i < lines.length; i++) {
-            assertEquals("  " + lines[i], lr.readLine());
+        BufferedReader lr = new BufferedReader(new StringReader(s));
+        if (lines.length > 0) {
+            assertEquals("", lr.readLine());
+            for (int i = 0; i < lines.length; i++) {
+                assertEquals(lines[i], lr.readLine());
+            }
+        } else {
+            assertNull(lr.readLine());
         }
-        assertEquals("}", lr.readLine());
     }
 
     static JsonMessageReader readerOf(String... lines) {
@@ -75,51 +83,51 @@ public abstract class AbstractJSONTest {
         return sw.toString();
     }
 
-    static Message create(IOConsumer<MessageWriter> c) {
-        return new Message() {
-            public void writeTo(MessageWriter w) throws IOException {
-                c.accept(w);
-            }
-
-            @Override
-            public Message immutable() {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public String toJSON() {
-                throw new UnsupportedOperationException();
-            }
-        };
-    }
-
-    static MessageSerializer<Message> create3(IOConsumer<MessageWriter> c) {
-        return new MessageSerializer<Message>() {
-
-            public void write(Message message, MessageWriter writer) throws IOException {
-                message.writeTo(writer);
-            }
-
-            @Override
-            public Message read(MessageReader reader) throws IOException {
-                throw new UnsupportedOperationException();
-            }
-        };
-    }
-
-    static <T extends Message> MessageSerializer<T> create1(IOFunction<MessageReader, T> c) {
-        return new MessageSerializer<T>() {
-
-            public void write(T message, MessageWriter writer) throws IOException {
-                message.writeTo(writer);
-            }
-
-            @Override
-            public T read(MessageReader reader) throws IOException {
-                return c.apply(reader);
-            }
-        };
-    }
+    // static Message create(IOConsumer<MessageWriter> c) {
+    // return new Message() {
+    // public void writeTo(MessageWriter w) throws IOException {
+    // c.accept(w);
+    // }
+    //
+    // @Override
+    // public Message immutable() {
+    // throw new UnsupportedOperationException();
+    // }
+    //
+    // @Override
+    // public String toJSON() {
+    // throw new UnsupportedOperationException();
+    // }
+    // };
+    // }
+    //
+    // static MessageSerializer<Message> create3(IOConsumer<MessageWriter> c) {
+    // return new MessageSerializer<Message>() {
+    //
+    // public void write(Message message, MessageWriter writer) throws IOException {
+    // message.writeTo(writer);
+    // }
+    //
+    // @Override
+    // public Message read(MessageReader reader) throws IOException {
+    // throw new UnsupportedOperationException();
+    // }
+    // };
+    // }
+    //
+    // static <T extends Message> MessageSerializer<T> create1(IOFunction<MessageReader, T> c) {
+    // return new MessageSerializer<T>() {
+    //
+    // public void write(T message, MessageWriter writer) throws IOException {
+    // message.writeTo(writer);
+    // }
+    //
+    // @Override
+    // public T read(MessageReader reader) throws IOException {
+    // return c.apply(reader);
+    // }
+    // };
+    // }
 
     interface IOConsumer<T> {
         void accept(T t) throws IOException;
@@ -154,7 +162,6 @@ public abstract class AbstractJSONTest {
         }
 
         /** {@inheritDoc} */
-        @Override
         public void writeTo(MessageWriter w) throws IOException {
             w.writeInt(1, "i1", i1);
             w.writeInt(2, "i2", i2);
