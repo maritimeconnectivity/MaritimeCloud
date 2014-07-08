@@ -14,9 +14,6 @@
    See the License for the specific language governing permissions and 
    limitations under the License.
 -->
-
-
-
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -77,46 +74,6 @@
                   </excludes>
                 </filter>
               </filters>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.1</version>
-        <executions>
-          <execution>
-            <id>java-1.7-compile</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-            <configuration>
-              <source>1.7</source>
-              <target>1.7</target>
-              <encoding>UTF-8</encoding>
-              <optimize>false</optimize>
-              <debug>true</debug>
-              <showDeprecation>true</showDeprecation>
-              <compilerArgument>-Xlint:unchecked</compilerArgument>
-            </configuration>
-          </execution>
-          <execution>
-            <id>java-1.8-compile</id>
-            <phase>process-test-sources</phase>
-            <goals>
-              <goal>testCompile</goal>
-            </goals>
-            <configuration>
-              <source>1.8</source>
-              <target>1.8</target>
-              <encoding>UTF-8</encoding>
-              <optimize>false</optimize>
-              <debug>true</debug>
-              <showDeprecation>true</showDeprecation>
-              <compilerArgument>-Xlint:unchecked</compilerArgument>
             </configuration>
           </execution>
         </executions>
