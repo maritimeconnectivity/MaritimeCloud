@@ -21,10 +21,10 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.DoubleSupplier;
+import java.util.function.LongSupplier;
+import java.util.function.Supplier;
 
-import net.maritimecloud.util.function.DoubleSupplier;
-import net.maritimecloud.util.function.LongSupplier;
-import net.maritimecloud.util.function.Supplier;
 import net.maritimecloud.util.units.SpeedUnit;
 
 /**

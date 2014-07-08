@@ -19,12 +19,12 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import net.maritimecloud.util.Binary;
+import net.maritimecloud.util.Timestamp;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
 
@@ -195,18 +195,18 @@ public abstract class ValueSerializer<T> {
         }
     };
 
-    /** A value serializer that can serialize instances of {@link Date}. */
-    public static final ValueSerializer<Date> TIMESTAMP = new ValueSerializer<Date>() {
+    /** A value serializer that can serialize instances of {@link Timestamp}. */
+    public static final ValueSerializer<Timestamp> TIMESTAMP = new ValueSerializer<Timestamp>() {
 
         /** {@inheritDoc} */
         @Override
-        public Date read(ValueReader reader) throws IOException {
+        public Timestamp read(ValueReader reader) throws IOException {
             return reader.readTimestamp();
         }
 
         /** {@inheritDoc} */
         @Override
-        public void write(Date t, ValueWriter writer) throws IOException {
+        public void write(Timestamp t, ValueWriter writer) throws IOException {
             writer.writeTimestamp(t);
         }
     };

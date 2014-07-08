@@ -17,7 +17,6 @@ package net.maritimecloud.internal.serialization.json;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,6 +26,7 @@ import net.maritimecloud.core.serialization.MessageEnum;
 import net.maritimecloud.core.serialization.MessageSerializer;
 import net.maritimecloud.core.serialization.ValueSerializer;
 import net.maritimecloud.util.Binary;
+import net.maritimecloud.util.Timestamp;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
 
@@ -177,7 +177,7 @@ class JsonMessageWriter extends AbstractMessageWriter {
 
     /** {@inheritDoc} */
     @Override
-    public void writeTimestamp(int tag, String name, Date value) throws IOException {
+    public void writeTimestamp(int tag, String name, Timestamp value) throws IOException {
         if (value != null) {
             w.writeTag(tag, name).writeTimestamp(value);
         }

@@ -21,7 +21,6 @@ import java.io.StringReader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +41,7 @@ import net.maritimecloud.core.serialization.MessageSerializer;
 import net.maritimecloud.core.serialization.SerializationException;
 import net.maritimecloud.core.serialization.ValueSerializer;
 import net.maritimecloud.util.Binary;
+import net.maritimecloud.util.Timestamp;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
 
@@ -134,7 +134,9 @@ public class JsonMessageReader implements MessageReader {
     @Override
     public <T extends Enum<T> & MessageEnum> T readEnum(int tag, String name, MessageEnumSerializer<T> factory)
             throws IOException {
-        return factory.from(name);
+        JsonValueReader r = read(name);
+
+        return factory.from(r.readText());
     }
 
     /** {@inheritDoc} */
@@ -287,13 +289,13 @@ public class JsonMessageReader implements MessageReader {
 
     /** {@inheritDoc} */
     @Override
-    public Date readTimestamp(int tag, String name) throws IOException {
+    public Timestamp readTimestamp(int tag, String name) throws IOException {
         return read(name).readTimestamp();
     }
 
     /** {@inheritDoc} */
     @Override
-    public Date readTimestamp(int tag, String name, Date defaultValue) throws IOException {
+    public Timestamp readTimestamp(int tag, String name, Timestamp defaultValue) throws IOException {
         JsonValueReader r = readOpt(name);
         return r == null ? defaultValue : r.readTimestamp();
     }

@@ -20,10 +20,10 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.Date;
 
 import net.maritimecloud.core.serialization.ValueSerializer;
 import net.maritimecloud.util.Binary;
+import net.maritimecloud.util.Timestamp;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
 
@@ -49,7 +49,7 @@ public class TestReader extends AbstractJSONTest {
         assertEquals(false, readerOf("\"i1\": false").readBoolean(1, "i1", null).booleanValue());
         assertEquals(Binary.EMPTY, readerOf("\"f\": \"\"").readBinary(1, "f", null));
         assertEquals(Binary.copyFromUtf8("er"), readerOf("\"f\": \"ZXI=\"").readBinary(1, "f", null));
-        assertEquals(new Date(32123), readerOf("\"f\": 32123").readTimestamp(1, "f", null));
+        assertEquals(Timestamp.create(32123), readerOf("\"f\": 32123").readTimestamp(1, "f", null));
         assertEquals("hello", readerOf("\"f\": \"hello\"").readText(1, "f", null));
         assertEquals("\\/\"", readerOf("\"f\": \"\\\\\\/\\\"\"").readText(1, "f", null));
 

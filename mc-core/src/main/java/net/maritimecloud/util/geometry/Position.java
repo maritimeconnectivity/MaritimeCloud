@@ -40,30 +40,31 @@ public class Position implements Message, Serializable {
             return Position.create(lat, lon);
         }
 
-        //
-        // static Position readFrom(MessageReader r) throws IOException {
-        // // if (r.isCompact()) {
-        // // int lat = r.readInt32(1, "latitude");
-        // // int lon = r.readInt32(2, "longitude");
-        // // return Position.create(lat / 10_000_000d, lon / 10_000_000d);
-        // // } else {
-        // double lat = r.readDouble(1, "latitude");
-        // double lon = r.readDouble(2, "longitude");
-        // return Position.create(lat, lon);
-        // // }
-        // }
-        //
-        // static Position readFromPacked(MessageReader r, int latId, String latName, int lonId, String lonName)
-        // throws IOException {
-        // int lat = r.readInt(latId, latName);
-        // int lon = r.readInt(lonId, lonName);
-        // return Position.create(lat / 10_000_000d, lon / 10_000_000d);
-        // }
-
         public void write(Position message, MessageWriter writer) throws IOException {
-            message.writeTo(writer);
+            writer.writeDouble(1, "latitude", message.latitude);
+            writer.writeDouble(2, "longitude", message.longitude);
         }
     };
+
+    //
+    // static Position readFrom(MessageReader r) throws IOException {
+    // // if (r.isCompact()) {
+    // // int lat = r.readInt32(1, "latitude");
+    // // int lon = r.readInt32(2, "longitude");
+    // // return Position.create(lat / 10_000_000d, lon / 10_000_000d);
+    // // } else {
+    // double lat = r.readDouble(1, "latitude");
+    // double lon = r.readDouble(2, "longitude");
+    // return Position.create(lat, lon);
+    // // }
+    // }
+    //
+    // static Position readFromPacked(MessageReader r, int latId, String latName, int lonId, String lonName)
+    // throws IOException {
+    // int lat = r.readInt(latId, latName);
+    // int lon = r.readInt(lonId, lonName);
+    // return Position.create(lat / 10_000_000d, lon / 10_000_000d);
+    // }
 
     /** serialVersionUID. */
     private static final long serialVersionUID = 1L;

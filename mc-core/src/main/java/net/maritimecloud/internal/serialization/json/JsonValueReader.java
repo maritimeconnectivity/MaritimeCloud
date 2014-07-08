@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -41,6 +40,7 @@ import net.maritimecloud.core.serialization.SerializationException;
 import net.maritimecloud.core.serialization.ValueReader;
 import net.maritimecloud.core.serialization.ValueSerializer;
 import net.maritimecloud.util.Binary;
+import net.maritimecloud.util.Timestamp;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
 
@@ -197,8 +197,8 @@ public class JsonValueReader implements ValueReader {
 
     /** {@inheritDoc} */
     @Override
-    public Date readTimestamp() throws IOException {
-        return new Date(readInt64());
+    public Timestamp readTimestamp() throws IOException {
+        return Timestamp.create(readInt64());
     }
 
     /** {@inheritDoc} */

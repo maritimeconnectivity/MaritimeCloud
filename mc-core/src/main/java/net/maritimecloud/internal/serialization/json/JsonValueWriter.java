@@ -8,7 +8,6 @@ import java.io.Writer;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,6 +18,7 @@ import net.maritimecloud.core.serialization.MessageSerializer;
 import net.maritimecloud.core.serialization.ValueSerializer;
 import net.maritimecloud.core.serialization.ValueWriter;
 import net.maritimecloud.util.Binary;
+import net.maritimecloud.util.Timestamp;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
 
@@ -209,7 +209,7 @@ public class JsonValueWriter implements ValueWriter, Closeable {
 
     /** {@inheritDoc} */
     @Override
-    public void writeTimestamp(Date value) throws IOException {
+    public void writeTimestamp(Timestamp value) throws IOException {
         writeInt64(value.getTime());
     }
 

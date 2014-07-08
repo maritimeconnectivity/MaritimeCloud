@@ -17,11 +17,11 @@ package net.maritimecloud.internal.serialization.json;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.LinkedHashSet;
 
 import net.maritimecloud.core.serialization.ValueSerializer;
 import net.maritimecloud.serialization.TestEnum;
+import net.maritimecloud.util.Timestamp;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
 
@@ -49,7 +49,7 @@ public class TestWriter extends AbstractJSONTest {
         assertJSONWrite(w -> w.writeBoolean(1, "i1", false), "\"i1\": false");
         assertJSONWrite(w -> w.writeBinary(1, "i1", B1), "\"i1\": \"/38E\"");
         assertJSONWrite(w -> w.writeText(1, "1f1", "hello"), "\"1f1\": \"hello\"");
-        assertJSONWrite(w -> w.writeTimestamp(1, "1f1", new Date(32112)), "\"1f1\": 32112");
+        assertJSONWrite(w -> w.writeTimestamp(1, "1f1", Timestamp.create(32112)), "\"1f1\": 32112");
 
         assertJSONWrite(w -> w.writePosition(1, "f", Position.create(10, -10)), "\"f\": {", "  \"latitude\": 10.0,",
                 "  \"longitude\": -10.0", "}");

@@ -17,12 +17,12 @@ package net.maritimecloud.core.serialization;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import net.maritimecloud.util.Binary;
+import net.maritimecloud.util.Timestamp;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
 
@@ -51,7 +51,7 @@ public interface ValueReader {
 
     String readText() throws IOException;
 
-    Date readTimestamp() throws IOException;
+    Timestamp readTimestamp() throws IOException;
 
     Position readPosition() throws IOException;
 

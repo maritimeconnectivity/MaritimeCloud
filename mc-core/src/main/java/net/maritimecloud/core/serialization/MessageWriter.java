@@ -19,12 +19,12 @@ import java.io.Flushable;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import net.maritimecloud.util.Binary;
+import net.maritimecloud.util.Timestamp;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
 
@@ -105,7 +105,7 @@ public interface MessageWriter extends Closeable, Flushable {
 
     void writePositionTime(int tag, String name, PositionTime value) throws IOException;
 
-    void writeTimestamp(int tag, String name, Date value) throws IOException;
+    void writeTimestamp(int tag, String name, Timestamp value) throws IOException;
 
 
     /**

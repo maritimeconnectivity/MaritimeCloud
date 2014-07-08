@@ -18,12 +18,12 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import net.maritimecloud.util.Binary;
+import net.maritimecloud.util.Timestamp;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
 
@@ -62,9 +62,9 @@ public interface MessageReader extends Closeable {
 
     PositionTime readPositionTime(int tag, String name) throws IOException;
 
-    Date readTimestamp(int tag, String name) throws IOException;
+    Timestamp readTimestamp(int tag, String name) throws IOException;
 
-    Date readTimestamp(int tag, String name, Date defaultValue) throws IOException;
+    Timestamp readTimestamp(int tag, String name, Timestamp defaultValue) throws IOException;
 
     Position readPosition(int tag, String name, Position defaultValue) throws IOException;
 
