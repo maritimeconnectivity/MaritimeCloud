@@ -37,6 +37,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -261,7 +262,7 @@ public abstract class Binary implements Iterable<Byte> {
     }
 
     public static Binary copyFromBase64(String text) {
-        return copyFrom(SimpleBase64.decode(text));
+        return copyFrom(Base64.getDecoder().decode(text));
     }
 
     // =================================================================
@@ -839,8 +840,8 @@ public abstract class Binary implements Iterable<Byte> {
         }
 
         /**
-         * Internal function used by {@link #toBinary()}. The current buffer may or may not be full, but it needs to
-         * be flushed.
+         * Internal function used by {@link #toBinary()}. The current buffer may or may not be full, but it needs to be
+         * flushed.
          */
         private void flushLastBuffer() {
             if (bufferPos < buffer.length) {
@@ -955,6 +956,6 @@ public abstract class Binary implements Iterable<Byte> {
     }
 
     public String base64encode() {
-        return SimpleBase64.encode(toByteArray());
+        return Base64.getEncoder().encodeToString(toByteArray());
     }
 }
