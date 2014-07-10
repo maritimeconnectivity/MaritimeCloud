@@ -42,39 +42,27 @@ public interface MessageReader extends Closeable {
 
     // double readDouble(int tag, String name) throws IOException;
 
-    Double readDouble(int tag, String name, Double defaultValue) throws IOException;
+    BigDecimal readDecimal(int tag, String name) throws IOException;
 
 
     BigDecimal readDecimal(int tag, String name, BigDecimal defaultValue) throws IOException;
 
-    <T extends Enum<T> & MessageEnum> T readEnum(int tag, String name, MessageEnumSerializer<T> factory)
-            throws IOException;
+    double readDouble(int tag, String name) throws IOException;
 
     // float readFloat(int tag, String name) throws IOException;
 
+    Double readDouble(int tag, String name, Double defaultValue) throws IOException;
+
+    <T extends Enum<T> & MessageEnum> T readEnum(int tag, String name, MessageEnumSerializer<T> factory)
+            throws IOException;
+
+    float readFloat(int tag, String name) throws IOException;
+
     Float readFloat(int tag, String name, Float defaultValue) throws IOException;
-
-    BigInteger readVarInt(int tag, String name) throws IOException;
-
-    BigDecimal readDecimal(int tag, String name) throws IOException;
-
-    Position readPostion(int tag, String name) throws IOException;
-
-    PositionTime readPositionTime(int tag, String name) throws IOException;
-
-    Timestamp readTimestamp(int tag, String name) throws IOException;
-
-    Timestamp readTimestamp(int tag, String name, Timestamp defaultValue) throws IOException;
-
-    Position readPosition(int tag, String name, Position defaultValue) throws IOException;
-
-    PositionTime readPositionTime(int tag, String name, PositionTime defaultValue) throws IOException;
 
     int readInt(int tag, String name) throws IOException;
 
     Integer readInt(int tag, String name, Integer defaultValue) throws IOException;
-
-    BigInteger readVarInt(int tag, String name, BigInteger defaultValue) throws IOException;
 
     long readInt64(int tag, String name) throws IOException;
 
@@ -87,13 +75,25 @@ public interface MessageReader extends Closeable {
 
     <T extends Message> T readMessage(int tag, String name, MessageSerializer<T> parser) throws IOException;
 
-    double readDouble(int tag, String name) throws IOException;
+    Position readPosition(int tag, String name) throws IOException;
 
-    float readFloat(int tag, String name) throws IOException;
+    Position readPosition(int tag, String name, Position defaultValue) throws IOException;
+
+    PositionTime readPositionTime(int tag, String name) throws IOException;
+
+    PositionTime readPositionTime(int tag, String name, PositionTime defaultValue) throws IOException;
 
     <T> Set<T> readSet(int tag, String name, ValueSerializer<T> parser) throws IOException;
 
     String readText(int tag, String name, String defaultValue) throws IOException;
+
+    Timestamp readTimestamp(int tag, String name) throws IOException;
+
+    Timestamp readTimestamp(int tag, String name, Timestamp defaultValue) throws IOException;
+
+    BigInteger readVarInt(int tag, String name) throws IOException;
+
+    BigInteger readVarInt(int tag, String name, BigInteger defaultValue) throws IOException;
 }
 
 // int readInt32(int tag, String name, int defaultValue) throws IOException;

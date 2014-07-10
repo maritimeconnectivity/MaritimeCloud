@@ -8,21 +8,20 @@ import java.io.Writer;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.maritimecloud.core.serialization.Message;
 import net.maritimecloud.core.serialization.MessageEnum;
 import net.maritimecloud.core.serialization.MessageSerializer;
+import net.maritimecloud.core.serialization.MessageWriter;
 import net.maritimecloud.core.serialization.ValueSerializer;
-import net.maritimecloud.core.serialization.ValueWriter;
+import net.maritimecloud.internal.serialization.AbstractValueWriter;
+import net.maritimecloud.internal.serialization.DefaultMessageWriter;
 import net.maritimecloud.util.Binary;
-import net.maritimecloud.util.Timestamp;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
 
-public class JsonValueWriter implements ValueWriter, Closeable {
+public class JsonValueWriter extends AbstractValueWriter implements Closeable {
 
     /** The Unix line separator. */
     static final String LS = "\n";
@@ -33,7 +32,7 @@ public class JsonValueWriter implements ValueWriter, Closeable {
 
     final Writer pw;
 
-    final JsonMessageWriter w = new JsonMessageWriter(this);
+    final MessageWriter w = new DefaultMessageWriter(this);
 
     public JsonValueWriter(Writer w) {
         this.pw = requireNonNull(w);
@@ -85,10 +84,7 @@ public class JsonValueWriter implements ValueWriter, Closeable {
 
     /** {@inheritDoc} */
     @Override
-    public void writeDouble(Double value) throws IOException {
-        if (!Double.isFinite(value)) {
-            throw new IOException("Cannot write double value " + value);
-        }
+    protected void writeDouble0(Double value) throws IOException {
         pw.write(value.toString());
     }
 
@@ -100,10 +96,7 @@ public class JsonValueWriter implements ValueWriter, Closeable {
 
     /** {@inheritDoc} */
     @Override
-    public void writeFloat(Float value) throws IOException {
-        if (!Float.isFinite(value)) {
-            throw new IOException("Cannot write float value " + value);
-        }
+    protected void writeFloat0(Float value) throws IOException {
         pw.write(value.toString());
     }
 
@@ -119,13 +112,7 @@ public class JsonValueWriter implements ValueWriter, Closeable {
         pw.write(value.toString());
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public <T> void writeList(List<T> list, ValueSerializer<T> serializer) throws IOException {
-        writeListOrSet(list, serializer);
-    }
-
-    private <T> void writeListOrSet(Collection<T> list, ValueSerializer<T> serializer) throws IOException {
+    protected <T> void writeListOrSet(Collection<T> list, ValueSerializer<T> serializer) throws IOException {
         pw.write("[");
         indent++;
         boolean isFirst = true;
@@ -173,7 +160,6 @@ public class JsonValueWriter implements ValueWriter, Closeable {
     /** {@inheritDoc} */
     @Override
     public void writePosition(Position value) throws IOException {
-        // pw.write("{ \"latitude\" = " + value.getLatitude() + ", \"longitude\"" + value.getLongitude() + "}");
         writeMessage(value, Position.SERIALIZER);
     }
 
@@ -183,13 +169,7 @@ public class JsonValueWriter implements ValueWriter, Closeable {
         writeMessage(value, PositionTime.SERIALIZER);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public <T> void writeSet(Set<T> set, ValueSerializer<T> serializer) throws IOException {
-        writeListOrSet(set, serializer);
-    }
-
-    JsonValueWriter writeTag(int tag, String name) throws IOException {
+    protected JsonValueWriter writeTag(int tag, String name) throws IOException {
         if (!isFirst) {
             pw.write(",");
         }
@@ -205,12 +185,6 @@ public class JsonValueWriter implements ValueWriter, Closeable {
     @Override
     public void writeText(String value) throws IOException {
         pw.append("\"").append(escape(value)).append("\"");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void writeTimestamp(Timestamp value) throws IOException {
-        writeInt64(value.getTime());
     }
 
     /** {@inheritDoc} */
@@ -251,7 +225,7 @@ public class JsonValueWriter implements ValueWriter, Closeable {
                 break;
             default:
                 if (ch >= '\u0000' && ch <= '\u001F' || ch >= '\u007F' && ch <= '\u009F' || ch >= '\u2000'
-                        && ch <= '\u20FF') {
+                && ch <= '\u20FF') {
                     String ss = Integer.toHexString(ch);
                     sb.append("\\u");
                     for (int k = 0; k < 4 - ss.length(); k++) {

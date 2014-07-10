@@ -18,14 +18,10 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.json.JsonObject;
 import javax.json.JsonReader;
@@ -36,28 +32,24 @@ import javax.json.spi.JsonProvider;
 import net.maritimecloud.core.serialization.Message;
 import net.maritimecloud.core.serialization.MessageEnum;
 import net.maritimecloud.core.serialization.MessageEnumSerializer;
-import net.maritimecloud.core.serialization.MessageReader;
 import net.maritimecloud.core.serialization.MessageSerializer;
 import net.maritimecloud.core.serialization.SerializationException;
+import net.maritimecloud.core.serialization.ValueReader;
 import net.maritimecloud.core.serialization.ValueSerializer;
-import net.maritimecloud.util.Binary;
-import net.maritimecloud.util.Timestamp;
-import net.maritimecloud.util.geometry.Position;
-import net.maritimecloud.util.geometry.PositionTime;
+import net.maritimecloud.internal.serialization.AbstractMessageReader;
 
 /**
  *
  * @author Kasper Nielsen
  */
-public class JsonMessageReader implements MessageReader {
+public class JsonMessageReader extends AbstractMessageReader {
 
     final JsonIterator iter;
 
     final JsonReader r;
 
-    JsonMessageReader(JsonMessageReader r, JsonObject o) {
-        this.r = r.r;
-        iter = new JsonIterator(o);
+    public JsonMessageReader(CharSequence s) {
+        this(JsonProvider.provider().createReader(new StringReader(s.toString())));
     }
 
     JsonMessageReader(JsonObject o) {
@@ -70,13 +62,23 @@ public class JsonMessageReader implements MessageReader {
         iter = new JsonIterator(r.readObject());
     }
 
-    public JsonMessageReader(CharSequence s) {
-        this(JsonProvider.provider().createReader(new StringReader(s.toString())));
-    }
-
     /** {@inheritDoc} */
     @Override
     public void close() throws IOException {}
+
+    protected ValueReader find(int tag, String name) throws SerializationException {
+        if (isNext(-1, name)) {
+            return new JsonValueReader(iter.next().getValue());
+        }
+        throw new SerializationException("Could not find tag '" + name + "'");
+    }
+
+    protected ValueReader findOptional(int tag, String name) {
+        if (isNext(-1, name)) {
+            return new JsonValueReader(iter.next().getValue());
+        }
+        return null;
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -88,97 +90,13 @@ public class JsonMessageReader implements MessageReader {
         return false;
     }
 
-    private JsonValueReader read(String name) throws SerializationException {
-        if (isNext(-1, name)) {
-            return new JsonValueReader(iter.next().getValue());
-        }
-        throw new SerializationException("Could not find tag '" + name + "'");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Binary readBinary(int tag, String name, Binary defaultValue) throws IOException {
-        JsonValueReader r = readOpt(name);
-        return r == null ? defaultValue : r.readBinary();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Boolean readBoolean(int tag, String name, Boolean defaultValue) throws IOException {
-        JsonValueReader r = readOpt(name);
-        return r == null ? defaultValue : r.readBoolean();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public BigDecimal readDecimal(int tag, String name) throws IOException {
-        return read(name).readDecimal();
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public BigDecimal readDecimal(int tag, String name, BigDecimal defaultValue) throws IOException {
-        JsonValueReader r = readOpt(name);
-        return r == null ? defaultValue : r.readDecimal();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Double readDouble(int tag, String name, Double defaultValue) throws IOException {
-        JsonValueReader r = readOpt(name);
-        return r == null ? defaultValue : r.readDouble();
-    }
-
     /** {@inheritDoc} */
     @Override
     public <T extends Enum<T> & MessageEnum> T readEnum(int tag, String name, MessageEnumSerializer<T> factory)
             throws IOException {
-        JsonValueReader r = read(name);
+        ValueReader r = find(tag, name);
 
         return factory.from(r.readText());
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Float readFloat(int tag, String name, Float defaultValue) throws SerializationException, IOException {
-        JsonValueReader r = readOpt(name);
-        return r == null ? defaultValue : r.readFloat();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public int readInt(int tag, String name) throws IOException {
-        return read(name).readInt();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Integer readInt(int tag, String name, Integer defaultValue) throws IOException {
-        JsonValueReader r = readOpt(name);
-        return r == null ? defaultValue : r.readInt();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public long readInt64(int tag, String name) throws IOException {
-        return read(name).readInt64();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Long readInt64(int tag, String name, Long defaultValue) throws IOException {
-        JsonValueReader r = readOpt(name);
-        return r == null ? defaultValue : r.readInt64();
-    }
-
-    /** {@inheritDoc} */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    @Override
-    public <T> List<T> readList(int tag, String name, ValueSerializer<T> parser) throws IOException {
-        JsonValueReader r = readOpt(name);
-        // The list cast shoudn't be necessary but javac complains for some reason
-        return r == null ? (List) Collections.emptyList() : r.readList(parser);
     }
 
     /** {@inheritDoc} */
@@ -217,117 +135,13 @@ public class JsonMessageReader implements MessageReader {
         // return result;
     }
 
-    private JsonValueReader readOpt(String name) {
-        if (isNext(-1, name)) {
-            return new JsonValueReader(iter.next().getValue());
-        }
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Position readPosition(int tag, String name, Position defaultValue) throws IOException {
-        JsonValueReader r = readOpt(name);
-        return r == null ? defaultValue : r.readPosition();
-
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PositionTime readPositionTime(int tag, String name) throws IOException {
-        return read(name).readPositionTime();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PositionTime readPositionTime(int tag, String name, PositionTime defaultValue) throws IOException {
-        JsonValueReader r = readOpt(name);
-        return r == null ? defaultValue : r.readPositionTime();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Position readPostion(int tag, String name) throws IOException {
-        return read(name).readPosition();
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public double readDouble(int tag, String name) throws IOException {
-        return read(name).readDouble();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public float readFloat(int tag, String name) throws IOException {
-        return read(name).readFloat();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws IOException
-     */
-    @Override
-    public <T> Set<T> readSet(int tag, String name, ValueSerializer<T> parser) throws IOException {
-        // parser.
-        //
-        // for (xxxx) {
-        // elementParser.
-        // }
-        // parser.parse(this);
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String readText(int tag, String name, String defaultValue) throws IOException {
-        JsonValueReader r = readOpt(name);
-        return r == null ? defaultValue : r.readText();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Timestamp readTimestamp(int tag, String name) throws IOException {
-        return read(name).readTimestamp();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Timestamp readTimestamp(int tag, String name, Timestamp defaultValue) throws IOException {
-        JsonValueReader r = readOpt(name);
-        return r == null ? defaultValue : r.readTimestamp();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public BigInteger readVarInt(int tag, String name) throws IOException {
-        return read(name).readVarInt();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public BigInteger readVarInt(int tag, String name, BigInteger defaultValue) throws IOException {
-        JsonValueReader r = readOpt(name);
-        return r == null ? defaultValue : r.readVarInt();
-    }
-
-    public static JsonValueReader readFromString(String value) {
-        String ss = " { \"x\": " + value + "}";
-        JsonReader reader = JsonProvider.provider().createReader(new StringReader(ss));
-        JsonObject o = reader.readObject();
-        JsonValue val = o.get("x");
-        return new JsonValueReader(val);
-    }
-
     // A Quick hack
     public static <T> T readFromString(String value, ValueSerializer<T> parser) throws IOException {
         String ss = " { \"x\": " + value + "}";
         JsonReader reader = JsonProvider.provider().createReader(new StringReader(ss));
         JsonObject o = reader.readObject();
         JsonValue val = o.get("x");
-        JsonValueReader r = new JsonValueReader(val);
+        ValueReader r = new JsonValueReader(val);
         return parser.read(r);
     }
 
@@ -444,3 +258,10 @@ final class JsonStringImpl implements JsonString {
         return sb.toString();
     }
 }
+// public static ValueReader readFromString(String value) {
+// String ss = " { \"x\": " + value + "}";
+// JsonReader reader = JsonProvider.provider().createReader(new StringReader(ss));
+// JsonObject o = reader.readObject();
+// JsonValue val = o.get("x");
+// return new JsonValueReader(val);
+// }

@@ -81,73 +81,6 @@ public class Hashing {
     }
 
     /**
-     * Returns the hash code of the specified boolean using the same contract as {@link Boolean}.
-     * 
-     * @param value
-     *            the boolean to calculate the hash code for
-     * @return the hash code of the specified value
-     */
-    public static int hashcode(boolean value) {
-        return value ? 1231 : 1237;
-    }
-
-    /**
-     * Returns the hash code of the specified byte using the same contract as {@link Byte}.
-     * 
-     * @param value
-     *            the byte to calculate the hash code for
-     * @return the hash code of the specified value
-     */
-    public static int hashcode(byte value) {
-        return value;
-    }
-
-    /**
-     * Returns the hash code of the specified char using the same contract as {@link Character}.
-     * 
-     * @param value
-     *            the char to calculate the hash code for
-     * @return the hash code of the specified value
-     */
-    public static int hashcode(char value) {
-        return value;
-    }
-
-    /**
-     * Returns the hash code of the specified double using the same contract as {@link Double}.
-     * 
-     * @param value
-     *            the double to calculate the hash code for
-     * @return the hash code of the specified value
-     */
-    public static int hashcode(double value) {
-        long bits = Double.doubleToLongBits(value);
-        return (int) (bits ^ bits >>> 32);
-    }
-
-    /**
-     * Returns the hash code of the specified float using the same contract as {@link Float}.
-     * 
-     * @param value
-     *            the float to calculate the hash code for
-     * @return the hash code of the specified value
-     */
-    public static int hashcode(float value) {
-        return Float.floatToIntBits(value);
-    }
-
-    /**
-     * Returns the hash code of the specified long using the same contract as {@link Long}.
-     * 
-     * @param value
-     *            the long to calculate the hash code for
-     * @return the hash code of the specified value
-     */
-    public static int hashcode(long value) {
-        return (int) (value ^ value >>> 32);
-    }
-
-    /**
      * Returns the hash code of the specified object, returning 0 for the {@code null} object. This method is equivalent
      * to {@link Objects#hashCode(Object)}
      * 
@@ -157,17 +90,6 @@ public class Hashing {
      */
     public static int hashcode(Object o) {
         return o == null ? 0 : o.hashCode();
-    }
-
-    /**
-     * Returns the hash code of the specified short using the same contract as {@link Short}.
-     * 
-     * @param value
-     *            the short to calculate the hash code for
-     * @return the hash code of the specified value
-     */
-    public static int hashcode(short value) {
-        return value;
     }
 
     /**

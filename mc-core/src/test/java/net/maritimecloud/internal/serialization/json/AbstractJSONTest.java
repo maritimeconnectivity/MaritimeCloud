@@ -31,8 +31,8 @@ import net.maritimecloud.core.serialization.Message;
 import net.maritimecloud.core.serialization.MessageReader;
 import net.maritimecloud.core.serialization.MessageSerializer;
 import net.maritimecloud.core.serialization.MessageWriter;
+import net.maritimecloud.internal.serialization.DefaultMessageWriter;
 import net.maritimecloud.internal.serialization.json.JsonMessageReader;
-import net.maritimecloud.internal.serialization.json.JsonMessageWriter;
 import net.maritimecloud.internal.serialization.json.JsonValueWriter;
 import net.maritimecloud.util.Binary;
 
@@ -54,7 +54,7 @@ public abstract class AbstractJSONTest {
 
     static void assertJSONWrite(IOConsumer<MessageWriter> c, String... lines) throws IOException {
         StringWriter sw = new StringWriter();
-        c.accept(new JsonMessageWriter(new JsonValueWriter(sw)));
+        c.accept(new DefaultMessageWriter(new JsonValueWriter(sw)));
         String s = sw.toString();// MessageSerializer.writeToJSON(create(c), create3(c));
 
         BufferedReader lr = new BufferedReader(new StringReader(s));

@@ -12,11 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.internal.serialization.json;
+package net.maritimecloud.internal.serialization;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,6 +25,7 @@ import java.util.Set;
 import net.maritimecloud.core.serialization.Message;
 import net.maritimecloud.core.serialization.MessageEnum;
 import net.maritimecloud.core.serialization.MessageSerializer;
+import net.maritimecloud.core.serialization.MessageWriter;
 import net.maritimecloud.core.serialization.ValueSerializer;
 import net.maritimecloud.util.Binary;
 import net.maritimecloud.util.Timestamp;
@@ -34,11 +36,11 @@ import net.maritimecloud.util.geometry.PositionTime;
  *
  * @author Kasper Nielsen
  */
-class JsonMessageWriter extends AbstractMessageWriter {
+public class DefaultMessageWriter implements MessageWriter {
 
-    final JsonValueWriter w;
+    final AbstractValueWriter w;
 
-    JsonMessageWriter(JsonValueWriter w) {
+    public DefaultMessageWriter(AbstractValueWriter w) {
         this.w = w;
     }
 
@@ -49,7 +51,7 @@ class JsonMessageWriter extends AbstractMessageWriter {
     /** {@inheritDoc} */
     @Override
     public void flush() throws IOException {
-        w.w.flush();
+        w.flush();
     }
 
     /** {@inheritDoc} */
@@ -58,6 +60,18 @@ class JsonMessageWriter extends AbstractMessageWriter {
         if (binary != null) {
             w.writeTag(tag, name).writeBinary(binary);
         }
+    }
+
+    public final void writeBinary(int tag, String name, byte[] bytes) throws IOException {
+        writeBinary(tag, name, bytes, 0, bytes.length);
+    }
+
+    public void writeBinary(int tag, String name, byte[] bytes, int offset, int length) throws IOException {
+        writeBinary(tag, name, Binary.copyFrom(bytes, offset, length));
+    }
+
+    public void writeBinary(int tag, String name, ByteBuffer buffer) throws IOException {
+        writeBinary(tag, name, Binary.copyFrom(buffer));
     }
 
     /** {@inheritDoc} */
@@ -190,6 +204,4 @@ class JsonMessageWriter extends AbstractMessageWriter {
             w.writeTag(tag, name).writeVarInt(value);
         }
     }
-
-
 }
