@@ -16,21 +16,21 @@ package net.maritimecloud.core.serialization;
 
 /**
  * An enumeration of values. All enums that can be serializes must implement this interface.
- * 
+ *
  * @author Kasper Nielsen
  */
-public interface MessageEnum {
+public inter face MessageEnum {
 
     /**
      * Returns the integer value of this enum value.
-     * 
+     *
      * @return the integer value of this enum value
      */
     int getValue();
 
     /**
      * Returns the name of this enum value
-     * 
+     *
      * @return the name of this enum value
      */
     String getName();
