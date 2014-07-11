@@ -19,7 +19,7 @@ package net.maritimecloud.core.serialization;
  *
  * @author Kasper Nielsen
  */
-public inter face MessageEnum {
+public interface MessageEnum {
 
     /**
      * Returns the integer value of this enum value.
