@@ -17,7 +17,6 @@ Build CI      : https://dma.ci.cloudbees.com/job/MaritimeCloud/
 
 License       : http://www.apache.org/licenses/LICENSE-2.0.html
 
-
 Build Instructions
 -------------------------------------------------------------------------------
 Prerequisites: Java 1.8 + Maven 3.x.x
