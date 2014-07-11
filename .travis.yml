@@ -1,3 +1,17 @@
 language: java
 jdk:
   - oraclejdk8
+
+before_install: "curl --create-dirs -o target/travis/settings.xml https://gist.githubusercontent.com/kaspernielsen/f02d81dd42d5acc5aa02/raw/fd5cb0b349beb214c360d10244b009654e5cb08c/settings.xml"
+script: "[ ${TRAVIS_PULL_REQUEST} = 'false' ] && mvn clean deploy --settings target/travis/settings.xml || mvn clean verify --settings target/travis/settings.xml"
+
+# whitelist
+branches:
+  only:
+    - master
+
+env:
+  global:
+    - secure: "VHp+Nt8FVyBtXLc4yXwZK0pdnJMusWtoNl+xgdEiqxr2NpWlP2vtkS3Ql0SyNY1OKOf3ZJrQuFlMcGNuVek2N9tQSX1smKzXsmxM1tXdOHkr5bczxabG6PXPOT35vqTm409rhf3XdhSYzHS3HnlRMvO+CzkCFi1jsUTNT3RH1oI="
+    - secure: "iPuiakOcv8hLC7XLXCJrtcy8hXCjvmVHLt5THadzvDDjBOvMlGizpzDEhVraSt5SPEFj/DJfHVlqXTRe6b54w3O50s1RrFmSE2LNGB+2Gi5T/3rpx83eHgeeBxxeXq3vSBSC1GNJKp+17yf1Ky1rTKPlHzWlqGZ7am3MrKdiJeY="
+
