@@ -30,7 +30,4 @@ The repository is organized into the following components.
 
 mc-core/                The core classes for the Maritime Cloud
 
-1
-https://travis-ci.org/MaritimeCloud/MaritimeCloud
-
 [![Build Status](https://api.travis-ci.org/MaritimeCloud/MaritimeCloud.png)](https://api.travis-ci.org/MaritimeCloud/MaritimeCloud.png)
