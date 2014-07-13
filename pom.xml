@@ -25,7 +25,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.maritimecloud</groupId>
   <artifactId>mc-parent</artifactId>
-  <version>0.2-RC4</version>
+  <version>0.2-RC5-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>MaritimeCloud Parent</name>
   <description>MaritimeCloud Parent Module</description>
