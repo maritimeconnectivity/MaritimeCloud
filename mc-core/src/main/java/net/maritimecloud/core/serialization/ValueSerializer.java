@@ -29,7 +29,8 @@ import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
 
 /**
- *
+ * @param <T>
+ *            the type of values to serialize
  * @author Kasper Nielsen
  */
 public abstract class ValueSerializer<T> {
@@ -147,7 +148,7 @@ public abstract class ValueSerializer<T> {
         }
     };
 
-    /** A value serializer that can serialize instances of {@link POSITION}. */
+    /** A value serializer that can serialize instances of {@link Position}. */
     public static final ValueSerializer<Position> POSITION = new ValueSerializer<Position>() {
 
         /** {@inheritDoc} */
@@ -163,7 +164,7 @@ public abstract class ValueSerializer<T> {
         }
     };
 
-    /** A value serializer that can serialize instances of {@link POSITION_TIME}. */
+    /** A value serializer that can serialize instances of {@link PositionTime}. */
     public static final ValueSerializer<PositionTime> POSITION_TIME = new ValueSerializer<PositionTime>() {
 
         /** {@inheritDoc} */

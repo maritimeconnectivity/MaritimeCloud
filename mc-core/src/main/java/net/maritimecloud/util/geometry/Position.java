@@ -104,9 +104,10 @@ public class Position implements Message, Serializable {
     }
 
     /**
-     * Get great circle distance to location
+     * Returns the great circle distance to the specified position.
      *
-     * @param location
+     * @param other
+     *            the position to calculate the distance from
      * @return distance in meters
      */
     public double geodesicDistanceTo(Position other) {
@@ -114,27 +115,27 @@ public class Position implements Message, Serializable {
     }
 
     /**
-     * Calculate final bearing for great circle route to location using Thaddeus Vincenty's</a> inverse formula.
+     * Calculate final bearing for great circle route to location using Thaddeus Vincenty's inverse formula.
      *
-     * @param the
-     *            second location
+     * @param other
+     *            the position to calculate the bearing from
      * @return bearing in degrees
      */
-    public double geodesicFinalBearingTo(Position location) {
-        return CoordinateSystem.vincentyFormula(getLatitude(), getLongitude(), location.getLatitude(),
-                location.getLongitude(), VincentyCalculationType.FINAL_BEARING);
+    public double geodesicFinalBearingTo(Position other) {
+        return CoordinateSystem.vincentyFormula(getLatitude(), getLongitude(), other.getLatitude(),
+                other.getLongitude(), VincentyCalculationType.FINAL_BEARING);
     }
 
     /**
-     * Calculate initial bearing for great circle route to location using Thaddeus Vincenty's</a> inverse formula.
+     * Calculate initial bearing for great circle route to location using Thaddeus Vincenty's inverse formula.
      *
-     * @param the
-     *            second location
+     * @param other
+     *            the position to calculate the bearing from
      * @return bearing in degrees
      */
-    public double geodesicInitialBearingTo(Position location) {
-        return CoordinateSystem.vincentyFormula(getLatitude(), getLongitude(), location.getLatitude(),
-                location.getLongitude(), VincentyCalculationType.INITIAL_BEARING);
+    public double geodesicInitialBearingTo(Position other) {
+        return CoordinateSystem.vincentyFormula(getLatitude(), getLongitude(), other.getLatitude(),
+                other.getLongitude(), VincentyCalculationType.INITIAL_BEARING);
     }
 
     public long getCell(double degress) {
@@ -292,7 +293,7 @@ public class Position implements Message, Serializable {
     /**
      * Returns a new position with the same latitude as this position but with the specified longitude.
      *
-     * @param latitude
+     * @param longitude
      *            the new longitude for the new position
      * @return the new position
      */
@@ -311,18 +312,6 @@ public class Position implements Message, Serializable {
         return PositionTime.create(this, time);
     }
 
-    /**
-     * Writes this position to the specified MSDL output stream.
-     *
-     * @param os
-     *            the output stream
-     * @throws IOException
-     *             the position failed to be written
-     */
-    public void writeTo(MessageWriter w) throws IOException {
-        w.writeDouble(1, "latitude", latitude);
-        w.writeDouble(2, "longitude", longitude);
-    }
 
     void writeToPacked(MessageWriter w, int latId, String latName, int lonId, String lonName) throws IOException {
         w.writeInt(latId, latName, (int) (latitude * 10_000_000d));
@@ -348,7 +337,8 @@ public class Position implements Message, Serializable {
      * Format the given integer value as a String of length 2 with leading zeros.
      *
      * @param value
-     * @return
+     *            the value to format
+     * @return the formatted string
      */
     private static String format00(int value) {
         if (value < 10) {
@@ -361,7 +351,8 @@ public class Position implements Message, Serializable {
      * Format the given integer value as a String of length 3 with leading zeros.
      *
      * @param value
-     * @return
+     *            the value to format
+     * @return the formatted string
      */
     private static String format000(int value) {
         if (value < 10) {
@@ -381,7 +372,7 @@ public class Position implements Message, Serializable {
      *            the latitude
      * @param longitude
      *            the longitude
-     * @return
+     * @return whether or not the specified latitude and longitude is valid
      */
     public static boolean isValid(double latitude, double longitude) {
         return latitude <= 90 && latitude >= -90 && longitude <= 180 && longitude >= -180;
@@ -412,8 +403,10 @@ public class Position implements Message, Serializable {
      * Verify that latitude is within the interval [-90:90].
      *
      * @param latitude
+     *            the latitude to verify
      * @throws IllegalArgumentException
      *             When latitude is invalid
+     * @return the specified latitude
      */
     public static double verifyLatitude(double latitude) {
         if (latitude > 90 || latitude < -90) {
@@ -428,8 +421,10 @@ public class Position implements Message, Serializable {
      * Verify that longitude is within the interval [-180:180].
      *
      * @param longitude
+     *            the longitude to verify
      * @throws IllegalArgumentException
      *             When longitude is invalid
+     * @return the specified longitude
      */
     public static double verifyLongitude(double longitude) {
         if (longitude > 180 || longitude < -180) {

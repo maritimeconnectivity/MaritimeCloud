@@ -42,13 +42,14 @@ import org.junit.Ignore;
  * permutation of one byte, two byte, and three byte sequences to ensure that the method produces the right result for
  * every possible byte encoding where "right" means it's consistent with java's UTF-8 string encoding/decoding such that
  * the method returns true for any sequence that will round trip when converted to a String and then back to bytes and
- * will return false for any sequence that will not round trip. See also {@link IsValidUtf8FourByteTest}. It also
- * includes some other more targeted tests.
+ * will return false for any sequence that will not round trip. See also {@link IsValidUtf8Test}. It also includes some
+ * other more targeted tests.
  *
  * @author jonp@google.com (Jon Perlow)
  * @author martinrb@google.com (Martin Buchholz)
  */
 @Ignore
+// This method is only ignored because it takes around 10 seconds to execute
 public class IsValidUtf8Test extends TestCase {
 
     /**
@@ -74,8 +75,8 @@ public class IsValidUtf8Test extends TestCase {
 
     /**
      * Tests that round tripping of a sample of four byte permutations work. All permutations are prohibitively
-     * expensive to test for automated runs; {@link IsValidUtf8FourByteTest} is used for full coverage. This method
-     * tests specific four-byte cases.
+     * expensive to test for automated runs; {@link IsValidUtf8Test} is used for full coverage. This method tests
+     * specific four-byte cases.
      */
     public void testIsValidUtf8_4BytesSamples() {
         // Valid 4 byte.

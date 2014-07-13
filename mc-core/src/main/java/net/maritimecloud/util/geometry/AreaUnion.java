@@ -55,11 +55,12 @@ class AreaUnion extends Area {
     final Area[] areas;
 
     /**
-     * @param cs
+     * @param area
+     *            the areas to combine
      */
-    AreaUnion(Area... a) {
+    AreaUnion(Area... area) {
         ArrayList<Area> areas = new ArrayList<>();
-        for (Area ar : a) {
+        for (Area ar : area) {
             requireNonNull(ar);
             if (ar instanceof AreaUnion) {
                 areas.addAll(Arrays.asList(((AreaUnion) ar).areas));

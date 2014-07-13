@@ -56,7 +56,7 @@ enum CoordinateSystem {
             double endLon = startLonDegrees
                     + Math.atan2(
                             Math.sin(bearingDegrees) * Math.sin(distanceMeters / earthRadius)
-                            * Math.cos(startLatDegrees),
+                                    * Math.cos(startLatDegrees),
                             Math.cos(distanceMeters / earthRadius) - Math.sin(startLatDegrees) * Math.sin(endLat));
             return Position.create(Math.toDegrees(endLat), Math.toDegrees(endLon));
         }
@@ -125,9 +125,6 @@ enum CoordinateSystem {
 
     abstract Position pointOnBearing0(double latitude, double longitude, double distance, double bearing);
 
-    /**
-     * Vincenty formula
-     */
     static double vincentyFormula(double latitude1, double longitude1, double latitude2, double longitude2,
             VincentyCalculationType type) {
         double a = 6378137;

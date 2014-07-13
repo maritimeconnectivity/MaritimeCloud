@@ -257,10 +257,14 @@ public final class Rectangle extends Area {
     // }
     /**
      * Creates a message of this type from a JSON throwing a runtime exception if the format of the message does not
-     * match
+     * match.
+     *
+     * @param string
+     *            the JSON string to parse
+     * @return the parsed rectangle
      */
-    public static Rectangle fromJSON(CharSequence c) {
-        return MessageSerializer.readFromJSON(SERIALIZER, c);
+    public static Rectangle fromJSON(CharSequence string) {
+        return MessageSerializer.readFromJSON(SERIALIZER, string);
     }
 
     private static int hashCode(double x) {

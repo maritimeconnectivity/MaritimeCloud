@@ -26,8 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import net.maritimecloud.core.serialization.MessageWriter;
-
 /**
  * This class holds the defining parameters for en ellipse.
  *
@@ -73,7 +71,6 @@ public final class Ellipse extends Area {
      * @param thetaDeg
      *            Direction of half axis alpha measured in degrees; 0 degrees is parallel with the increasing direction
      *            of the cartesian X axis.
-     * @param cs
      */
     public Ellipse(Position geodeticReference, double alpha, double beta, double thetaDeg) {
         this.geodeticReference = geodeticReference;
@@ -92,7 +89,9 @@ public final class Ellipse extends Area {
      * @param geodeticReference
      *            The position, from which the center of the ellipse is offset by (dx, dy) meters.
      * @param dx
+     *            dx
      * @param dy
+     *            dy
      * @param alpha
      *            Length of half axis in direction theta (in meters)
      * @param beta
@@ -100,7 +99,6 @@ public final class Ellipse extends Area {
      * @param thetaDeg
      *            Direction of half axis alpha measured in degrees; 0 degrees is parallel with the increasing direction
      *            of the cartesian X axis.
-     * @param cs
      */
     public Ellipse(Position geodeticReference, double dx, double dy, double alpha, double beta, double thetaDeg) {
         this.geodeticReference = geodeticReference;
@@ -175,7 +173,7 @@ public final class Ellipse extends Area {
      *
      * @param otherEllipse
      *            the other safety zone.
-     * @return
+     * @return whether or not the two elipses intersect
      */
     public boolean intersects(Ellipse otherEllipse) {
         // TODO must have equal geodeticReference to compare
@@ -268,8 +266,4 @@ public final class Ellipse extends Area {
         return sb.toString();
     }
 
-    /** {@inheritDoc} */
-    public void writeTo(MessageWriter w) {
-        throw new UnsupportedOperationException();
-    }
 }

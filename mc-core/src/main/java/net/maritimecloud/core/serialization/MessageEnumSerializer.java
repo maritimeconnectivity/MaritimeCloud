@@ -18,7 +18,9 @@ import java.io.IOException;
 
 /**
  * A parser for creating message enums based on an integer or string value.
- *
+ * 
+ * @param <T>
+ *            the type of enum
  * @author Kasper Nielsen
  */
 public abstract class MessageEnumSerializer<T extends Enum<T> & MessageEnum> extends ValueSerializer<T> {

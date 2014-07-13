@@ -32,8 +32,6 @@ import net.maritimecloud.core.serialization.MessageReader;
 import net.maritimecloud.core.serialization.MessageSerializer;
 import net.maritimecloud.core.serialization.MessageWriter;
 import net.maritimecloud.internal.serialization.DefaultMessageWriter;
-import net.maritimecloud.internal.serialization.json.JsonMessageReader;
-import net.maritimecloud.internal.serialization.json.JsonValueWriter;
 import net.maritimecloud.util.Binary;
 
 /**
@@ -161,7 +159,6 @@ public abstract class AbstractJSONTest {
             return ddd;
         }
 
-        /** {@inheritDoc} */
         public void writeTo(MessageWriter w) throws IOException {
             w.writeInt(1, "i1", i1);
             w.writeInt(2, "i2", i2);

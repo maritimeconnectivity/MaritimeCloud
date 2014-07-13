@@ -16,6 +16,7 @@
 /**
  * Utility classes used across multiple packages.
  *
- * <img src="dk.dma.enav.model.geometry.png" height="900" width="1200"/>
  **/
 package net.maritimecloud.util.geometry;
+
+// * <img src="dk.dma.enav.model.geometry.png" height="900" width="1200"/>

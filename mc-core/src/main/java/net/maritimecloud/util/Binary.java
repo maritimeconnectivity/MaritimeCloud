@@ -90,7 +90,7 @@ public abstract class Binary implements Iterable<Byte> {
      *            index of byte
      * @return the value
      * @throws ArrayIndexOutOfBoundsException
-     *             {@code index} is < 0 or >= size
+     *             {@code index} is less than 0 or greater than or equal to size
      */
     public abstract byte byteAt(int index);
 
@@ -479,10 +479,17 @@ public abstract class Binary implements Iterable<Byte> {
     }
 
     /**
-     * Internal (package private) implementation of
+     * Internal (package private) implementation of {@link #copyTo(byte[], int, int, int)}. It assumes that all error
+     * checking has already been performed and that
      *
-     * @link{#copyTo(byte[],int,int,int . It assumes that all error checking has already been performed and that
-     * @code{numberToCopy > 0}.
+     * @param target
+     *            sd
+     * @param sourceOffset
+     *            source
+     * @param targetOffset
+     *            target
+     * @param numberToCopy
+     *            numer
      */
     protected abstract void copyToInternal(byte[] target, int sourceOffset, int targetOffset, int numberToCopy);
 
@@ -587,7 +594,7 @@ public abstract class Binary implements Iterable<Byte> {
      * (as of 2011) still accepts 3-byte surrogate character byte sequences.
      *
      * <p>
-     * See the Unicode Standard,</br> Table 3-6. <em>UTF-8 Bit Distribution</em>,</br> Table 3-7.
+     * See the Unicode Standard, Table 3-6. <em>UTF-8 Bit Distribution</em>, Table 3-7.
      * <em>Well Formed UTF-8 Byte Sequences</em>.
      *
      * @return whether the bytes in this {@code ByteString} are a well-formed UTF-8 byte sequence
@@ -636,7 +643,7 @@ public abstract class Binary implements Iterable<Byte> {
      * <p>
      * The {@link InputStream} returned by this method is guaranteed to be completely non-blocking. The method
      * {@link InputStream#available()} returns the number of bytes remaining in the stream. The methods
-     * {@link InputStream#read(byte[]), {@link InputStream#read(byte[],int,int)} and {@link InputStream#skip(long)}
+     * {@link InputStream#read(byte[])}, {@link InputStream#read(byte[],int,int)} and {@link InputStream#skip(long)}
      * will read/skip as many bytes as are available.
      * <p>
      * The methods in the returned {@link InputStream} might <b>not</b> be thread safe.

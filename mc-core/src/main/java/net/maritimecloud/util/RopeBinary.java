@@ -46,36 +46,32 @@ import java.util.Stack;
 /**
  * Class to represent {@code ByteStrings} formed by concatenation of other ByteStrings, without copying the data in the
  * pieces. The concatenation is represented as a tree whose leaf nodes are each a {@link LiteralBinary}.
- * 
+ *
  * <p>
  * Most of the operation here is inspired by the now-famous paper <a
  * href="http://www.cs.ubc.ca/local/reading/proceedings/spe91-95/spe/vol25/issue12/spe986.pdf"> BAP95 </a> Ropes: an
  * Alternative to Strings hans-j. boehm, russ atkinson and michael plass
- * 
- * <p>
- * The algorithms described in the paper have been implemented for character strings in
- * {@link com.google.common.string.Rope} and in the c++ class {@code cord.cc}.
- * 
+ *
  * <p>
  * Fundamentally the Rope algorithm represents the collection of pieces as a binary tree. BAP95 uses a Fibonacci bound
  * relating depth to a minimum sequence length, sequences that are too short relative to their depth cause a tree
  * rebalance. More precisely, a tree of depth d is "balanced" in the terminology of BAP95 if its length is at least
  * F(d+2), where F(n) is the n-the Fibonacci number. Thus for depths 0, 1, 2, 3, 4, 5,... we have minimum lengths 1, 2,
  * 3, 5, 8, 13,...
- * 
+ *
  * @author carlanton@google.com (Carl Haverl)
  */
 class RopeBinary extends Binary {
 
     /**
-     * BAP95. Let Fn be the nth Fibonacci number. A {@link RopeBinary} of depth n is "balanced", i.e flat enough, if
-     * its length is at least Fn+2, e.g. a "balanced" {@link RopeBinary} of depth 1 must have length at least 2, of
-     * depth 4 must have length >= 8, etc.
-     * 
+     * BAP95. Let Fn be the nth Fibonacci number. A {@link RopeBinary} of depth n is "balanced", i.e flat enough, if its
+     * length is at least Fn+2, e.g. a "balanced" {@link RopeBinary} of depth 1 must have length at least 2, of depth 4
+     * must have length >= 8, etc.
+     *
      * <p>
      * There's nothing special about using the Fibonacci numbers for this, but they are a reasonable sequence for
      * encapsulating the idea that we are OK with longer strings being encoded in deeper binary trees.
-     * 
+     *
      * <p>
      * For 32-bit integers, this array has length 46.
      */
@@ -122,7 +118,7 @@ class RopeBinary extends Binary {
     /**
      * Create a new RopeByteString, which can be thought of as a new tree node, by recording references to the two given
      * strings.
-     * 
+     *
      * @param left
      *            string on the left of this node, should have {@code size() >
      *              0}
@@ -142,11 +138,11 @@ class RopeBinary extends Binary {
      * Concatenate the given strings while performing various optimizations to slow the growth rate of tree depth and
      * tree node count. The result is either a {@link LiteralBinary} or a {@link RopeBinary} depending on which
      * optimizations, if any, were applied.
-     * 
+     *
      * <p>
      * Small pieces of length less than {@link Binary#CONCATENATE_BY_COPY_SIZE} may be copied by value here, as in
      * BAP95. Large pieces are referenced without copy.
-     * 
+     *
      * @param left
      *            string on the left
      * @param right
@@ -206,7 +202,7 @@ class RopeBinary extends Binary {
     /**
      * Concatenates two strings by copying data values. This is called in a few cases in order to reduce the growth of
      * the number of tree nodes.
-     * 
+     *
      * @param left
      *            string on the left
      * @param right
@@ -224,10 +220,10 @@ class RopeBinary extends Binary {
 
     /**
      * Create a new RopeByteString for testing only while bypassing all the defenses of
-     * {@link #concatenate(Binary, Binary)}. This allows testing trees of specific structure. We are also able
-     * to insert empty leaves, though these are dis-allowed, so that we can make sure the implementation can withstand
-     * their presence.
-     * 
+     * {@link #concatenate(Binary, Binary)}. This allows testing trees of specific structure. We are also able to insert
+     * empty leaves, though these are dis-allowed, so that we can make sure the implementation can withstand their
+     * presence.
+     *
      * @param left
      *            string on the left of this node
      * @param right
@@ -241,7 +237,7 @@ class RopeBinary extends Binary {
     /**
      * Gets the byte at the given index. Throws {@link ArrayIndexOutOfBoundsException} for backwards-compatibility
      * reasons although it would more properly be {@link IndexOutOfBoundsException}.
-     * 
+     *
      * @param index
      *            index of byte
      * @return the value
@@ -284,7 +280,7 @@ class RopeBinary extends Binary {
      * Determines if the tree is balanced according to BAP95, which means the tree is flat-enough with respect to the
      * bounds. Note that this definition of balanced is one where sub-trees of balanced trees are not necessarily
      * balanced.
-     * 
+     *
      * @return true if the tree is balanced
      */
     @Override
@@ -296,11 +292,11 @@ class RopeBinary extends Binary {
      * Takes a substring of this one. This involves recursive descent along the left and right edges of the substring,
      * and referencing any wholly contained segments in between. Any leaf nodes entirely uninvolved in the substring
      * will not be referenced by the substring.
-     * 
+     *
      * <p>
      * Substrings of {@code length < 2} should result in at most a single recursive call chain, terminating at a leaf
-     * node. Thus the result will be a {@link LiteralBinary}. {@link #RopeByteString(Binary, Binary)}.
-     * 
+     * node. Thus the result will be a {@link LiteralBinary}. {@link #RopeBinary(Binary, Binary)}.
+     *
      * @param beginIndex
      *            start at this index
      * @param endIndex
@@ -463,7 +459,7 @@ class RopeBinary extends Binary {
     /**
      * Determines if this string is equal to another of the same length by iterating over the leaf nodes. On each step
      * of the iteration, the overlapping segments of the leaves are compared.
-     * 
+     *
      * @param other
      *            string of the same length as this one
      * @return true if the values of this string equals the value of the given one
@@ -570,7 +566,7 @@ class RopeBinary extends Binary {
      * This class implements the balancing algorithm of BAP95. In the paper the authors use an array to keep track of
      * pieces, while here we use a stack. The tree is balanced by traversing subtrees in left to right order, and the
      * stack always contains the part of the string we've traversed so far.
-     * 
+     *
      * <p>
      * One surprising aspect of the algorithm is the result of balancing is not necessarily balanced, though it is
      * nearly balanced. For details, see BAP95.
@@ -617,12 +613,12 @@ class RopeBinary extends Binary {
          * Push a string on the balance stack (BAP95). BAP95 uses an array and calls the elements in the array 'bins'.
          * We instead use a stack, so the 'bins' of lengths are represented by differences between the elements of
          * minLengthByDepth.
-         * 
+         *
          * <p>
          * If the length bin for our string, and all shorter length bins, are empty, we just push it on the stack.
          * Otherwise, we need to start concatenating, putting the given string in the "middle" and continuing until we
          * land in an empty length bin that matches the length of our concatenation.
-         * 
+         *
          * @param byteString
          *            string to place on the balance stack
          */
@@ -681,7 +677,7 @@ class RopeBinary extends Binary {
      * This class is a continuable tree traversal, which keeps the state information which would exist on the stack in a
      * recursive traversal instead on a stack of "Bread Crumbs". The maximum depth of the stack in this iterator is the
      * same as the depth of the tree being traversed.
-     * 
+     *
      * <p>
      * This iterator is used to implement {@link RopeBinary#equalsFragments(Binary)}.
      */
@@ -726,7 +722,7 @@ class RopeBinary extends Binary {
 
         /**
          * Returns the next item and advances one {@code LiteralByteString}.
-         * 
+         *
          * @return next non-empty LiteralByteString or {@code null}
          */
         public LiteralBinary next() {
@@ -834,13 +830,11 @@ class RopeBinary extends Binary {
 
         /**
          * Internal implementation of read and skip. If b != null, then read the next {@code length} bytes into the
-         * buffer {@code b} at offset {@code offset}. If b == null, then skip the next {@code length)
-         * bytes.
+         * buffer {@code b} at offset {@code offset}. If b == null, then skip the next {@code length} bytes.
          * <p>
          * This method assumes that all error checking has already happened.
          * <p>
          * Returns the actual number of bytes read or skipped.
-
          */
         private int readSkipInternal(byte b[], int offset, int length) {
             int bytesRemaining = length;

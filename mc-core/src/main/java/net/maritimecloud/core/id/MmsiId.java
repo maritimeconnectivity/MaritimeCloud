@@ -26,9 +26,6 @@ public class MmsiId extends MaritimeId {
 
     private final int mmsi;
 
-    /**
-     * @param scheme
-     */
     public MmsiId(int mmsi) {
         super("mmsi");
         this.mmsi = mmsi;
@@ -46,7 +43,6 @@ public class MmsiId extends MaritimeId {
         return obj instanceof MmsiId && equals((MmsiId) obj);
     }
 
-    /** {@inheritDoc} */
     public boolean equals(MmsiId other) {
         return mmsi == other.mmsi;
     }

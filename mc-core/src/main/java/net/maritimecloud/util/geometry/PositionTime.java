@@ -42,20 +42,17 @@ public class PositionTime extends Position {
         }
 
         public void write(PositionTime message, MessageWriter writer) throws IOException {
-            message.writeTo(writer);
+            writer.writeDouble(1, "latitude", message.latitude);
+            writer.writeDouble(2, "longitude", message.longitude);
+            writer.writeInt64(3, "time", message.time);
         }
     };
 
     /** serialVersionUID */
     private static final long serialVersionUID = 1L;
 
-    private final long time;
+    final long time;
 
-    /**
-     * @param latitude
-     * @param longitude
-     * @param time
-     */
     PositionTime(double latitude, double longitude, long time) {
         super(latitude, longitude);
         this.time = time;
@@ -172,23 +169,6 @@ public class PositionTime extends Position {
         return "(" + getLatitude() + ", " + getLongitude() + ", time= " + time + ")";
     }
 
-    /**
-     * Writes this position to the specified MSDL output stream.
-     *
-     * @param os
-     *            the output stream
-     * @throws IOException
-     *             the position failed to be written
-     */
-    public void writeTo(MessageWriter w) throws IOException {
-        // if (w.isCompact()) {
-        // writeToPacked(w, 1, "latitude", 2, "longitude");
-        // } else {
-        w.writeDouble(1, "latitude", latitude);
-        w.writeDouble(2, "longitude", longitude);
-        w.writeInt64(3, "time", time);
-        // }
-    }
 
     /**
      * Creates a new position from the specified latitude and longitude.
@@ -197,6 +177,8 @@ public class PositionTime extends Position {
      *            the latitude
      * @param longitude
      *            the longitude
+     * @param time
+     *            the epoch time
      * @return the new position
      * @throws IllegalArgumentException
      *             if the

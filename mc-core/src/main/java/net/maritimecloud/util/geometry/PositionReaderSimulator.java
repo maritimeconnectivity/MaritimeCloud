@@ -66,14 +66,12 @@ public final class PositionReaderSimulator {
      * area. And travel to another random position within the area with a random speed. When it arrives at the position
      * it will choose another random position within the area to travel to and so on.
      *
-     * @param area
-     *            the area that vessel will return positions within
+     * @param supplier
+     *            a supplier of positions
      * @return the simulated position reader
      * @throws NullPointerException
      *             if the specified area is null
      */
-
-
     PositionReader forA(Supplier<Position> supplier) {
         return new AbtractSimulatedReader(this, supplier);
     }

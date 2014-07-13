@@ -89,8 +89,8 @@ public abstract class Area implements Message, Serializable {
     /**
      * Returns <tt>true</tt> if the specified element is fully contained in the shape, otherwise <tt>false</tt>.
      *
-     * @param element
-     *            the element to test
+     * @param area
+     *            the area to test
      * @return true if the specified element is fully contained in the shape, otherwise false
      */
     public boolean contains(Area area) {
@@ -138,9 +138,13 @@ public abstract class Area implements Message, Serializable {
     /**
      * Creates a message of this type from a JSON throwing a runtime exception if the format of the message does not
      * match
+     *
+     * @param string
+     *            the JSON string to parse
+     * @return the parsed area
      */
-    public static Area fromJSON(CharSequence c) {
-        return MessageSerializer.readFromJSON(SERIALIZER, c);
+    public static Area fromJSON(CharSequence string) {
+        return MessageSerializer.readFromJSON(SERIALIZER, string);
     }
 
     static double nextDouble(Random r, double least, double bound) {

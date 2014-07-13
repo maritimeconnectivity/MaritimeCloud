@@ -25,7 +25,9 @@ import net.maritimecloud.internal.serialization.json.JsonValueWriter;
 
 /**
  * A message serializer takes care of persisting and retrieving {@link Message messages}.
- *
+ * 
+ * @param <T>
+ *            the type of message that can be serialized
  * @author Kasper Nielsen
  */
 public abstract class MessageSerializer<T extends Message> extends ValueSerializer<T> {

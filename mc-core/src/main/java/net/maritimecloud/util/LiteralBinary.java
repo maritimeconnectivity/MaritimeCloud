@@ -41,10 +41,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
- * This class implements a {@link com.google.Binary.ByteString.ByteString} backed by a single array of bytes, contiguous in
- * memory. It supports substring by pointing to only a sub-range of the underlying byte array, meaning that a substring
- * will reference the full byte-array of the string it's made from, exactly as with {@link String}.
- * 
+ * This class implements a {@link Binary} backed by a single array of bytes, contiguous in memory. It supports substring
+ * by pointing to only a sub-range of the underlying byte array, meaning that a substring will reference the full
+ * byte-array of the string it's made from, exactly as with {@link String}.
+ *
  * @author carlanton@google.com (Carl Haverl)
  */
 class LiteralBinary extends Binary {
@@ -53,7 +53,7 @@ class LiteralBinary extends Binary {
 
     /**
      * Creates a {@code LiteralByteString} backed by the given array, without copying.
-     * 
+     *
      * @param bytes
      *            array to wrap
      */
@@ -185,7 +185,7 @@ class LiteralBinary extends Binary {
     /**
      * Check equality of the substring of given length of this object starting at zero with another
      * {@code LiteralByteString} substring starting at offset.
-     * 
+     *
      * @param other
      *            what to compare a substring in
      * @param offset
@@ -221,7 +221,7 @@ class LiteralBinary extends Binary {
 
     /**
      * Compute the hashCode using the traditional algorithm from {@link Binary}.
-     * 
+     *
      * @return hashCode value
      */
     @Override
@@ -325,7 +325,7 @@ class LiteralBinary extends Binary {
 
     /**
      * Offset into {@code bytes[]} to use, non-zero for substrings.
-     * 
+     *
      * @return always 0 for this class
      */
     protected int getOffsetIntoBytes() {

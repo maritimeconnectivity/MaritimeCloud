@@ -32,8 +32,8 @@ import java.util.Properties;
  * Class to represent a country by its assigned MID's (Maritime Identification Digits) in addition to its ISO 3166
  * identification.
  *
- * See {@link http://en.wikipedia.org/wiki/Maritime_Mobile_Service_Identity}
- *
+ * @see <a
+ *      href="http://en.wikipedia.org/wiki/Maritime_Mobile_Service_Identity">http://en.wikipedia.org/wiki/Maritime_Mobile_Service_Identity</a>
  */
 // TODO make Message
 public final class Country implements Serializable, Comparable<Country> {
@@ -156,9 +156,10 @@ public final class Country implements Serializable, Comparable<Country> {
 
     /**
      * Get MidCountry by ISO 3166 two or three letter code
-     *
+     * 
      * @param code
-     * @return
+     *            the code
+     * @return the country corresponding to the specified code
      */
     public static Country getByCode(String code) {
         if (code.length() == 2) {
@@ -171,7 +172,8 @@ public final class Country implements Serializable, Comparable<Country> {
      * Get MidCountry by MID
      *
      * @param mid
-     * @return
+     *            the code
+     * @return the country corresponding to the specified code
      */
     public static Country getByMid(int mid) {
         Country country = MID_COUNTRY_MAP.get(mid);

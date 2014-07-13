@@ -250,9 +250,13 @@ public class Circle extends Area {
     /**
      * Creates a message of this type from a JSON. Throwing a runtime exception if the format of the message does not
      * match.
+     * 
+     * @param string
+     *            the JSON string to parse
+     * @return the parsed area
      */
-    public static Circle fromJSON(CharSequence c) {
-        return MessageSerializer.readFromJSON(SERIALIZER, c);
+    public static Circle fromJSON(CharSequence string) {
+        return MessageSerializer.readFromJSON(SERIALIZER, string);
     }
 
     /**

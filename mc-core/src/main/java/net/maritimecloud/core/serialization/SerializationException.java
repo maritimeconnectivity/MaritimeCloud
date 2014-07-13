@@ -25,17 +25,10 @@ public class SerializationException extends IOException {
     /**  */
     private static final long serialVersionUID = 1L;
 
-    /**
-     * @param message
-     */
     public SerializationException(String message) {
         super(message);
     }
 
-    /**
-     * @param message
-     * @param cause
-     */
     public SerializationException(String message, Throwable cause) {
         super(message, cause);
     }

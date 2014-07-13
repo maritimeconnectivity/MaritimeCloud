@@ -51,7 +51,7 @@ import java.util.Random;
 import java.util.logging.Logger;
 
 /**
- * Shared testing code for {@link IsValidUtf8Test} and {@link IsValidUtf8FourByteTest}.
+ * Shared testing code for {@link IsValidUtf8Test} and {@link IsValidUtf8Test}.
  *
  * @author jonp@google.com (Jon Perlow)
  * @author martinrb@google.com (Martin Buchholz)
@@ -70,9 +70,9 @@ class IsValidUtf8TestUtil {
 
     // 18,304
     static long EXPECTED_TWO_BYTE_ROUNDTRIPPABLE_COUNT =
-            // Both bytes are one byte characters
-            (long) Math.pow(EXPECTED_ONE_BYTE_ROUNDTRIPPABLE_COUNT, 2) +
-            // The possible number of two byte characters
+    // Both bytes are one byte characters
+    (long) Math.pow(EXPECTED_ONE_BYTE_ROUNDTRIPPABLE_COUNT, 2) +
+    // The possible number of two byte characters
             TWO_BYTE_ROUNDTRIPPABLE_CHARACTERS;
 
     // 2048
@@ -83,9 +83,9 @@ class IsValidUtf8TestUtil {
 
     // 2,650,112
     static long EXPECTED_THREE_BYTE_ROUNDTRIPPABLE_COUNT =
-            // All one byte characters
-            (long) Math.pow(EXPECTED_ONE_BYTE_ROUNDTRIPPABLE_COUNT, 3) +
-            // One two byte character and a one byte character
+    // All one byte characters
+    (long) Math.pow(EXPECTED_ONE_BYTE_ROUNDTRIPPABLE_COUNT, 3) +
+    // One two byte character and a one byte character
             2 * TWO_BYTE_ROUNDTRIPPABLE_CHARACTERS * ONE_BYTE_ROUNDTRIPPABLE_CHARACTERS +
             // Three byte characters
             THREE_BYTE_ROUNDTRIPPABLE_CHARACTERS;
@@ -95,8 +95,8 @@ class IsValidUtf8TestUtil {
 
     // 289,571,839
     static long EXPECTED_FOUR_BYTE_ROUNDTRIPPABLE_COUNT =
-            // All one byte characters
-            (long) Math.pow(EXPECTED_ONE_BYTE_ROUNDTRIPPABLE_COUNT, 4)
+    // All one byte characters
+    (long) Math.pow(EXPECTED_ONE_BYTE_ROUNDTRIPPABLE_COUNT, 4)
             +
             // One and three byte characters
             2 * THREE_BYTE_ROUNDTRIPPABLE_CHARACTERS * ONE_BYTE_ROUNDTRIPPABLE_CHARACTERS

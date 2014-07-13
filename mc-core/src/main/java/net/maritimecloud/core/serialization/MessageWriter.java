@@ -131,6 +131,11 @@ public interface MessageWriter extends Closeable, Flushable {
      *            the tag name
      * @param list
      *            the list to write
+     * @param serializer
+     *            the serializer for each element
+     * @param <T>
+     *            the type of elements
+     *
      * @throws IOException
      *             If an I/O error occurs
      */
@@ -143,8 +148,16 @@ public interface MessageWriter extends Closeable, Flushable {
      *            the tag value
      * @param name
      *            the tag name
-     * @param list
+     * @param map
      *            the map to write
+     * @param keySerializer
+     *            the serializer for each key
+     * @param valueSerializer
+     *            the serializer for each value
+     * @param <K>
+     *            the type of keys in the map
+     * @param <V>
+     *            the type of values in the map
      * @throws IOException
      *             If an I/O error occurs
      */
@@ -158,8 +171,13 @@ public interface MessageWriter extends Closeable, Flushable {
      *            the tag value
      * @param name
      *            the tag name
-     * @param value
+     * @param message
      *            the message to write
+     * @param serializer
+     *            the serializer for the message
+     * @param <T>
+     *            the type of message
+     * 
      * @throws IOException
      *             If an I/O error occurs
      */
@@ -173,8 +191,12 @@ public interface MessageWriter extends Closeable, Flushable {
      *            the tag value
      * @param name
      *            the tag name
-     * @param list
+     * @param set
      *            the set to write
+     * @param serializer
+     *            the serializer for each element
+     * @param <T>
+     *            the type of elements
      * @throws IOException
      *             If an I/O error occurs
      */

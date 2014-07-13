@@ -44,13 +44,11 @@ public interface ValueWriter {
      */
     public abstract void writeBoolean(Boolean value) throws IOException;
 
+    public abstract void writeDecimal(BigDecimal value) throws IOException;
+
     /**
      * Writes a double.
      *
-     * @param tag
-     *            the tag value
-     * @param name
-     *            the tag name
      * @param value
      *            the double value to write
      * @throws IOException
@@ -63,10 +61,6 @@ public interface ValueWriter {
     /**
      * Writes a float.
      *
-     * @param tag
-     *            the tag value
-     * @param name
-     *            the tag name
      * @param value
      *            the float value to write
      * @throws IOException
@@ -77,10 +71,6 @@ public interface ValueWriter {
     /**
      * Writes an integer.
      *
-     * @param tag
-     *            the tag value
-     * @param name
-     *            the tag name
      * @param value
      *            the integer value to write
      * @throws IOException
@@ -91,10 +81,6 @@ public interface ValueWriter {
     /**
      * Writes a long.
      *
-     * @param tag
-     *            the tag value
-     * @param name
-     *            the tag name
      * @param value
      *            the long value to write
      * @throws IOException
@@ -102,26 +88,15 @@ public interface ValueWriter {
      */
     public abstract void writeInt64(Long value) throws IOException;
 
-    public abstract void writeVarInt(BigInteger value) throws IOException;
-
-    public abstract void writeDecimal(BigDecimal value) throws IOException;
-
-    public abstract void writePosition(Position value) throws IOException;
-
-    public abstract void writePositionTime(PositionTime value) throws IOException;
-
-    public abstract void writeTimestamp(Timestamp value) throws IOException;
-
-
     /**
      * Writes a list.
      *
-     * @param tag
-     *            the tag value
-     * @param name
-     *            the tag name
      * @param list
      *            the list to write
+     * @param serializer
+     *            the serializer for each element
+     * @param <T>
+     *            the type of elements
      * @throws IOException
      *             If an I/O error occurs
      */
@@ -130,12 +105,16 @@ public interface ValueWriter {
     /**
      * Writes a map.
      *
-     * @param tag
-     *            the tag value
-     * @param name
-     *            the tag name
-     * @param list
+     * @param map
      *            the map to write
+     * @param keySerializer
+     *            the serializer for each key
+     * @param valueSerializer
+     *            the serializer for each value
+     * @param <K>
+     *            the type of keys in the map
+     * @param <V>
+     *            the type of values in the map
      * @throws IOException
      *             If an I/O error occurs
      */
@@ -145,44 +124,49 @@ public interface ValueWriter {
     /**
      * Writes the specified message if it is non-null.
      *
-     * @param tag
-     *            the tag value
-     * @param name
-     *            the tag name
-     * @param value
+     * @param message
      *            the message to write
+     * @param serializer
+     *            the serializer for the message
+     * @param <T>
+     *            the type of message
      * @throws IOException
      *             If an I/O error occurs
      */
     public abstract <T extends Message> void writeMessage(T message, MessageSerializer<T> serializer)
             throws IOException;
 
+    public abstract void writePosition(Position value) throws IOException;
+
+
+    public abstract void writePositionTime(PositionTime value) throws IOException;
+
     /**
      * Writes a set.
      *
-     * @param tag
-     *            the tag value
-     * @param name
-     *            the tag name
-     * @param list
+     * @param set
      *            the set to write
+     * @param serializer
+     *            the serializer for each element
+     * @param <T>
+     *            the type of elements
      * @throws IOException
      *             If an I/O error occurs
      */
     public abstract <T> void writeSet(Set<T> set, ValueSerializer<T> serializer) throws IOException;
 
-
     /**
      * Writes a string.
      *
-     * @param tag
-     *            the tag value
-     * @param name
-     *            the tag name
      * @param value
      *            the string value to write
      * @throws IOException
      *             If an I/O error occurs
      */
     public abstract void writeText(String value) throws IOException;
+
+    public abstract void writeTimestamp(Timestamp value) throws IOException;
+
+
+    public abstract void writeVarInt(BigInteger value) throws IOException;
 }

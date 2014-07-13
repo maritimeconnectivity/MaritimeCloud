@@ -159,11 +159,7 @@ public abstract class AbstractMessageReader implements MessageReader {
         return r == null ? defaultValue : r.readPositionTime();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @throws IOException
-     */
+    /** {@inheritDoc} */
     @Override
     public <T> Set<T> readSet(int tag, String name, ValueSerializer<T> parser) throws IOException {
         return new HashSet<>(readList(tag, name, parser));

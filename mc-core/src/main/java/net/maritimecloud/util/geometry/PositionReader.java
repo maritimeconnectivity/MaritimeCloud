@@ -37,8 +37,8 @@ public abstract class PositionReader {
     /**
      * Returns a reader that returns the same position every time.
      *
-     * @param positionTime
-     *            the position time to return every time
+     * @param position
+     *            the position to return every time
      * @return a new fixed position reader
      */
     public static PositionReader fixedPosition(final Position position) {
