@@ -10,3 +10,4 @@ mc-msdl/*.msdl
 mc-msdl/generated
 private
 TODO*
+dependency-reduced-pom.xml
