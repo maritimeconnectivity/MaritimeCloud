@@ -20,8 +20,19 @@ read -p "Press enter to start release process: " enter
 
 mvn -DperformRelease=true clean source:jar javadoc:jar install
 
-//Lets bump the version counter
+#Lets bump the version counter
 
 mvn versions:set -DnewVersion=$release
 mvn -DperformRelease=true clean source:jar javadoc:jar install
 mvn versions:commit
+
+
+#git add
+#Commit and tag git
+
+
+#Build and deploy
+
+#mvn versions:set -DnewVersion=$release
+#mvn versions:commit
+#
