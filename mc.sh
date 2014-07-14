@@ -26,6 +26,12 @@ mvn versions:set -DnewVersion=$release
 mvn -DperformRelease=true clean source:jar javadoc:jar install
 mvn versions:commit
 
+git add '*pom.xml'
+
+git tag -a v$release -m 'Version $relase'
+git commit -m "Releasing $release"
+
+git push
 
 #git add
 #Commit and tag git
