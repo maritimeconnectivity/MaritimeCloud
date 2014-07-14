@@ -23,22 +23,22 @@ mvn -DperformRelease=true clean source:jar javadoc:jar install
 #Lets bump the version counter
 
 mvn versions:set -DnewVersion=$release
-mvn -DperformRelease=true clean source:jar javadoc:jar install
+mvn -DperformRelease=true clean source:jar javadoc:jar install deploy
 mvn versions:commit
 
 git add '*pom.xml'
 
-git tag -a v$release -m 'Version $relase'
-git commit -m "Releasing $release"
-
+git commit -m "Releasing $release  [ci skip]"
 git push
 
-#git add
-#Commit and tag git
+git tag -a v$release -m 'Version $release'
+git push origin v$release
 
 
-#Build and deploy
+mvn versions:set -DnewVersion=$next
+mvn clean source:jar javadoc:jar install deploy
+mvn versions:commit
+git add '*pom.xml'
 
-#mvn versions:set -DnewVersion=$release
-#mvn versions:commit
-#
+git commit -m "Preparing next development iteration $next"
+git push
