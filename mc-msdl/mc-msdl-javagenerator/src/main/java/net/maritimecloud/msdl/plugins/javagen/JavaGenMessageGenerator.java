@@ -39,6 +39,7 @@ import net.maritimecloud.msdl.model.MapType;
 import net.maritimecloud.msdl.model.MsdlFile;
 import net.maritimecloud.msdl.model.Type;
 import net.maritimecloud.msdl.plugins.javagen.annotation.JavaImplements;
+import net.maritimecloud.net.BroadcastMessage;
 import net.maritimecloud.util.Binary;
 
 import org.cakeframework.internal.codegen.CodegenClass;
@@ -90,8 +91,9 @@ public class JavaGenMessageGenerator {
     void generateClass() {
         String mType;
         if (this instanceof JavaGenBroadcastMessageGenerator) {
-            c.imports().addExplicitImport(ClassDefinitions.BROADCAST_MESSAGE_CLASS);
-            mType = ClassDefinitions.BROADCAST_MESSAGE;
+            // c.imports().addExplicitImport(ClassDefinitions.BROADCAST_MESSAGE_CLASS);
+            c.addImport(BroadcastMessage.class);
+            mType = BroadcastMessage.class.getSimpleName();
         } else {
             c.addImport(Message.class);
             mType = Message.class.getSimpleName();
@@ -209,18 +211,18 @@ public class JavaGenMessageGenerator {
             ListOrSetType los = (ListOrSetType) f.getType();
             c.addImport(MessageHelper.class);
             return MessageHelper.class.getSimpleName() + ".readList(" + f.getTag() + ", \"" + f.getName() + "\", "
-                    + readerName + ", " + complexParser(c, los.getElementType()) + ");";
+            + readerName + ", " + complexParser(c, los.getElementType()) + ");";
         } else if (type == BaseType.SET) { // Complex type
             ListOrSetType los = (ListOrSetType) f.getType();
             c.addImport(MessageHelper.class);
             return MessageHelper.class.getSimpleName() + ".readSet(" + f.getTag() + ", \"" + f.getName() + "\", "
-                    + readerName + ", " + complexParser(c, los.getElementType()) + ");";
+            + readerName + ", " + complexParser(c, los.getElementType()) + ");";
         } else { // Complex type
             MapType los = (MapType) f.getType();
             c.addImport(MessageHelper.class);
             return MessageHelper.class.getSimpleName() + ".readMap(" + f.getTag() + ", \"" + f.getName() + "\", "
-                    + readerName + ", " + complexParser(c, los.getKeyType()) + ", "
-                    + complexParser(c, los.getValueType()) + ");";
+            + readerName + ", " + complexParser(c, los.getKeyType()) + ", "
+            + complexParser(c, los.getValueType()) + ");";
         }
     }
 
@@ -266,7 +268,7 @@ public class JavaGenMessageGenerator {
         } else {
             MapType los = (MapType) type;
             return "MessageParser.ofMap(" + complexParser(c, los.getKeyType()) + ", "
-                    + complexParser(c, los.getValueType()) + ")";
+            + complexParser(c, los.getValueType()) + ")";
         }
     }
 

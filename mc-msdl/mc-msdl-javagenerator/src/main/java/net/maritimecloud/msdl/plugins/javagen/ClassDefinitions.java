@@ -21,23 +21,7 @@ package net.maritimecloud.msdl.plugins.javagen;
  */
 public class ClassDefinitions {
 
-    /* The various packages. */
-    public static final String PACKAGE = "net.maritimecloud.mms";
-
-    public static final String PACKAGE_BROADCAST = PACKAGE + ".broadcast";
-
-    public static final String PACKAGE_ENDPOINT = PACKAGE + ".endpoint";
-
-    public static final String PACKAGE_SPI = PACKAGE + ".spi";
-
-
-    public static final String BROADCAST_MESSAGE = "BroadcastMessage";
-
-    public static final String BROADCAST_MESSAGE_CLASS = PACKAGE_BROADCAST + "." + BROADCAST_MESSAGE;
-
-    public static final String MESSAGE_CONTEXT = "CallerContext";
-
-    public static final String MESSAGE_CONTEXT_CLASS = PACKAGE_SPI + "." + MESSAGE_CONTEXT;
+    public static final String PACKAGE_ENDPOINT = "net.maritimecloud.mms.endpoint";
 
     public static final String ENDPOINT_IMPLEMENTATION = "EndpointImplementation";
 
@@ -49,7 +33,7 @@ public class ClassDefinitions {
 
     public static final String ENDPOINT_INVOCATOR = "EndpointInvocator";
 
-    public static final String ENDPOINT_INVOCATOR_CLASS = PACKAGE_SPI + "." + ENDPOINT_INVOCATOR;
+    public static final String ENDPOINT_INVOCATOR_CLASS = PACKAGE_ENDPOINT + "." + ENDPOINT_INVOCATOR;
 
     public static final String ENDPOINT_INVOCATION_FUTURE = "EndpointInvocationFuture";
 

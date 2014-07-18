@@ -1,0 +1,1 @@
+https://jersey.java.net/documentation/latest/user-guide.html#resource-builder

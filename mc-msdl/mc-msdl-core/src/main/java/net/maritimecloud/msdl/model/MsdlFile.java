@@ -58,7 +58,4 @@ public interface MsdlFile {
      * @return any namespace that has been defined in the MSDL file
      */
     String getNamespace();
-
-    @Deprecated
-    List<ServiceDeclaration> getServices();
 }

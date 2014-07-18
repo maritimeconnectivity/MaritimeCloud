@@ -12,25 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.msdl.plugins.javagen;
-
-import net.maritimecloud.msdl.model.BaseMessage;
-
-import org.cakeframework.internal.codegen.CodegenClass;
-
 
 /**
- *
- * @author Kasper Nielsen
- */
-public class JavaGenBroadcastMessageGenerator extends JavaGenMessageGenerator {
+ * Contains commonly used units of measurement. This will be heavily expanded in future versions.
+ **/
+package net.maritimecloud.util.units;
 
-    /**
-     * @param parent
-     * @param msg
-     */
-    JavaGenBroadcastMessageGenerator(CodegenClass parent, BaseMessage msg) {
-        super(parent, msg);
-    }
-
-}

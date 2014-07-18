@@ -43,11 +43,6 @@ class TypeResolver {
 
     void resolve() {
         for (ParsedFile f : files) {
-            for (ParsedService ps : f.listOf(ParsedService.class)) {
-                for (ParsedBroadcastMessage m : ps.broadcastMessages) {
-                    resolveMessage0(m);
-                }
-            }
             for (ParsedMessage m : f.listOf(ParsedMessage.class)) {
                 resolveMessage0(m);
             }
@@ -57,11 +52,6 @@ class TypeResolver {
         }
 
         for (ParsedFile f : files) {
-            for (ParsedService ps : f.listOf(ParsedService.class)) {
-                for (ParsedBroadcastMessage m : ps.broadcastMessages) {
-                    resolveMessage1(m);
-                }
-            }
             for (ParsedMessage m : f.listOf(ParsedMessage.class)) {
                 resolveMessage1(m);
             }

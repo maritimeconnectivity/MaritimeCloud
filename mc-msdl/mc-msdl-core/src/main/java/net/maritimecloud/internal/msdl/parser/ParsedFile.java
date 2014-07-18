@@ -27,14 +27,12 @@ import net.maritimecloud.internal.msdl.parser.antlr.MsdlParser.EnumDeclarationCo
 import net.maritimecloud.internal.msdl.parser.antlr.MsdlParser.ImportDeclarationContext;
 import net.maritimecloud.internal.msdl.parser.antlr.MsdlParser.MessageDeclarationContext;
 import net.maritimecloud.internal.msdl.parser.antlr.MsdlParser.NamespaceDeclarationContext;
-import net.maritimecloud.internal.msdl.parser.antlr.MsdlParser.ServiceDeclarationContext;
 import net.maritimecloud.internal.msdl.parser.antlr.MsdlParser.TypeDeclarationContext;
 import net.maritimecloud.msdl.model.BroadcastMessageDeclaration;
 import net.maritimecloud.msdl.model.EndpointDefinition;
 import net.maritimecloud.msdl.model.EnumDeclaration;
 import net.maritimecloud.msdl.model.MessageDeclaration;
 import net.maritimecloud.msdl.model.MsdlFile;
-import net.maritimecloud.msdl.model.ServiceDeclaration;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -125,12 +123,6 @@ class ParsedFile implements MsdlFile {
     // return antlrFile.getPath();
     // }
 
-    /** {@inheritDoc} */
-    @Override
-    public List<ServiceDeclaration> getServices() {
-        return listOf(ServiceDeclaration.class);
-    }
-
     void parse() {
         parseNamespace();
         parseImports();
@@ -163,8 +155,6 @@ class ParsedFile implements MsdlFile {
                 containers.add(new ParsedEnum(this, ac).parse((EnumDeclarationContext) child));
             } else if (child instanceof MessageDeclarationContext) {
                 containers.add(new ParsedMessage(this, ac).parse((MessageDeclarationContext) child));
-            } else if (child instanceof ServiceDeclarationContext) {
-                containers.add(new ParsedService(this, ac).parse((ServiceDeclarationContext) child));
             } else if (child instanceof BroadcastDeclarationContext) {
                 containers.add(new ParsedBroadcastMessage(this, ac).parse((BroadcastDeclarationContext) child));
             } else if (child instanceof EndpointDeclarationContext) {
