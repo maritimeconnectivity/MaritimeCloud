@@ -12,31 +12,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.core.serialization;
-
+package net.maritimecloud.msdl.model;
 
 /**
- * The basic message interface that all messages must be implement. Messages are normally generated from MSDL files.
- * <p>
- * Any class implementing this interface should also have a
- * <code>public static final MessageSerializer SERIALIZER</code> field. To allow for reading the serialized message back
- * again.
+ * A map type.
  *
  * @author Kasper Nielsen
  */
-public interface Message {
+public interface MapType extends Type {
 
     /**
-     * Returns an immutable copy of this message.
+     * Returns the type of keys in the map.
      *
-     * @return an immutable copy of this message
+     * @return the type of keys in the map
      */
-    Message immutable();
+    Type getKeyType();
 
     /**
-     * Returns a JSON representation of this message.
+     * Returns the type of values in the map.
      *
-     * @return a JSON representation of this message
+     * @return the type of values in the map
      */
-    String toJSON();
+    Type getValueType();
 }

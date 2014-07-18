@@ -62,5 +62,6 @@
   
   <modules>
     <module>mc-core</module>
+    <module>mc-msdl</module>
   </modules>
 </project>

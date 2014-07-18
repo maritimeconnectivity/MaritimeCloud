@@ -12,31 +12,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.core.serialization;
-
+package net.maritimecloud.msdl.model;
 
 /**
- * The basic message interface that all messages must be implement. Messages are normally generated from MSDL files.
- * <p>
- * Any class implementing this interface should also have a
- * <code>public static final MessageSerializer SERIALIZER</code> field. To allow for reading the serialized message back
- * again.
+ * The definition of a message field or an endpoint argument.
  *
  * @author Kasper Nielsen
  */
-public interface Message {
+public interface FieldOrParameter {
 
     /**
-     * Returns an immutable copy of this message.
+     * Returns a non-null comment for the field.
      *
-     * @return an immutable copy of this message
+     * @return a non-null comment for the field
      */
-    Message immutable();
+    CommentDeclaration getComment();
 
     /**
-     * Returns a JSON representation of this message.
+     * Returns the name of the field.
      *
-     * @return a JSON representation of this message
+     * @return the name of the field
      */
-    String toJSON();
+    String getName();
+
+    /**
+     * Returns the tag of the field.
+     *
+     * @return the tag of the field
+     */
+    int getTag();
+
+    /**
+     * Returns the type of the field
+     *
+     * @return the type of the field
+     */
+    Type getType();
 }

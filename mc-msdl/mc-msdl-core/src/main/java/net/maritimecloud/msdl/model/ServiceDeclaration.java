@@ -12,31 +12,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.core.serialization;
+package net.maritimecloud.msdl.model;
 
+import java.util.List;
 
 /**
- * The basic message interface that all messages must be implement. Messages are normally generated from MSDL files.
- * <p>
- * Any class implementing this interface should also have a
- * <code>public static final MessageSerializer SERIALIZER</code> field. To allow for reading the serialized message back
- * again.
  *
  * @author Kasper Nielsen
  */
-public interface Message {
+public interface ServiceDeclaration {
+
+    List<BroadcastMessageDeclaration> getBroadcastMessages();
+
+    List<EndpointDefinition> getEndpoints();
 
     /**
-     * Returns an immutable copy of this message.
+     * Returns the file this enum is defined in.
      *
-     * @return an immutable copy of this message
+     * @return the file this enum is defined in
      */
-    Message immutable();
+    MsdlFile getFile();
 
-    /**
-     * Returns a JSON representation of this message.
-     *
-     * @return a JSON representation of this message
-     */
-    String toJSON();
+    String getName();
 }

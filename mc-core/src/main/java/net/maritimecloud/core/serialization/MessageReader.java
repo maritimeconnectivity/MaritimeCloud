@@ -28,7 +28,7 @@ import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
 
 /**
- * Abstract class for reading message streams.
+ * Interface for reading messages.
  *
  * @author Kasper Nielsen
  */
@@ -40,16 +40,12 @@ public interface MessageReader extends Closeable {
 
     Boolean readBoolean(int tag, String name, Boolean defaultValue) throws IOException;
 
-    // double readDouble(int tag, String name) throws IOException;
-
     BigDecimal readDecimal(int tag, String name) throws IOException;
 
 
     BigDecimal readDecimal(int tag, String name, BigDecimal defaultValue) throws IOException;
 
     double readDouble(int tag, String name) throws IOException;
-
-    // float readFloat(int tag, String name) throws IOException;
 
     Double readDouble(int tag, String name, Double defaultValue) throws IOException;
 

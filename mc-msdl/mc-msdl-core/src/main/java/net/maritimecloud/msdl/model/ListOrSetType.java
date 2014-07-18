@@ -12,31 +12,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.core.serialization;
-
+package net.maritimecloud.msdl.model;
 
 /**
- * The basic message interface that all messages must be implement. Messages are normally generated from MSDL files.
- * <p>
- * Any class implementing this interface should also have a
- * <code>public static final MessageSerializer SERIALIZER</code> field. To allow for reading the serialized message back
- * again.
- *
+ * A list or set type.
+ * 
  * @author Kasper Nielsen
  */
-public interface Message {
+public interface ListOrSetType extends Type {
 
     /**
-     * Returns an immutable copy of this message.
+     * Returns the type of elements in the list or set.
      *
-     * @return an immutable copy of this message
+     * @return the type of elements in the list or set
      */
-    Message immutable();
-
-    /**
-     * Returns a JSON representation of this message.
-     *
-     * @return a JSON representation of this message
-     */
-    String toJSON();
+    Type getElementType();
 }

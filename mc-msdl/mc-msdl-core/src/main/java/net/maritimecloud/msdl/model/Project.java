@@ -12,31 +12,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.core.serialization;
+package net.maritimecloud.msdl.model;
 
+import java.util.Map;
 
 /**
- * The basic message interface that all messages must be implement. Messages are normally generated from MSDL files.
- * <p>
- * Any class implementing this interface should also have a
- * <code>public static final MessageSerializer SERIALIZER</code> field. To allow for reading the serialized message back
- * again.
+ * A project is root node in the MSDL model and basically consist of all the files that should be processed by each
+ * plugin.
  *
  * @author Kasper Nielsen
  */
-public interface Message {
+public interface Project extends Iterable<MsdlFile> {
 
     /**
-     * Returns an immutable copy of this message.
+     * Returns a map of all MSDL files that should be processed. The relative filename is the key in the returned map
      *
-     * @return an immutable copy of this message
+     * @return a map of all MSDL files that should be processed
      */
-    Message immutable();
-
-    /**
-     * Returns a JSON representation of this message.
-     *
-     * @return a JSON representation of this message
-     */
-    String toJSON();
+    Map<String, MsdlFile> getFiles();
 }

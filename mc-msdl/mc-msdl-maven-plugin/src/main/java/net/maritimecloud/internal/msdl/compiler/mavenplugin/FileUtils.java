@@ -12,31 +12,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.core.serialization;
+package net.maritimecloud.internal.msdl.compiler.mavenplugin;
 
+import static java.lang.Math.max;
+
+import java.io.File;
+import java.util.Set;
 
 /**
- * The basic message interface that all messages must be implement. Messages are normally generated from MSDL files.
- * <p>
- * Any class implementing this interface should also have a
- * <code>public static final MessageSerializer SERIALIZER</code> field. To allow for reading the serialized message back
- * again.
  *
  * @author Kasper Nielsen
  */
-public interface Message {
+class FileHelper {
+
 
     /**
-     * Returns an immutable copy of this message.
-     *
-     * @return an immutable copy of this message
+     * Returns timestamp for the most recently modified file in the given set.
+     * 
+     * @param files
+     *            a set of file descriptors.
+     * @return timestamp of the most recently modified file.
      */
-    Message immutable();
-
-    /**
-     * Returns a JSON representation of this message.
-     *
-     * @return a JSON representation of this message
-     */
-    String toJSON();
+    static long lastModified(Set<File> files) {
+        long result = 0;
+        for (File file : files) {
+            result = max(result, file.lastModified());
+        }
+        return result;
+    }
 }
