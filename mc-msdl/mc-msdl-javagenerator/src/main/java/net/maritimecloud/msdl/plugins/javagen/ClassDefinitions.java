@@ -23,10 +23,6 @@ public class ClassDefinitions {
 
     public static final String PACKAGE_ENDPOINT = "net.maritimecloud.mms.endpoint";
 
-    public static final String ENDPOINT_IMPLEMENTATION = "EndpointImplementation";
-
-    public static final String ENDPOINT_IMPLEMENTATION_CLASS = PACKAGE_ENDPOINT + "." + ENDPOINT_IMPLEMENTATION;
-
     public static final String ENDPOINT_LOCAL = "EndpointLocal";
 
     public static final String ENDPOINT_LOCAL_CLASS = PACKAGE_ENDPOINT + "." + ENDPOINT_LOCAL;
@@ -38,8 +34,4 @@ public class ClassDefinitions {
     public static final String ENDPOINT_INVOCATION_FUTURE = "EndpointInvocationFuture";
 
     public static final String ENDPOINT_INVOCATION_FUTURE_CLASS = PACKAGE_ENDPOINT + "." + ENDPOINT_INVOCATION_FUTURE;
-
-    public static final String ENDPOINT_INVOCATION_CONTEXT = "EndpointInvocationContext";
-
-    public static final String ENDPOINT_INVOCATION_CONTEXT_CLASS = PACKAGE_ENDPOINT + "." + ENDPOINT_INVOCATION_CONTEXT;
 }

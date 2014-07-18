@@ -26,6 +26,7 @@ import net.maritimecloud.msdl.model.BaseType;
 import net.maritimecloud.msdl.model.EndpointDefinition;
 import net.maritimecloud.msdl.model.EndpointMethod;
 import net.maritimecloud.msdl.model.FieldOrParameter;
+import net.maritimecloud.net.EndpointImplementation;
 import net.maritimecloud.util.Binary;
 
 import org.cakeframework.internal.codegen.CodegenBlock;
@@ -121,18 +122,17 @@ public class JavaGenEndpointGenerator {
 
     void generateServer() {
         cServer.setDefinition("public abstract class Abstract", ed.getName(), " implements ",
-                ClassDefinitions.ENDPOINT_IMPLEMENTATION);
-        cServer.imports().addExplicitImport(ClassDefinitions.ENDPOINT_IMPLEMENTATION_CLASS);
+                EndpointImplementation.class);
+        cServer.addImport(EndpointImplementation.class);
         for (EndpointMethod f : functions) {
             cServer.addMethod("protected abstract ", generateSignature(cServer, f, false));
             // m.throwNewUnsupportedOperationException("Method is not supported");
         }
 
 
-        cServer.imports().addExplicitImport(ClassDefinitions.ENDPOINT_INVOCATION_CONTEXT_CLASS);
         cServer.addImport(MessageReader.class, IOException.class, ValueWriter.class);
         CodegenMethod m = cServer.addMethod("public final void invoke(", String.class, " name, ",
-                ClassDefinitions.ENDPOINT_INVOCATION_CONTEXT, " context, ", MessageReader.class, " reader, ",
+                EndpointImplementation.Context.class, " context, ", MessageReader.class, " reader, ",
                 ValueWriter.class, " writer) throws ", IOException.class);
 
         for (EndpointMethod f : functions) {
@@ -166,8 +166,8 @@ public class JavaGenEndpointGenerator {
         String s = type(cc, f, isClient) + " " + f.getName() + "(";
         boolean first = true;
         if (!isClient) {
-            cc.imports().addExplicitImport(ClassDefinitions.ENDPOINT_INVOCATION_CONTEXT_CLASS);
-            s += ClassDefinitions.ENDPOINT_INVOCATION_CONTEXT + " context";
+            // cc.addI .imports().addExplicitImport(ClassDefinitions.ENDPOINT_INVOCATION_CONTEXT_CLASS);
+            s += EndpointImplementation.Context.class.getSimpleName() + " context";
             first = false;
         }
 

@@ -43,13 +43,13 @@ public interface BroadcastListener<T extends BroadcastMessage> {
          *
          * @return the identity of the party that send the broadcast
          */
-        MaritimeId getSender();
+        MaritimeId getBroadcaster();
 
         /**
          * If the sending party has a position, returns said position. Otherwise returns <code>null</code>.
          *
          * @return if the sending party has a position, returns said position
          */
-        Position getSenderPosition();
+        Position getBroadcasterPosition();
     }
 }
