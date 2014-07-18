@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.internal.serialization;
+package net.maritimecloud.internal.message;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -22,11 +22,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.maritimecloud.core.serialization.Message;
-import net.maritimecloud.core.serialization.MessageEnum;
-import net.maritimecloud.core.serialization.MessageSerializer;
-import net.maritimecloud.core.serialization.MessageWriter;
-import net.maritimecloud.core.serialization.ValueSerializer;
+import net.maritimecloud.message.Message;
+import net.maritimecloud.message.MessageEnum;
+import net.maritimecloud.message.MessageSerializer;
+import net.maritimecloud.message.MessageWriter;
+import net.maritimecloud.message.ValueSerializer;
 import net.maritimecloud.util.Binary;
 import net.maritimecloud.util.Timestamp;
 import net.maritimecloud.util.geometry.Position;

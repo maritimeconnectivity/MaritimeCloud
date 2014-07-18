@@ -12,15 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.internal.serialization;
+package net.maritimecloud.internal.message;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import net.maritimecloud.core.serialization.ValueSerializer;
-import net.maritimecloud.core.serialization.ValueWriter;
+import net.maritimecloud.message.ValueSerializer;
+import net.maritimecloud.message.ValueWriter;
 import net.maritimecloud.util.Timestamp;
 
 /**

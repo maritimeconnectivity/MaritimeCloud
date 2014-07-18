@@ -17,8 +17,8 @@ package net.maritimecloud.net;
 import java.io.IOException;
 
 import net.maritimecloud.core.id.MaritimeId;
-import net.maritimecloud.core.serialization.MessageReader;
-import net.maritimecloud.core.serialization.ValueWriter;
+import net.maritimecloud.message.MessageReader;
+import net.maritimecloud.message.ValueWriter;
 import net.maritimecloud.util.geometry.Position;
 
 /**

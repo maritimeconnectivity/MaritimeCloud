@@ -18,10 +18,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import net.maritimecloud.core.serialization.Message;
-import net.maritimecloud.core.serialization.MessageReader;
-import net.maritimecloud.core.serialization.ValueWriter;
 import net.maritimecloud.internal.msdl.parser.antlr.StringUtil;
+import net.maritimecloud.message.Message;
+import net.maritimecloud.message.MessageReader;
+import net.maritimecloud.message.ValueWriter;
 import net.maritimecloud.msdl.model.BaseType;
 import net.maritimecloud.msdl.model.EndpointDefinition;
 import net.maritimecloud.msdl.model.EndpointMethod;

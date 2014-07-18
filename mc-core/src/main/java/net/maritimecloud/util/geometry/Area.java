@@ -19,10 +19,10 @@ import java.io.Serializable;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-import net.maritimecloud.core.serialization.Message;
-import net.maritimecloud.core.serialization.MessageReader;
-import net.maritimecloud.core.serialization.MessageSerializer;
-import net.maritimecloud.core.serialization.MessageWriter;
+import net.maritimecloud.message.Message;
+import net.maritimecloud.message.MessageReader;
+import net.maritimecloud.message.MessageSerializer;
+import net.maritimecloud.message.MessageWriter;
 
 /**
  * A shape has an area

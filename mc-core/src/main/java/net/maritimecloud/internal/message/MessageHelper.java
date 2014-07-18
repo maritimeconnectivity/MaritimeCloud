@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.internal.serialization;
+package net.maritimecloud.internal.message;
 
 import static java.util.Objects.requireNonNull;
 
@@ -26,10 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.maritimecloud.core.serialization.Message;
-import net.maritimecloud.core.serialization.MessageReader;
-import net.maritimecloud.core.serialization.MessageSerializer;
-import net.maritimecloud.core.serialization.ValueSerializer;
+import net.maritimecloud.message.Message;
+import net.maritimecloud.message.MessageReader;
+import net.maritimecloud.message.MessageSerializer;
+import net.maritimecloud.message.ValueSerializer;
 
 /**
  * Various utility method that are used by generated messages.

@@ -14,7 +14,7 @@
  */
 package net.maritimecloud.net;
 
-import net.maritimecloud.core.serialization.Message;
+import net.maritimecloud.message.Message;
 
 /**
  * Base interface for a message that can be broadcast.

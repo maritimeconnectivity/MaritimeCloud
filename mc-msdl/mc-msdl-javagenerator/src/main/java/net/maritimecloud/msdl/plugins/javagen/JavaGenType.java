@@ -19,10 +19,10 @@ import static java.util.Objects.requireNonNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.maritimecloud.core.serialization.MessageWriter;
-import net.maritimecloud.core.serialization.ValueSerializer;
-import net.maritimecloud.core.serialization.ValueWriter;
 import net.maritimecloud.internal.msdl.parser.antlr.StringUtil;
+import net.maritimecloud.message.MessageWriter;
+import net.maritimecloud.message.ValueSerializer;
+import net.maritimecloud.message.ValueWriter;
 import net.maritimecloud.msdl.model.BaseType;
 import net.maritimecloud.msdl.model.EnumDeclaration;
 import net.maritimecloud.msdl.model.FieldOrParameter;

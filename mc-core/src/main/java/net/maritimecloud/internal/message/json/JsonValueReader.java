@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.internal.serialization.json;
+package net.maritimecloud.internal.message.json;
 
 import static java.util.Objects.requireNonNull;
 
@@ -32,13 +32,13 @@ import javax.json.JsonObject;
 import javax.json.JsonString;
 import javax.json.JsonValue;
 
-import net.maritimecloud.core.serialization.Message;
-import net.maritimecloud.core.serialization.MessageEnum;
-import net.maritimecloud.core.serialization.MessageEnumSerializer;
-import net.maritimecloud.core.serialization.MessageSerializer;
-import net.maritimecloud.core.serialization.SerializationException;
-import net.maritimecloud.core.serialization.ValueReader;
-import net.maritimecloud.core.serialization.ValueSerializer;
+import net.maritimecloud.message.Message;
+import net.maritimecloud.message.MessageEnum;
+import net.maritimecloud.message.MessageEnumSerializer;
+import net.maritimecloud.message.MessageSerializer;
+import net.maritimecloud.message.SerializationException;
+import net.maritimecloud.message.ValueReader;
+import net.maritimecloud.message.ValueSerializer;
 import net.maritimecloud.util.Binary;
 import net.maritimecloud.util.Timestamp;
 import net.maritimecloud.util.geometry.Position;

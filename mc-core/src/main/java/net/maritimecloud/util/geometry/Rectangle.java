@@ -17,9 +17,9 @@ package net.maritimecloud.util.geometry;
 import java.io.IOException;
 import java.util.Random;
 
-import net.maritimecloud.core.serialization.MessageReader;
-import net.maritimecloud.core.serialization.MessageSerializer;
-import net.maritimecloud.core.serialization.MessageWriter;
+import net.maritimecloud.message.MessageReader;
+import net.maritimecloud.message.MessageSerializer;
+import net.maritimecloud.message.MessageWriter;
 
 public final class Rectangle extends Area {
 

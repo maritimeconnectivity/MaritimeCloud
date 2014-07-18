@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.core.serialization;
+package net.maritimecloud.message;
 
 import static java.util.Objects.requireNonNull;
 
@@ -20,8 +20,8 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import net.maritimecloud.internal.serialization.json.JsonMessageReader;
-import net.maritimecloud.internal.serialization.json.JsonValueWriter;
+import net.maritimecloud.internal.message.json.JsonMessageReader;
+import net.maritimecloud.internal.message.json.JsonValueWriter;
 
 /**
  * A message serializer takes care of persisting and retrieving {@link Message messages}.

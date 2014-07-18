@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.maritimecloud.core.serialization.Message;
+import net.maritimecloud.message.Message;
 import net.maritimecloud.util.Binary;
 import net.maritimecloud.util.Timestamp;
 import net.maritimecloud.util.geometry.Position;

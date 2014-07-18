@@ -21,7 +21,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import net.maritimecloud.core.serialization.ValueSerializer;
+import net.maritimecloud.message.ValueSerializer;
 import net.maritimecloud.util.Binary;
 import net.maritimecloud.util.Timestamp;
 import net.maritimecloud.util.geometry.Position;

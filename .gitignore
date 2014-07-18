@@ -11,3 +11,4 @@ mc-msdl/generated
 private
 TODO*
 dependency-reduced-pom.xml
+mc-rest

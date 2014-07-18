@@ -39,7 +39,7 @@ import static java.lang.StrictMath.toRadians;
  *
  * In the cartesian representations the unit of x and y is 1 meter.
  */
-public final class CoordinateConverter {
+final class CoordinateConverter {
     /** Earth radius in metres */
     private static final double RADIUS = 6356752.3;
 

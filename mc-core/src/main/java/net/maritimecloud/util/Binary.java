@@ -691,7 +691,7 @@ public abstract class Binary implements Iterable<Byte> {
     }
 
     /**
-     * Outputs to a {@code ByteString} instance. Call {@link #toBinary()} to create the {@code ByteString} instance.
+     * Outputs to a {@code Binary} instance. Call {@link #toBinary()} to create the {@code Binary} instance.
      */
     public static final class Output extends OutputStream {
         // Implementation note.

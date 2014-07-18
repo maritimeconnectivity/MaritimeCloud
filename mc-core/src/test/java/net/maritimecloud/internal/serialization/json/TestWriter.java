@@ -19,7 +19,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 
-import net.maritimecloud.core.serialization.ValueSerializer;
+import net.maritimecloud.message.ValueSerializer;
 import net.maritimecloud.serialization.TestEnum;
 import net.maritimecloud.util.Timestamp;
 import net.maritimecloud.util.geometry.Position;

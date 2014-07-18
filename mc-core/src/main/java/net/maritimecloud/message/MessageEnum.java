@@ -12,9 +12,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package net.maritimecloud.message;
 
 /**
- * Provides classes for serializing and deserializing messages.
- **/
-package net.maritimecloud.core.serialization;
+ * An enumeration of values. All enums that can be serializes must implement this interface.
+ *
+ * @author Kasper Nielsen
+ */
+public interface MessageEnum {
 
+    /**
+     * Returns the integer value of this enum value.
+     *
+     * @return the integer value of this enum value
+     */
+    int getValue();
+
+    /**
+     * Returns the name of this enum value
+     *
+     * @return the name of this enum value
+     */
+    String getName();
+}

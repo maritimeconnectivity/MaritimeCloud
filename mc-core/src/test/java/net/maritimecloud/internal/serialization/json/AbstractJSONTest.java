@@ -27,11 +27,13 @@ import java.util.List;
 import javax.json.JsonReader;
 import javax.json.spi.JsonProvider;
 
-import net.maritimecloud.core.serialization.Message;
-import net.maritimecloud.core.serialization.MessageReader;
-import net.maritimecloud.core.serialization.MessageSerializer;
-import net.maritimecloud.core.serialization.MessageWriter;
-import net.maritimecloud.internal.serialization.DefaultMessageWriter;
+import net.maritimecloud.internal.message.DefaultMessageWriter;
+import net.maritimecloud.internal.message.json.JsonMessageReader;
+import net.maritimecloud.internal.message.json.JsonValueWriter;
+import net.maritimecloud.message.Message;
+import net.maritimecloud.message.MessageReader;
+import net.maritimecloud.message.MessageSerializer;
+import net.maritimecloud.message.MessageWriter;
 import net.maritimecloud.util.Binary;
 
 /**

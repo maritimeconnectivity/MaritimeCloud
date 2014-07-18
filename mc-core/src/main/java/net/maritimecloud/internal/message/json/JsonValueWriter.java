@@ -1,4 +1,4 @@
-package net.maritimecloud.internal.serialization.json;
+package net.maritimecloud.internal.message.json;
 
 import static java.util.Objects.requireNonNull;
 
@@ -10,13 +10,13 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Map;
 
-import net.maritimecloud.core.serialization.Message;
-import net.maritimecloud.core.serialization.MessageEnum;
-import net.maritimecloud.core.serialization.MessageSerializer;
-import net.maritimecloud.core.serialization.MessageWriter;
-import net.maritimecloud.core.serialization.ValueSerializer;
-import net.maritimecloud.internal.serialization.AbstractValueWriter;
-import net.maritimecloud.internal.serialization.DefaultMessageWriter;
+import net.maritimecloud.internal.message.AbstractValueWriter;
+import net.maritimecloud.internal.message.DefaultMessageWriter;
+import net.maritimecloud.message.Message;
+import net.maritimecloud.message.MessageEnum;
+import net.maritimecloud.message.MessageSerializer;
+import net.maritimecloud.message.MessageWriter;
+import net.maritimecloud.message.ValueSerializer;
 import net.maritimecloud.util.Binary;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
