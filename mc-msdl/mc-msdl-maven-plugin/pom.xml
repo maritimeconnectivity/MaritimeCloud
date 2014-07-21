@@ -4,7 +4,7 @@
   <parent>
     <groupId>net.maritimecloud.msdl</groupId>
     <artifactId>mc-msdl-parent</artifactId>
-    <version>0.2-RC11-SNAPSHOT</version>
+    <version>0.2</version>
   </parent>
 
   <artifactId>mc-msdl-maven-plugin</artifactId>
