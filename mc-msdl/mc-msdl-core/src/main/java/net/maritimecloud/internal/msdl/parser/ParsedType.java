@@ -46,7 +46,10 @@ public class ParsedType {
 
     List<ParsedType> arguments = new ArrayList<>();
 
+    SourceTagHolder source;
+
     ParsedType parse(ParsedFile file, TypeContext c) {
+        source = new SourceTagHolder(file, c);
         if (c.primitiveType() != null) {
             PrimitiveTypeContext ptc = c.primitiveType();
             int t = ptc.start.getType();

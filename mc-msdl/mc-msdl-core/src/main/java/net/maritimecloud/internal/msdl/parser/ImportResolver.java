@@ -101,9 +101,9 @@ class ImportResolver implements Iterable<ParsedFile> {
                 logger.error("Could not find import " + name);
             } else if (l.size() == 1) {
                 f = project.parseFile(l.get(0));
-                if (l.size() > 0) {
-                    logger.warn("Multiple files named '" + p + " existed on the classpath, will use first file: "
-                            + l.get(0));
+                if (l.size() > 1) {
+                    logger.warn("Multiple files named '" + name + "' existed on the classpath, will use first file: "
+                            + l.get(0) + " All = " + l);
                 }
             }
 

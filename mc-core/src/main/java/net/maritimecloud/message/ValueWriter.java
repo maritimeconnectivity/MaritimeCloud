@@ -17,6 +17,7 @@ package net.maritimecloud.message;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,7 +33,13 @@ import net.maritimecloud.util.geometry.PositionTime;
  */
 public interface ValueWriter {
 
-    public abstract void writeBinary(Binary binary) throws IOException;
+    @SuppressWarnings("unused")
+    default void close() throws IOException {}
+
+    @SuppressWarnings("unused")
+    default void flush() throws IOException {}
+
+    void writeBinary(Binary binary) throws IOException;
 
     /**
      * Writes a boolean.
@@ -42,9 +49,9 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeBoolean(Boolean value) throws IOException;
+    void writeBoolean(Boolean value) throws IOException;
 
-    public abstract void writeDecimal(BigDecimal value) throws IOException;
+    void writeDecimal(BigDecimal value) throws IOException;
 
     /**
      * Writes a double.
@@ -54,9 +61,9 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeDouble(Double value) throws IOException;
+    void writeDouble(Double value) throws IOException;
 
-    public abstract void writeEnum(MessageEnum serializable) throws IOException;
+    void writeEnum(MessageEnum serializable) throws IOException;
 
     /**
      * Writes a float.
@@ -66,7 +73,7 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeFloat(Float value) throws IOException;
+    void writeFloat(Float value) throws IOException;
 
     /**
      * Writes an integer.
@@ -76,7 +83,7 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeInt(Integer value) throws IOException;
+    void writeInt(Integer value) throws IOException;
 
     /**
      * Writes a long.
@@ -86,7 +93,7 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeInt64(Long value) throws IOException;
+    void writeInt64(Long value) throws IOException;
 
     /**
      * Writes a list.
@@ -100,7 +107,7 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract <T> void writeList(List<T> list, ValueSerializer<T> serializer) throws IOException;
+    <T> void writeList(List<T> list, ValueSerializer<T> serializer) throws IOException;
 
     /**
      * Writes a map.
@@ -118,8 +125,8 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract <K, V> void writeMap(Map<K, V> map, ValueSerializer<K> keySerializer,
-            ValueSerializer<V> valueSerializer) throws IOException;
+    <K, V> void writeMap(Map<K, V> map, ValueSerializer<K> keySerializer, ValueSerializer<V> valueSerializer)
+            throws IOException;
 
     /**
      * Writes the specified message if it is non-null.
@@ -133,13 +140,12 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract <T extends Message> void writeMessage(T message, MessageSerializer<T> serializer)
-            throws IOException;
+    <T extends Message> void writeMessage(T message, MessageSerializer<T> serializer) throws IOException;
 
-    public abstract void writePosition(Position value) throws IOException;
+    void writePosition(Position value) throws IOException;
 
 
-    public abstract void writePositionTime(PositionTime value) throws IOException;
+    void writePositionTime(PositionTime value) throws IOException;
 
     /**
      * Writes a set.
@@ -153,7 +159,9 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract <T> void writeSet(Set<T> set, ValueSerializer<T> serializer) throws IOException;
+    default <T> void writeSet(Set<T> set, ValueSerializer<T> serializer) throws IOException {
+        writeList(new ArrayList<>(set), serializer);
+    }
 
     /**
      * Writes a string.
@@ -163,10 +171,11 @@ public interface ValueWriter {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public abstract void writeText(String value) throws IOException;
+    void writeText(String value) throws IOException;
 
-    public abstract void writeTimestamp(Timestamp value) throws IOException;
+    default void writeTimestamp(Timestamp value) throws IOException {
+        writeInt64(value.getTime());
+    }
 
-
-    public abstract void writeVarInt(BigInteger value) throws IOException;
+    void writeVarInt(BigInteger value) throws IOException;
 }

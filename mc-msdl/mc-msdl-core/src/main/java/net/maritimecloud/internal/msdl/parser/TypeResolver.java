@@ -89,7 +89,8 @@ class TypeResolver {
             String name = t.referenceName;
             Collection<Object> l = types.get(name);
             if (l.size() == 0) {
-                logger.error("Could not find type '" + name + "', Available types = " + types.keySet());
+
+                logger.error(t.source + " Could not find type '" + name + "', Available types = " + types.keySet());
             } else if (l.size() > 1) {
                 logger.error("Too many of types " + name);
             } else {

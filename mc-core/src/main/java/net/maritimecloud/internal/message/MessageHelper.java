@@ -37,6 +37,19 @@ import net.maritimecloud.message.ValueSerializer;
  * @author Kasper Nielsen
  */
 public class MessageHelper {
+    public static double checkDouble(double value) {
+        if (!Double.isFinite(value)) {
+            throw new IllegalArgumentException("Cannot write double value " + value);
+        }
+        return value;
+    }
+
+    public static float checkFloat(float value) {
+        if (!Float.isFinite(value)) {
+            throw new IllegalArgumentException("Cannot write float value " + value);
+        }
+        return value;
+    }
 
     @SuppressWarnings({ "unchecked" })
     private static <T> T convert(T value) {
@@ -101,8 +114,21 @@ public class MessageHelper {
             Field field = c.getField("SERIALIZER");
             return (MessageSerializer<T>) field.get(null);
         } catch (NoSuchFieldException e) {
+            throw new RuntimeException("All messages must have a public static final "
+                    + MessageSerializer.class.getSimpleName() + " SERIALIZER field, offending class = "
+                    + c.getCanonicalName());
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String getName(Class<? extends Message> c) {
+        try {
+            Field field = c.getField("NAME");
+            return (String) field.get(null);
+        } catch (NoSuchFieldException e) {
             throw new RuntimeException(
-                    "All messages must have a public static final SERIALIZER field, offending class = "
+                    "All messages must have a public static final String SERIALIZER field, offending class = "
                             + c.getCanonicalName());
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);

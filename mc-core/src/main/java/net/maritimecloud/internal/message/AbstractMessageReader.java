@@ -37,10 +37,9 @@ import net.maritimecloud.util.geometry.PositionTime;
  */
 public abstract class AbstractMessageReader implements MessageReader {
 
+    protected abstract ValueReader find(int tag, String name) throws IOException;
 
-    protected abstract ValueReader find(int tag, String name) throws SerializationException;
-
-    protected abstract ValueReader findOptional(int tag, String name);
+    protected abstract ValueReader findOptional(int tag, String name) throws IOException;
 
     /** {@inheritDoc} */
     @Override
@@ -68,7 +67,6 @@ public abstract class AbstractMessageReader implements MessageReader {
         ValueReader r = findOptional(tag, name);
         return r == null ? defaultValue : r.readDecimal();
     }
-
 
     /** {@inheritDoc} */
     @Override

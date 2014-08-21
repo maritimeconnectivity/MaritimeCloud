@@ -50,32 +50,21 @@ import org.cakeframework.internal.codegen.CodegenMethod;
  * @author Kasper Nielsen
  */
 public class JavaGenMessageGenerator {
-    final CodegenClass c;
-
-    final CodegenClass parent;
-
     final Annotatable anno;
 
-    final List<FieldOrParameter> fields;
+    final CodegenClass c;
 
-    final String name;
+    final List<FieldOrParameter> fields;
 
     final MsdlFile file;
 
     final boolean isMessage;
 
-    final String serializerName;
+    final String name;
 
-    JavaGenMessageGenerator(CodegenClass parent, String name, EndpointDefinition def, EndpointMethod met) {
-        this.parent = parent;
-        this.anno = def;
-        this.name = name;
-        this.file = def.getFile();
-        this.fields = met.getParameters();
-        this.c = parent == null ? new CodegenClass() : parent.addInnerClass();
-        this.isMessage = false;
-        this.serializerName = name + "Serializer";
-    }
+    final CodegenClass parent;
+
+    final String serializerName;
 
     JavaGenMessageGenerator(CodegenClass parent, BaseMessage msg) {
         this.parent = parent;
@@ -88,37 +77,15 @@ public class JavaGenMessageGenerator {
         this.serializerName = "Serializer";
     }
 
-    void generateClass() {
-        String mType;
-        if (this instanceof JavaGenBroadcastMessageGenerator) {
-            // c.imports().addExplicitImport(ClassDefinitions.BROADCAST_MESSAGE_CLASS);
-            c.addImport(BroadcastMessage.class);
-            mType = BroadcastMessage.class.getSimpleName();
-        } else {
-            c.addImport(Message.class);
-            mType = Message.class.getSimpleName();
-        }
-
-        String imple = "";
-        if (anno.isAnnotationPresent(JavaImplements.class)) {
-            for (String s : anno.getAnnotation(JavaImplements.class).value()) {
-                imple += ", " + s;
-            }
-        }
-
-        if (parent == null) {
-            c.setDefinition("public class ", name, " implements ", mType, imple);
-        } else {
-            c.setDefinition("public static class ", name, " implements ", mType, imple);
-        }
-
-        String fullName = file.getNamespace() + "." + name;
-        c.addFieldWithJavadoc("The full name of this message.", "public static final String NAME = \"", fullName, "\";");
-
-        c.addImport(MessageSerializer.class);
-        c.addFieldWithJavadoc("A message serializer that can read and write instances of this class.",
-                "public static final ", MessageSerializer.class, "<", name, "> SERIALIZER = new ", serializerName,
-                "();");
+    JavaGenMessageGenerator(CodegenClass parent, String name, EndpointDefinition def, EndpointMethod met) {
+        this.parent = parent;
+        this.anno = def;
+        this.name = name;
+        this.file = def.getFile();
+        this.fields = met.getParameters();
+        this.c = parent == null ? new CodegenClass() : parent.addInnerClass();
+        this.isMessage = false;
+        this.serializerName = name + "Serializer";
     }
 
     JavaGenMessageGenerator generate() {
@@ -144,256 +111,6 @@ public class JavaGenMessageGenerator {
         }
 
         return this;
-    }
-
-    void generateConstructorEmpty() {
-        CodegenMethod m = c.addMethod("public ", c.getSimpleName(), "()");
-        m.addJavadoc("Creates a new ", c.getSimpleName(), ".");
-        for (FieldOrParameter f : fields) {
-            BaseType t = f.getType().getBaseType();
-            if (t == BaseType.LIST) {
-                m.add(f.getName(), " = new java.util.ArrayList<>();");
-            } else if (t == BaseType.SET) {
-                m.add(f.getName(), " = new java.util.LinkedHashSet<>();");
-            } else if (t == BaseType.MAP) {
-                m.add(f.getName(), " = new java.util.LinkedHashMap<>();");
-            }
-        }
-    }
-
-    void generateConstructorParser() {
-        CodegenMethod m = c.addMethod(c.getSimpleName(), "(", MessageReader.class, " reader) throws IOException");
-        m.addJavadoc("Creates a new ", c.getSimpleName(), " by reading from a message reader.");
-        m.addJavadocParameter("reader", "the message reader");
-        // TODO replace with generateParseMethod
-        for (FieldOrParameter f : fields) {
-            JavaGenType ty = new JavaGenType(f.getType());
-            BaseType type = f.getType().getBaseType();
-            String tagName = "(" + f.getTag() + ", \"" + f.getName() + "\"";
-            if (type.isPrimitive()) {
-                m.add("this.", f.getName(), " = reader.read", ty.writeReadName(), tagName, ", null);");
-            } else if (type == BaseType.ENUM) {
-                m.add("this.", f.getName(), " = reader.readEnum", tagName, ", ", ty.render(c), ".SERIALIZER);");
-            } else if (type == BaseType.MESSAGE) {
-                m.add("this.", f.getName(), " = reader.readMessage", tagName, ", ", ty.render(c), ".SERIALIZER);");
-            } else if (type == BaseType.LIST) { // Complex type
-                ListOrSetType los = (ListOrSetType) f.getType();
-                c.addImport(MessageHelper.class);
-                m.add("this.", f.getName(), " = ", MessageHelper.class, ".readList", tagName, ", reader, ",
-                        complexParser(c, los.getElementType()), ");");
-            } else if (type == BaseType.SET) { // Complex type
-                c.addImport(MessageHelper.class);
-                ListOrSetType los = (ListOrSetType) f.getType();
-                m.add("this.", f.getName(), " = ", MessageHelper.class, ".readSet", tagName, ", reader, ",
-                        complexParser(c, los.getElementType()), ");");
-            } else { // Complex type
-                c.addImport(MessageHelper.class);
-                MapType los = (MapType) f.getType();
-                m.add("this.", f.getName(), " = ", MessageHelper.class, ".readMap", tagName, ", reader, ",
-                        complexParser(c, los.getKeyType()), ", ", complexParser(c, los.getValueType()), ");");
-            }
-        }
-    }
-
-    static String generateParseMethod(String readerName, CodegenClass c, FieldOrParameter f) {
-        BaseType type = f.getType().getBaseType();
-        JavaGenType ty = new JavaGenType(f.getType());
-        ty.addImports(c);
-        if (type.isPrimitive()) {
-            return readerName + ".read" + ty.writeReadName() + "(" + f.getTag() + ", \"" + f.getName() + "\", null);";
-        } else if (type == BaseType.ENUM) {
-            return readerName + ".readEnum(" + f.getTag() + ", \"" + f.getName() + "\", " + ty.render(c)
-                    + ".SERIALIZER);";
-        } else if (type == BaseType.MESSAGE) {
-            return readerName + ".readMessage(" + f.getTag() + ", \"" + f.getName() + "\", " + ty.render(c)
-                    + ".SERIALIZER);";
-        } else if (type == BaseType.LIST) { // Complex type
-            ListOrSetType los = (ListOrSetType) f.getType();
-            c.addImport(MessageHelper.class);
-            return MessageHelper.class.getSimpleName() + ".readList(" + f.getTag() + ", \"" + f.getName() + "\", "
-            + readerName + ", " + complexParser(c, los.getElementType()) + ");";
-        } else if (type == BaseType.SET) { // Complex type
-            ListOrSetType los = (ListOrSetType) f.getType();
-            c.addImport(MessageHelper.class);
-            return MessageHelper.class.getSimpleName() + ".readSet(" + f.getTag() + ", \"" + f.getName() + "\", "
-            + readerName + ", " + complexParser(c, los.getElementType()) + ");";
-        } else { // Complex type
-            MapType los = (MapType) f.getType();
-            c.addImport(MessageHelper.class);
-            return MessageHelper.class.getSimpleName() + ".readMap(" + f.getTag() + ", \"" + f.getName() + "\", "
-            + readerName + ", " + complexParser(c, los.getKeyType()) + ", "
-            + complexParser(c, los.getValueType()) + ");";
-        }
-    }
-
-    void generateConstructorImmutable() {
-        CodegenMethod m = c.addMethod(c.getSimpleName(), "(", c.getSimpleName(), " instance)");
-        m.addJavadoc("Creates a new ", c.getSimpleName(), " by copying an existing.");
-        m.addJavadocParameter("instance", "the instance to copy all fields from");
-        for (FieldOrParameter f : fields) {
-            BaseType t = f.getType().getBaseType();
-            if (t == BaseType.LIST || t == BaseType.SET || t == BaseType.MAP) {
-                c.addImport(MessageHelper.class);
-                m.add("this.", f.getName(), " = ", MessageHelper.class, ".immutableCopy(instance." + f.getName(), ");");
-            } else if (t == BaseType.MESSAGE) {
-                c.addImport(MessageHelper.class);
-                m.add("this.", f.getName(), " = ", MessageHelper.class, ".immutable(instance." + f.getName(), ");");
-            } else {
-                m.add("this.", f.getName(), " = instance." + f.getName(), ";");
-            }
-        }
-    }
-
-
-    static String complexParser(CodegenClass c, Type type) {
-        if (type == null) {
-            return "null";
-        }
-        BaseType b = type.getBaseType();
-        if (b.isPrimitive()) {
-            c.addImport(ValueSerializer.class);
-            if (b == BaseType.BINARY) {
-                c.addImport(Binary.class);
-            }
-            return ValueSerializer.class.getSimpleName() + "." + b.name().toUpperCase();
-        } else if (b.isReferenceType()) {
-            JavaGenType ty = new JavaGenType(type);
-            return ty.render(c) + ".SERIALIZER";
-        } else if (b == BaseType.LIST) {
-            ListOrSetType los = (ListOrSetType) type;
-            return complexParser(c, los.getElementType()) + ".listOf()";
-        } else if (b == BaseType.SET) {
-            ListOrSetType los = (ListOrSetType) type;
-            return complexParser(c, los.getElementType()) + ".setOf()";
-        } else {
-            MapType los = (MapType) type;
-            return "MessageParser.ofMap(" + complexParser(c, los.getKeyType()) + ", "
-            + complexParser(c, los.getValueType()) + ")";
-        }
-    }
-
-    void generateFields() {
-        for (FieldOrParameter f : fields) {
-            JavaGenType ty = new JavaGenType(f.getType());
-            ty.addImports(c);
-            String init = "private " + (f.getType().getBaseType().isComplexType() ? "final " : "");
-            // MSDLBaseType t = f.getType().getBaseType();
-            // if (t == MSDLBaseType.LIST) {
-            // init = " = new java.util.ArrayList<>()";
-            // } else if (t == MSDLBaseType.SET) {
-            // init = " = new java.util.LinkedHashSet<>()";
-            // } else if (t == MSDLBaseType.MAP) {
-            // init = " = new java.util.LinkedHashMap<>()";
-            // }
-            c.addFieldWithJavadoc("Field", init, ty.render(c), " ", f.getName(), ";");
-        }
-    }
-
-    void generateHashCode() {
-        CodegenMethod m = c.addMethod("public int hashCode()");
-        m.addAnnotation(Override.class).addJavadoc("{@inheritDoc}");
-        if (fields.size() == 0) {
-            m.add("return ", c.getSimpleName().hashCode(), ";");
-        } else if (fields.size() == 1) {
-            m.add("return ", generateHashCode(fields.get(0)), ";");
-        } else {
-            m.add("int result = 31 + ", generateHashCode(fields.get(0)), ";");
-            for (int i = 1; i < fields.size() - 1; i++) {
-                m.add("result = 31 * result + ", generateHashCode(fields.get(i)), ";");
-            }
-            m.add("return 31 * result + ", generateHashCode(fields.get(fields.size() - 1)), ";");
-        }
-    }
-
-    String generateHashCode(FieldOrParameter f) {
-        // Comment in again if we get primitive datatypes
-        // if (f.getType().getBaseType() == MSDLBaseType.INT32) {
-        // return f.getName();
-        // } else {
-        c.addImport(Hashing.class);
-        return "Hashing.hashcode(this." + f.getName() + ")";
-        // }
-    }
-
-    void generateToFrom() {
-        CodegenMethod m = c.addMethod("public String toJSON()");
-        m.addJavadoc("Returns a JSON representation of this message");
-        if (isMessage) {
-            c.addImport(MessageSerializer.class);
-            m.add("return ", MessageSerializer.class, ".writeToJSON(this, SERIALIZER);");
-
-            CodegenMethod from = c.addMethod("public static ", c.getSimpleName(), " fromJSON(", CharSequence.class,
-                    " c)");
-            from.addJavadoc("Creates a message of this type from a JSON throwing a runtime exception if the format of the message does not match");
-            from.add("return ", MessageSerializer.class, ".readFromJSON(SERIALIZER, c);");
-        } else {
-            m.throwNewUnsupportedOperationException("method not supported");
-        }
-    }
-
-    //
-    // public static HelloWorld fromJSON(CharSequence c) {
-    // return MessageSerializer.readFromJSON(PARSER, c);
-    // }
-
-    void generateEquals() {
-        CodegenMethod m = c.addMethod("public boolean equals(Object other)");
-        m.addJavadoc("{@inheritDoc}").addAnnotation(Override.class);
-        if (fields.isEmpty()) {
-            m.add("return other == this || other instanceof ", c.getSimpleName(), ";");
-            return;
-        }
-
-        m.add("if (other == this) {");
-        m.add("return true;");
-        m.add("} else if (other instanceof ", c.getSimpleName(), ") {");
-        m.add(c.getSimpleName(), " o = (", c.getSimpleName(), ") other;");
-        for (int i = 0; i < fields.size(); i++) {
-            StringBuilder b = i == 0 ? new StringBuilder("return ") : new StringBuilder("       ");
-            FieldOrParameter f = fields.get(i);
-            // JavaGenType t = new JavaGenType(f.getType());
-            // Check data typen
-            // if (false /* fields.get(i).getType().getBaseType().isPrimitive() */) {
-            // b.append("this." + f.getName() + " == o." + f.getName());
-            // } else {
-            c.addImport(Objects.class);
-            b.append("Objects.equals(" + f.getName() + ", o." + f.getName() + ")");
-            // }
-            b.append(i == fields.size() - 1 ? ";" : " &&");
-            m.add(b);
-        }
-
-        m.add("}");
-        m.add("return false;");
-    }
-
-    static void generateWriteTo(CodegenClass c, Collection<FieldOrParameter> fields) {
-        if (fields.size() > 0) {
-            CodegenMethod m = c.addMethod("void writeTo(", MessageWriter.class, " w) throws IOException");
-            // m.addAnnotation(Override.class).addJavadoc("{@inheritDoc}");
-            m.addImport(IOException.class).addImport(MessageWriter.class);
-            for (FieldOrParameter f : fields) {
-                StringBuilder sb = new StringBuilder();
-                sb.append("w.write").append(new JavaGenType(f.getType()).writeReadName());
-                sb.append("(").append(f.getTag()).append(", \"").append(f.getName()).append("\", ");
-                sb.append(f.getName());
-                if (f.getType().getBaseType() == BaseType.MESSAGE) {
-                    sb.append(", ").append(new JavaGenType(f.getType()).render(c) + ".SERIALIZER");
-                } else if (f.getType().getBaseType().isComplexType()) {
-                    sb.append(", ");
-                    if (f.getType() instanceof ListOrSetType) {
-                        ListOrSetType lt = (ListOrSetType) f.getType();
-                        sb.append(complexParser(c, lt.getElementType()));
-                    } else {
-                        MapType lt = (MapType) f.getType();
-                        sb.append(complexParser(c, lt.getKeyType()));
-                        sb.append(", ").append(complexParser(c, lt.getValueType()));
-                    }
-                }
-                sb.append(");");
-                m.add(sb);
-            }
-        }
     }
 
     void generateAccessors() {
@@ -492,6 +209,40 @@ public class JavaGenMessageGenerator {
         // }
     }
 
+    void generateClass() {
+        String mType;
+        if (this instanceof JavaGenBroadcastMessageGenerator) {
+            // c.imports().addExplicitImport(ClassDefinitions.BROADCAST_MESSAGE_CLASS);
+            c.addImport(BroadcastMessage.class);
+            mType = BroadcastMessage.class.getSimpleName();
+        } else {
+            c.addImport(Message.class);
+            mType = Message.class.getSimpleName();
+        }
+
+        String imple = "";
+        if (anno.isAnnotationPresent(JavaImplements.class)) {
+            for (String s : anno.getAnnotation(JavaImplements.class).value()) {
+                imple += ", " + s;
+            }
+        }
+
+        if (parent == null) {
+            c.setDefinition("public class ", name, " implements ", mType, imple);
+        } else {
+            String isPublic = anno instanceof EndpointDefinition ? "" : "public ";
+            c.setDefinition(isPublic, "static class ", name, " implements ", mType, imple);
+        }
+
+        String fullName = file.getNamespace() + "." + name;
+        c.addFieldWithJavadoc("The full name of this message.", "public static final String NAME = \"", fullName, "\";");
+
+        c.addImport(MessageSerializer.class);
+        c.addFieldWithJavadoc("A message serializer that can read and write instances of this class.",
+                "public static final ", MessageSerializer.class, "<", name, "> SERIALIZER = new ", serializerName,
+                "();");
+    }
+
     CodegenMethod generateComplexAccessor(CodegenClass clazz, FieldOrParameter f) {
         String name = f.getName();
         String beanPrefix2 = StringUtil.capitalizeFirstLetter(f.getName());
@@ -523,14 +274,151 @@ public class JavaGenMessageGenerator {
         }
     }
 
-    static class NameGenerator {
-        private final HashMap<String, Integer> map = new HashMap<>();
-
-        String next(String prefix) {
-            Integer val = map.get(prefix);
-            map.put(prefix, val == null ? 1 : val + 1);
-            return "$" + prefix + (val == null ? "" : val);
+    void generateConstructorEmpty() {
+        CodegenMethod m = c.addMethod("public ", c.getSimpleName(), "()");
+        m.addJavadoc("Creates a new ", c.getSimpleName(), ".");
+        for (FieldOrParameter f : fields) {
+            BaseType t = f.getType().getBaseType();
+            if (t == BaseType.LIST) {
+                m.add(f.getName(), " = new java.util.ArrayList<>();");
+            } else if (t == BaseType.SET) {
+                m.add(f.getName(), " = new java.util.LinkedHashSet<>();");
+            } else if (t == BaseType.MAP) {
+                m.add(f.getName(), " = new java.util.LinkedHashMap<>();");
+            }
         }
+    }
+
+
+    void generateConstructorImmutable() {
+        CodegenMethod m = c.addMethod(c.getSimpleName(), "(", c.getSimpleName(), " instance)");
+        m.addJavadoc("Creates a new ", c.getSimpleName(), " by copying an existing.");
+        m.addJavadocParameter("instance", "the instance to copy all fields from");
+        for (FieldOrParameter f : fields) {
+            BaseType t = f.getType().getBaseType();
+            if (t == BaseType.LIST || t == BaseType.SET || t == BaseType.MAP) {
+                c.addImport(MessageHelper.class);
+                m.add("this.", f.getName(), " = ", MessageHelper.class, ".immutableCopy(instance." + f.getName(), ");");
+            } else if (t == BaseType.MESSAGE) {
+                c.addImport(MessageHelper.class);
+                m.add("this.", f.getName(), " = ", MessageHelper.class, ".immutable(instance." + f.getName(), ");");
+            } else {
+                m.add("this.", f.getName(), " = instance." + f.getName(), ";");
+            }
+        }
+    }
+
+    void generateConstructorParser() {
+        CodegenMethod m = c.addMethod(c.getSimpleName(), "(", MessageReader.class, " reader) throws IOException");
+        m.addJavadoc("Creates a new ", c.getSimpleName(), " by reading from a message reader.");
+        m.addJavadocParameter("reader", "the message reader");
+        // TODO replace with generateParseMethod
+        for (FieldOrParameter f : fields) {
+            JavaGenType ty = new JavaGenType(f.getType());
+            BaseType type = f.getType().getBaseType();
+            String tagName = "(" + f.getTag() + ", \"" + f.getName() + "\"";
+            if (type.isPrimitive()) {
+                m.add("this.", f.getName(), " = reader.read", ty.writeReadName(), tagName, ", null);");
+            } else if (type == BaseType.ENUM) {
+                m.add("this.", f.getName(), " = reader.readEnum", tagName, ", ", ty.render(c), ".SERIALIZER);");
+            } else if (type == BaseType.MESSAGE) {
+                m.add("this.", f.getName(), " = reader.readMessage", tagName, ", ", ty.render(c), ".SERIALIZER);");
+            } else if (type == BaseType.LIST) { // Complex type
+                ListOrSetType los = (ListOrSetType) f.getType();
+                c.addImport(MessageHelper.class);
+                m.add("this.", f.getName(), " = ", MessageHelper.class, ".readList", tagName, ", reader, ",
+                        complexParser(c, los.getElementType()), ");");
+            } else if (type == BaseType.SET) { // Complex type
+                c.addImport(MessageHelper.class);
+                ListOrSetType los = (ListOrSetType) f.getType();
+                m.add("this.", f.getName(), " = ", MessageHelper.class, ".readSet", tagName, ", reader, ",
+                        complexParser(c, los.getElementType()), ");");
+            } else { // Complex type
+                c.addImport(MessageHelper.class);
+                MapType los = (MapType) f.getType();
+                m.add("this.", f.getName(), " = ", MessageHelper.class, ".readMap", tagName, ", reader, ",
+                        complexParser(c, los.getKeyType()), ", ", complexParser(c, los.getValueType()), ");");
+            }
+        }
+    }
+
+    void generateEquals() {
+        CodegenMethod m = c.addMethod("public boolean equals(Object other)");
+        m.addJavadoc("{@inheritDoc}").addAnnotation(Override.class);
+        if (fields.isEmpty()) {
+            m.add("return other == this || other instanceof ", c.getSimpleName(), ";");
+            return;
+        }
+
+        m.add("if (other == this) {");
+        m.add("return true;");
+        m.add("} else if (other instanceof ", c.getSimpleName(), ") {");
+        m.add(c.getSimpleName(), " o = (", c.getSimpleName(), ") other;");
+        for (int i = 0; i < fields.size(); i++) {
+            StringBuilder b = i == 0 ? new StringBuilder("return ") : new StringBuilder("       ");
+            FieldOrParameter f = fields.get(i);
+            // JavaGenType t = new JavaGenType(f.getType());
+            // Check data typen
+            // if (false /* fields.get(i).getType().getBaseType().isPrimitive() */) {
+            // b.append("this." + f.getName() + " == o." + f.getName());
+            // } else {
+            c.addImport(Objects.class);
+            b.append("Objects.equals(" + f.getName() + ", o." + f.getName() + ")");
+            // }
+            b.append(i == fields.size() - 1 ? ";" : " &&");
+            m.add(b);
+        }
+
+        m.add("}");
+        m.add("return false;");
+    }
+
+    void generateFields() {
+        for (FieldOrParameter f : fields) {
+            JavaGenType ty = new JavaGenType(f.getType());
+            ty.addImports(c);
+            String init = "private " + (f.getType().getBaseType().isComplexType() ? "final " : "");
+            // MSDLBaseType t = f.getType().getBaseType();
+            // if (t == MSDLBaseType.LIST) {
+            // init = " = new java.util.ArrayList<>()";
+            // } else if (t == MSDLBaseType.SET) {
+            // init = " = new java.util.LinkedHashSet<>()";
+            // } else if (t == MSDLBaseType.MAP) {
+            // init = " = new java.util.LinkedHashMap<>()";
+            // }
+            c.addFieldWithJavadoc("Field", init, ty.render(c), " ", f.getName(), ";");
+        }
+    }
+
+    void generateHashCode() {
+        CodegenMethod m = c.addMethod("public int hashCode()");
+        m.addAnnotation(Override.class).addJavadoc("{@inheritDoc}");
+        if (fields.size() == 0) {
+            m.add("return ", c.getSimpleName().hashCode(), ";");
+        } else if (fields.size() == 1) {
+            m.add("return ", generateHashCode(fields.get(0)), ";");
+        } else {
+            m.add("int result = 31 + ", generateHashCode(fields.get(0)), ";");
+            for (int i = 1; i < fields.size() - 1; i++) {
+                m.add("result = 31 * result + ", generateHashCode(fields.get(i)), ";");
+            }
+            m.add("return 31 * result + ", generateHashCode(fields.get(fields.size() - 1)), ";");
+        }
+    }
+
+    //
+    // public static HelloWorld fromJSON(CharSequence c) {
+    // return MessageSerializer.readFromJSON(PARSER, c);
+    // }
+
+    String generateHashCode(FieldOrParameter f) {
+        // Comment in again if we get primitive datatypes
+        // if (f.getType().getBaseType() == MSDLBaseType.INT32) {
+        // return f.getName();
+        // } else {
+        c.addImport(Hashing.class);
+        return "Hashing.hashcode(this." + f.getName() + ")";
+        // }
     }
 
     void generateParser() {
@@ -556,8 +444,121 @@ public class JavaGenMessageGenerator {
         }
     }
 
+    void generateToFrom() {
+        CodegenMethod m = c.addMethod("public String toJSON()");
+        m.addJavadoc("Returns a JSON representation of this message");
+        if (isMessage) {
+            c.addImport(MessageSerializer.class);
+            m.add("return ", MessageSerializer.class, ".writeToJSON(this, SERIALIZER);");
+
+            CodegenMethod from = c.addMethod("public static ", c.getSimpleName(), " fromJSON(", CharSequence.class,
+                    " c)");
+            from.addJavadoc("Creates a message of this type from a JSON throwing a runtime exception if the format of the message does not match");
+            from.add("return ", MessageSerializer.class, ".readFromJSON(SERIALIZER, c);");
+        } else {
+            m.throwNewUnsupportedOperationException("method not supported");
+        }
+    }
+
+    static String complexParser(CodegenClass c, Type type) {
+        if (type == null) {
+            return "null";
+        }
+        BaseType b = type.getBaseType();
+        if (b.isPrimitive()) {
+            c.addImport(ValueSerializer.class);
+            if (b == BaseType.BINARY) {
+                c.addImport(Binary.class);
+            }
+            return ValueSerializer.class.getSimpleName() + "." + b.name().toUpperCase();
+        } else if (b.isReferenceType()) {
+            JavaGenType ty = new JavaGenType(type);
+            return ty.render(c) + ".SERIALIZER";
+        } else if (b == BaseType.LIST) {
+            ListOrSetType los = (ListOrSetType) type;
+            return complexParser(c, los.getElementType()) + ".listOf()";
+        } else if (b == BaseType.SET) {
+            ListOrSetType los = (ListOrSetType) type;
+            return complexParser(c, los.getElementType()) + ".setOf()";
+        } else {
+            MapType los = (MapType) type;
+            return "MessageParser.ofMap(" + complexParser(c, los.getKeyType()) + ", "
+                    + complexParser(c, los.getValueType()) + ")";
+        }
+    }
+
+    static String generateParseMethod(String readerName, CodegenClass c, FieldOrParameter f) {
+        BaseType type = f.getType().getBaseType();
+        JavaGenType ty = new JavaGenType(f.getType());
+        ty.addImports(c);
+        if (type.isPrimitive()) {
+            return readerName + ".read" + ty.writeReadName() + "(" + f.getTag() + ", \"" + f.getName() + "\", null);";
+        } else if (type == BaseType.ENUM) {
+            return readerName + ".readEnum(" + f.getTag() + ", \"" + f.getName() + "\", " + ty.render(c)
+                    + ".SERIALIZER);";
+        } else if (type == BaseType.MESSAGE) {
+            return readerName + ".readMessage(" + f.getTag() + ", \"" + f.getName() + "\", " + ty.render(c)
+                    + ".SERIALIZER);";
+        } else if (type == BaseType.LIST) { // Complex type
+            ListOrSetType los = (ListOrSetType) f.getType();
+            c.addImport(MessageHelper.class);
+            return MessageHelper.class.getSimpleName() + ".readList(" + f.getTag() + ", \"" + f.getName() + "\", "
+                    + readerName + ", " + complexParser(c, los.getElementType()) + ");";
+        } else if (type == BaseType.SET) { // Complex type
+            ListOrSetType los = (ListOrSetType) f.getType();
+            c.addImport(MessageHelper.class);
+            return MessageHelper.class.getSimpleName() + ".readSet(" + f.getTag() + ", \"" + f.getName() + "\", "
+                    + readerName + ", " + complexParser(c, los.getElementType()) + ");";
+        } else { // Complex type
+            MapType los = (MapType) f.getType();
+            c.addImport(MessageHelper.class);
+            return MessageHelper.class.getSimpleName() + ".readMap(" + f.getTag() + ", \"" + f.getName() + "\", "
+                    + readerName + ", " + complexParser(c, los.getKeyType()) + ", "
+                    + complexParser(c, los.getValueType()) + ");";
+        }
+    }
+
+    static void generateWriteTo(CodegenClass c, Collection<FieldOrParameter> fields) {
+        if (fields.size() > 0) {
+            CodegenMethod m = c.addMethod("void writeTo(", MessageWriter.class, " w) throws IOException");
+            // m.addAnnotation(Override.class).addJavadoc("{@inheritDoc}");
+            m.addImport(IOException.class).addImport(MessageWriter.class);
+            for (FieldOrParameter f : fields) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("w.write").append(new JavaGenType(f.getType()).writeReadName());
+                sb.append("(").append(f.getTag()).append(", \"").append(f.getName()).append("\", ");
+                sb.append(f.getName());
+                if (f.getType().getBaseType() == BaseType.MESSAGE) {
+                    sb.append(", ").append(new JavaGenType(f.getType()).render(c) + ".SERIALIZER");
+                } else if (f.getType().getBaseType().isComplexType()) {
+                    sb.append(", ");
+                    if (f.getType() instanceof ListOrSetType) {
+                        ListOrSetType lt = (ListOrSetType) f.getType();
+                        sb.append(complexParser(c, lt.getElementType()));
+                    } else {
+                        MapType lt = (MapType) f.getType();
+                        sb.append(complexParser(c, lt.getKeyType()));
+                        sb.append(", ").append(complexParser(c, lt.getValueType()));
+                    }
+                }
+                sb.append(");");
+                m.add(sb);
+            }
+        }
+    }
+
     static enum MsgType {
-        MESSAGE, BROADCAST, ENDPOINT_PARAMETERS;
+        BROADCAST, ENDPOINT_PARAMETERS, MESSAGE;
+    }
+
+    static class NameGenerator {
+        private final HashMap<String, Integer> map = new HashMap<>();
+
+        String next(String prefix) {
+            Integer val = map.get(prefix);
+            map.put(prefix, val == null ? 1 : val + 1);
+            return "$" + prefix + (val == null ? "" : val);
+        }
     }
 
 }

@@ -36,6 +36,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
@@ -55,6 +57,7 @@ import java.util.NoSuchElementException;
  * @author kenton@google.com Kenton Varda
  * @author carlanton@google.com Carl Haverl
  * @author martinrb@google.com Martin Buchholz
+ * @author kasperni@gmail.com Kasper Nielsen
  */
 public abstract class Binary implements Iterable<Byte> {
 
@@ -65,21 +68,42 @@ public abstract class Binary implements Iterable<Byte> {
      */
     static final int CONCATENATE_BY_COPY_SIZE = 128;
 
-    /**
-     * When copying an InputStream into a ByteString with .readFrom(), the chunks in the underlying rope start at 256
-     * bytes, but double each iteration up to 8192 bytes.
-     */
-    static final int MIN_READ_FROM_CHUNK_SIZE = 0x100; // 256b
+    /** An empty {@code Binary} with size = 0. */
+    public static final Binary EMPTY = new LiteralBinary(new byte[0]);
 
     static final int MAX_READ_FROM_CHUNK_SIZE = 0x2000; // 8k
 
     /**
-     * Empty {@code ByteString}.
+     * When copying an InputStream into a Binary with .readFrom(), the chunks in the underlying rope start at 256 bytes,
+     * but double each iteration up to 8192 bytes.
      */
-    public static final Binary EMPTY = new LiteralBinary(new byte[0]);
+    static final int MIN_READ_FROM_CHUNK_SIZE = 0x100; // 256b
 
-    // This constructor is here to prevent subclassing outside of this package,
+    /** Prevent subclassing outside of this package. */
     Binary() {}
+
+    /**
+     * Constructs a read-only {@code java.nio.ByteBuffer} whose content is equal to the contents of this byte string.
+     * The result uses the same backing array as the byte string, if possible.
+     *
+     * @return wrapped bytes
+     */
+    public abstract ByteBuffer asReadOnlyByteBuffer();
+
+    /**
+     * Constructs a list of read-only {@code java.nio.ByteBuffer} objects such that the concatenation of their contents
+     * is equal to the contents of this byte string. The result uses the same backing arrays as the byte string.
+     * <p>
+     * By returning a list, implementations of this method may be able to avoid copying even when there are multiple
+     * backing arrays.
+     *
+     * @return a list of wrapped bytes
+     */
+    public abstract List<ByteBuffer> asReadOnlyByteBufferList();
+
+    public String base64encode() {
+        return Base64.getEncoder().encodeToString(toByteArray());
+    }
 
     /**
      * Gets the byte at the given index. This method should be used only for random access to individual bytes. To
@@ -95,339 +119,24 @@ public abstract class Binary implements Iterable<Byte> {
     public abstract byte byteAt(int index);
 
     /**
-     * Return a {@link Binary.ByteIterator} over the bytes in the ByteString. To avoid auto-boxing, you may get the
-     * iterator manually and call {@link ByteIterator#nextByte()}.
-     *
-     * @return the iterator
-     */
-    public abstract ByteIterator iterator();
-
-    /**
-     * This interface extends {@code Iterator<Byte>}, so that we can return an unboxed {@code byte}.
-     */
-    public interface ByteIterator extends Iterator<Byte> {
-        /**
-         * An alternative to {@link Iterator#next()} that returns an unboxed primitive {@code byte}.
-         *
-         * @return the next {@code byte} in the iteration
-         * @throws NoSuchElementException
-         *             if the iteration has no more elements
-         */
-        byte nextByte();
-    }
-
-    /**
-     * Gets the number of bytes.
-     *
-     * @return size in bytes
-     */
-    public abstract int size();
-
-    /**
-     * Returns {@code true} if the size is {@code 0}, {@code false} otherwise.
-     *
-     * @return true if this is zero bytes long
-     */
-    public boolean isEmpty() {
-        return size() == 0;
-    }
-
-    // =================================================================
-    // ByteString -> substring
-
-    /**
-     * Return the substring from {@code beginIndex}, inclusive, to the end of the string.
-     *
-     * @param beginIndex
-     *            start at this index
-     * @return substring sharing underlying data
-     * @throws IndexOutOfBoundsException
-     *             if {@code beginIndex < 0} or {@code beginIndex > size()}.
-     */
-    public Binary substring(int beginIndex) {
-        return substring(beginIndex, size());
-    }
-
-    /**
-     * Return the substring from {@code beginIndex}, inclusive, to {@code endIndex}, exclusive.
-     *
-     * @param beginIndex
-     *            start at this index
-     * @param endIndex
-     *            the last character is the one before this index
-     * @return substring sharing underlying data
-     * @throws IndexOutOfBoundsException
-     *             if {@code beginIndex < 0}, {@code endIndex > size()}, or {@code beginIndex > endIndex}.
-     */
-    public abstract Binary substring(int beginIndex, int endIndex);
-
-    /**
-     * Tests if this bytestring starts with the specified prefix. Similar to {@link String#startsWith(String)}
-     *
-     * @param prefix
-     *            the prefix.
-     * @return <code>true</code> if the byte sequence represented by the argument is a prefix of the byte sequence
-     *         represented by this string; <code>false</code> otherwise.
-     */
-    public boolean startsWith(Binary prefix) {
-        return size() >= prefix.size() && substring(0, prefix.size()).equals(prefix);
-    }
-
-    // =================================================================
-    // byte[] -> ByteString
-
-    /**
-     * Copies the given bytes into a {@code ByteString}.
-     *
-     * @param bytes
-     *            source array
-     * @param offset
-     *            offset in source array
-     * @param size
-     *            number of bytes to copy
-     * @return new {@code ByteString}
-     */
-    public static Binary copyFrom(byte[] bytes, int offset, int size) {
-        byte[] copy = new byte[size];
-        System.arraycopy(bytes, offset, copy, 0, size);
-        return new LiteralBinary(copy);
-    }
-
-    /**
-     * Copies the given bytes into a {@code ByteString}.
-     *
-     * @param bytes
-     *            to copy
-     * @return new {@code ByteString}
-     */
-    public static Binary copyFrom(byte[] bytes) {
-        return copyFrom(bytes, 0, bytes.length);
-    }
-
-    /**
-     * Copies the next {@code size} bytes from a {@code java.nio.ByteBuffer} into a {@code ByteString}.
-     *
-     * @param bytes
-     *            source buffer
-     * @param size
-     *            number of bytes to copy
-     * @return new {@code ByteString}
-     */
-    public static Binary copyFrom(ByteBuffer bytes, int size) {
-        byte[] copy = new byte[size];
-        bytes.get(copy);
-        return new LiteralBinary(copy);
-    }
-
-    /**
-     * Copies the remaining bytes from a {@code java.nio.ByteBuffer} into a {@code ByteString}.
-     *
-     * @param bytes
-     *            sourceBuffer
-     * @return new {@code ByteString}
-     */
-    public static Binary copyFrom(ByteBuffer bytes) {
-        return copyFrom(bytes, bytes.remaining());
-    }
-
-    /**
-     * Encodes {@code text} into a sequence of bytes using the named charset and returns the result as a
-     * {@code ByteString}.
-     *
-     * @param text
-     *            source string
-     * @param charsetName
-     *            encoding to use
-     * @return new {@code ByteString}
-     * @throws UnsupportedEncodingException
-     *             if the encoding isn't found
-     */
-    public static Binary copyFrom(String text, String charsetName) throws UnsupportedEncodingException {
-        return new LiteralBinary(text.getBytes(charsetName));
-    }
-
-    /**
-     * Encodes {@code text} into a sequence of UTF-8 bytes and returns the result as a {@code ByteString}.
-     *
-     * @param text
-     *            source string
-     * @return new {@code ByteString}
-     */
-    public static Binary copyFromUtf8(String text) {
-        try {
-            return new LiteralBinary(text.getBytes("UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("UTF-8 not supported?", e);
-        }
-    }
-
-    public static Binary copyFromBase64(String text) {
-        return copyFrom(Base64.getDecoder().decode(text));
-    }
-
-    // =================================================================
-    // InputStream -> ByteString
-
-    /**
-     * Completely reads the given stream's bytes into a {@code ByteString}, blocking if necessary until all bytes are
-     * read through to the end of the stream.
-     *
-     * <b>Performance notes:</b> The returned {@code ByteString} is an immutable tree of byte arrays ("chunks") of the
-     * stream data. The first chunk is small, with subsequent chunks each being double the size, up to 8K. If the caller
-     * knows the precise length of the stream and wishes to avoid all unnecessary copies and allocations, consider using
-     * the two-argument version of this method, below.
-     *
-     * @param streamToDrain
-     *            The source stream, which is read completely but not closed.
-     * @return A new {@code ByteString} which is made up of chunks of various sizes, depending on the behavior of the
-     *         underlying stream.
-     * @throws IOException
-     *             IOException is thrown if there is a problem reading the underlying stream.
-     */
-    public static Binary readFrom(InputStream streamToDrain) throws IOException {
-        return readFrom(streamToDrain, MIN_READ_FROM_CHUNK_SIZE, MAX_READ_FROM_CHUNK_SIZE);
-    }
-
-    /**
-     * Completely reads the given stream's bytes into a {@code ByteString}, blocking if necessary until all bytes are
-     * read through to the end of the stream.
-     *
-     * <b>Performance notes:</b> The returned {@code ByteString} is an immutable tree of byte arrays ("chunks") of the
-     * stream data. The chunkSize parameter sets the size of these byte arrays. In particular, if the chunkSize is
-     * precisely the same as the length of the stream, unnecessary allocations and copies will be avoided. Otherwise,
-     * the chunks will be of the given size, except for the last chunk, which will be resized (via a reallocation and
-     * copy) to contain the remainder of the stream.
-     *
-     * @param streamToDrain
-     *            The source stream, which is read completely but not closed.
-     * @param chunkSize
-     *            The size of the chunks in which to read the stream.
-     * @return A new {@code ByteString} which is made up of chunks of the given size.
-     * @throws IOException
-     *             IOException is thrown if there is a problem reading the underlying stream.
-     */
-    public static Binary readFrom(InputStream streamToDrain, int chunkSize) throws IOException {
-        return readFrom(streamToDrain, chunkSize, chunkSize);
-    }
-
-    // Helper method that takes the chunk size range as a parameter.
-    public static Binary readFrom(InputStream streamToDrain, int minChunkSize, int maxChunkSize) throws IOException {
-        Collection<Binary> results = new ArrayList<>();
-
-        // copy the inbound bytes into a list of chunks; the chunk size
-        // grows exponentially to support both short and long streams.
-        int chunkSize = minChunkSize;
-        while (true) {
-            Binary chunk = readChunk(streamToDrain, chunkSize);
-            if (chunk == null) {
-                break;
-            }
-            results.add(chunk);
-            chunkSize = Math.min(chunkSize * 2, maxChunkSize);
-        }
-
-        return Binary.copyFrom(results);
-    }
-
-    /**
-     * Blocks until a chunk of the given size can be made from the stream, or EOF is reached. Calls read() repeatedly in
-     * case the given stream implementation doesn't completely fill the given buffer in one read() call.
-     *
-     * @return A chunk of the desired size, or else a chunk as large as was available when end of stream was reached.
-     *         Returns null if the given stream had no more data in it.
-     */
-    private static Binary readChunk(InputStream in, final int chunkSize) throws IOException {
-        final byte[] buf = new byte[chunkSize];
-        int bytesRead = 0;
-        while (bytesRead < chunkSize) {
-            final int count = in.read(buf, bytesRead, chunkSize - bytesRead);
-            if (count == -1) {
-                break;
-            }
-            bytesRead += count;
-        }
-
-        if (bytesRead == 0) {
-            return null;
-        } else {
-            return Binary.copyFrom(buf, 0, bytesRead);
-        }
-    }
-
-    // =================================================================
-    // Multiple ByteStrings -> One ByteString
-
-    /**
-     * Concatenate the given {@code ByteString} to this one. Short concatenations, of total size smaller than
+     * Concatenate the given {@code Binary} to this one. Short concatenations, of total size smaller than
      * {@link Binary#CONCATENATE_BY_COPY_SIZE}, are produced by copying the underlying bytes (as per Rope.java, <a
      * href="http://www.cs.ubc.ca/local/reading/proceedings/spe91-95/spe/vol25/issue12/spe986.pdf"> BAP95 </a>. In
      * general, the concatenate involves no copying.
      *
      * @param other
      *            string to concatenate
-     * @return a new {@code ByteString} instance
+     * @return a new {@code Binary} instance
      */
     public Binary concat(Binary other) {
         int thisSize = size();
         int otherSize = other.size();
         if ((long) thisSize + otherSize >= Integer.MAX_VALUE) {
-            throw new IllegalArgumentException("ByteString would be too long: " + thisSize + "+" + otherSize);
+            throw new IllegalArgumentException("Binary would be too long: " + thisSize + "+" + otherSize);
         }
 
         return RopeBinary.concatenate(this, other);
     }
-
-    /**
-     * Concatenates all byte strings in the iterable and returns the result. This is designed to run in O(list size),
-     * not O(total bytes).
-     *
-     * <p>
-     * The returned {@code ByteString} is not necessarily a unique object. If the list is empty, the returned object is
-     * the singleton empty {@code ByteString}. If the list has only one element, that {@code ByteString} will be
-     * returned without copying.
-     *
-     * @param byteStrings
-     *            strings to be concatenated
-     * @return new {@code ByteString}
-     */
-    public static Binary copyFrom(Iterable<Binary> byteStrings) {
-        Collection<Binary> collection;
-        if (!(byteStrings instanceof Collection)) {
-            collection = new ArrayList<>();
-            for (Binary byteString : byteStrings) {
-                collection.add(byteString);
-            }
-        } else {
-            collection = (Collection<Binary>) byteStrings;
-        }
-        Binary result;
-        if (collection.isEmpty()) {
-            result = EMPTY;
-        } else {
-            result = balancedConcat(collection.iterator(), collection.size());
-        }
-        return result;
-    }
-
-    // Internal function used by copyFrom(Iterable<ByteString>).
-    // Create a balanced concatenation of the next "length" elements from the
-    // iterable.
-    private static Binary balancedConcat(Iterator<Binary> iterator, int length) {
-        assert length >= 1;
-        Binary result;
-        if (length == 1) {
-            result = iterator.next();
-        } else {
-            int halfLength = length >>> 1;
-            Binary left = balancedConcat(iterator, halfLength);
-            Binary right = balancedConcat(iterator, length - halfLength);
-            result = left.concat(right);
-        }
-        return result;
-    }
-
-    // =================================================================
-    // ByteString -> byte[]
 
     /**
      * Copies bytes into a buffer at the given offset.
@@ -442,6 +151,9 @@ public abstract class Binary implements Iterable<Byte> {
     public void copyTo(byte[] target, int offset) {
         copyTo(target, 0, offset, size());
     }
+
+    // =================================================================
+    // Binary -> substring
 
     /**
      * Copies bytes into a buffer.
@@ -479,6 +191,18 @@ public abstract class Binary implements Iterable<Byte> {
     }
 
     /**
+     * Copies bytes into a ByteBuffer.
+     *
+     * @param target
+     *            ByteBuffer to copy into.
+     * @throws java.nio.ReadOnlyBufferException
+     *             if the {@code target} is read-only
+     * @throws java.nio.BufferOverflowException
+     *             if the {@code target}'s remaining() space is not large enough to hold the data.
+     */
+    public abstract void copyTo(ByteBuffer target);
+
+    /**
      * Internal (package private) implementation of {@link #copyTo(byte[], int, int, int)}. It assumes that all error
      * checking has already been performed and that
      *
@@ -493,89 +217,48 @@ public abstract class Binary implements Iterable<Byte> {
      */
     protected abstract void copyToInternal(byte[] target, int sourceOffset, int targetOffset, int numberToCopy);
 
-    /**
-     * Copies bytes into a ByteBuffer.
-     *
-     * @param target
-     *            ByteBuffer to copy into.
-     * @throws java.nio.ReadOnlyBufferException
-     *             if the {@code target} is read-only
-     * @throws java.nio.BufferOverflowException
-     *             if the {@code target}'s remaining() space is not large enough to hold the data.
-     */
-    public abstract void copyTo(ByteBuffer target);
-
-    /**
-     * Copies bytes to a {@code byte[]}.
-     *
-     * @return copied bytes
-     */
-    public byte[] toByteArray() {
-        int size = size();
-        byte[] result = new byte[size];
-        copyToInternal(result, 0, 0, size);
-        return result;
-    }
-
-    /**
-     * Writes the complete contents of this byte string to the specified output stream argument.
-     *
-     * @param out
-     *            the output stream to which to write the data.
-     * @throws IOException
-     *             if an I/O error occurs.
-     */
-    public abstract void writeTo(OutputStream out) throws IOException;
-
-    /**
-     * Constructs a read-only {@code java.nio.ByteBuffer} whose content is equal to the contents of this byte string.
-     * The result uses the same backing array as the byte string, if possible.
-     *
-     * @return wrapped bytes
-     */
-    public abstract ByteBuffer asReadOnlyByteBuffer();
-
-    /**
-     * Constructs a list of read-only {@code java.nio.ByteBuffer} objects such that the concatenation of their contents
-     * is equal to the contents of this byte string. The result uses the same backing arrays as the byte string.
-     * <p>
-     * By returning a list, implementations of this method may be able to avoid copying even when there are multiple
-     * backing arrays.
-     *
-     * @return a list of wrapped bytes
-     */
-    public abstract List<ByteBuffer> asReadOnlyByteBufferList();
-
-    /**
-     * Constructs a new {@code String} by decoding the bytes using the specified charset.
-     *
-     * @param charsetName
-     *            encode using this charset
-     * @return new string
-     * @throws UnsupportedEncodingException
-     *             if charset isn't recognized
-     */
-    public abstract String toString(String charsetName) throws UnsupportedEncodingException;
-
     // =================================================================
-    // UTF-8 decoding
+    // byte[] -> Binary
+
+    @Override
+    public abstract boolean equals(Object o);
 
     /**
-     * Constructs a new {@code String} by decoding the bytes as UTF-8.
+     * Return the depth of the tree representing this {@code Binary}, if any, whose root is this node. If this is a leaf
+     * node, return 0.
      *
-     * @return new string using UTF-8 encoding
+     * @return tree depth or zero
      */
-    public String toStringUtf8() {
-        try {
-            return toString("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("UTF-8 not supported?", e);
-        }
+    protected abstract int getTreeDepth();
+
+    /**
+     * Return a non-zero hashCode depending only on the sequence of bytes in this Binary.
+     *
+     * @return hashCode value for this object
+     */
+    @Override
+    public abstract int hashCode();
+
+    /**
+     * Return {@code true} if this Binary is literal (a leaf node) or a flat-enough tree in the sense of
+     * {@link RopeBinary}.
+     *
+     * @return true if the tree is flat enough
+     */
+    protected abstract boolean isBalanced();
+
+    /**
+     * Returns {@code true} if the size is {@code 0}, {@code false} otherwise.
+     *
+     * @return true if this is zero bytes long
+     */
+    public boolean isEmpty() {
+        return size() == 0;
     }
 
     /**
-     * Tells whether this {@code ByteString} represents a well-formed UTF-8 byte sequence, such that the original bytes
-     * can be converted to a String object and then round tripped back to bytes without loss.
+     * Tells whether this {@code Binary} represents a well-formed UTF-8 byte sequence, such that the original bytes can
+     * be converted to a String object and then round tripped back to bytes without loss.
      *
      * <p>
      * More precisely, returns {@code true} whenever:
@@ -597,46 +280,20 @@ public abstract class Binary implements Iterable<Byte> {
      * See the Unicode Standard, Table 3-6. <em>UTF-8 Bit Distribution</em>, Table 3-7.
      * <em>Well Formed UTF-8 Byte Sequences</em>.
      *
-     * @return whether the bytes in this {@code ByteString} are a well-formed UTF-8 byte sequence
+     * @return whether the bytes in this {@code Binary} are a well-formed UTF-8 byte sequence
      */
     public abstract boolean isValidUtf8();
 
     /**
-     * Tells whether the given byte sequence is a well-formed, malformed, or incomplete UTF-8 byte sequence. This method
-     * accepts and returns a partial state result, allowing the bytes for a complete UTF-8 byte sequence to be composed
-     * from multiple {@code ByteString} segments.
+     * Return a {@link Binary.ByteIterator} over the bytes in the Binary. To avoid auto-boxing, you may get the iterator
+     * manually and call {@link ByteIterator#nextByte()}.
      *
-     * @param state
-     *            either {@code 0} (if this is the initial decoding operation) or the value returned from a call to a
-     *            partial decoding method for the previous bytes
-     * @param offset
-     *            offset of the first byte to check
-     * @param length
-     *            number of bytes to check
-     *
-     * @return {@code -1} if the partial byte sequence is definitely malformed, {@code 0} if it is well-formed (no
-     *         additional input needed), or, if the byte sequence is "incomplete", i.e. apparently terminated in the
-     *         middle of a character, an opaque integer "state" value containing enough information to decode the
-     *         character when passed to a subsequent invocation of a partial decoding method.
+     * @return the iterator
      */
-    protected abstract int partialIsValidUtf8(int state, int offset, int length);
+    public abstract ByteIterator iterator();
 
     // =================================================================
-    // equals() and hashCode()
-
-    @Override
-    public abstract boolean equals(Object o);
-
-    /**
-     * Return a non-zero hashCode depending only on the sequence of bytes in this ByteString.
-     *
-     * @return hashCode value for this object
-     */
-    @Override
-    public abstract int hashCode();
-
-    // =================================================================
-    // Input stream
+    // InputStream -> Binary
 
     /**
      * Creates an {@code InputStream} which can be used to read the bytes.
@@ -653,6 +310,298 @@ public abstract class Binary implements Iterable<Byte> {
     public abstract InputStream newInput();
 
     /**
+     * Compute the hash across the value bytes starting with the given hash, and return the result. This is used to
+     * compute the hash across strings represented as a set of pieces by allowing the hash computation to be continued
+     * from piece to piece.
+     *
+     * @param h
+     *            starting hash value
+     * @param offset
+     *            offset into this value to start looking at data values
+     * @param length
+     *            number of data values to include in the hash computation
+     * @return ending hash value
+     */
+    protected abstract int partialHash(int h, int offset, int length);
+
+    /**
+     * Tells whether the given byte sequence is a well-formed, malformed, or incomplete UTF-8 byte sequence. This method
+     * accepts and returns a partial state result, allowing the bytes for a complete UTF-8 byte sequence to be composed
+     * from multiple {@code Binary} segments.
+     *
+     * @param state
+     *            either {@code 0} (if this is the initial decoding operation) or the value returned from a call to a
+     *            partial decoding method for the previous bytes
+     * @param offset
+     *            offset of the first byte to check
+     * @param length
+     *            number of bytes to check
+     *
+     * @return {@code -1} if the partial byte sequence is definitely malformed, {@code 0} if it is well-formed (no
+     *         additional input needed), or, if the byte sequence is "incomplete", i.e. apparently terminated in the
+     *         middle of a character, an opaque integer "state" value containing enough information to decode the
+     *         character when passed to a subsequent invocation of a partial decoding method.
+     */
+    protected abstract int partialIsValidUtf8(int state, int offset, int length);
+
+    /**
+     * Return the cached hash code if available.
+     *
+     * @return value of cached hash code or 0 if not computed yet
+     */
+    protected abstract int peekCachedHashCode();
+
+    // =================================================================
+    // Multiple Binarys -> One Binary
+
+    /**
+     * Returns a SHA-256 hash of this binary.
+     *
+     * @return
+     */
+    public final Binary sha256() {
+        MessageDigest md;
+        try {
+            md = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("All java implementations should have SHA-256", e);
+        }
+        md.update(toByteArray());
+        byte[] digest = md.digest();
+        return new LiteralBinary(digest);
+    }
+
+    /**
+     * Gets the number of bytes.
+     *
+     * @return size in bytes
+     */
+    public abstract int size();
+
+    /**
+     * Tests if this bytestring starts with the specified prefix. Similar to {@link String#startsWith(String)}
+     *
+     * @param prefix
+     *            the prefix.
+     * @return <code>true</code> if the byte sequence represented by the argument is a prefix of the byte sequence
+     *         represented by this string; <code>false</code> otherwise.
+     */
+    public boolean startsWith(Binary prefix) {
+        return size() >= prefix.size() && substring(0, prefix.size()).equals(prefix);
+    }
+
+    // =================================================================
+    // Binary -> byte[]
+
+    /**
+     * Return the substring from {@code beginIndex}, inclusive, to the end of the string.
+     *
+     * @param beginIndex
+     *            start at this index
+     * @return substring sharing underlying data
+     * @throws IndexOutOfBoundsException
+     *             if {@code beginIndex < 0} or {@code beginIndex > size()}.
+     */
+    public Binary substring(int beginIndex) {
+        return substring(beginIndex, size());
+    }
+
+    /**
+     * Return the substring from {@code beginIndex}, inclusive, to {@code endIndex}, exclusive.
+     *
+     * @param beginIndex
+     *            start at this index
+     * @param endIndex
+     *            the last character is the one before this index
+     * @return substring sharing underlying data
+     * @throws IndexOutOfBoundsException
+     *             if {@code beginIndex < 0}, {@code endIndex > size()}, or {@code beginIndex > endIndex}.
+     */
+    public abstract Binary substring(int beginIndex, int endIndex);
+
+    /**
+     * Copies bytes to a {@code byte[]}.
+     *
+     * @return copied bytes
+     */
+    public byte[] toByteArray() {
+        int size = size();
+        byte[] result = new byte[size];
+        copyToInternal(result, 0, 0, size);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("<Binary@%s size=%d>", Integer.toHexString(System.identityHashCode(this)), size());
+    }
+
+    /**
+     * Constructs a new {@code String} by decoding the bytes using the specified charset.
+     *
+     * @param charsetName
+     *            encode using this charset
+     * @return new string
+     * @throws UnsupportedEncodingException
+     *             if charset isn't recognized
+     */
+    public abstract String toString(String charsetName) throws UnsupportedEncodingException;
+
+    /**
+     * Constructs a new {@code String} by decoding the bytes as UTF-8.
+     *
+     * @return new string using UTF-8 encoding
+     */
+    public String toStringUtf8() {
+        try {
+            return toString("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("UTF-8 not supported?", e);
+        }
+    }
+
+    /**
+     * Writes the complete contents of this byte string to the specified output stream argument.
+     *
+     * @param out
+     *            the output stream to which to write the data.
+     * @throws IOException
+     *             if an I/O error occurs.
+     */
+    public abstract void writeTo(OutputStream out) throws IOException;
+
+    // Internal function used by copyFrom(Iterable<Binary>).
+    // Create a balanced concatenation of the next "length" elements from the
+    // iterable.
+    private static Binary balancedConcat(Iterator<Binary> iterator, int length) {
+        assert length >= 1;
+        Binary result;
+        if (length == 1) {
+            result = iterator.next();
+        } else {
+            int halfLength = length >>> 1;
+            Binary left = balancedConcat(iterator, halfLength);
+            Binary right = balancedConcat(iterator, length - halfLength);
+            result = left.concat(right);
+        }
+        return result;
+    }
+
+    /**
+     * Copies the given bytes into a {@code Binary}.
+     *
+     * @param bytes
+     *            to copy
+     * @return new {@code Binary}
+     */
+    public static Binary copyFrom(byte[] bytes) {
+        return copyFrom(bytes, 0, bytes.length);
+    }
+
+    // =================================================================
+    // UTF-8 decoding
+
+    /**
+     * Copies the given bytes into a {@code Binary}.
+     *
+     * @param bytes
+     *            source array
+     * @param offset
+     *            offset in source array
+     * @param size
+     *            number of bytes to copy
+     * @return new {@code Binary}
+     */
+    public static Binary copyFrom(byte[] bytes, int offset, int size) {
+        byte[] copy = new byte[size];
+        System.arraycopy(bytes, offset, copy, 0, size);
+        return new LiteralBinary(copy);
+    }
+
+    /**
+     * Copies the remaining bytes from a {@code java.nio.ByteBuffer} into a {@code Binary}.
+     *
+     * @param bytes
+     *            sourceBuffer
+     * @return new {@code Binary}
+     */
+    public static Binary copyFrom(ByteBuffer bytes) {
+        return copyFrom(bytes, bytes.remaining());
+    }
+
+    /**
+     * Copies the next {@code size} bytes from a {@code java.nio.ByteBuffer} into a {@code Binary}.
+     *
+     * @param bytes
+     *            source buffer
+     * @param size
+     *            number of bytes to copy
+     * @return new {@code Binary}
+     */
+    public static Binary copyFrom(ByteBuffer bytes, int size) {
+        byte[] copy = new byte[size];
+        bytes.get(copy);
+        return new LiteralBinary(copy);
+    }
+
+    // =================================================================
+    // equals() and hashCode()
+
+    /**
+     * Concatenates all byte strings in the iterable and returns the result. This is designed to run in O(list size),
+     * not O(total bytes).
+     *
+     * <p>
+     * The returned {@code Binary} is not necessarily a unique object. If the list is empty, the returned object is the
+     * singleton empty {@code Binary}. If the list has only one element, that {@code Binary} will be returned without
+     * copying.
+     *
+     * @param byteStrings
+     *            strings to be concatenated
+     * @return new {@code Binary}
+     */
+    public static Binary copyFrom(Iterable<Binary> byteStrings) {
+        Collection<Binary> collection;
+        if (!(byteStrings instanceof Collection)) {
+            collection = new ArrayList<>();
+            for (Binary byteString : byteStrings) {
+                collection.add(byteString);
+            }
+        } else {
+            collection = (Collection<Binary>) byteStrings;
+        }
+        Binary result;
+        if (collection.isEmpty()) {
+            result = EMPTY;
+        } else {
+            result = balancedConcat(collection.iterator(), collection.size());
+        }
+        return result;
+    }
+
+    /**
+     * Encodes {@code text} into a sequence of bytes using the named charset and returns the result as a {@code Binary}.
+     *
+     * @param text
+     *            source string
+     * @param charsetName
+     *            encoding to use
+     * @return new {@code Binary}
+     * @throws UnsupportedEncodingException
+     *             if the encoding isn't found
+     */
+    public static Binary copyFrom(String text, String charsetName) throws UnsupportedEncodingException {
+        return new LiteralBinary(text.getBytes(charsetName));
+    }
+
+    // =================================================================
+    // Input stream
+
+    public static Binary copyFromBase64(String text) {
+        return copyFrom(Base64.getDecoder().decode(text));
+    }
+
+    /**
      * Creates a {@link CodedInputStream} which can be used to read the bytes. Using this is often more efficient than
      * creating a {@link CodedInputStream} that wraps the result of {@link #newInput()}.
      *
@@ -664,30 +613,192 @@ public abstract class Binary implements Iterable<Byte> {
     // Output stream
 
     /**
+     * Encodes {@code text} into a sequence of UTF-8 bytes and returns the result as a {@code Binary}.
+     *
+     * @param text
+     *            source string
+     * @return new {@code Binary}
+     */
+    public static Binary copyFromUtf8(String text) {
+        try {
+            return new LiteralBinary(text.getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("UTF-8 not supported?", e);
+        }
+    }
+
+    /**
+     * Creates a new {@link Output}. Call {@link Output#toBinary()} to create the {@code Binary} instance.
+     * <p>
+     * A {@link Binary.Output} offers the same functionality as a {@link ByteArrayOutputStream}, except that it returns
+     * a {@link Binary} rather than a {@code byte array}.
+     *
+     * @return {@code OutputStream} for building a {@code Binary}
+     */
+    public static Output newOutput() {
+        return new Output(CONCATENATE_BY_COPY_SIZE);
+    }
+
+    /**
      * Creates a new {@link Output} with the given initial capacity. Call {@link Output#toBinary()} to create the
-     * {@code ByteString} instance.
+     * {@code Binary} instance.
      * <p>
      * A {@link Binary.Output} offers the same functionality as a {@link ByteArrayOutputStream}, except that it returns
      * a {@link Binary} rather than a {@code byte} array.
      *
      * @param initialCapacity
      *            estimate of number of bytes to be written
-     * @return {@code OutputStream} for building a {@code ByteString}
+     * @return {@code OutputStream} for building a {@code Binary}
      */
     public static Output newOutput(int initialCapacity) {
         return new Output(initialCapacity);
     }
 
+    // /**
+    // * Constructs a new {@code Binary} builder, which allows you to efficiently construct a {@code Binary} by
+    // * writing to a {@link CodedOutputStream}. Using this is much more efficient than calling {@code newOutput()} and
+    // * wrapping that in a {@code CodedOutputStream}.
+    // *
+    // * <p>
+    // * This is package-private because it's a somewhat confusing interface. Users can call
+    // * {@link Message#toBinary()} instead of calling this directly.
+    // *
+    // * @param size
+    // * The target byte size of the {@code Binary}. You must write exactly this many bytes before building
+    // * the result.
+    // * @return the builder
+    // */
+    // public static CodedBuilder newCodedBuilder(int size) {
+    // return new CodedBuilder(size);
+    // }
+    //
+    // /** See {@link Binary#newCodedBuilder(int)}. */
+    // public static final class CodedBuilder {
+    // private final CodedOutputStream output;
+    //
+    // private final byte[] buffer;
+    //
+    // private CodedBuilder(int size) {
+    // buffer = new byte[size];
+    // output = CodedOutputStream.newInstance(buffer);
+    // }
+    //
+    // public Binary build() {
+    // output.checkNoSpaceLeft();
+    //
+    // // We can be confident that the CodedOutputStream will not modify the
+    // // underlying bytes anymore because it already wrote all of them. So,
+    // // no need to make a copy.
+    // return new LiteralBinary(buffer);
+    // }
+    //
+    // public CodedOutputStream getCodedOutput() {
+    // return output;
+    // }
+    // }
+
+    // =================================================================
+    // Methods {@link RopeBinary} needs on instances, which aren't part of the
+    // public API.
+
     /**
-     * Creates a new {@link Output}. Call {@link Output#toBinary()} to create the {@code ByteString} instance.
-     * <p>
-     * A {@link Binary.Output} offers the same functionality as a {@link ByteArrayOutputStream}, except that it returns
-     * a {@link Binary} rather than a {@code byte array}.
+     * Blocks until a chunk of the given size can be made from the stream, or EOF is reached. Calls read() repeatedly in
+     * case the given stream implementation doesn't completely fill the given buffer in one read() call.
      *
-     * @return {@code OutputStream} for building a {@code ByteString}
+     * @return A chunk of the desired size, or else a chunk as large as was available when end of stream was reached.
+     *         Returns null if the given stream had no more data in it.
      */
-    public static Output newOutput() {
-        return new Output(CONCATENATE_BY_COPY_SIZE);
+    private static Binary readChunk(InputStream in, final int chunkSize) throws IOException {
+        final byte[] buf = new byte[chunkSize];
+        int bytesRead = 0;
+        while (bytesRead < chunkSize) {
+            final int count = in.read(buf, bytesRead, chunkSize - bytesRead);
+            if (count == -1) {
+                break;
+            }
+            bytesRead += count;
+        }
+
+        if (bytesRead == 0) {
+            return null;
+        } else {
+            return Binary.copyFrom(buf, 0, bytesRead);
+        }
+    }
+
+    /**
+     * Completely reads the given stream's bytes into a {@code Binary}, blocking if necessary until all bytes are read
+     * through to the end of the stream.
+     *
+     * <b>Performance notes:</b> The returned {@code Binary} is an immutable tree of byte arrays ("chunks") of the
+     * stream data. The first chunk is small, with subsequent chunks each being double the size, up to 8K. If the caller
+     * knows the precise length of the stream and wishes to avoid all unnecessary copies and allocations, consider using
+     * the two-argument version of this method, below.
+     *
+     * @param streamToDrain
+     *            The source stream, which is read completely but not closed.
+     * @return A new {@code Binary} which is made up of chunks of various sizes, depending on the behavior of the
+     *         underlying stream.
+     * @throws IOException
+     *             IOException is thrown if there is a problem reading the underlying stream.
+     */
+    public static Binary readFrom(InputStream streamToDrain) throws IOException {
+        return readFrom(streamToDrain, MIN_READ_FROM_CHUNK_SIZE, MAX_READ_FROM_CHUNK_SIZE);
+    }
+
+    /**
+     * Completely reads the given stream's bytes into a {@code Binary}, blocking if necessary until all bytes are read
+     * through to the end of the stream.
+     *
+     * <b>Performance notes:</b> The returned {@code Binary} is an immutable tree of byte arrays ("chunks") of the
+     * stream data. The chunkSize parameter sets the size of these byte arrays. In particular, if the chunkSize is
+     * precisely the same as the length of the stream, unnecessary allocations and copies will be avoided. Otherwise,
+     * the chunks will be of the given size, except for the last chunk, which will be resized (via a reallocation and
+     * copy) to contain the remainder of the stream.
+     *
+     * @param streamToDrain
+     *            The source stream, which is read completely but not closed.
+     * @param chunkSize
+     *            The size of the chunks in which to read the stream.
+     * @return A new {@code Binary} which is made up of chunks of the given size.
+     * @throws IOException
+     *             IOException is thrown if there is a problem reading the underlying stream.
+     */
+    public static Binary readFrom(InputStream streamToDrain, int chunkSize) throws IOException {
+        return readFrom(streamToDrain, chunkSize, chunkSize);
+    }
+
+    // Helper method that takes the chunk size range as a parameter.
+    public static Binary readFrom(InputStream streamToDrain, int minChunkSize, int maxChunkSize) throws IOException {
+        Collection<Binary> results = new ArrayList<>();
+
+        // copy the inbound bytes into a list of chunks; the chunk size
+        // grows exponentially to support both short and long streams.
+        int chunkSize = minChunkSize;
+        while (true) {
+            Binary chunk = readChunk(streamToDrain, chunkSize);
+            if (chunk == null) {
+                break;
+            }
+            results.add(chunk);
+            chunkSize = Math.min(chunkSize * 2, maxChunkSize);
+        }
+
+        return Binary.copyFrom(results);
+    }
+
+    /**
+     * This interface extends {@code Iterator<Byte>}, so that we can return an unboxed {@code byte}.
+     */
+    public interface ByteIterator extends Iterator<Byte> {
+        /**
+         * An alternative to {@link Iterator#next()} that returns an unboxed primitive {@code byte}.
+         *
+         * @return the next {@code byte} in the iteration
+         * @throws NoSuchElementException
+         *             if the iteration has no more elements
+         */
+        byte nextByte();
     }
 
     /**
@@ -695,21 +806,12 @@ public abstract class Binary implements Iterable<Byte> {
      */
     public static final class Output extends OutputStream {
         // Implementation note.
-        // The public methods of this class must be synchronized. ByteStrings
+        // The public methods of this class must be synchronized. Binarys
         // are guaranteed to be immutable. Without some sort of locking, it could
         // be possible for one thread to call toByteSring(), while another thread
         // is still modifying the underlying byte array.
 
         private static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
-
-        // argument passed by user, indicating initial capacity.
-        private final int initialCapacity;
-
-        // ByteStrings to be concatenated to create the result
-        private final ArrayList<Binary> flushedBuffers;
-
-        // Total number of bytes in the ByteStrings of flushedBuffers
-        private int flushedBuffersTotalBytes;
 
         // Current buffer to which we are writing
         private byte[] buffer;
@@ -717,8 +819,17 @@ public abstract class Binary implements Iterable<Byte> {
         // Location in buffer[] to which we write the next byte.
         private int bufferPos;
 
+        // Binarys to be concatenated to create the result
+        private final ArrayList<Binary> flushedBuffers;
+
+        // Total number of bytes in the Binarys of flushedBuffers
+        private int flushedBuffersTotalBytes;
+
+        // argument passed by user, indicating initial capacity.
+        private final int initialCapacity;
+
         /**
-         * Creates a new ByteString output stream with the specified initial capacity.
+         * Creates a new Binary output stream with the specified initial capacity.
          *
          * @param initialCapacity
          *            the initial capacity of the output stream.
@@ -732,45 +843,6 @@ public abstract class Binary implements Iterable<Byte> {
             this.buffer = new byte[initialCapacity];
         }
 
-        @Override
-        public synchronized void write(int b) {
-            if (bufferPos == buffer.length) {
-                flushFullBuffer(1);
-            }
-            buffer[bufferPos++] = (byte) b;
-        }
-
-        @Override
-        public synchronized void write(byte[] b, int offset, int length) {
-            if (length <= buffer.length - bufferPos) {
-                // The bytes can fit into the current buffer.
-                System.arraycopy(b, offset, buffer, bufferPos, length);
-                bufferPos += length;
-            } else {
-                // Use up the current buffer
-                int copySize = buffer.length - bufferPos;
-                System.arraycopy(b, offset, buffer, bufferPos, copySize);
-                offset += copySize;
-                length -= copySize;
-                // Flush the buffer, and get a new buffer at least big enough to cover
-                // what we still need to output
-                flushFullBuffer(length);
-                System.arraycopy(b, offset, buffer, 0 /* count */, length);
-                bufferPos = length;
-            }
-        }
-
-        /**
-         * Creates a byte string. Its size is the current size of this output stream and its output has been copied to
-         * it.
-         *
-         * @return the current contents of this output stream, as a byte string.
-         */
-        public synchronized Binary toBinary() {
-            flushLastBuffer();
-            return Binary.copyFrom(flushedBuffers);
-        }
-
         /**
          * Implement java.util.Arrays.copyOf() for jdk 1.5.
          */
@@ -778,57 +850,6 @@ public abstract class Binary implements Iterable<Byte> {
             byte[] result = new byte[length];
             System.arraycopy(buffer, 0, result, 0, Math.min(buffer.length, length));
             return result;
-        }
-
-        /**
-         * Writes the complete contents of this byte array output stream to the specified output stream argument.
-         *
-         * @param out
-         *            the output stream to which to write the data.
-         * @throws IOException
-         *             if an I/O error occurs.
-         */
-        public void writeTo(OutputStream out) throws IOException {
-            Binary[] cachedFlushBuffers;
-            byte[] cachedBuffer;
-            int cachedBufferPos;
-            synchronized (this) {
-                // Copy the information we need into local variables so as to hold
-                // the lock for as short a time as possible.
-                cachedFlushBuffers = flushedBuffers.toArray(new Binary[flushedBuffers.size()]);
-                cachedBuffer = buffer;
-                cachedBufferPos = bufferPos;
-            }
-            for (Binary byteString : cachedFlushBuffers) {
-                byteString.writeTo(out);
-            }
-
-            out.write(copyArray(cachedBuffer, cachedBufferPos));
-        }
-
-        /**
-         * Returns the current size of the output stream.
-         *
-         * @return the current size of the output stream
-         */
-        public synchronized int size() {
-            return flushedBuffersTotalBytes + bufferPos;
-        }
-
-        /**
-         * Resets this stream, so that all currently accumulated output in the output stream is discarded. The output
-         * stream can be used again, reusing the already allocated buffer space.
-         */
-        public synchronized void reset() {
-            flushedBuffers.clear();
-            flushedBuffersTotalBytes = 0;
-            bufferPos = 0;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("<ByteString.Output@%s size=%d>", Integer.toHexString(System.identityHashCode(this)),
-                    size());
         }
 
         /**
@@ -870,99 +891,95 @@ public abstract class Binary implements Iterable<Byte> {
             flushedBuffersTotalBytes += bufferPos;
             bufferPos = 0;
         }
-    }
 
-    // /**
-    // * Constructs a new {@code ByteString} builder, which allows you to efficiently construct a {@code ByteString} by
-    // * writing to a {@link CodedOutputStream}. Using this is much more efficient than calling {@code newOutput()} and
-    // * wrapping that in a {@code CodedOutputStream}.
-    // *
-    // * <p>
-    // * This is package-private because it's a somewhat confusing interface. Users can call
-    // * {@link Message#toByteString()} instead of calling this directly.
-    // *
-    // * @param size
-    // * The target byte size of the {@code ByteString}. You must write exactly this many bytes before building
-    // * the result.
-    // * @return the builder
-    // */
-    // public static CodedBuilder newCodedBuilder(int size) {
-    // return new CodedBuilder(size);
-    // }
-    //
-    // /** See {@link ByteString#newCodedBuilder(int)}. */
-    // public static final class CodedBuilder {
-    // private final CodedOutputStream output;
-    //
-    // private final byte[] buffer;
-    //
-    // private CodedBuilder(int size) {
-    // buffer = new byte[size];
-    // output = CodedOutputStream.newInstance(buffer);
-    // }
-    //
-    // public ByteString build() {
-    // output.checkNoSpaceLeft();
-    //
-    // // We can be confident that the CodedOutputStream will not modify the
-    // // underlying bytes anymore because it already wrote all of them. So,
-    // // no need to make a copy.
-    // return new LiteralByteString(buffer);
-    // }
-    //
-    // public CodedOutputStream getCodedOutput() {
-    // return output;
-    // }
-    // }
+        /**
+         * Resets this stream, so that all currently accumulated output in the output stream is discarded. The output
+         * stream can be used again, reusing the already allocated buffer space.
+         */
+        public synchronized void reset() {
+            flushedBuffers.clear();
+            flushedBuffersTotalBytes = 0;
+            bufferPos = 0;
+        }
 
-    // =================================================================
-    // Methods {@link RopeByteString} needs on instances, which aren't part of the
-    // public API.
+        /**
+         * Returns the current size of the output stream.
+         *
+         * @return the current size of the output stream
+         */
+        public synchronized int size() {
+            return flushedBuffersTotalBytes + bufferPos;
+        }
 
-    /**
-     * Return the depth of the tree representing this {@code ByteString}, if any, whose root is this node. If this is a
-     * leaf node, return 0.
-     *
-     * @return tree depth or zero
-     */
-    protected abstract int getTreeDepth();
+        /**
+         * Creates a byte string. Its size is the current size of this output stream and its output has been copied to
+         * it.
+         *
+         * @return the current contents of this output stream, as a byte string.
+         */
+        public synchronized Binary toBinary() {
+            flushLastBuffer();
+            return Binary.copyFrom(flushedBuffers);
+        }
 
-    /**
-     * Return {@code true} if this ByteString is literal (a leaf node) or a flat-enough tree in the sense of
-     * {@link RopeBinary}.
-     *
-     * @return true if the tree is flat enough
-     */
-    protected abstract boolean isBalanced();
+        @Override
+        public String toString() {
+            return String.format("<Binary.Output@%s size=%d>", Integer.toHexString(System.identityHashCode(this)),
+                    size());
+        }
 
-    /**
-     * Return the cached hash code if available.
-     *
-     * @return value of cached hash code or 0 if not computed yet
-     */
-    protected abstract int peekCachedHashCode();
+        @Override
+        public synchronized void write(byte[] b, int offset, int length) {
+            if (length <= buffer.length - bufferPos) {
+                // The bytes can fit into the current buffer.
+                System.arraycopy(b, offset, buffer, bufferPos, length);
+                bufferPos += length;
+            } else {
+                // Use up the current buffer
+                int copySize = buffer.length - bufferPos;
+                System.arraycopy(b, offset, buffer, bufferPos, copySize);
+                offset += copySize;
+                length -= copySize;
+                // Flush the buffer, and get a new buffer at least big enough to cover
+                // what we still need to output
+                flushFullBuffer(length);
+                System.arraycopy(b, offset, buffer, 0 /* count */, length);
+                bufferPos = length;
+            }
+        }
 
-    /**
-     * Compute the hash across the value bytes starting with the given hash, and return the result. This is used to
-     * compute the hash across strings represented as a set of pieces by allowing the hash computation to be continued
-     * from piece to piece.
-     *
-     * @param h
-     *            starting hash value
-     * @param offset
-     *            offset into this value to start looking at data values
-     * @param length
-     *            number of data values to include in the hash computation
-     * @return ending hash value
-     */
-    protected abstract int partialHash(int h, int offset, int length);
+        @Override
+        public synchronized void write(int b) {
+            if (bufferPos == buffer.length) {
+                flushFullBuffer(1);
+            }
+            buffer[bufferPos++] = (byte) b;
+        }
 
-    @Override
-    public String toString() {
-        return String.format("<ByteString@%s size=%d>", Integer.toHexString(System.identityHashCode(this)), size());
-    }
+        /**
+         * Writes the complete contents of this byte array output stream to the specified output stream argument.
+         *
+         * @param out
+         *            the output stream to which to write the data.
+         * @throws IOException
+         *             if an I/O error occurs.
+         */
+        public void writeTo(OutputStream out) throws IOException {
+            Binary[] cachedFlushBuffers;
+            byte[] cachedBuffer;
+            int cachedBufferPos;
+            synchronized (this) {
+                // Copy the information we need into local variables so as to hold
+                // the lock for as short a time as possible.
+                cachedFlushBuffers = flushedBuffers.toArray(new Binary[flushedBuffers.size()]);
+                cachedBuffer = buffer;
+                cachedBufferPos = bufferPos;
+            }
+            for (Binary byteString : cachedFlushBuffers) {
+                byteString.writeTo(out);
+            }
 
-    public String base64encode() {
-        return Base64.getEncoder().encodeToString(toByteArray());
+            out.write(copyArray(cachedBuffer, cachedBufferPos));
+        }
     }
 }

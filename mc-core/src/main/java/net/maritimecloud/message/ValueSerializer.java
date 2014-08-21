@@ -49,6 +49,11 @@ public abstract class ValueSerializer<T> {
         public void write(Binary t, ValueWriter writer) throws IOException {
             writer.writeBinary(t);
         }
+
+        @Override
+        public void write(int tag, String name, Binary t, MessageWriter writer) throws IOException {
+            writer.writeBinary(tag, name, t);
+        }
     };
 
     /** A value serializer that can serialize booleans. */
@@ -66,6 +71,12 @@ public abstract class ValueSerializer<T> {
         public void write(Boolean t, ValueWriter writer) throws IOException {
             writer.writeBoolean(t);
         }
+
+
+        @Override
+        public void write(int tag, String name, Boolean t, MessageWriter writer) throws IOException {
+            writer.writeBoolean(tag, name, t);
+        }
     };
 
     /** A value serializer that can serialize instances of {@link BigDecimal}. */
@@ -81,6 +92,11 @@ public abstract class ValueSerializer<T> {
         @Override
         public void write(BigDecimal t, ValueWriter writer) throws IOException {
             writer.writeDecimal(t);
+        }
+
+        @Override
+        public void write(int tag, String name, BigDecimal t, MessageWriter writer) throws IOException {
+            writer.writeDecimal(tag, name, t);
         }
     };
 
@@ -98,6 +114,11 @@ public abstract class ValueSerializer<T> {
         public void write(Double t, ValueWriter writer) throws IOException {
             writer.writeDouble(t);
         }
+
+        @Override
+        public void write(int tag, String name, Double t, MessageWriter writer) throws IOException {
+            writer.writeDouble(tag, name, t);
+        }
     };
 
     /** A value serializer that can serialize floats. */
@@ -113,6 +134,11 @@ public abstract class ValueSerializer<T> {
         @Override
         public void write(Float t, ValueWriter writer) throws IOException {
             writer.writeFloat(t);
+        }
+
+        @Override
+        public void write(int tag, String name, Float t, MessageWriter writer) throws IOException {
+            writer.writeFloat(tag, name, t);
         }
     };
 
@@ -130,6 +156,11 @@ public abstract class ValueSerializer<T> {
         public void write(Integer t, ValueWriter writer) throws IOException {
             writer.writeInt(t);
         }
+
+        @Override
+        public void write(int tag, String name, Integer t, MessageWriter writer) throws IOException {
+            writer.writeInt(tag, name, t);
+        }
     };
 
     /** A value serializer that can serialize longs. */
@@ -145,6 +176,11 @@ public abstract class ValueSerializer<T> {
         @Override
         public void write(Long t, ValueWriter writer) throws IOException {
             writer.writeInt64(t);
+        }
+
+        @Override
+        public void write(int tag, String name, Long t, MessageWriter writer) throws IOException {
+            writer.writeInt64(tag, name, t);
         }
     };
 
@@ -162,6 +198,11 @@ public abstract class ValueSerializer<T> {
         public void write(Position t, ValueWriter writer) throws IOException {
             writer.writePosition(t);
         }
+
+        @Override
+        public void write(int tag, String name, Position t, MessageWriter writer) throws IOException {
+            writer.writePosition(tag, name, t);
+        }
     };
 
     /** A value serializer that can serialize instances of {@link PositionTime}. */
@@ -177,6 +218,11 @@ public abstract class ValueSerializer<T> {
         @Override
         public void write(PositionTime t, ValueWriter writer) throws IOException {
             writer.writePositionTime(t);
+        }
+
+        @Override
+        public void write(int tag, String name, PositionTime t, MessageWriter writer) throws IOException {
+            writer.writePositionTime(tag, name, t);
         }
     };
 
@@ -194,6 +240,11 @@ public abstract class ValueSerializer<T> {
         public void write(String t, ValueWriter writer) throws IOException {
             writer.writeText(t);
         }
+
+        @Override
+        public void write(int tag, String name, String t, MessageWriter writer) throws IOException {
+            writer.writeText(tag, name, t);
+        }
     };
 
     /** A value serializer that can serialize instances of {@link Timestamp}. */
@@ -210,6 +261,11 @@ public abstract class ValueSerializer<T> {
         public void write(Timestamp t, ValueWriter writer) throws IOException {
             writer.writeTimestamp(t);
         }
+
+        @Override
+        public void write(int tag, String name, Timestamp t, MessageWriter writer) throws IOException {
+            writer.writeTimestamp(tag, name, t);
+        }
     };
 
     /** A value serializer that can serialize instances of {@link BigInteger}. */
@@ -225,6 +281,11 @@ public abstract class ValueSerializer<T> {
         @Override
         public void write(BigInteger t, ValueWriter writer) throws IOException {
             writer.writeVarInt(t);
+        }
+
+        @Override
+        public void write(int tag, String name, BigInteger t, MessageWriter writer) throws IOException {
+            writer.writeVarInt(tag, name, t);
         }
     };
 
@@ -253,6 +314,8 @@ public abstract class ValueSerializer<T> {
 
     public abstract void write(T t, ValueWriter writer) throws IOException;
 
+    public abstract void write(int tag, String name, T t, MessageWriter writer) throws IOException;
+
     static class ListSerializer<E> extends ValueSerializer<List<E>> {
         final ValueSerializer<E> serializer;
 
@@ -270,6 +333,12 @@ public abstract class ValueSerializer<T> {
         @Override
         public void write(List<E> t, ValueWriter writer) throws IOException {
             writer.writeList(t, serializer);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void write(int tag, String name, List<E> t, MessageWriter writer) throws IOException {
+            writer.writeList(tag, name, t, serializer);
         }
     }
 
@@ -294,6 +363,12 @@ public abstract class ValueSerializer<T> {
         public void write(Map<K, V> t, ValueWriter writer) throws IOException {
             writer.writeMap(t, keyParser, valueParser);
         }
+
+        /** {@inheritDoc} */
+        @Override
+        public void write(int tag, String name, Map<K, V> t, MessageWriter writer) throws IOException {
+            writer.writeMap(tag, name, t, keyParser, valueParser);
+        }
     }
 
     static class SetSerializer<E> extends ValueSerializer<Set<E>> {
@@ -313,6 +388,12 @@ public abstract class ValueSerializer<T> {
         @Override
         public void write(Set<E> t, ValueWriter writer) throws IOException {
             writer.writeSet(t, serializer);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void write(int tag, String name, Set<E> t, MessageWriter writer) throws IOException {
+            writer.writeSet(tag, name, t, serializer);
         }
     }
 }

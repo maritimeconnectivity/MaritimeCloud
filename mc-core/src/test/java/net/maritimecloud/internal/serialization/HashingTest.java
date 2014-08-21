@@ -18,8 +18,6 @@ package net.maritimecloud.internal.serialization;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-import java.lang.ref.SoftReference;
-import java.lang.reflect.Field;
 import java.security.MessageDigest;
 
 import net.maritimecloud.internal.message.Hashing;
@@ -69,17 +67,11 @@ public class HashingTest {
         assertEquals(11896, Hashing.murmur3BaseStep(12345678));
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void sha1() throws Exception {
         assertArrayEquals(MessageDigest.getInstance("SHA-1").digest(A), Hashing.SHA1(A));
         assertArrayEquals(MessageDigest.getInstance("SHA-1").digest(B), Hashing.SHA1(B));
 
-        // Test clearing of softreference
-        Field f = Hashing.class.getDeclaredField("SHA1");
-        f.setAccessible(true);
-        ((ThreadLocal<SoftReference<?>>) f.get(null)).get().clear();
-        assertArrayEquals(MessageDigest.getInstance("SHA-1").digest(B), Hashing.SHA1(B));
     }
 
     @Test(expected = NullPointerException.class)
@@ -92,17 +84,11 @@ public class HashingTest {
         Hashing.SHA256(null);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void sha256() throws Exception {
         assertArrayEquals(MessageDigest.getInstance("SHA-256").digest(A), Hashing.SHA256(A));
         assertArrayEquals(MessageDigest.getInstance("SHA-256").digest(B), Hashing.SHA256(B));
 
-        // Test clearing of softreference
-        Field f = Hashing.class.getDeclaredField("SHA256");
-        f.setAccessible(true);
-        ((ThreadLocal<SoftReference<?>>) f.get(null)).get().clear();
-        assertArrayEquals(MessageDigest.getInstance("SHA-256").digest(B), Hashing.SHA256(B));
     }
 
 }

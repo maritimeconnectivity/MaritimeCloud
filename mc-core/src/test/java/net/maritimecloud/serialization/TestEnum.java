@@ -14,8 +14,11 @@
  */
 package net.maritimecloud.serialization;
 
+import java.io.IOException;
+
 import net.maritimecloud.message.MessageEnum;
 import net.maritimecloud.message.MessageEnumSerializer;
+import net.maritimecloud.message.MessageWriter;
 
 /**
  *
@@ -73,6 +76,10 @@ public enum TestEnum implements MessageEnum {
         public TestEnum from(String name) {
             throw new UnsupportedOperationException("not implemented yet");
         }
+
+        /** {@inheritDoc} */
+        @Override
+        public void write(int tag, String name, TestEnum t, MessageWriter writer) throws IOException {}
     }
 
 }

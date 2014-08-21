@@ -14,9 +14,6 @@
  */
 package net.maritimecloud.net;
 
-import net.maritimecloud.core.id.MaritimeId;
-import net.maritimecloud.util.geometry.Position;
-
 /**
  * A callback interface for receiving broadcast messages of a specific type.
  *
@@ -33,23 +30,5 @@ public interface BroadcastListener<T extends BroadcastMessage> {
      * @param broadcast
      *            the message that was received
      */
-    void onMessage(BroadcastListener.Context context, T broadcast);
-
-    /** Information about the broadcast that was received. */
-    interface Context {
-
-        /**
-         * Returns the identity of the party that send the broadcast.
-         *
-         * @return the identity of the party that send the broadcast
-         */
-        MaritimeId getBroadcaster();
-
-        /**
-         * If the sending party has a position, returns said position. Otherwise returns <code>null</code>.
-         *
-         * @return if the sending party has a position, returns said position
-         */
-        Position getBroadcasterPosition();
-    }
+    void onMessage(MessageHeader header, T broadcast);
 }

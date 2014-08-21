@@ -17,7 +17,6 @@ package net.maritimecloud.internal.message;
 
 import static java.util.Objects.requireNonNull;
 
-import java.lang.ref.SoftReference;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -27,31 +26,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Various utility method for hashing objects and primitives.
- * 
+ *
  * @author Kasper Nielsen
  */
 public class Hashing {
 
-    /** Keeps a per-thread message digest. */
-    private static final ThreadLocal<SoftReference<MessageDigest>> SHA1 = new ThreadLocal<>();
-
-    /** Keeps a per-thread message digest. */
-    private static final ThreadLocal<SoftReference<MessageDigest>> SHA256 = new ThreadLocal<>();
-
     /** @return a MessageDigest that uses SHA-1 */
     private static MessageDigest getSHA1MessageDigest() {
-        SoftReference<MessageDigest> ref = SHA1.get();
-        if (ref != null) {
-            MessageDigest result = ref.get();
-            if (result != null) {
-                return result;
-            }
-        }
         try {
-            MessageDigest md = MessageDigest.getInstance("SHA-1");
-            ref = new SoftReference<>(md);
-            SHA1.set(ref);
-            return md;
+            return MessageDigest.getInstance("SHA-1");
         } catch (NoSuchAlgorithmException e) {
             // /CLOVER:OFF
             throw new Error("All java implementations should be able to create SHA-1 digests", e);
@@ -61,18 +44,8 @@ public class Hashing {
 
     /** @return a MessageDigest that uses SHA-256 */
     private static MessageDigest getSHA256MessageDigest() {
-        SoftReference<MessageDigest> ref = SHA256.get();
-        if (ref != null) {
-            MessageDigest result = ref.get();
-            if (result != null) {
-                return result;
-            }
-        }
         try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            ref = new SoftReference<>(md);
-            SHA256.set(ref);
-            return md;
+            return MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
             // /CLOVER:OFF
             throw new Error("All java implementations should be able to create SHA-256 digests", e);
@@ -83,7 +56,7 @@ public class Hashing {
     /**
      * Returns the hash code of the specified object, returning 0 for the {@code null} object. This method is equivalent
      * to {@link Objects#hashCode(Object)}
-     * 
+     *
      * @param o
      *            the object to calculate the hash code for
      * @return the hash code of the specified object
@@ -94,7 +67,7 @@ public class Hashing {
 
     /**
      * Applies the supplementary hash function used by {@link IdentityHashMap} to the specified integer.
-     * 
+     *
      * @param h
      *            the integer to hash
      * @return the hashed integer
@@ -105,7 +78,7 @@ public class Hashing {
 
     /**
      * Applies the supplementary hash function used by {@link HashMap} to the specified integer.
-     * 
+     *
      * @param h
      *            the integer to hash
      * @return the hashed integer
@@ -117,7 +90,7 @@ public class Hashing {
 
     /**
      * Applies the supplementary hash function used by {@link ConcurrentHashMap} to the specified integer.
-     * 
+     *
      * @param h
      *            the integer to hash
      * @return the hashed integer
@@ -156,10 +129,10 @@ public class Hashing {
 
     /**
      * Returns a SHA-1 hash of the specified byte array.
-     * 
+     *
      * @param bytes
      *            the array to calculate the hash of
-     * @return a SHA-1 hash
+     * @return a SHA-1 hash of the specified byte array
      */
     public static byte[] SHA1(byte[] bytes) {
         requireNonNull(bytes, "bytes is null");
@@ -169,10 +142,10 @@ public class Hashing {
 
     /**
      * Returns a SHA-256 hash of the specified byte array.
-     * 
+     *
      * @param bytes
      *            the array to calculate the hash of
-     * @return a SHA-256 hash
+     * @return a SHA-256 hash of the specified byte array
      */
     public static byte[] SHA256(byte[] bytes) {
         requireNonNull(bytes, "bytes is null");

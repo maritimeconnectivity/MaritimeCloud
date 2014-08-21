@@ -21,9 +21,11 @@ import static net.maritimecloud.util.geometry.CoordinateConverter.compass2cartes
 
 import java.io.IOException;
 
+import net.maritimecloud.internal.id160.BinaryUtil;
 import net.maritimecloud.message.MessageReader;
 import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.message.MessageWriter;
+import net.maritimecloud.util.Binary;
 
 /**
  * A position couple with a timestamp.
@@ -56,6 +58,18 @@ public class PositionTime extends Position {
     PositionTime(double latitude, double longitude, long time) {
         super(latitude, longitude);
         this.time = time;
+    }
+
+    public static PositionTime fromBinary(Binary b) {
+        return null;
+    }
+
+    public Binary toBinary() {
+        byte[] b = new byte[4 + 4 + 8];
+        BinaryUtil.writeInt(getLatitudeAsInt(), b, 0);
+        BinaryUtil.writeInt(getLongitudeAsInt(), b, 4);
+        BinaryUtil.writeLong(getTime(), b, 8);
+        return Binary.copyFrom(b);
     }
 
     /** {@inheritDoc} */

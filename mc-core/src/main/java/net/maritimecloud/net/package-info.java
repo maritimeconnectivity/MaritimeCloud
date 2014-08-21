@@ -14,7 +14,7 @@
  */
 
 /**
- * Provides common used classes for communicating with remote actors.
+ * Provides commonly used classes for communicating with remote actors on the maritime cloud.
  **/
 package net.maritimecloud.net;
 

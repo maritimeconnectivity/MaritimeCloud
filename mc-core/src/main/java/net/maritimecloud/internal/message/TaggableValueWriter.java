@@ -12,13 +12,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.net;
+package net.maritimecloud.internal.message;
 
-import net.maritimecloud.message.Message;
+import java.io.IOException;
+
+import net.maritimecloud.message.ValueWriter;
 
 /**
- * A special type of {@link Message} that can be broadcast.
  *
  * @author Kasper Nielsen
  */
-public interface BroadcastMessage extends Message {}
+public interface TaggableValueWriter extends ValueWriter {
+
+    TaggableValueWriter writeTag(int tag, String name) throws IOException;
+}

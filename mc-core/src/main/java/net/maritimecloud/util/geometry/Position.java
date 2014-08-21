@@ -19,10 +19,12 @@ import java.io.Serializable;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
+import net.maritimecloud.internal.id160.BinaryUtil;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageReader;
 import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.message.MessageWriter;
+import net.maritimecloud.util.Binary;
 import net.maritimecloud.util.geometry.CoordinateSystem.VincentyCalculationType;
 
 /**
@@ -312,10 +314,17 @@ public class Position implements Message, Serializable {
         return PositionTime.create(this, time);
     }
 
-
     void writeToPacked(MessageWriter w, int latId, String latName, int lonId, String lonName) throws IOException {
-        w.writeInt(latId, latName, (int) (latitude * 10_000_000d));
-        w.writeInt(lonId, lonName, (int) (longitude * 10_000_000d));
+        w.writeInt(latId, latName, getLatitudeAsInt());
+        w.writeInt(lonId, lonName, getLongitudeAsInt());
+    }
+
+    int getLatitudeAsInt() {
+        return (int) (latitude * 10_000_000d);
+    }
+
+    int getLongitudeAsInt() {
+        return (int) (longitude * 10_000_000d);
     }
 
     /**
@@ -348,6 +357,18 @@ public class Position implements Message, Serializable {
     }
 
     /**
+     * Returns a 64 bit representation of this position. Encoded as decimal degress with 7 decimal places.
+     *
+     * @return
+     */
+    public Binary toBinary() {
+        byte[] b = new byte[4 + 4];
+        BinaryUtil.writeInt(getLatitudeAsInt(), b, 0);
+        BinaryUtil.writeInt(getLongitudeAsInt(), b, 4);
+        return Binary.copyFrom(b);
+    }
+
+    /**
      * Format the given integer value as a String of length 3 with leading zeros.
      *
      * @param value
@@ -361,6 +382,10 @@ public class Position implements Message, Serializable {
             return "0" + value;
         }
         return Integer.toString(value);
+    }
+
+    public static Position fromBinary(Binary b) {
+        return null;
     }
 
     public static Position fromPackedLong(long l) {

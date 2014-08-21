@@ -17,7 +17,6 @@ package net.maritimecloud.internal.message;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,20 +32,24 @@ import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
 
 /**
+ * A message writer where the tag is completely separated from the actual value written. This is most often the case.
+ * But, for example, the compact binary sometime combines the tag and the actual value into 1 byte.
  *
  * @author Kasper Nielsen
  */
-public class DefaultMessageWriter implements MessageWriter {
+public class TaggableMessageWriter implements MessageWriter {
 
-    final AbstractValueWriter w;
+    final TaggableValueWriter w;
 
-    public DefaultMessageWriter(AbstractValueWriter w) {
+    public TaggableMessageWriter(TaggableValueWriter w) {
         this.w = w;
     }
 
     /** {@inheritDoc} */
     @Override
-    public void close() throws IOException {}
+    public void close() throws IOException {
+        w.close();
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -60,18 +63,6 @@ public class DefaultMessageWriter implements MessageWriter {
         if (binary != null) {
             w.writeTag(tag, name).writeBinary(binary);
         }
-    }
-
-    public final void writeBinary(int tag, String name, byte[] bytes) throws IOException {
-        writeBinary(tag, name, bytes, 0, bytes.length);
-    }
-
-    public void writeBinary(int tag, String name, byte[] bytes, int offset, int length) throws IOException {
-        writeBinary(tag, name, Binary.copyFrom(bytes, offset, length));
-    }
-
-    public void writeBinary(int tag, String name, ByteBuffer buffer) throws IOException {
-        writeBinary(tag, name, Binary.copyFrom(buffer));
     }
 
     /** {@inheritDoc} */
@@ -146,7 +137,6 @@ public class DefaultMessageWriter implements MessageWriter {
             w.writeTag(tag, name).writeMap(map, keySerializer, valueSerializer);
         }
     }
-
 
     /** {@inheritDoc} */
     @Override

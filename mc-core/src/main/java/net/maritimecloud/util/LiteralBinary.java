@@ -52,7 +52,7 @@ class LiteralBinary extends Binary {
     protected final byte[] bytes;
 
     /**
-     * Creates a {@code LiteralByteString} backed by the given array, without copying.
+     * Creates a {@code LiteralBinary} backed by the given array, without copying.
      *
      * @param bytes
      *            array to wrap
@@ -75,33 +75,29 @@ class LiteralBinary extends Binary {
     }
 
     // =================================================================
-    // ByteString -> substring
+    // Binary -> substring
 
     @Override
     public Binary substring(int beginIndex, int endIndex) {
         if (beginIndex < 0) {
             throw new IndexOutOfBoundsException("Beginning index: " + beginIndex + " < 0");
-        }
-        if (endIndex > size()) {
+        } else if (endIndex > size()) {
             throw new IndexOutOfBoundsException("End index: " + endIndex + " > " + size());
         }
+
         int substringLength = endIndex - beginIndex;
         if (substringLength < 0) {
             throw new IndexOutOfBoundsException("Beginning index larger than ending index: " + beginIndex + ", "
                     + endIndex);
         }
-
-        Binary result;
         if (substringLength == 0) {
-            result = Binary.EMPTY;
-        } else {
-            result = new BoundedBinary(bytes, getOffsetIntoBytes() + beginIndex, substringLength);
+            return Binary.EMPTY;
         }
-        return result;
+        return new BoundedBinary(bytes, getOffsetIntoBytes() + beginIndex, substringLength);
     }
 
     // =================================================================
-    // ByteString -> byte[]
+    // Binary -> byte[]
 
     @Override
     protected void copyToInternal(byte[] target, int sourceOffset, int targetOffset, int numberToCopy) {
@@ -178,13 +174,13 @@ class LiteralBinary extends Binary {
         } else if (other instanceof RopeBinary) {
             return other.equals(this);
         } else {
-            throw new IllegalArgumentException("Has a new type of ByteString been created? Found " + other.getClass());
+            throw new IllegalArgumentException("Has a new type of Binary been created? Found " + other.getClass());
         }
     }
 
     /**
      * Check equality of the substring of given length of this object starting at zero with another
-     * {@code LiteralByteString} substring starting at offset.
+     * {@code LiteralBinary} substring starting at offset.
      *
      * @param other
      *            what to compare a substring in

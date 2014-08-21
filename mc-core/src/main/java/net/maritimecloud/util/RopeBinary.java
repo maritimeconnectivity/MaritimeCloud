@@ -44,7 +44,7 @@ import java.util.NoSuchElementException;
 import java.util.Stack;
 
 /**
- * Class to represent {@code ByteStrings} formed by concatenation of other ByteStrings, without copying the data in the
+ * Class to represent {@code Binarys} formed by concatenation of other Binarys, without copying the data in the
  * pieces. The concatenation is represented as a tree whose leaf nodes are each a {@link LiteralBinary}.
  *
  * <p>
@@ -116,7 +116,7 @@ class RopeBinary extends Binary {
     private final int treeDepth;
 
     /**
-     * Create a new RopeByteString, which can be thought of as a new tree node, by recording references to the two given
+     * Create a new RopeBinary, which can be thought of as a new tree node, by recording references to the two given
      * strings.
      *
      * @param left
@@ -164,7 +164,7 @@ class RopeBinary extends Binary {
                 result = concatenateBytes(left, right);
             } else if (leftRope != null && leftRope.right.size() + right.size() < CONCATENATE_BY_COPY_SIZE) {
                 // Optimization from BAP95: As an optimization of the case where the
-                // ByteString is constructed by repeated concatenate, recognize the case
+                // Binary is constructed by repeated concatenate, recognize the case
                 // where a short string is concatenated to a left-hand node whose
                 // right-hand branch is short. In the paper this applies to leaves, but
                 // we just look at the length here. This has the advantage of shedding
@@ -219,7 +219,7 @@ class RopeBinary extends Binary {
     }
 
     /**
-     * Create a new RopeByteString for testing only while bypassing all the defenses of
+     * Create a new RopeBinary for testing only while bypassing all the defenses of
      * {@link #concatenate(Binary, Binary)}. This allows testing trees of specific structure. We are also able to insert
      * empty leaves, though these are dis-allowed, so that we can make sure the implementation can withstand their
      * presence.
@@ -338,7 +338,7 @@ class RopeBinary extends Binary {
                 Binary rightSub = right.substring(0, endIndex - leftLength);
                 // Intentionally not rebalancing, since in many cases these two
                 // substrings will already be less deep than the top-level
-                // RopeByteString we're taking a substring of.
+                // RopeBinary we're taking a substring of.
                 result = new RopeBinary(leftSub, rightSub);
             }
         }
@@ -346,7 +346,7 @@ class RopeBinary extends Binary {
     }
 
     // =================================================================
-    // ByteString -> byte[]
+    // Binary -> byte[]
 
     @Override
     protected void copyToInternal(byte[] target, int sourceOffset, int targetOffset, int numberToCopy) {
@@ -375,7 +375,7 @@ class RopeBinary extends Binary {
 
     @Override
     public List<ByteBuffer> asReadOnlyByteBufferList() {
-        // Walk through the list of LiteralByteString's that make up this
+        // Walk through the list of LiteralBinary's that make up this
         // rope, and add each one as a read-only ByteBuffer.
         List<ByteBuffer> result = new ArrayList<>();
         PieceIterator pieces = new PieceIterator(this);
@@ -433,8 +433,8 @@ class RopeBinary extends Binary {
             return false;
         }
 
-        Binary otherByteString = (Binary) other;
-        if (totalLength != otherByteString.size()) {
+        Binary otherBinary = (Binary) other;
+        if (totalLength != otherBinary.size()) {
             return false;
         }
         if (totalLength == 0) {
@@ -447,13 +447,13 @@ class RopeBinary extends Binary {
         // hashCode here, and if we're going to be testing a bunch of byteStrings,
         // it might even make sense.
         if (hash != 0) {
-            int cachedOtherHash = otherByteString.peekCachedHashCode();
+            int cachedOtherHash = otherBinary.peekCachedHashCode();
             if (cachedOtherHash != 0 && hash != cachedOtherHash) {
                 return false;
             }
         }
 
-        return equalsFragments(otherByteString);
+        return equalsFragments(otherBinary);
     }
 
     /**
@@ -587,7 +587,7 @@ class RopeBinary extends Binary {
                 Binary newLeft = prefixesStack.pop();
                 partialString = new RopeBinary(newLeft, partialString);
             }
-            // We should end up with a RopeByteString since at a minimum we will
+            // We should end up with a RopeBinary since at a minimum we will
             // create one from concatenating left and right
             return partialString;
         }
@@ -604,7 +604,7 @@ class RopeBinary extends Binary {
                 doBalance(rbs.left);
                 doBalance(rbs.right);
             } else {
-                throw new IllegalArgumentException("Has a new type of ByteString been created? Found "
+                throw new IllegalArgumentException("Has a new type of Binary been created? Found "
                         + root.getClass());
             }
         }
@@ -721,9 +721,9 @@ class RopeBinary extends Binary {
         }
 
         /**
-         * Returns the next item and advances one {@code LiteralByteString}.
+         * Returns the next item and advances one {@code LiteralBinary}.
          *
-         * @return next non-empty LiteralByteString or {@code null}
+         * @return next non-empty LiteralBinary or {@code null}
          */
         public LiteralBinary next() {
             if (next == null) {

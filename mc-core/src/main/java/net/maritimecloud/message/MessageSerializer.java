@@ -20,12 +20,12 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import net.maritimecloud.internal.message.json.JsonMessageReader;
-import net.maritimecloud.internal.message.json.JsonValueWriter;
+import net.maritimecloud.internal.message.text.json.JsonMessageReader;
+import net.maritimecloud.internal.message.text.json.JsonValueWriter;
 
 /**
  * A message serializer takes care of persisting and retrieving {@link Message messages}.
- * 
+ *
  * @param <T>
  *            the type of message that can be serialized
  * @author Kasper Nielsen
@@ -61,13 +61,11 @@ public abstract class MessageSerializer<T extends Message> extends ValueSerializ
      */
     public abstract void write(T message, MessageWriter writer) throws IOException;
 
-
     /** {@inheritDoc} */
     @Override
     public final void write(T value, ValueWriter writer) throws IOException {
         writer.writeMessage(value, this);
     }
-
 
     public static <T extends Message> String writeToJSON(T message, MessageSerializer<T> serializer) {
         StringWriter sw = new StringWriter();
@@ -77,6 +75,12 @@ public abstract class MessageSerializer<T extends Message> extends ValueSerializ
             throw new RuntimeException("Failed to write message as JSON", e);
         }
         return sw.toString();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void write(int tag, String name, T t, MessageWriter writer) throws IOException {
+        writer.writeMessage(tag, name, t, this);
     }
 
     @SuppressWarnings("resource")

@@ -18,9 +18,15 @@ package net.maritimecloud.message;
 /**
  * The basic message interface that all messages must be implement. Messages are normally generated from MSDL files.
  * <p>
+ * Normally, there should be no need to manually extend this class, as broadcast messages are automatically generated
+ * from a MSDL file.
+ * <p>
  * Any class implementing this interface should also have a
  * <code>public static final MessageSerializer SERIALIZER</code> field. To allow for reading the serialized message back
  * again.
+ * <p>
+ * Any implementation of this message must contain a <tt>public static final String NAME = "name"</tt> field. With the
+ * full name of this broadcast message.
  *
  * @author Kasper Nielsen
  */

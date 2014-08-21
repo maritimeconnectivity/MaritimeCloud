@@ -19,6 +19,7 @@ import java.io.Flushable;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,13 +29,25 @@ import net.maritimecloud.util.Timestamp;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
 
-
 /**
  * Abstract class for writing to message streams.
  *
  * @author Kasper Nielsen
  */
 public interface MessageWriter extends Closeable, Flushable {
+
+    default void writeBinary(int tag, String name, byte[] bytes) throws IOException {
+        writeBinary(tag, name, bytes, 0, bytes.length);
+    }
+
+    default void writeBinary(int tag, String name, byte[] bytes, int offset, int length) throws IOException {
+        writeBinary(tag, name, Binary.copyFrom(bytes, offset, length));
+    }
+
+    default void writeBinary(int tag, String name, ByteBuffer buffer) throws IOException {
+        writeBinary(tag, name, Binary.copyFrom(buffer));
+    }
+
 
     void writeBinary(int tag, String name, Binary binary) throws IOException;
 
@@ -95,7 +108,6 @@ public interface MessageWriter extends Closeable, Flushable {
      *             If an I/O error occurs
      */
     void writeInt(int tag, String name, Integer value) throws IOException;
-
 
     void writeVarInt(int tag, String name, BigInteger value) throws IOException;
 
@@ -177,7 +189,7 @@ public interface MessageWriter extends Closeable, Flushable {
      *            the serializer for the message
      * @param <T>
      *            the type of message
-     * 
+     *
      * @throws IOException
      *             If an I/O error occurs
      */

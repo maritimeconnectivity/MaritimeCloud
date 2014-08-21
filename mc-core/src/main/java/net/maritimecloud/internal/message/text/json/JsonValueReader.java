@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.internal.message.json;
+package net.maritimecloud.internal.message.text.json;
 
 import static java.util.Objects.requireNonNull;
 
@@ -21,10 +21,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
@@ -32,38 +30,34 @@ import javax.json.JsonObject;
 import javax.json.JsonString;
 import javax.json.JsonValue;
 
+import net.maritimecloud.internal.message.text.AbstractTextValueReader;
 import net.maritimecloud.message.Message;
-import net.maritimecloud.message.MessageEnum;
-import net.maritimecloud.message.MessageEnumSerializer;
 import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.message.SerializationException;
-import net.maritimecloud.message.ValueReader;
 import net.maritimecloud.message.ValueSerializer;
-import net.maritimecloud.util.Binary;
-import net.maritimecloud.util.Timestamp;
-import net.maritimecloud.util.geometry.Position;
-import net.maritimecloud.util.geometry.PositionTime;
 
 /**
  *
  * @author Kasper Nielsen
  */
-public class JsonValueReader implements ValueReader {
+public class JsonValueReader extends AbstractTextValueReader {
+
+    /** {@inheritDoc} */
+    @Override
+    public <T> List<T> readList(ValueSerializer<T> parser) throws IOException {
+        ArrayList<T> result = new ArrayList<>();
+        JsonArray a = (JsonArray) value;
+        for (int i = 0; i < a.size(); i++) {
+            T t = parser.read(new JsonValueReader(a.get(i)));
+            result.add(t);
+        }
+        return result;
+    }
 
     final JsonValue value;
 
     JsonValueReader(JsonValue value) {
         this.value = requireNonNull(value);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Binary readBinary() throws IOException {
-        if (value instanceof JsonString) {
-            JsonString v = (JsonString) value;
-            return Binary.copyFromBase64(v.getString());
-        }
-        throw new SerializationException("Was not a string");
     }
 
     /** {@inheritDoc} */
@@ -99,12 +93,6 @@ public class JsonValueReader implements ValueReader {
 
     /** {@inheritDoc} */
     @Override
-    public <T extends Enum<T> & MessageEnum> T readEnum(MessageEnumSerializer<T> factory) throws IOException {
-        return factory.from(value.toString());
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public Float readFloat() throws IOException {
         if (value instanceof JsonNumber) {
             JsonNumber v = (JsonNumber) value;
@@ -135,18 +123,6 @@ public class JsonValueReader implements ValueReader {
 
     /** {@inheritDoc} */
     @Override
-    public <T> List<T> readList(ValueSerializer<T> parser) throws IOException {
-        ArrayList<T> result = new ArrayList<>();
-        JsonArray a = (JsonArray) value;
-        for (int i = 0; i < a.size(); i++) {
-            T t = parser.read(new JsonValueReader(a.get(i)));
-            result.add(t);
-        }
-        return result;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public <K, V> Map<K, V> readMap(ValueSerializer<K> keyParser, ValueSerializer<V> valueParser) throws IOException {
         Map<K, V> result = new HashMap<>();
         JsonObject a = (JsonObject) value;
@@ -169,36 +145,12 @@ public class JsonValueReader implements ValueReader {
 
     /** {@inheritDoc} */
     @Override
-    public Position readPosition() throws IOException {
-        return readMessage(Position.SERIALIZER);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PositionTime readPositionTime() throws IOException {
-        return readMessage(PositionTime.SERIALIZER);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public <T> Set<T> readSet(ValueSerializer<T> parser) throws IOException {
-        return new HashSet<>(readList(parser));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String readText() throws IOException {
+    protected String readString() throws IOException {
         if (value instanceof JsonString) {
             JsonString v = (JsonString) value;
             return v.getString();
         }
         throw new SerializationException("Was not a string");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Timestamp readTimestamp() throws IOException {
-        return Timestamp.create(readInt64());
     }
 
     /** {@inheritDoc} */

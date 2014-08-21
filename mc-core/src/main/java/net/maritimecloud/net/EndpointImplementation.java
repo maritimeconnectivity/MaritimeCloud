@@ -14,15 +14,11 @@
  */
 package net.maritimecloud.net;
 
-import java.io.IOException;
-
-import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.message.MessageReader;
 import net.maritimecloud.message.ValueWriter;
-import net.maritimecloud.util.geometry.Position;
 
 /**
- * The implementation of an endpoint.
+ * The implementation part of an endpoint.
  *
  * @author Kasper Nielsen
  */
@@ -40,31 +36,15 @@ public interface EndpointImplementation {
      *
      * @param name
      *            the name of the endpoint method
-     * @param context
-     *            the caller context
+     * @param header
+     *            the message header
      * @param parameterReader
      *            a reader for reading the parameters to the method
      * @param resultWriter
      *            a writer used for writing the result of invoking the method
-     * @throws IOException
+     * @throws Exception
      *             if an exception occurred while invoking the service
      */
-    void invoke(String name, Context context, MessageReader parameterReader, ValueWriter resultWriter) throws Exception;
-
-    interface Context {
-
-        /**
-         * Returns the identity of the calling party.
-         *
-         * @return the identity of the calling party
-         */
-        MaritimeId getCaller();
-
-        /**
-         * If the calling party has a position, returns said position. Otherwise returns <code>null</code>.
-         *
-         * @return if the calling party has a position, returns said position
-         */
-        Position getCallerPosition();
-    }
+    void invoke(String name, MessageHeader header, MessageReader parameterReader, ValueWriter resultWriter)
+            throws Exception;
 }

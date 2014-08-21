@@ -33,14 +33,14 @@ package net.maritimecloud.util;
 import java.util.NoSuchElementException;
 
 /**
- * This class is used to represent the substring of a {@link Binary} over a single byte array. In terms of the
- * public API of {@link Binary}, you end up here by calling {@link Binary#copyFrom(byte[])} followed by
+ * This class is used to represent the substring of a {@link Binary} over a single byte array. In terms of the public
+ * API of {@link Binary}, you end up here by calling {@link Binary#copyFrom(byte[])} followed by
  * {@link Binary#substring(int, int)}.
- * 
+ *
  * <p>
- * This class contains most of the overhead involved in creating a substring from a {@link LiteralBinary}. The
- * overhead involves some range-checking and two extra fields.
- * 
+ * This class contains most of the overhead involved in creating a substring from a {@link LiteralBinary}. The overhead
+ * involves some range-checking and two extra fields.
+ *
  * @author carlanton@google.com (Carl Haverl)
  */
 class BoundedBinary extends LiteralBinary {
@@ -50,8 +50,8 @@ class BoundedBinary extends LiteralBinary {
     private final int bytesLength;
 
     /**
-     * Creates a {@code BoundedByteString} backed by the sub-range of given array, without copying.
-     * 
+     * Creates a {@code BoundedBinary} backed by the sub-range of given array, without copying.
+     *
      * @param bytes
      *            array to wrap
      * @param offset
@@ -66,14 +66,11 @@ class BoundedBinary extends LiteralBinary {
         super(bytes);
         if (offset < 0) {
             throw new IllegalArgumentException("Offset too small: " + offset);
-        }
-        if (length < 0) {
+        } else if (length < 0) {
             throw new IllegalArgumentException("Length too small: " + offset);
-        }
-        if ((long) offset + length > bytes.length) {
+        } else if ((long) offset + length > bytes.length) {
             throw new IllegalArgumentException("Offset+Length too large: " + offset + "+" + length);
         }
-
         this.bytesOffset = offset;
         this.bytesLength = length;
     }
@@ -81,7 +78,7 @@ class BoundedBinary extends LiteralBinary {
     /**
      * Gets the byte at the given index. Throws {@link ArrayIndexOutOfBoundsException} for backwards-compatibility
      * reasons although it would more properly be {@link IndexOutOfBoundsException}.
-     * 
+     *
      * @param index
      *            index of byte
      * @return the value
@@ -94,11 +91,9 @@ class BoundedBinary extends LiteralBinary {
         // checking for substrings.
         if (index < 0) {
             throw new ArrayIndexOutOfBoundsException("Index too small: " + index);
-        }
-        if (index >= size()) {
-            throw new ArrayIndexOutOfBoundsException("Index too large: " + index + ", " + size());
-        }
-
+        } else if (index >= size()) {
+                throw new ArrayIndexOutOfBoundsException("Index too large: " + index + ", " + size());
+            }
         return bytes[bytesOffset + index];
     }
 
@@ -113,7 +108,7 @@ class BoundedBinary extends LiteralBinary {
     }
 
     // =================================================================
-    // ByteString -> byte[]
+    // Binary -> byte[]
 
     @Override
     protected void copyToInternal(byte[] target, int sourceOffset, int targetOffset, int numberToCopy) {

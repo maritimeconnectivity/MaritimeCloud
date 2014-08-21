@@ -17,6 +17,7 @@ package net.maritimecloud.message;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,14 +45,19 @@ public interface ValueReader {
 
     BigDecimal readDecimal() throws IOException;
 
-
     Boolean readBoolean() throws IOException;
 
     Binary readBinary() throws IOException;
 
     String readText() throws IOException;
 
-    Timestamp readTimestamp() throws IOException;
+    default Timestamp readTimestamp() throws IOException {
+        long timestamp = readInt64();
+        if (timestamp < 0) {
+            throw new SerializationException("Read a negative timestamp, must be positive, was " + timestamp);
+        }
+        return Timestamp.create(timestamp);
+    }
 
     Position readPosition() throws IOException;
 
@@ -64,7 +70,9 @@ public interface ValueReader {
 
     <T> List<T> readList(ValueSerializer<T> parser) throws IOException;
 
-    <T> Set<T> readSet(ValueSerializer<T> parser) throws IOException;
+    default <T> Set<T> readSet(ValueSerializer<T> parser) throws IOException {
+        return new LinkedHashSet<>(readList(parser));
+    }
 
     <K, V> Map<K, V> readMap(ValueSerializer<K> keyParser, ValueSerializer<V> valueParser) throws IOException;
 }

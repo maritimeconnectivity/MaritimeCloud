@@ -34,7 +34,9 @@ import net.maritimecloud.util.geometry.PositionTime;
  */
 public interface MessageReader extends Closeable {
 
-    boolean isNext(int tag, String name);
+    default void close() throws IOException {};
+
+    boolean isNext(int tag, String name) throws IOException;
 
     Binary readBinary(int tag, String name, Binary defaultValue) throws IOException;
 

@@ -14,69 +14,73 @@
  */
 package net.maritimecloud.internal.msdl.parser;
 
-import static java.util.Objects.requireNonNull;
-
 import java.nio.file.Path;
 
 import net.maritimecloud.msdl.model.SourceToken;
-
-import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  *
  * @author Kasper Nielsen
  */
-class SourceTagHolder implements SourceToken {
+public class DefaultSourceToken implements SourceToken {
 
-    final ParsedFile file;
+    private final int endColumn;
 
-    final int startCharPosition;
+    private final int endLine;
 
-    final int startLine;
+    private final Path path;
 
-    final int stopCharPosition;
+    private final int startColumn;
 
-    final int stopLine;
+    private final int startLine;
 
-    SourceTagHolder(ParsedFile file, ParserRuleContext c) {
-        this.file = requireNonNull(file);
-        this.startLine = c.getStart().getLine();
-        this.startCharPosition = c.getStart().getCharPositionInLine();
-        this.stopLine = c.getStop().getLine();
-        this.stopCharPosition = c.getStop().getCharPositionInLine();
+    /**
+     * @param path
+     * @param startColumn
+     * @param startLine
+     * @param endColumn
+     * @param endLine
+     */
+    public DefaultSourceToken(Path path, int startColumn, int startLine, int endColumn, int endLine) {
+        this.path = path;
+        this.startColumn = startColumn;
+        this.startLine = startLine;
+        this.endColumn = endColumn;
+        this.endLine = endLine;
     }
 
     /** {@inheritDoc} */
     @Override
     public int getEndColumn() {
-        return stopCharPosition;
+        return endColumn;
     }
 
     /** {@inheritDoc} */
     @Override
     public int getEndLine() {
-        return stopLine;
+        return endLine;
     }
 
     /** {@inheritDoc} */
     @Override
     public Path getPath() {
-        return file.antlrFile.getPath();
-    }
-
-    public String toString() {
-        return getPath() + ":[" + startLine + ":" + startCharPosition + "]";
+        return path;
     }
 
     /** {@inheritDoc} */
     @Override
     public int getStartColumn() {
-        return startCharPosition;
+        return startColumn;
     }
 
     /** {@inheritDoc} */
     @Override
     public int getStartLine() {
         return startLine;
+    }
+
+
+    public String toString() {
+        return getPath() + ":[" + startLine + ":" + startColumn + "]";
     }
 }
