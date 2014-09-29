@@ -39,7 +39,7 @@ public interface EndpointInvocationFuture<T> {
      * @throws UnsupportedOperationException
      *             if the underlying communication mechanism does not support acknowledgement of the broadcast message.
      */
-    Acknowledgement acknowledgement();
+    Acknowledgement relayed();
 
     /**
      * Returns a unique hash of the message send.
@@ -51,7 +51,6 @@ public interface EndpointInvocationFuture<T> {
     T join();
 
     EndpointInvocationFuture<Void> thenRun(Runnable action);
-
 
     /**
      * Waits if necessary for the computation to complete, and then retrieves its result.
@@ -114,14 +113,14 @@ public interface EndpointInvocationFuture<T> {
     boolean isDone();
 
     /**
-     * Creates a new MmsFuture that will time out via {@link TimeoutException} if this task has not completed within the
-     * specified time.
+     * Creates a new EndpointInvocationFuture that will time out via {@link TimeoutException} if this task has not
+     * completed within the specified time.
      *
      * @param timeout
      *            the maximum time to wait
      * @param unit
      *            the time unit of the timeout argument
-     * @return the new network future
+     * @return the new future
      */
     EndpointInvocationFuture<T> timeout(long timeout, TimeUnit unit);
 }

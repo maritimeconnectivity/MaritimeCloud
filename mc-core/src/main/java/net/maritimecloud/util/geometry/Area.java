@@ -131,13 +131,20 @@ public abstract class Area implements Message, Serializable {
         return MessageSerializer.writeToJSON(this, SERIALIZER);
     }
 
+    /**
+     * Returns a union of this area with the specified area.
+     *
+     * @param other
+     *            the area to join with this area.
+     * @return the joined area
+     */
     public final Area unionWith(Area other) {
         return new AreaUnion(this, other);
     }
 
     /**
      * Creates a message of this type from a JSON throwing a runtime exception if the format of the message does not
-     * match
+     * match a valid area.
      *
      * @param string
      *            the JSON string to parse

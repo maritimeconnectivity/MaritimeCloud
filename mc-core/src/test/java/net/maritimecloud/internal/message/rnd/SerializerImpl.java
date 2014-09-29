@@ -12,10 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package net.maritimecloud.internal.message.rnd;
+
+import net.maritimecloud.message.Message;
+import net.maritimecloud.message.MessageSerializer;
 
 /**
- * Contains geometry based utility classes.
  *
- **/
-package net.maritimecloud.util.geometry;
+ * @author Kasper Nielsen
+ */
+public interface SerializerImpl {
 
+    <T extends Message> byte[] serializer(MessageSerializer<T> serializer, T msg);
+
+    <T extends Message> T deserializer(MessageSerializer<T> serializer, byte[] msg);
+}

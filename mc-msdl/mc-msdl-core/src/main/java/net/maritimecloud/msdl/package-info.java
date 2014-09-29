@@ -14,8 +14,7 @@
  */
 
 /**
- * Contains geometry based utility classes.
- *
+ * Provides the classes for writing plugins that work on MSDL files.
  **/
-package net.maritimecloud.util.geometry;
+package net.maritimecloud.msdl;
 

@@ -49,7 +49,7 @@ public class BinaryInputStream extends Types {
         this.is = requireNonNull(is);
     }
 
-    public int readInt() throws IOException {
+    public int readInt() {
         // return encodeAndWriteInteger(tag, name, Float.floatToIntBits(value));
         return 0;
     }

@@ -44,6 +44,9 @@ public class Polygon extends Area {
     final Position[] positions;
 
     public Polygon(Position... positions) {
+        if (positions.length < 3) {
+            throw new IllegalArgumentException("A polygon must have at lease 3 points, had " + positions.length);
+        }
         this.positions = positions;
     }
 
@@ -79,4 +82,8 @@ public class Polygon extends Area {
     public static Polygon create(Position... positions) {
         return new Polygon(positions);
     }
+    //
+    // static boolean crossesMeridian(Position p1, Position p2) {
+    //
+    // }
 }

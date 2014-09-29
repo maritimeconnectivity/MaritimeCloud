@@ -21,4 +21,12 @@ import net.maritimecloud.message.Message;
  *
  * @author Kasper Nielsen
  */
-public interface BroadcastMessage extends Message {}
+public interface BroadcastMessage extends Message {
+
+    /**
+     * Returns an immutable copy of this message.
+     *
+     * @return an immutable copy of this message
+     */
+    BroadcastMessage immutable();
+}

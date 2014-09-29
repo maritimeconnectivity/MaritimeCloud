@@ -129,16 +129,6 @@ public final class Rectangle extends Area {
         return minLongitude;
     }
 
-    /**
-     * Returns a random position within the box.
-     *
-     * @return a random position within the box
-     */
-    @Deprecated
-    public Position getRandom() {
-        return getRandomPosition();
-    }
-
     /** {@inheritDoc} */
     @Override
     public Position getRandomPosition(Random r) {

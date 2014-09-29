@@ -14,8 +14,7 @@
  */
 
 /**
- * Contains geometry based utility classes.
- *
+ * Provides classes and interfaces for obtaining reflective information about the contents of a MSDL file.
  **/
-package net.maritimecloud.util.geometry;
+package net.maritimecloud.msdl.model;
 

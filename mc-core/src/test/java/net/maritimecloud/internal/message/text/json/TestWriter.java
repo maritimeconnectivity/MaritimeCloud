@@ -12,15 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.internal.serialization.json;
+package net.maritimecloud.internal.message.text.json;
 
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 
+import net.maritimecloud.message.TestEnum;
 import net.maritimecloud.message.ValueSerializer;
-import net.maritimecloud.serialization.TestEnum;
 import net.maritimecloud.util.Timestamp;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;

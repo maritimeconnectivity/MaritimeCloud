@@ -55,6 +55,8 @@ class AreaUnion extends Area {
     final Area[] areas;
 
     /**
+     * Creates a new AreaUnion.
+     * 
      * @param area
      *            the areas to combine
      */

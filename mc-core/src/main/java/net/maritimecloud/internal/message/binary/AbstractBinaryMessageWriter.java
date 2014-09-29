@@ -62,7 +62,7 @@ public abstract class AbstractBinaryMessageWriter implements MessageWriter {
     @Override
     public final void writeDouble(int tag, String name, Double value) throws IOException {
         if (value != null) {
-            writeDouble0(tag, name, MessageHelper.checkDouble(value));
+            writeDouble0(tag, MessageHelper.checkDouble(value));
         }
     }
 
@@ -88,17 +88,13 @@ public abstract class AbstractBinaryMessageWriter implements MessageWriter {
     protected abstract <T extends Message> void writeMessage0(int tag, T message, MessageSerializer<T> serializer)
             throws IOException;
 
-    protected abstract void writeDouble0(int tag, String name, double value) throws IOException;
-
     /** {@inheritDoc} */
     @Override
     public final void writeFloat(int tag, String name, Float value) throws IOException {
         if (value != null) {
-            writeFloat0(tag, name, MessageHelper.checkFloat(value));
+            writeFloat0(tag, MessageHelper.checkFloat(value));
         }
     };
-
-    protected abstract void writeFloat0(int tag, String name, double value) throws IOException;
 
     protected abstract void writeInt640(int tag, String name, long value) throws IOException;
 
@@ -107,7 +103,7 @@ public abstract class AbstractBinaryMessageWriter implements MessageWriter {
     public final <T> void writeList(int tag, String name, List<T> list, ValueSerializer<T> serializer)
             throws IOException {
         if (list != null && list.size() > 0) {
-            writeSetOrList(tag, name, null, serializer);
+            writeSetOrList(tag, null, serializer);
         }
     }
 
@@ -115,12 +111,9 @@ public abstract class AbstractBinaryMessageWriter implements MessageWriter {
     @Override
     public final <T> void writeSet(int tag, String name, Set<T> set, ValueSerializer<T> serializer) throws IOException {
         if (set != null && set.size() > 0) {
-            writeSetOrList(tag, name, set, serializer);
+            writeSetOrList(tag, set, serializer);
         }
     }
-
-    protected abstract <T> void writeSetOrList(int tag, String name, Collection<T> set, ValueSerializer<T> serializer)
-            throws IOException;
 
     /** {@inheritDoc} */
     @Override
@@ -133,7 +126,7 @@ public abstract class AbstractBinaryMessageWriter implements MessageWriter {
     protected abstract void writeDecimal0(int tag, BigDecimal bd) throws IOException;
 
     protected void writeDouble0(int tag, double value) throws IOException {
-        long val = Double.doubleToLongBits(value);
+        long val = Double.doubleToLongBits(MessageHelper.checkDouble(value));
         writeInt640(tag, val);
     }
 
@@ -147,7 +140,7 @@ public abstract class AbstractBinaryMessageWriter implements MessageWriter {
 
 
     protected void writeFloat0(int tag, float value) throws IOException {
-        int val = Float.floatToIntBits(value);
+        int val = Float.floatToIntBits(MessageHelper.checkFloat(value));
         writeInt0(tag, val);
     }
 

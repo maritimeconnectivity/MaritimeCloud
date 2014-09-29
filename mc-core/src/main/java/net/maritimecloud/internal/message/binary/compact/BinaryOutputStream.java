@@ -133,7 +133,7 @@ public class BinaryOutputStream extends Types {
         }
     }
 
-    public BinaryOutputStream writeLong(int tag, long value) throws IOException {
+    public BinaryOutputStream writeLong(int tag, long value) {
         return this;
     }
 
@@ -198,7 +198,7 @@ public class BinaryOutputStream extends Types {
         return this;
     }
 
-    void writeVarInt32(int value) throws IOException {
+    void writeVarInt32(int value) {
 
     }
 

@@ -25,8 +25,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import javax.crypto.Cipher;
 
-import net.maritimecloud.util.Id160;
-
 /**
  * A secure random number generator isolated to the current thread. This generator is similar to
  * {@link ThreadLocalRandom} except this generator uses an AES {@link Cipher} for generating values. Like

@@ -8,6 +8,7 @@ target
 /_old
 mc-msdl/*.msdl
 mc-msdl/generated
+mc-almanac
 private
 TODO*
 dependency-reduced-pom.xml

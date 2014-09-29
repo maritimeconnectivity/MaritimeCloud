@@ -15,7 +15,8 @@
 package net.maritimecloud.net;
 
 import net.maritimecloud.util.Binary;
-import net.maritimecloud.util.geometry.PositionTime;
+import net.maritimecloud.util.Timestamp;
+import net.maritimecloud.util.geometry.Position;
 
 /**
  * A future returned when sending a broadcast. This future can be used if supported by the underlying transport
@@ -26,29 +27,37 @@ import net.maritimecloud.util.geometry.PositionTime;
 public interface BroadcastFuture {
 
     /**
-     * A future that can be used to determine when the message have been received by the server. This is done on a best
-     * effort basis. The broadcast message might be delivered to remote clients before the returned future completes.
-     *
-     * @return a completion stage that can be used to execute actions when the broadcast has been delivered to a central
-     *         server
-     *
-     * @throws UnsupportedOperationException
-     *             if the underlying communication mechanism does not support acknowledgement of the broadcast message.
-     */
-    Acknowledgement acknowledgement();
-
-    /**
      * Returns a unique hash of the broadcast message that was send.
      *
-     * @return a unique hash of the broadcast message that was send.
+     * @return a unique hash of the broadcast message that was send
      */
     Binary getMessageHash();
 
     /**
-     * Returns the position time that was attached to the broadcast being sent.
+     * Returns an optional position that was attached to the broadcast being sent. Clients that do not have a position
+     * reader attached will not attach a position to the header of the broadcast.
      *
-     * @return the position time that was attached to the broadcast being sent
+     * @return the optional position that was attached to the broadcast being sent
      */
-    // Separate Time + Postion me thinkgs
-    PositionTime getPositionTime();
+    Position getPosition();
+
+    /**
+     * Returns the time stamp that was attached to the broadcast being sent.
+     *
+     * @return the time stamp that was attached to the broadcast being sent
+     */
+    Timestamp getTime();
+
+    /**
+     * If the protocol in which the broadcast is send uses a central relaying server, for example MMS. This method can
+     * be used to determine when the message have been received by the MMS server. This is done on a best effort basis.
+     * The broadcast message might be delivered to remote clients before the returned future completes.
+     *
+     * @return an acknowledgement object that can be used to execute actions when the broadcast has been delivered to a
+     *         relay server
+     *
+     * @throws UnsupportedOperationException
+     *             if the underlying communication mechanism does not make of a central relaying server.
+     */
+    Acknowledgement relayed();
 }

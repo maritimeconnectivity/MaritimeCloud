@@ -106,21 +106,19 @@ public class BinaryMessageWriter extends AbstractBinaryMessageWriter {
     /** {@inheritDoc} */
     @Override
     protected <T> void writeSetOrList(int tag, Collection<T> col, ValueSerializer<T> serializer) throws IOException {
-        if (col.size() == 1) {
-            T t = col.iterator().next();
-            if (t != null) {
-                serializer.write(tag, "tagIsIgnored", t, this);
-            }
-        } else {
-            byte[] bytes = BinaryValueWriter.writeWithWriter(e -> {
-                for (T t : col) {
-                    if (t != null) {
-                        serializer.write(t, e);
-                    }
+        /*
+         * if (col.size() == 1) { T t = col.iterator().next(); if (t != null) { serializer.write(tag, "tagIsIgnored", t,
+         * this); } } else {
+         */
+        byte[] bytes = BinaryValueWriter.writeWithWriter(e -> {
+            for (T t : col) {
+                if (t != null) {
+                    serializer.write(t, e);
                 }
-            });
-            os.writeBytes(tag, bytes);
-        }
+            }
+        });
+        os.writeBytes(tag, bytes);
+        // }
     }
 
     public static <T extends Message> byte[] write(T message, MessageSerializer<T> serializer) throws IOException {
@@ -134,18 +132,5 @@ public class BinaryMessageWriter extends AbstractBinaryMessageWriter {
 
     /** {@inheritDoc} */
     @Override
-    protected void writeDouble0(int tag, String name, double value) throws IOException {}
-
-    /** {@inheritDoc} */
-    @Override
-    protected void writeFloat0(int tag, String name, double value) throws IOException {}
-
-    /** {@inheritDoc} */
-    @Override
     protected void writeInt640(int tag, String name, long value) throws IOException {}
-
-    /** {@inheritDoc} */
-    @Override
-    protected <T> void writeSetOrList(int tag, String name, Collection<T> set, ValueSerializer<T> serializer)
-            throws IOException {}
 }

@@ -18,7 +18,7 @@ import net.maritimecloud.message.MessageReader;
 import net.maritimecloud.message.ValueWriter;
 
 /**
- * The implementation part of an endpoint.
+ * The implementation part of an endpoint. Endpoints generated from MSDL files uses this interface.
  *
  * @author Kasper Nielsen
  */

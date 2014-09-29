@@ -35,8 +35,6 @@ import java.util.UUID;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.ThreadLocalRandom;
 
-import net.maritimecloud.util.Id160;
-
 /**
  * A random number generator isolated to the current thread. This generator is similar to {@link ThreadLocalRandom}
  * except this generator uses a <a href="http://en.wikipedia.org/wiki/Mersenne_twister">Mersenne twister pseudorandom

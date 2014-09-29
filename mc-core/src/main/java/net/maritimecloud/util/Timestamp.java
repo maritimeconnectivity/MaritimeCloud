@@ -25,6 +25,8 @@ import java.util.concurrent.TimeUnit;
  * @author Kasper Nielsen
  */
 public class Timestamp {
+
+    /** The default clock used for creating timestamps. */
     final static Clock CLOCK = Clock.systemUTC();
 
     final long value;
@@ -70,6 +72,11 @@ public class Timestamp {
         return new Timestamp(value);
     }
 
+    /**
+     * Returns a new timestamp with the current time.
+     *
+     * @return a new timestamp with the current time
+     */
     public static Timestamp now() {
         return new Timestamp(CLOCK.millis());
     }

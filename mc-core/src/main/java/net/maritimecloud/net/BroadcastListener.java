@@ -23,12 +23,12 @@ package net.maritimecloud.net;
 public interface BroadcastListener<T extends BroadcastMessage> {
 
     /**
-     * Invoked whenever a broadcast message was received.
+     * Invoked whenever a broadcast message is received.
      *
-     * @param context
-     *            information about the sender of the broadcast
+     * @param header
+     *            header information about the broadcast
      * @param broadcast
-     *            the message that was received
+     *            the broadcast message that was received
      */
     void onMessage(MessageHeader header, T broadcast);
 }

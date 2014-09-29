@@ -12,10 +12,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package net.maritimecloud.internal.almanac;
+
 
 /**
- * Contains geometry based utility classes.
  *
- **/
-package net.maritimecloud.util.geometry;
+ * @author Kasper Nielsen
+ */
+public class Almanac {
 
+    // identity
+    // opret
+    // set
+    //
+    // services
+
+    // Skal kunne opdateres offline
+    // Skal kunne opdateres diffferent
+
+
+    // Block hvert 10 min. Hvis der har vaeret aendringer
+    // var length block id
+    // var length signature length
+    // Signatur
+    //
+    // Liste af aendringer
+
+
+    // AlmanakBlockTabel
+    // id -> block contents
+
+    // AlmanakTabel
+
+    // GemmerBlocks xx maaneder tilbage
+
+    // AlmanacBlockServer
+    // BlockId evt ingen.
+
+    // Git <-
+}

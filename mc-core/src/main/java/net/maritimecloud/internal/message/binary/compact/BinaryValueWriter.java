@@ -29,35 +29,37 @@ import net.maritimecloud.message.ValueSerializer;
 import net.maritimecloud.util.Binary;
 
 /**
- *
+ * A compact binary value writer.
+ * 
  * @author Kasper Nielsen
  */
 public class BinaryValueWriter extends AbstractBinaryValueWriter {
 
-    final BinaryOutputStream os;
+    /** The output stream to write to. */
+    final BinaryOutputStream bos;
 
     BinaryValueWriter(BinaryOutputStream bos) {
-        this.os = requireNonNull(bos);
+        this.bos = requireNonNull(bos);
     }
 
     /** {@inheritDoc} */
     @Override
     public void writeBinary(Binary binary) throws IOException {
         byte[] b = binary.toByteArray();
-        os.writeRawVarint32(b.length);
-        os.writeBytes(b);
+        bos.writeRawVarint32(b.length);
+        bos.writeBytes(b);
     }
 
     /** {@inheritDoc} */
     @Override
     public void writeInt(Integer value) throws IOException {
-        os.writeRawVarint32(BinaryUtils.encodeZigZag32(value));
+        bos.writeRawVarint32(BinaryUtils.encodeZigZag32(value));
     }
 
     /** {@inheritDoc} */
     @Override
     public void writeInt64(Long value) throws IOException {
-        os.writeRawVarint64(BinaryUtils.encodeZigZag64(value));
+        bos.writeRawVarint64(BinaryUtils.encodeZigZag64(value));
     }
 
     /** {@inheritDoc} */
@@ -77,7 +79,17 @@ public class BinaryValueWriter extends AbstractBinaryValueWriter {
     @Override
     public <K, V> void writeMap(Map<K, V> map, ValueSerializer<K> keySerializer, ValueSerializer<V> valueSerializer)
             throws IOException {
-
+        byte[] b = writeWithWriter(e -> {
+            for (Map.Entry<K, V> entry : map.entrySet()) {
+                K key = entry.getKey();
+                V value = entry.getValue();
+                if (key != null && value != null) {
+                    keySerializer.write(key, e);
+                    valueSerializer.write(value, e);
+                }
+            }
+        });
+        writeBinary(Binary.copyFrom(b));
     }
 
     /** {@inheritDoc} */

@@ -12,10 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package net.maritimecloud.net;
+
 
 /**
- * Contains geometry based utility classes.
  *
- **/
-package net.maritimecloud.util.geometry;
+ * @author Kasper Nielsen
+ */
+public interface EndpointRegistration {
 
+    /**
+     * Cancels the endpoint registration. All endpoints will automatically be shutdown when the user explicit
+     * disconnects. Remote clients that tries to access the service will receive an {@link EndpointUnavailableException}
+     */
+    void unregister();
+}

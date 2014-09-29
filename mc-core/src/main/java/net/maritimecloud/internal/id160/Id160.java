@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.util;
+package net.maritimecloud.internal.id160;
 
 import static java.util.Objects.requireNonNull;
 import static net.maritimecloud.internal.id160.BinaryUtil.readInt;
@@ -27,11 +27,6 @@ import java.nio.ReadOnlyBufferException;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Stream;
-
-import net.maritimecloud.internal.id160.BinaryUtil;
-import net.maritimecloud.internal.id160.HexStringUtil;
-import net.maritimecloud.internal.id160.ThreadLocalAESRandom;
-import net.maritimecloud.internal.id160.ThreadLocalMersenneTwisterRandom;
 
 /**
  * A class that represents an immutable 160-bit identifier.

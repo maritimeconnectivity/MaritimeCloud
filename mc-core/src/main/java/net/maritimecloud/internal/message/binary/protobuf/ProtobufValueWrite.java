@@ -12,67 +12,65 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.internal.message.binary.compact;
-
-import static java.util.Objects.requireNonNull;
+package net.maritimecloud.internal.message.binary.protobuf;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
-import net.maritimecloud.internal.message.binary.AbstractBinaryValueReader;
+import net.maritimecloud.internal.message.binary.AbstractBinaryValueWriter;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.message.ValueSerializer;
 import net.maritimecloud.util.Binary;
 
+import com.google.protobuf.CodedOutputStream;
+
 /**
  *
  * @author Kasper Nielsen
  */
-public abstract class BinaryValueReader extends AbstractBinaryValueReader {
+public class ProtobufValueWrite extends AbstractBinaryValueWriter {
 
-    BinaryInputStream bis;
+    final CodedOutputStream cos;
 
-    BinaryValueReader(BinaryInputStream bis) {
-        this.bis = requireNonNull(bis);
+
+    ProtobufValueWrite(OutputStream os) {
+        // this.os = requireNonNull(os);
+        cos = CodedOutputStream.newInstance(os);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Binary readBinary() throws IOException {
-        int length = bis.readVarint32();
-        return Binary.copyFrom(bis.read(length));
+    public void writeBinary(Binary binary) throws IOException {
+        cos.writeByteArrayNoTag(binary.toByteArray());
     }
 
     /** {@inheritDoc} */
     @Override
-    public Integer readInt() throws IOException {
-        return null;
+    public void writeInt(Integer value) throws IOException {
+        cos.writeInt32NoTag(value);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Long readInt64() throws IOException {
-        return null;
+    public void writeInt64(Long value) throws IOException {
+        cos.writeInt64NoTag(value);
     }
 
     /** {@inheritDoc} */
     @Override
-    public <T extends Message> T readMessage(MessageSerializer<T> parser) throws IOException {
-        return null;
-    }
+    public <T> void writeList(List<T> list, ValueSerializer<T> serializer) throws IOException {}
 
     /** {@inheritDoc} */
     @Override
-    public <T> List<T> readList(ValueSerializer<T> parser) throws IOException {
-        return null;
-    }
+    public <K, V> void writeMap(Map<K, V> map, ValueSerializer<K> keySerializer, ValueSerializer<V> valueSerializer)
+            throws IOException {}
 
     /** {@inheritDoc} */
     @Override
-    public <K, V> Map<K, V> readMap(ValueSerializer<K> keyParser, ValueSerializer<V> valueParser) throws IOException {
-        return null;
-    }
+    public <T extends Message> void writeMessage(T message, MessageSerializer<T> serializer) throws IOException {
 
+    }
 }

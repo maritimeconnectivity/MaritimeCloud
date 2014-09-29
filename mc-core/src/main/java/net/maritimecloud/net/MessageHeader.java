@@ -16,14 +16,26 @@ package net.maritimecloud.net;
 
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.util.Binary;
+import net.maritimecloud.util.Timestamp;
 import net.maritimecloud.util.geometry.Position;
 
 /**
- * A message that is relayed with each message that is received.
- * 
+ * The header of a received message.
+ *
  * @author Kasper Nielsen
  */
 public interface MessageHeader {
+
+    /**
+     * Returns a unique hash of the transmitted message.
+     * <p>
+     * This hash is calculated as a combination of the name of the remote actor who sent the message. The position and
+     * time of the actor who sent the message. The name of the broadcast type. And the actual binary contents of the
+     * broadcast message.
+     *
+     * @return a unique hash for the specified message
+     */
+    Binary getMessageHash();
 
     /**
      * Returns the identity of the party that send the message.
@@ -37,16 +49,12 @@ public interface MessageHeader {
      *
      * @return if the sending party has a position, returns said position
      */
-    Position getSourcePosition();
+    Position getPosition();
 
     /**
-     * Returns a unique hash for the specified transmitted message.
-     * <p>
-     * This hash is calculated as a combination of the name of the remote actor who sent the message. The position and
-     * time of the actor who sent the message. The name of the broadcast type. And the actual contents of the broadcast
-     * message.
+     * Returns the timestamp of the message.
      *
-     * @return a unique hash for the specified message
+     * @return the timestamp of the message
      */
-    Binary getMessageHash();
+    Timestamp getTime();
 }

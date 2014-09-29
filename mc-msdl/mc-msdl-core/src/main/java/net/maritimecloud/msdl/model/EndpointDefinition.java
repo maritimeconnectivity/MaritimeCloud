@@ -43,5 +43,4 @@ public interface EndpointDefinition extends Annotatable {
      * @return the name of the message
      */
     String getName();
-
 }

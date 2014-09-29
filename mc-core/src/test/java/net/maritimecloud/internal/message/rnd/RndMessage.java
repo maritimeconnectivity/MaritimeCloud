@@ -12,10 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package net.maritimecloud.internal.message.rnd;
 
 /**
- * Contains geometry based utility classes.
  *
- **/
-package net.maritimecloud.util.geometry;
+ * @author Kasper Nielsen
+ */
+public class RndMessage extends RndType {
 
+}
