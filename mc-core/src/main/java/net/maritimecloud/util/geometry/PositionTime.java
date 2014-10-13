@@ -26,6 +26,7 @@ import net.maritimecloud.message.MessageReader;
 import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.message.MessageWriter;
 import net.maritimecloud.util.Binary;
+import net.maritimecloud.util.Timestamp;
 
 /**
  * A position couple with a timestamp.
@@ -181,6 +182,10 @@ public class PositionTime extends Position {
     @Override
     public String toString() {
         return "(" + getLatitude() + ", " + getLongitude() + ", time= " + time + ")";
+    }
+
+    public Timestamp timestamp() {
+        return Timestamp.create(getTime());
     }
 
 

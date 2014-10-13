@@ -54,4 +54,10 @@ public class ServerId extends MaritimeId {
     public String toString() {
         return "server://" + id;
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getId() {
+        return Integer.toString(id);
+    }
 }

@@ -69,7 +69,7 @@ public class GeometryTest {
     @Test
     public void polygonTest() {
         Geometry1 g = new Geometry1();
-        Polygon p = Polygon.create(Position.create(1, 1), Position.create(2, 2), Position.create(3, 3));
+        Polygon p = Polygon.create(Position.create(1, 1), Position.create(2, 2), Position.create(1, 1));
         assertSame(g, g.setP1(p));
         assertSame(p, g.getP1());
 

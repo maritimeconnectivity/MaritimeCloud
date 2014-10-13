@@ -29,17 +29,29 @@ import net.maritimecloud.message.MessageWriter;
  **/
 public abstract class Area implements Message, Serializable {
 
+    /** serialVersionUID. */
+    private static final long serialVersionUID = 1L;
+
+    static final String UNION = "union";
+
+    static final int UNION_TAG = 1;
+
     static final String CIRCLE = "circle";
 
     static final int CIRCLE_TAG = 2;
+
+    static final String RECTANGLE = "rectangle";
+
+    static final int RECTANGLE_TAG = 3;
 
     static final String POLYGON = "polygon";
 
     static final int POLYGON_TAG = 4;
 
-    static final String RECTANGLE = "rectangle";
+    static final String ELIPSE = "elipse";
 
-    static final int RECTANGLE_TAG = 3;
+    static final int ELIPSE_TAG = 5;
+
 
     /** A parser of areas. */
     public static final MessageSerializer<Area> SERIALIZER = new MessageSerializer<Area>() {
@@ -54,6 +66,8 @@ public abstract class Area implements Message, Serializable {
             } else if (r.isNext(RECTANGLE_TAG, RECTANGLE)) {
                 return r.readMessage(RECTANGLE_TAG, RECTANGLE, Rectangle.SERIALIZER);
             } else if (r.isNext(POLYGON_TAG, POLYGON)) {
+                return r.readMessage(POLYGON_TAG, POLYGON, Polygon.SERIALIZER);
+            } else if (r.isNext(ELIPSE_TAG, ELIPSE)) {
                 return r.readMessage(POLYGON_TAG, POLYGON, Polygon.SERIALIZER);
             } else {
                 throw new UnsupportedOperationException();
@@ -79,12 +93,6 @@ public abstract class Area implements Message, Serializable {
         }
     };
 
-    /** serialVersionUID. */
-    private static final long serialVersionUID = 1L;
-
-    static final String UNION = "union";
-
-    static final int UNION_TAG = 1;
 
     /**
      * Returns <tt>true</tt> if the specified element is fully contained in the shape, otherwise <tt>false</tt>.

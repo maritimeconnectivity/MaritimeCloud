@@ -20,7 +20,7 @@ package net.maritimecloud.net;
  * @author Kasper Nielsen
  */
 @FunctionalInterface
-public interface BroadcastListener<T extends BroadcastMessage> {
+public interface BroadcastConsumer<T extends BroadcastMessage> {
 
     /**
      * Invoked whenever a broadcast message is received.

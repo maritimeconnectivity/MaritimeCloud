@@ -46,6 +46,8 @@ public class Polygon extends Area {
     public Polygon(Position... positions) {
         if (positions.length < 3) {
             throw new IllegalArgumentException("A polygon must have at lease 3 points, had " + positions.length);
+        } else if (!positions[0].equals(positions[positions.length - 1])) {
+            throw new IllegalArgumentException("The first and last position must be identical");
         }
         this.positions = positions;
     }
@@ -53,13 +55,29 @@ public class Polygon extends Area {
     /** {@inheritDoc} */
     @Override
     public boolean contains(Position position) {
+        return contains(position.getLatitude(), position.getLongitude());
+    }
+
+    boolean contains(double latitude, double longitude) {
+        Position p1;
+
         throw new UnsupportedOperationException();
     }
 
     /** {@inheritDoc} */
     @Override
     public Rectangle getBoundingBox() {
-        throw new UnsupportedOperationException();
+        double topLeftLatitude = Double.MIN_VALUE;
+        double bottom = Double.MAX_VALUE;
+        double left = Double.MIN_NORMAL;
+        double right = Double.MAX_VALUE;
+        for (Position p : positions) {
+            topLeftLatitude = Math.max(topLeftLatitude, p.getLatitude());
+            bottom = Math.min(bottom, p.getLatitude());
+            left = Math.max(left, p.getLongitude());
+            right = Math.min(right, p.getLongitude());
+        }
+        return new Rectangle(topLeftLatitude, left, bottom, right);
     }
 
     /** {@inheritDoc} */
@@ -82,8 +100,4 @@ public class Polygon extends Area {
     public static Polygon create(Position... positions) {
         return new Polygon(positions);
     }
-    //
-    // static boolean crossesMeridian(Position p1, Position p2) {
-    //
-    // }
 }

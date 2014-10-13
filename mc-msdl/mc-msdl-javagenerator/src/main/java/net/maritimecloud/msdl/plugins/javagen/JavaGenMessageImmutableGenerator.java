@@ -80,7 +80,7 @@ class JavaGenMessageImmutableGenerator {
 
                 // SETTER
                 m = c.addMethod("public ", g.c.getSimpleName(), " set", beanPrefix, "(",
-                        new JavaGenType(f.getType()).render(c), " ", f.getName(), ")");
+                        new JavaGenType(f.getType()).render(c, g.file), " ", f.getName(), ")");
             }
             m.addAnnotation(Override.class).addJavadoc("{@inheritDoc}");
             m.add("throw new UnsupportedOperationException(\"Instance is immutable\");");

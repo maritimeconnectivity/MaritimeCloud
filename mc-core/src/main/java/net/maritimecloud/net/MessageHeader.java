@@ -14,6 +14,9 @@
  */
 package net.maritimecloud.net;
 
+import java.util.Collections;
+import java.util.Map;
+
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.util.Binary;
 import net.maritimecloud.util.Timestamp;
@@ -27,7 +30,16 @@ import net.maritimecloud.util.geometry.Position;
 public interface MessageHeader {
 
     /**
-     * Returns a unique hash of the transmitted message.
+     * Implementation <b>might</b> choose to provide additional properties to consumers of messages.
+     *
+     * @return a map containing additional properties about the message.
+     */
+    default Map<String, Object> context() {
+        return Collections.emptyMap();
+    }
+
+    /**
+     * Returns a unique id of the transmitted message.
      * <p>
      * This hash is calculated as a combination of the name of the remote actor who sent the message. The position and
      * time of the actor who sent the message. The name of the broadcast type. And the actual binary contents of the
@@ -35,26 +47,26 @@ public interface MessageHeader {
      *
      * @return a unique hash for the specified message
      */
-    Binary getMessageHash();
+    Binary getMessageId();
 
     /**
      * Returns the identity of the party that send the message.
      *
      * @return the identity of the party that send the message
      */
-    MaritimeId getSource();
+    MaritimeId getSender();
 
     /**
      * If the sending party has a position, returns said position. Otherwise returns <code>null</code>.
      *
      * @return if the sending party has a position, returns said position
      */
-    Position getPosition();
+    Position getSenderPosition();
 
     /**
      * Returns the timestamp of the message.
      *
      * @return the timestamp of the message
      */
-    Timestamp getTime();
+    Timestamp getSenderTime();
 }

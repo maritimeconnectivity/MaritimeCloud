@@ -26,6 +26,7 @@ import net.maritimecloud.msdl.model.BaseType;
 import net.maritimecloud.msdl.model.EndpointDefinition;
 import net.maritimecloud.msdl.model.EndpointMethod;
 import net.maritimecloud.msdl.model.FieldOrParameter;
+import net.maritimecloud.msdl.model.MsdlFile;
 import net.maritimecloud.net.EndpointImplementation;
 import net.maritimecloud.net.EndpointInvocationFuture;
 import net.maritimecloud.net.LocalEndpoint;
@@ -52,12 +53,15 @@ public class JavaGenEndpointGenerator {
 
     final List<EndpointMethod> functions;
 
+    final MsdlFile file;
+
     JavaGenEndpointGenerator(CodegenClass parent, EndpointDefinition ed) {
         this.parent = parent;
         this.ed = ed;
         this.functions = ed.getFunctions();
         this.cClient = new CodegenClass();
         this.cServer = new CodegenClass();
+        this.file = ed.getFile();
     }
 
 
@@ -91,7 +95,7 @@ public class JavaGenEndpointGenerator {
             }
             // new ", className, "(", args, ")
             m.add("return invokeRemote(\"", ed.getName(), ".", f.getName(), "\", arguments, ", className,
-                    ".SERIALIZER, ", JavaGenMessageGenerator.complexParser(cClient, f.getReturnType()), ");");
+                    ".SERIALIZER, ", JavaGenMessageGenerator.complexParser(cClient, f.getReturnType(), file), ");");
             generateTmpClass(className, f);
         }
     }
@@ -105,21 +109,21 @@ public class JavaGenEndpointGenerator {
         CodegenClass cc = cClient.addInnerClass("static final class ", className, " implements ", Message.class);
         for (FieldOrParameter f : ef.getParameters()) {
             JavaGenType ty = new JavaGenType(f.getType());
-            cc.addField("private final ", ty.render(cc), " ", f.getName(), ";");
+            cc.addField("private final ", ty.render(cc, file), " ", f.getName(), ";");
             if (f.getType().getBaseType() == BaseType.BINARY) {
                 cClient.addImport(Binary.class);
             }
         }
         if (ef.getParameters().size() > 0) {
             String args = ef.getParameters().stream()
-                    .map(e -> JavaGenType.render(cClient, e.getType()) + " " + e.getName())
+                    .map(e -> JavaGenType.render(cClient, e.getType(), file) + " " + e.getName())
                     .collect(Collectors.joining(", "));
             CodegenMethod con = cc.addMethod(className, "(", args, ")");
             for (FieldOrParameter f : ef.getParameters()) {
                 con.add("this.", f.getName(), " = ", f.getName(), ";");
             }
         }
-        JavaGenMessageGenerator.generateWriteTo(cc, ef.getParameters());
+        JavaGenMessageGenerator.generateWriteTo(cc, ef.getParameters(), file);
     }
 
     void generateServer() {
@@ -140,17 +144,17 @@ public class JavaGenEndpointGenerator {
         for (EndpointMethod f : functions) {
             CodegenBlock b = m.newNestedBlock("if (name.equals(\"", f.getName(), "\"))");
             for (FieldOrParameter fd : f.getParameters()) {
-                b.add(JavaGenType.render(cServer, fd.getType()), " ", fd.getName(), " = ",
-                        JavaGenMessageGenerator.generateParseMethod("reader", cServer, fd), ";");
+                b.add(JavaGenType.render(cServer, fd.getType(), file), " ", fd.getName(), "_ = ",
+                        JavaGenMessageGenerator.generateParseMethod("reader", cServer, fd, file), ";");
             }
-            String args = f.getParameters().stream().map(e -> e.getName()).collect(Collectors.joining(", "));
+            String args = f.getParameters().stream().map(e -> e.getName() + "_").collect(Collectors.joining(", "));
             String met = f.getName() + "(header" + (args.length() > 0 ? ", " : "") + args + ");";
             if (f.getReturnType() == null) {
                 b.add(met);
                 // b.add("return null;");
             } else {
-                b.add(new JavaGenType(f.getReturnType()).render(cServer), " result = ", met);
-                b.add("writer.", new JavaGenType(f.getReturnType()).write(cServer, "result", null), ";");
+                b.add(new JavaGenType(f.getReturnType()).render(cServer, file), " result = ", met);
+                b.add("writer.", new JavaGenType(f.getReturnType()).write(cServer, "result", null, file), ";");
             }
             b.add("return;");
         }
@@ -176,7 +180,7 @@ public class JavaGenEndpointGenerator {
                 s += ", ";
             }
             first = false;
-            s += new JavaGenType(d.getType()).render(cc);
+            s += new JavaGenType(d.getType()).render(cc, file);
             s += " " + d.getName();
         }
         return s + ")";
@@ -192,7 +196,7 @@ public class JavaGenEndpointGenerator {
             // .isAnyOf(BaseType.BOOL, BaseType.BOOL, BaseType.BOOL, BaseType.BOOL, BaseType.BOOL)) {
             //
             // } else {
-            s = los.render(cc);
+            s = los.render(cc, file);
             // }
         }
         if (isClient) {

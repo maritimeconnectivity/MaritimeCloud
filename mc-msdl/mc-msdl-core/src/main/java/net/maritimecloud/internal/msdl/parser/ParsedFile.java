@@ -132,9 +132,11 @@ class ParsedFile implements MsdlFile {
 
     private void parseImports() {
         for (ImportDeclarationContext importContext : antlrFile.getCompilationUnit().importDeclaration()) {
-            String p = importContext.getChild(1).getText();
-            p = p.substring(1, p.length() - 1);
-            imports.add(p);
+            if (importContext.getChild(1) != null) {
+                String p = importContext.getChild(1).getText();
+                p = p.substring(1, p.length() - 1);
+                imports.add(p);
+            }
         }
     }
 

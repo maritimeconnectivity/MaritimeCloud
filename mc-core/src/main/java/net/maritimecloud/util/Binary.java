@@ -44,6 +44,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Immutable sequence of bytes. Substring is supported by sharing the reference to the immutable underlying bytes, as
@@ -59,7 +60,7 @@ import java.util.NoSuchElementException;
  * @author martinrb@google.com Martin Buchholz
  * @author kasperni@gmail.com Kasper Nielsen
  */
-public abstract class Binary implements Iterable<Byte> {
+public abstract class Binary implements Iterable<Byte>, Comparable<Binary> {
 
     /**
      * When two strings to be concatenated have a combined length shorter than this, we just copy their bytes on
@@ -117,6 +118,25 @@ public abstract class Binary implements Iterable<Byte> {
      *             {@code index} is less than 0 or greater than or equal to size
      */
     public abstract byte byteAt(int index);
+
+    /** {@inheritDoc} */
+    @Override
+    public int compareTo(Binary o) {
+        if (size() != o.size()) {
+            throw new IllegalArgumentException("Can only compare binaries with identical length, this.length ="
+                    + size() + ", other.length =" + o.size());
+        }
+        ByteIterator thisIter = iterator();
+        ByteIterator otherIter = o.iterator();
+        while (thisIter.hasNext()) {
+            byte tb = thisIter.nextByte();
+            byte ob = otherIter.nextByte();
+            if (tb != ob) {
+                return Byte.compare(tb, ob);
+            }
+        }
+        return 0;
+    }
 
     /**
      * Concatenate the given {@code Binary} to this one. Short concatenations, of total size smaller than
@@ -494,7 +514,7 @@ public abstract class Binary implements Iterable<Byte> {
      *            to copy
      * @return new {@code Binary}
      */
-    public static Binary copyFrom(byte[] bytes) {
+    public static Binary copyFrom(byte... bytes) {
         return copyFrom(bytes, 0, bytes.length);
     }
 
@@ -700,6 +720,12 @@ public abstract class Binary implements Iterable<Byte> {
     // =================================================================
     // Methods {@link RopeBinary} needs on instances, which aren't part of the
     // public API.
+
+    public static Binary random(int bytes) {
+        byte[] b = new byte[bytes];
+        ThreadLocalRandom.current().nextBytes(b);
+        return Binary.copyFrom(b);
+    }
 
     /**
      * Blocks until a chunk of the given size can be made from the stream, or EOF is reached. Calls read() repeatedly in

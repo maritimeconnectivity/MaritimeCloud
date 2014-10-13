@@ -14,6 +14,7 @@
  */
 package net.maritimecloud.util;
 
+import java.nio.ByteBuffer;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
@@ -66,6 +67,11 @@ public class Timestamp {
             throw new IllegalArgumentException("Value must be non-negative, was " + value);
         }
         return value;
+    }
+
+    public Binary toBinary() {
+        byte[] bytes = ByteBuffer.allocate(8).putLong(getTime()).array();
+        return Binary.copyFrom(bytes);
     }
 
     public static Timestamp create(long value) {

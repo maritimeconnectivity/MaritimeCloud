@@ -14,6 +14,7 @@
  */
 package net.maritimecloud.net;
 
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -26,4 +27,6 @@ public interface EndpointRegistration {
      * disconnects. Remote clients that tries to access the service will receive an {@link EndpointUnavailableException}
      */
     void unregister();
+
+    boolean awaitRegistered(long timeout, TimeUnit unit) throws InterruptedException;
 }

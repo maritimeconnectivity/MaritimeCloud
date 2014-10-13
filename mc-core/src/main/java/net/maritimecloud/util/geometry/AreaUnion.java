@@ -56,7 +56,7 @@ class AreaUnion extends Area {
 
     /**
      * Creates a new AreaUnion.
-     * 
+     *
      * @param area
      *            the areas to combine
      */
@@ -140,7 +140,7 @@ class AreaUnion extends Area {
         // Vi skal have en getAreaSize og saa bruge en
         // AliasedMethodTable http://www.keithschwarz.com/darts-dice-coins/
         // We lazy calculater bliver noedt til at have et volatile temp object her der gemmer da shit
-        throw new UnsupportedOperationException("getRandomPosition is not current supported");
+        throw new UnsupportedOperationException("getRandomPosition is not currently supported");
     }
 
     /** {@inheritDoc} */

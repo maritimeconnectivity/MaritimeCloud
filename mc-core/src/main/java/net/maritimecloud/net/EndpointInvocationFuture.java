@@ -15,74 +15,18 @@
 package net.maritimecloud.net;
 
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
-
-import net.maritimecloud.util.Binary;
+import java.util.function.Function;
 
 /**
  * A future interface returned when invoking a remote endpoint method.
  *
  * @author Kasper Nielsen
  */
-public interface EndpointInvocationFuture<T> {
-
-    /**
-     * A future that can be used to determine when the message have been received by the server. This is done on a best
-     * effort basis. The broadcast message might be delivered to remote clients before the returned future completes.
-     *
-     * @return a completion stage that can be used to execute actions when the broadcast has been delivered to a central
-     *         server
-     *
-     * @throws UnsupportedOperationException
-     *             if the underlying communication mechanism does not support acknowledgement of the broadcast message.
-     */
-    Acknowledgement relayed();
-
-    /**
-     * Returns a unique hash of the message send.
-     *
-     * @return a unique hash of the message send
-     */
-    Binary getMessageHash();
-
-    T join();
-
-    EndpointInvocationFuture<Void> thenRun(Runnable action);
-
-    /**
-     * Waits if necessary for the computation to complete, and then retrieves its result.
-     *
-     * @return the computed result
-     * @throws CancellationException
-     *             if the computation was cancelled
-     * @throws ExecutionException
-     *             if the computation threw an exception
-     * @throws InterruptedException
-     *             if the current thread was interrupted while waiting
-     */
-    T get() throws InterruptedException, ExecutionException;
-
-    /**
-     * Waits if necessary for at most the given time for completion, and then retrieves its result, if available.
-     *
-     * @param timeout
-     *            the maximum time to wait
-     * @param unit
-     *            the time unit of the timeout argument
-     * @return the computed result
-     * @throws CancellationException
-     *             if the computation was cancelled
-     * @throws ExecutionException
-     *             if the computation threw an exception
-     * @throws InterruptedException
-     *             if the current thread was interrupted while waiting
-     * @throws TimeoutException
-     *             if the wait timed out
-     */
-    T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException;
+public interface EndpointInvocationFuture<T> extends DispatchedMessage, Future<T> {
 
     /**
      * Returns the result value (or throws any encountered exception) if completed, else returns the given
@@ -105,12 +49,11 @@ public interface EndpointInvocationFuture<T> {
      */
     void handle(BiConsumer<T, Throwable> consumer);
 
-    /**
-     * Returns {@code true} if completed in any fashion: normally, exceptionally, or via cancellation.
-     *
-     * @return {@code true} if completed
-     */
-    boolean isDone();
+    T join();
+
+    <U> EndpointInvocationFuture<U> thenApply(Function<? super T, ? extends U> fn);
+
+    void thenRun(Runnable action);
 
     /**
      * Creates a new EndpointInvocationFuture that will time out via {@link TimeoutException} if this task has not

@@ -15,9 +15,37 @@
 package net.maritimecloud.net;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
-public class EndpointUnavailableException {
+public class EndpointUnavailableException extends Exception {
 
+    /** <code>serialVersionUID</code>. */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Constructs a new EndpointUnavailableException with the specified detailed message. The cause is not initialized,
+     * and may subsequently be initialized by a call to {@link Throwable#initCause}.
+     *
+     * @param message
+     *            the detailed message. The detailed message is saved for later retrieval by the {@link #getMessage()}
+     *            method.
+     */
+    public EndpointUnavailableException(String message) {
+        super(message);
+    }
+
+    /**
+     * Constructs a new EndpointUnavailableException with the specified detailed message and cause.
+     *
+     * @param cause
+     *            the cause (which is saved for later retrieval by the {@link #getCause()}method). (A{@code null} value
+     *            is permitted, and indicates that the cause is nonexistent or unknown.)
+     * @param message
+     *            the detailed message. The detailed message is saved for later retrieval by the {@link #getMessage()}
+     *            method.
+     */
+    public EndpointUnavailableException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

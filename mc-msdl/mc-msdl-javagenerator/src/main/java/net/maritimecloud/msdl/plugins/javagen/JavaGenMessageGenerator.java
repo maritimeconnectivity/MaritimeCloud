@@ -100,7 +100,7 @@ public class JavaGenMessageGenerator {
                 generateConstructorImmutable();
             }
         }
-        generateWriteTo(c, fields);
+        generateWriteTo(c, fields, file);
         generateAccessors();
         generateParser();
         JavaGenMessageImmutableGenerator.generate(this);
@@ -118,7 +118,7 @@ public class JavaGenMessageGenerator {
             String beanPrefix = StringUtil.capitalizeFirstLetter(f.getName());
             BaseType t = f.getType().getBaseType();
             JavaGenType los = new JavaGenType(f.getType());
-            String r = los.render(c);
+            String r = los.render(c, file);
             // Getter
 
 
@@ -154,7 +154,7 @@ public class JavaGenMessageGenerator {
 
 
                 set = generateComplexAccessorAll(c, f);
-                set.add("for (", element.render(c) + " e : ", name, ") {");
+                set.add("for (", element.render(c, file) + " e : ", name, ") {");
                 set.add("add", beanPrefix2, "(e);");
                 set.add("}");
             } else if (t == BaseType.MAP) {
@@ -249,12 +249,12 @@ public class JavaGenMessageGenerator {
         if (f.getType().getBaseType() == BaseType.MAP) {
             JavaGenType key = new JavaGenType(((MapType) f.getType()).getKeyType());
             JavaGenType value = new JavaGenType(((MapType) f.getType()).getValueType());
-            return clazz.addMethod("public ", c.getSimpleName(), " put", beanPrefix2, "(", key.render(c), " key, ",
-                    value.render(c), " value)");
+            return clazz.addMethod("public ", c.getSimpleName(), " put", beanPrefix2, "(", key.render(c, file),
+                    " key, ", value.render(c, file), " value)");
         } else {
             JavaGenType element = new JavaGenType(((ListOrSetType) f.getType()).getElementType());
-            return clazz.addMethod("public ", c.getSimpleName(), " add", beanPrefix2, "(", element.render(c), " ",
-                    name, ")");
+            return clazz.addMethod("public ", c.getSimpleName(), " add", beanPrefix2, "(", element.render(c, file),
+                    " ", name, ")");
         }
     }
 
@@ -265,12 +265,12 @@ public class JavaGenMessageGenerator {
             JavaGenType key = new JavaGenType(((MapType) f.getType()).getKeyType());
             JavaGenType value = new JavaGenType(((MapType) f.getType()).getValueType());
             return clazz.addMethod("public ", c.getSimpleName(), " putAll", beanPrefix2, "(Map<? extends ",
-                    key.render(c), ", ? extends ", value.render(c), "> ", name, ")");
+                    key.render(c, file), ", ? extends ", value.render(c, file), "> ", name, ")");
         } else {
             clazz.addImport(Collection.class);
             JavaGenType element = new JavaGenType(((ListOrSetType) f.getType()).getElementType());
             return clazz.addMethod("public ", c.getSimpleName(), " addAll", beanPrefix2, "(Collection<? extends ",
-                    element.render(c), "> ", name, ")");
+                    element.render(c, file), "> ", name, ")");
         }
     }
 
@@ -320,24 +320,25 @@ public class JavaGenMessageGenerator {
             if (type.isPrimitive()) {
                 m.add("this.", f.getName(), " = reader.read", ty.writeReadName(), tagName, ", null);");
             } else if (type == BaseType.ENUM) {
-                m.add("this.", f.getName(), " = reader.readEnum", tagName, ", ", ty.render(c), ".SERIALIZER);");
+                m.add("this.", f.getName(), " = reader.readEnum", tagName, ", ", ty.render(c, file), ".SERIALIZER);");
             } else if (type == BaseType.MESSAGE) {
-                m.add("this.", f.getName(), " = reader.readMessage", tagName, ", ", ty.render(c), ".SERIALIZER);");
+                m.add("this.", f.getName(), " = reader.readMessage", tagName, ", ", ty.render(c, file), ".SERIALIZER);");
             } else if (type == BaseType.LIST) { // Complex type
                 ListOrSetType los = (ListOrSetType) f.getType();
                 c.addImport(MessageHelper.class);
                 m.add("this.", f.getName(), " = ", MessageHelper.class, ".readList", tagName, ", reader, ",
-                        complexParser(c, los.getElementType()), ");");
+                        complexParser(c, los.getElementType(), file), ");");
             } else if (type == BaseType.SET) { // Complex type
                 c.addImport(MessageHelper.class);
                 ListOrSetType los = (ListOrSetType) f.getType();
                 m.add("this.", f.getName(), " = ", MessageHelper.class, ".readSet", tagName, ", reader, ",
-                        complexParser(c, los.getElementType()), ");");
+                        complexParser(c, los.getElementType(), file), ");");
             } else { // Complex type
                 c.addImport(MessageHelper.class);
                 MapType los = (MapType) f.getType();
                 m.add("this.", f.getName(), " = ", MessageHelper.class, ".readMap", tagName, ", reader, ",
-                        complexParser(c, los.getKeyType()), ", ", complexParser(c, los.getValueType()), ");");
+                        complexParser(c, los.getKeyType(), file), ", ", complexParser(c, los.getValueType(), file),
+                        ");");
             }
         }
     }
@@ -386,7 +387,11 @@ public class JavaGenMessageGenerator {
             // } else if (t == MSDLBaseType.MAP) {
             // init = " = new java.util.LinkedHashMap<>()";
             // }
-            c.addFieldWithJavadoc("Field", init, ty.render(c), " ", f.getName(), ";");
+            c.addFieldWithJavadoc("Field definition.", init, ty.render(c, file), " ", f.getName(), ";");
+
+            ty.getMsgType(c, file);
+
+
         }
     }
 
@@ -460,7 +465,7 @@ public class JavaGenMessageGenerator {
         }
     }
 
-    static String complexParser(CodegenClass c, Type type) {
+    static String complexParser(CodegenClass c, Type type, MsdlFile file) {
         if (type == null) {
             return "null";
         }
@@ -473,52 +478,52 @@ public class JavaGenMessageGenerator {
             return ValueSerializer.class.getSimpleName() + "." + b.name().toUpperCase();
         } else if (b.isReferenceType()) {
             JavaGenType ty = new JavaGenType(type);
-            return ty.render(c) + ".SERIALIZER";
+            return ty.render(c, file) + ".SERIALIZER";
         } else if (b == BaseType.LIST) {
             ListOrSetType los = (ListOrSetType) type;
-            return complexParser(c, los.getElementType()) + ".listOf()";
+            return complexParser(c, los.getElementType(), file) + ".listOf()";
         } else if (b == BaseType.SET) {
             ListOrSetType los = (ListOrSetType) type;
-            return complexParser(c, los.getElementType()) + ".setOf()";
+            return complexParser(c, los.getElementType(), file) + ".setOf()";
         } else {
             MapType los = (MapType) type;
-            return "MessageParser.ofMap(" + complexParser(c, los.getKeyType()) + ", "
-                    + complexParser(c, los.getValueType()) + ")";
+            return "MessageParser.ofMap(" + complexParser(c, los.getKeyType(), file) + ", "
+            + complexParser(c, los.getValueType(), file) + ")";
         }
     }
 
-    static String generateParseMethod(String readerName, CodegenClass c, FieldOrParameter f) {
+    static String generateParseMethod(String readerName, CodegenClass c, FieldOrParameter f, MsdlFile file) {
         BaseType type = f.getType().getBaseType();
         JavaGenType ty = new JavaGenType(f.getType());
         ty.addImports(c);
         if (type.isPrimitive()) {
             return readerName + ".read" + ty.writeReadName() + "(" + f.getTag() + ", \"" + f.getName() + "\", null);";
         } else if (type == BaseType.ENUM) {
-            return readerName + ".readEnum(" + f.getTag() + ", \"" + f.getName() + "\", " + ty.render(c)
+            return readerName + ".readEnum(" + f.getTag() + ", \"" + f.getName() + "\", " + ty.render(c, file)
                     + ".SERIALIZER);";
         } else if (type == BaseType.MESSAGE) {
-            return readerName + ".readMessage(" + f.getTag() + ", \"" + f.getName() + "\", " + ty.render(c)
+            return readerName + ".readMessage(" + f.getTag() + ", \"" + f.getName() + "\", " + ty.render(c, file)
                     + ".SERIALIZER);";
         } else if (type == BaseType.LIST) { // Complex type
             ListOrSetType los = (ListOrSetType) f.getType();
             c.addImport(MessageHelper.class);
             return MessageHelper.class.getSimpleName() + ".readList(" + f.getTag() + ", \"" + f.getName() + "\", "
-                    + readerName + ", " + complexParser(c, los.getElementType()) + ");";
+            + readerName + ", " + complexParser(c, los.getElementType(), file) + ");";
         } else if (type == BaseType.SET) { // Complex type
             ListOrSetType los = (ListOrSetType) f.getType();
             c.addImport(MessageHelper.class);
             return MessageHelper.class.getSimpleName() + ".readSet(" + f.getTag() + ", \"" + f.getName() + "\", "
-                    + readerName + ", " + complexParser(c, los.getElementType()) + ");";
+            + readerName + ", " + complexParser(c, los.getElementType(), file) + ");";
         } else { // Complex type
             MapType los = (MapType) f.getType();
             c.addImport(MessageHelper.class);
             return MessageHelper.class.getSimpleName() + ".readMap(" + f.getTag() + ", \"" + f.getName() + "\", "
-                    + readerName + ", " + complexParser(c, los.getKeyType()) + ", "
-                    + complexParser(c, los.getValueType()) + ");";
+            + readerName + ", " + complexParser(c, los.getKeyType(), file) + ", "
+            + complexParser(c, los.getValueType(), file) + ");";
         }
     }
 
-    static void generateWriteTo(CodegenClass c, Collection<FieldOrParameter> fields) {
+    static void generateWriteTo(CodegenClass c, Collection<FieldOrParameter> fields, MsdlFile file) {
         if (fields.size() > 0) {
             CodegenMethod m = c.addMethod("void writeTo(", MessageWriter.class, " w) throws IOException");
             // m.addAnnotation(Override.class).addJavadoc("{@inheritDoc}");
@@ -529,16 +534,16 @@ public class JavaGenMessageGenerator {
                 sb.append("(").append(f.getTag()).append(", \"").append(f.getName()).append("\", ");
                 sb.append(f.getName());
                 if (f.getType().getBaseType() == BaseType.MESSAGE) {
-                    sb.append(", ").append(new JavaGenType(f.getType()).render(c) + ".SERIALIZER");
+                    sb.append(", ").append(new JavaGenType(f.getType()).render(c, file) + ".SERIALIZER");
                 } else if (f.getType().getBaseType().isComplexType()) {
                     sb.append(", ");
                     if (f.getType() instanceof ListOrSetType) {
                         ListOrSetType lt = (ListOrSetType) f.getType();
-                        sb.append(complexParser(c, lt.getElementType()));
+                        sb.append(complexParser(c, lt.getElementType(), file));
                     } else {
                         MapType lt = (MapType) f.getType();
-                        sb.append(complexParser(c, lt.getKeyType()));
-                        sb.append(", ").append(complexParser(c, lt.getValueType()));
+                        sb.append(complexParser(c, lt.getKeyType(), file));
+                        sb.append(", ").append(complexParser(c, lt.getValueType(), file));
                     }
                 }
                 sb.append(");");

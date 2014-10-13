@@ -14,29 +14,62 @@
  */
 package net.maritimecloud.net;
 
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 
 /**
- * An acknowledgement that a given message has been received. Either by a central relay server or by the client itself.
+ * An acknowledgement that a given message has been received. For example, it is used for the MMS client to indicate
+ * whether or not the MMS Server has received a message.
  *
  * @author Kasper Nielsen
  */
 public interface Acknowledgement {
 
     /**
-     * Returns whether or not the message has been acknowledge.
+     * Returns a new Acknowledgement that, when the message that was send has been acknowledged is executed. If the
+     * message fails to be acknowledged the specified throwable is non-null.
      *
-     * @return whether or not the message has been acknowledge
+     * See the {@link CompletionStage} documentation for rules covering exceptional completion.
+     *
+     * @param fn
+     *            the consumer that will invoked before completing the returned Acknowledgement. If the message failed
+     *            to be acknowledge the specified throwable is non-null
+     * @return the new Acknowledgement
      */
-    boolean isAckowledged();
+    Acknowledgement handle(Consumer<Throwable> fn);
 
     /**
-     * Returns a new Acknowledgement that, when the message has been acknowledged, executes the given action.
+     * Returns whether or not the message has been successfully acknowledge by the remote relay server.
+     *
+     * @return whether or not the message has been successfully acknowledge by the remote relay server
+     */
+    boolean isAcknowledged();
+
+    /**
+     * Returns {@code true} if completed in any fashion: normally or exceptionally.
+     *
+     * @return {@code true} if completed
+     */
+    boolean isDone();
+
+    /**
+     * Returns once the message has been acknowledged, or throws an (unchecked) exception if completed exceptionally. To
+     * better conform with the use of common functional forms, if a computation involved in the completion of this
+     * instance threw an exception, this method throws an (unchecked) {@link CompletionException} with the underlying
+     * exception as its cause.
+     *
+     * @throws CompletionException
+     *             if this acknowledgement completed exceptionally or a completion computation threw an exception
+     */
+    void join();
+
+    /**
+     * Returns a new Acknowledgement that, when the message that was send has been successfully acknowledged, executes
+     * the given action.
      *
      * See the {@link CompletionStage} documentation for rules covering exceptional completion.
      *
@@ -48,7 +81,7 @@ public interface Acknowledgement {
 
     /**
      * Creates a new acknowledgement that will time out via {@link TimeoutException} if the message has not been
-     * acknowledgement within the specified time.
+     * acknowledgement within the specified timeout.
      *
      * @param timeout
      *            the maximum time to wait
@@ -57,20 +90,6 @@ public interface Acknowledgement {
      * @return the new acknowledgement
      */
     Acknowledgement timeout(long timeout, TimeUnit unit);
-
-    /**
-     * Returns the result value when complete, or throws an (unchecked) exception if completed exceptionally. To better
-     * conform with the use of common functional forms, if a computation involved in the completion of this
-     * CompletableFuture threw an exception, this method throws an (unchecked) {@link CompletionException} with the
-     * underlying exception as its cause.
-     *
-     * @return the result value
-     * @throws CancellationException
-     *             if the computation was cancelled
-     * @throws CompletionException
-     *             if this future completed exceptionally or a completion computation threw an exception
-     */
-    void join();
 
     /**
      * Returns a {@link CompletableFuture} maintaining the same completion properties as this acknowledgement.

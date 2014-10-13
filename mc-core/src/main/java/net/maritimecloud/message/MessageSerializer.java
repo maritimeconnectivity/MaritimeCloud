@@ -88,6 +88,7 @@ public abstract class MessageSerializer<T extends Message> extends ValueSerializ
             throws IOException {
         requireNonNull(serializer);
         new JsonValueWriter(w).writeMessage(message, serializer);
+        w.flush();
     }
 
     public static <T extends Message> T readFromJSON(MessageSerializer<T> parser, CharSequence cs) {

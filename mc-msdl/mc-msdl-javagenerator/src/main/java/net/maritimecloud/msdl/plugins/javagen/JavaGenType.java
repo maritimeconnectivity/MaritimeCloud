@@ -18,6 +18,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import net.maritimecloud.internal.msdl.parser.antlr.StringUtil;
 import net.maritimecloud.message.MessageWriter;
@@ -29,6 +30,7 @@ import net.maritimecloud.msdl.model.FieldOrParameter;
 import net.maritimecloud.msdl.model.ListOrSetType;
 import net.maritimecloud.msdl.model.MapType;
 import net.maritimecloud.msdl.model.MessageDeclaration;
+import net.maritimecloud.msdl.model.MsdlFile;
 import net.maritimecloud.msdl.model.Type;
 import net.maritimecloud.msdl.plugins.javagen.annotation.JavaImplementation;
 import net.maritimecloud.util.Binary;
@@ -78,8 +80,8 @@ class JavaGenType {
         return StringUtil.capitalizeFirstLetter(s);
     }
 
-    static String render(CodegenClass c, Type t) {
-        return new JavaGenType(t).render(c);
+    static String render(CodegenClass c, Type t, MsdlFile existing) {
+        return new JavaGenType(t).render(c, existing);
     }
 
     String setOrGetAll(FieldOrParameter f) {
@@ -91,26 +93,30 @@ class JavaGenType {
         }
     }
 
-    String render(CodegenClass c) {
+    String render(CodegenClass c, MsdlFile existing) {
         requireNonNull(c);
         addImports(c);
         switch (t) {
         case LIST:
-            return "List<" + parameters.get(0).render(c) + ">";
+            return "List<" + parameters.get(0).render(c, existing) + ">";
         case SET:
-            return "Set<" + parameters.get(0).render(c) + ">";
+            return "Set<" + parameters.get(0).render(c, existing) + ">";
         case MAP:
-            return "Map<" + parameters.get(0).render(c) + ", " + parameters.get(1).render(c) + ">";
+            return "Map<" + parameters.get(0).render(c, existing) + ", " + parameters.get(1).render(c, existing) + ">";
         case MESSAGE:
             MessageDeclaration md = (MessageDeclaration) type;
             if (md.isAnnotationPresent(JavaImplementation.class)) {
                 return md.getAnnotation(JavaImplementation.class).value();
+            } else if (!Objects.equals(md.getFile().getNamespace(), existing.getNamespace())) {
+                return md.getFile().getNamespace() + "." + md.getName();
             }
             return md.getName();
         case ENUM:
             EnumDeclaration d = (EnumDeclaration) type;
             if (d.isAnnotationPresent(JavaImplementation.class)) {
                 return d.getAnnotation(JavaImplementation.class).value();
+            } else if (!Objects.equals(d.getFile().getNamespace(), existing.getNamespace())) {
+                return d.getFile().getNamespace() + "." + d.getName();
             }
             return d.getName();
         default:
@@ -118,7 +124,33 @@ class JavaGenType {
         }
     }
 
-    String write(CodegenClass c, String name, FieldOrParameter f) {
+    void getMsgType(CodegenClass addImport, MsdlFile file) {
+        return;
+        // switch (t) {
+        // case LIST:
+        // case SET:
+        // parameters.get(0).getMsgType(addImport, file);
+        // return;
+        // case MAP:
+        // parameters.get(0).getMsgType(addImport, file);
+        // parameters.get(1).getMsgType(addImport, file);
+        // return;
+        // case MESSAGE:
+        // MessageDeclaration md = (MessageDeclaration) type;
+        // if (!Objects.equals(md.getFile().getNamespace(), file.getNamespace())) {
+        // addImport.addImport(md.getFile().getNamespace() + "." + md.getName());
+        // }
+        // return;
+        // case ENUM:
+        // EnumDeclaration d = (EnumDeclaration) type;
+        // if (!Objects.equals(d.getFile().getNamespace(), file.getNamespace())) {
+        // addImport.addImport(d.getFile().getNamespace() + "." + d.getName());
+        // }
+        // default: // do nothing
+        // }
+    }
+
+    String write(CodegenClass c, String name, FieldOrParameter f, MsdlFile existing) {
         c.addImport(f == null ? ValueWriter.class : MessageWriter.class);
         StringBuilder sb = new StringBuilder();
         sb.append("write").append(writeReadName()).append("(");
@@ -127,23 +159,23 @@ class JavaGenType {
         }
         sb.append(name);
         if (type.getBaseType() == BaseType.MESSAGE) {
-            sb.append(", ").append(render(c)).append(".SERIALIZER");
+            sb.append(", ").append(render(c, existing)).append(".SERIALIZER");
         } else if (type.getBaseType().isComplexType()) {
             sb.append(", ");
             if (type instanceof ListOrSetType) {
                 ListOrSetType lt = (ListOrSetType) type;
-                sb.append(complexParser(c, lt.getElementType()));
+                sb.append(complexParser(c, lt.getElementType(), existing));
             } else {
                 MapType lt = (MapType) type;
-                sb.append(complexParser(c, lt.getKeyType()));
-                sb.append(", ").append(complexParser(c, lt.getValueType()));
+                sb.append(complexParser(c, lt.getKeyType(), existing));
+                sb.append(", ").append(complexParser(c, lt.getValueType(), existing));
             }
         }
         sb.append(")");
         return sb.toString();
     }
 
-    static String complexParser(CodegenClass c, Type type) {
+    static String complexParser(CodegenClass c, Type type, MsdlFile existing) {
         if (type == null) {
             return "null";
         }
@@ -156,17 +188,17 @@ class JavaGenType {
             return ValueSerializer.class.getSimpleName() + "." + b.name().toUpperCase();
         } else if (b.isReferenceType()) {
             JavaGenType ty = new JavaGenType(type);
-            return ty.render(c) + ".SERIALIZER";
+            return ty.render(c, existing) + ".SERIALIZER";
         } else if (b == BaseType.LIST) {
             ListOrSetType los = (ListOrSetType) type;
-            return complexParser(c, los.getElementType()) + ".listOf()";
+            return complexParser(c, los.getElementType(), existing) + ".listOf()";
         } else if (b == BaseType.SET) {
             ListOrSetType los = (ListOrSetType) type;
-            return complexParser(c, los.getElementType()) + ".setOf()";
+            return complexParser(c, los.getElementType(), existing) + ".setOf()";
         } else {
             MapType los = (MapType) type;
-            return "MessageParser.ofMap(" + complexParser(c, los.getKeyType()) + ", "
-            + complexParser(c, los.getValueType()) + ")";
+            return "MessageParser.ofMap(" + complexParser(c, los.getKeyType(), existing) + ", "
+            + complexParser(c, los.getValueType(), existing) + ")";
         }
     }
 }

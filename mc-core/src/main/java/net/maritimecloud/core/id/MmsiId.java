@@ -51,6 +51,12 @@ public class MmsiId extends MaritimeId {
         return "mmsi:" + mmsi;
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public String getId() {
+        return Integer.toString(mmsi);
+    }
+
     // mmsi:102323233
 
     // enid://

@@ -22,9 +22,14 @@ import static java.lang.StrictMath.sin;
 import static java.lang.StrictMath.sqrt;
 import static java.lang.StrictMath.toRadians;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import net.maritimecloud.message.MessageReader;
+import net.maritimecloud.message.MessageSerializer;
+import net.maritimecloud.message.MessageWriter;
 
 /**
  * This class holds the defining parameters for en ellipse.
@@ -58,6 +63,30 @@ public final class Ellipse extends Area {
      * of the X axis.
      */
     private final double thetaDeg;
+
+    public static final MessageSerializer<Ellipse> SERIALIZER = new MessageSerializer<Ellipse>() {
+
+        /** {@inheritDoc} */
+        @Override
+        public Ellipse read(MessageReader reader) throws IOException {
+            double alpha = reader.readDouble(1, "alpha");
+            double beta = reader.readDouble(2, "beta");
+            double theta = reader.readDouble(3, "theta");
+            double dx = reader.readDouble(4, "dx");
+            double dy = reader.readDouble(5, "dy");
+            Position geodeticReference = reader.readPosition(6, "geodeticReference");
+            return new Ellipse(geodeticReference, dx, dy, alpha, beta, theta);
+        }
+
+        public void write(Ellipse message, MessageWriter w) throws IOException {
+            w.writeDouble(1, "alpha", message.getAlpha());
+            w.writeDouble(2, "beta", message.getBeta());
+            w.writeDouble(3, "theta", message.getY());
+            w.writeDouble(4, "dx", message.getX());
+            w.writeDouble(5, "dy", message.getY());
+            w.writePosition(6, "geodeticReference", message.getGeodeticReference());
+        }
+    };
 
     /**
      * Create an ellipse with center in the geodetic reference point.

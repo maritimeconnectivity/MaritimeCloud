@@ -30,6 +30,27 @@ import org.cakeframework.internal.codegen.CodegenMethod;
  */
 class JavaGenEnumGenerator {
 
+    private static void createEnumSerializer(CodegenEnum c, EnumDeclaration def) {
+        // The serializer is added as an inner class.
+        CodegenClass i = c.addInnerClass();
+        i.addImport(MessageEnumSerializer.class);
+        i.setDefinition("static class Serializer extends ", MessageEnumSerializer.class, "<", c.getSimpleName(), ">");
+
+        CodegenMethod m = i.addMethod("public ", c.getSimpleName(), " from(int value)");
+        m.addJavadoc("{@inheritDoc}").addAnnotation(Override.class);
+        m.add("return ", c.getSimpleName(), ".valueOf(value);");
+
+        m = i.addMethod("public ", c.getSimpleName(), " from(String name)");
+        m.addJavadoc("{@inheritDoc}").addAnnotation(Override.class);
+
+        m.add("switch (name) {");
+        for (Constant ed : def) {
+            m.add("case \"", ed.getName(), "\": return ", c.getSimpleName(), ".", ed.getName(), ";");
+        }
+        m.add("default: return null;");
+        m.add("}");
+    }
+
     static CodegenEnum generateEnum(CodegenClass parent, EnumDeclaration def) {
         CodegenEnum c = new CodegenEnum();
         c.addImport(MessageEnum.class);
@@ -67,27 +88,7 @@ class JavaGenEnumGenerator {
         valueOf.add("default: return null;");
         valueOf.add("}");
 
-        createEnumParser(c, def);
+        createEnumSerializer(c, def);
         return c;
-    }
-
-    private static void createEnumParser(CodegenEnum c, EnumDeclaration def) {
-        CodegenClass i = c.addInnerClass();
-        i.addImport(MessageEnumSerializer.class);
-        i.setDefinition("static class Serializer extends ", MessageEnumSerializer.class, "<", c.getSimpleName(), ">");
-
-        CodegenMethod m = i.addMethod("public ", c.getSimpleName(), " from(int value)");
-        m.addJavadoc("{@inheritDoc}").addAnnotation(Override.class);
-        m.add("return ", c.getSimpleName(), ".valueOf(value);");
-
-        m = i.addMethod("public ", c.getSimpleName(), " from(String name)");
-        m.addJavadoc("{@inheritDoc}").addAnnotation(Override.class);
-
-        m.add("switch (name) {");
-        for (Constant ed : def) {
-            m.add("case \"", ed.getName(), "\": return ", c.getSimpleName(), ".", ed.getName(), ";");
-        }
-        m.add("default: return null;");
-        m.add("}");
     }
 }

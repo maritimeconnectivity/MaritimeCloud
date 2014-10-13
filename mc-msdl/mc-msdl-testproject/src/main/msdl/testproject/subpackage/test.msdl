@@ -3,6 +3,6 @@ namespace testproject.subpackage;
 import "testproject/test.msdl";
 
 message Msg {
- // 1: Geometry1 c1;
-//  2: B1 b1;
+  1: Geometry1 c1;
+  2: B1 b1;
 }

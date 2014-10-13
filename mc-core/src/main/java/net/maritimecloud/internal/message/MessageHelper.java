@@ -122,14 +122,15 @@ public class MessageHelper {
         }
     }
 
-    public static String getName(Class<? extends Message> c) {
+    public static String getName(Class<? extends Message> messageType) {
+        requireNonNull(messageType, "message type is null");
         try {
-            Field field = c.getField("NAME");
+            Field field = messageType.getField("NAME");
             return (String) field.get(null);
         } catch (NoSuchFieldException e) {
             throw new RuntimeException(
-                    "All messages must have a public static final String SERIALIZER field, offending class = "
-                            + c.getCanonicalName());
+                    "All messages must have a public static final String NAME field, offending class = "
+                            + messageType.getCanonicalName());
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }

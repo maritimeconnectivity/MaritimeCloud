@@ -41,7 +41,7 @@ import org.cakeframework.internal.codegen.CodegenUtil;
  */
 public class JavaGenPlugin extends MsdlPlugin {
 
-    Path licensePath;
+    Path fileHeader;
 
     String license;
 
@@ -53,67 +53,73 @@ public class JavaGenPlugin extends MsdlPlugin {
         this.outputPath = requireNonNull(p);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    protected void process(Project project) throws Exception {
-        if (licensePath != null) {
-            StringBuilder sb = new StringBuilder();
-            for (String s : Files.readAllLines(licensePath)) {
-                sb.append(s).append(CodegenUtil.LS);
-            }
-            license = sb.toString();
-        }
-        for (MsdlFile f : project) {
-            generate(this, f, outputPath);
-        }
-
-    }
-
-    void generate(JavaGenPlugin p, MsdlFile definition, Path rootpath) throws IOException {
+    void generateSourceForFile(MsdlFile file) throws IOException {
         List<CodegenClass> classes = new ArrayList<>();
-        for (EnumDeclaration ed : definition.getEnums()) {
+
+        // Generate enums in the file
+        for (EnumDeclaration ed : file.getEnums()) {
             if (!ed.isAnnotationPresent(JavaImplementation.class)) {
                 classes.add(JavaGenEnumGenerator.generateEnum(null, ed));
             }
         }
-        for (MessageDeclaration md : definition.getMessages()) {
+
+        // Generate ordinary messages in the file
+        for (MessageDeclaration md : file.getMessages()) {
             if (!md.isAnnotationPresent(JavaImplementation.class)) {
                 classes.add(new JavaGenMessageGenerator(null, md).generate().c);
             }
         }
 
-        for (MessageDeclaration md : definition.getMessages()) {
-            if (!md.isAnnotationPresent(JavaImplementation.class)) {
-                classes.add(new JavaGenMessageGenerator(null, md).generate().c);
+        // Generate broadcast messages in the file
+        for (BroadcastMessageDeclaration bd : file.getBroadcasts()) {
+            if (!bd.isAnnotationPresent(JavaImplementation.class)) {
+                classes.add(new JavaGenBroadcastMessageGenerator(null, bd).generate().c);
             }
         }
-        for (BroadcastMessageDeclaration bd : definition.getBroadcasts()) {
-            // if (!bd.isAnnotationPresent(JavaImplementation.class)) {
-            classes.add(new JavaGenBroadcastMessageGenerator(null, bd).generate().c);
-            // }
-        }
-        for (EndpointDefinition ed : definition.getEndpoints()) {
+
+        // Generate endpoints in the file
+        for (EndpointDefinition ed : file.getEndpoints()) {
             JavaGenEndpointGenerator g = new JavaGenEndpointGenerator(null, ed).generate();
-            classes.add(g.cClient);
-            classes.add(g.cServer);
+            classes.add(g.cClient); // add client part of endpoint
+            classes.add(g.cServer); // add server part of endpoint
         }
 
-        // for (ServiceDeclaration sd : definition.getServices()) {
-        // classes.add(new JavaGenServiceGenerator(sd).generate().c);
-        // }
         for (CodegenClass cc : classes) {
-            if (definition.getNamespace() != null) {
-                cc.setPackage(definition.getNamespace());
+            if (file.getNamespace() != null) {
+                cc.setPackage(file.getNamespace());
             }
             if (license != null) {
                 cc.setLicense(license);
             }
 
-            Path path = cc.writeSource(rootpath);
+            Path path = cc.writeSource(outputPath);
             if (path != null) {
-                p.getLogger().info("Wrote " + path);
+                getLogger().info("Wrote " + path);
             }
         }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void process(Project project) throws Exception {
+        // If user has a set a file header/license generate it first
+        if (fileHeader != null) {
+            StringBuilder sb = new StringBuilder();
+            for (String s : Files.readAllLines(fileHeader)) {
+                sb.append(s).append(CodegenUtil.LS);
+            }
+            license = sb.toString();
+        }
+
+        for (MsdlFile f : project) {
+            generateSourceForFile(f);
+        }
+
+    }
+
+    public JavaGenPlugin setHeader(Path path) {
+        this.fileHeader = path;
+        return this;
     }
 
     /**
@@ -122,11 +128,6 @@ public class JavaGenPlugin extends MsdlPlugin {
      */
     public JavaGenPlugin setPackagePrefix(String packagePrefix) {
         this.packagePrefix = packagePrefix;
-        return this;
-    }
-
-    public JavaGenPlugin setHeader(Path path) {
-        this.licensePath = path;
         return this;
     }
 

@@ -14,39 +14,57 @@
  */
 package net.maritimecloud.net;
 
-import net.maritimecloud.util.geometry.Area;
+import net.maritimecloud.util.Binary;
 
 /**
- * A broadcast subscription is created every time a {@link BroadcastListener} is registered.
+ * A broadcast subscription is created every time a {@link BroadcastConsumer} is registered.
  *
  * @author Kasper Nielsen
  */
 public interface BroadcastSubscription {
 
-    /** Stops receiving any more broadcast messages for the registered listener. */
+    /** Permanently stops receiving broadcast for this subscription. */
     void cancel();
-
-    /**
-     * Returns the area for which the client is listening for broadcast. If this subscription has been created using a
-     * distance relative to a moving position. The returned area will change whenever the position is updated.
-     * <p>
-     * Returns <code>null</code> if the underlying implementation does not filter broadcast messages based on area.s
-     *
-     * @return the area for which the client is listening for broadcast.
-     */
-    Area getArea();
 
     /**
      * Returns the type of broadcast message we are listening for.
      *
      * @return the type of broadcast message we are listening for
      */
-    Class<? extends BroadcastMessage> getBroadcastMessageType();
+    Class<? extends BroadcastMessage> getBroadcastJavaType();
 
     /**
-     * Returns the number of messages received by the registered listener.
+     * Returns the type of broadcast messages that we are listening for.
+     *
+     * @return the type of broadcast messages that we are listening for
+     */
+    String getBroadcastType();
+
+    /**
+     * Returns a unique 256 bit id for this subscription.
+     *
+     * @return a unique 256 bit id for this subscription
+     */
+    Binary getId();
+
+    /**
+     * Returns the number of messages received for this subscription.
      *
      * @return the number of messages received
      */
     long getNumberOfReceivedMessages();
 }
+
+// I have dropped this so far. Problem is in the future we might have a default area registered for a client at the
+// central server.
+// This area will be used if no area is specified. However, the area is never sent to the client. It is only available
+// centrally on the server.
+// /**
+// * Returns the area for which the client is listening for broadcast. If this subscription has been created using a
+// * distance relative to a moving position. The returned area will change whenever the position is updated.
+// * <p>
+// * Returns <code>null</code> if the underlying implementation does not filter broadcast messages based on area.
+// *
+// * @return the area for which the client is listening for broadcast.
+// */
+// Area getArea();

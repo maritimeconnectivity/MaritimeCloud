@@ -40,6 +40,15 @@ public abstract class LocalEndpoint {
     }
 
     /**
+     * Returns the id of the remote actor implementing the endpoint.
+     *
+     * @return the id of the remote actor implementing the endpoint
+     */
+    public final MaritimeId getRemoteId() {
+        return invocator.getRemote();
+    }
+
+    /**
      * Invoke a remote method.
      *
      * @param endpoint
@@ -59,15 +68,6 @@ public abstract class LocalEndpoint {
         return invocator.invokeRemote(endpoint, parameters, serializer, resultParser);
     }
 
-    /**
-     * Returns the id of the remote actor implementing the endpoint.
-     *
-     * @return the id of the remote actor implementing the endpoint
-     */
-    public final MaritimeId getRemote() {
-        return invocator.getRemote();
-    }
-
     /** Used internally for invoking remote methods. */
     public interface Invocator {
 
@@ -78,7 +78,18 @@ public abstract class LocalEndpoint {
          */
         MaritimeId getRemote();
 
+        /**
+         * @param endpoint
+         *            the name of the endpoint
+         * @param parameters
+         *            an optional list of parameters to the method
+         * @param parameterSerializer
+         *            serializer for parameters
+         * @param resultSerializer
+         *            the serializer used for the result
+         * @return a future representing pending completion of the invocation
+         */
         <T> EndpointInvocationFuture<T> invokeRemote(String endpoint, Message parameters,
-                MessageSerializer<? extends Message> serializer, ValueSerializer<T> resultSerializer);
+                MessageSerializer<? extends Message> parameterSerializer, ValueSerializer<T> resultSerializer);
     }
 }

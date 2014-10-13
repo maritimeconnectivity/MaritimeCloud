@@ -61,4 +61,10 @@ public abstract class MaritimeId implements Serializable {
         }
         throw new IllegalArgumentException("Unknown schenme " + uri.getScheme());
     }
+
+    public abstract String getId();
+
+    public int getIdAsInt() {
+        return Integer.parseInt(getId());
+    }
 }

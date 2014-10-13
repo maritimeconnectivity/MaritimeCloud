@@ -17,16 +17,19 @@ package net.maritimecloud.internal.security;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.Signature;
 
 /**
+ * Various security helper methods.
  *
  * @author Kasper Nielsen
  */
 public class SecurityTools {
 
+    public static final String DEFAULT_SIGNATURE_ALGORITHM = "SHA512withECDSA";
 
-    public static Signature newSignature(PrivateKey key) {
+    public static Signature newSignatureForSigning(PrivateKey key) {
         Signature dsa = SecurityTools.newSignature();
         try {
             dsa.initSign(key);
@@ -36,13 +39,21 @@ public class SecurityTools {
         return dsa;
     }
 
-    public static Signature newSignature() {
+    public static Signature newSignatureForVerify(PublicKey key) {
+        Signature dsa = SecurityTools.newSignature();
         try {
-            return Signature.getInstance("SHA512withECDSA");
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("SHA512withECDSA should be installed on all platform", e);
+            dsa.initVerify(key);
+        } catch (InvalidKeyException e) {
+            throw new IllegalArgumentException("The specified public key is invalid", e);
         }
+        return dsa;
     }
 
-
+    public static Signature newSignature() {
+        try {
+            return Signature.getInstance(DEFAULT_SIGNATURE_ALGORITHM);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(DEFAULT_SIGNATURE_ALGORITHM + " should be installed on all platform", e);
+        }
+    }
 }
