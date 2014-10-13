@@ -17,8 +17,8 @@ package net.maritimecloud.internal.msdl.parser;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import net.maritimecloud.internal.msdl.parser.antlr.AntlrFile;
 import net.maritimecloud.internal.msdl.parser.antlr.MsdlParser.BroadcastDeclarationContext;
@@ -41,8 +41,11 @@ import org.antlr.v4.runtime.tree.ParseTree;
  *
  * @author Kasper Nielsen
  */
-class ParsedFile implements MsdlFile {
+class ParsedMsdlFile implements MsdlFile {
+
     final AntlrFile antlrFile;
+
+    final List<AbstractContainer> containers = new ArrayList<>();
 
     final ArrayList<String> imports = new ArrayList<>();
 
@@ -50,11 +53,9 @@ class ParsedFile implements MsdlFile {
 
     final ParsedProject project;
 
-    final ArrayList<ParsedFile> resolvedImports = new ArrayList<>();
+    final ArrayList<ParsedMsdlFile> resolvedImports = new ArrayList<>();
 
-    final List<AbstractContainer> containers = new ArrayList<>();
-
-    ParsedFile(ParsedProject project, AntlrFile antlrFile) {
+    ParsedMsdlFile(ParsedProject project, AntlrFile antlrFile) {
         this.antlrFile = requireNonNull(antlrFile);
         this.project = requireNonNull(project);
     }
@@ -73,18 +74,6 @@ class ParsedFile implements MsdlFile {
         return listOf(BroadcastMessageDeclaration.class);
     }
 
-
-    @SuppressWarnings("unchecked")
-    <T> List<T> listOf(Class<T> type) {
-        ArrayList<T> result = new ArrayList<>();
-        for (Object o : containers) {
-            if (type.isAssignableFrom(o.getClass())) {
-                result.add((T) o);
-            }
-        }
-        return result;
-    }
-
     /**
      * @return the endpoints
      */
@@ -101,14 +90,8 @@ class ParsedFile implements MsdlFile {
     /** {@inheritDoc} */
     @Override
     public List<MessageDeclaration> getMessages() {
-        List<MessageDeclaration> result = listOf(MessageDeclaration.class);
-        for (Iterator<MessageDeclaration> iterator = result.iterator(); iterator.hasNext();) {
-            MessageDeclaration d = iterator.next();
-            if (d instanceof BroadcastMessageDeclaration) {
-                iterator.remove();
-            }
-        }
-        return result;
+        List<MessageDeclaration> msgs = listOf(MessageDeclaration.class);
+        return msgs.stream().filter(e -> !(e instanceof BroadcastMessageDeclaration)).collect(Collectors.toList());
     }
 
     /** {@inheritDoc} */
@@ -117,17 +100,21 @@ class ParsedFile implements MsdlFile {
         return namespace;
     }
 
-    // /** {@inheritDoc} */
-    // @Override
-    // public Path getPath() {
-    // return antlrFile.getPath();
-    // }
+    @SuppressWarnings("unchecked")
+    <T> List<T> listOf(Class<T> type) {
+        ArrayList<T> result = new ArrayList<>();
+        for (Object o : containers) {
+            if (type.isAssignableFrom(o.getClass())) {
+                result.add((T) o);
+            }
+        }
+        return result;
+    }
 
     void parse() {
         parseNamespace();
         parseImports();
         parseTypes();
-        // return f;
     }
 
     private void parseImports() {
@@ -168,6 +155,4 @@ class ParsedFile implements MsdlFile {
     public String toString() {
         return antlrFile.getPath().toString();
     }
-
-    void warn(ParserRuleContext context, String msg) {}
 }

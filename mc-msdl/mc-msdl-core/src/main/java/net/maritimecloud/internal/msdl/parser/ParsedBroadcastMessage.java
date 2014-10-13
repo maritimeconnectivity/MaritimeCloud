@@ -27,7 +27,7 @@ public class ParsedBroadcastMessage extends ParsedMessage implements BroadcastMe
      * @param file
      * @param ac
      */
-    ParsedBroadcastMessage(ParsedFile file, AnnotationContainer ac) {
+    ParsedBroadcastMessage(ParsedMsdlFile file, AnnotationContainer ac) {
         super(file, ac);
     }
 
@@ -36,11 +36,6 @@ public class ParsedBroadcastMessage extends ParsedMessage implements BroadcastMe
      * @return
      */
     public ParsedBroadcastMessage parse(BroadcastDeclarationContext c) {
-        // System.out.println(c.getText());
-        // System.out.println(c.getStart().getLine());
-        // System.out.println(c.getStart().getCharPositionInLine());
-        // System.out.println(c.getStop().getLine());
-        // System.out.println(c.getStop().getCharPositionInLine());
         parse(c.Identifier(), c.fields());
         return this;
     }

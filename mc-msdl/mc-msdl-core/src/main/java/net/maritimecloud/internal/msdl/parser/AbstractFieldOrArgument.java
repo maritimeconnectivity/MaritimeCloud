@@ -30,18 +30,17 @@ public class AbstractFieldOrArgument implements FieldOrParameter {
 
     private MsdlComment comment;
 
-    final ParsedFile file;
-
-    private Integer tag;
+    final ParsedMsdlFile file;
 
     String name;
 
-
     Type publicType;
+
+    private Integer tag;
 
     ParsedType type;
 
-    AbstractFieldOrArgument(ParsedFile file) {
+    AbstractFieldOrArgument(ParsedMsdlFile file) {
         this.file = file;
     }
 
@@ -49,12 +48,12 @@ public class AbstractFieldOrArgument implements FieldOrParameter {
         return comment;
     }
 
-    public final int getTag() {
-        return tag; // this class is never exported out if tag==null
+    public final String getName() {
+        return name;
     }
 
-    private String n() {
-        return this instanceof ParsedField ? " field" : " parameter";
+    public final int getTag() {
+        return tag; // this class is never exported out if tag==null
     }
 
 
@@ -66,6 +65,11 @@ public class AbstractFieldOrArgument implements FieldOrParameter {
         return publicType;
     }
 
+    private String n() {
+        return this instanceof ParsedField ? " field" : " parameter";
+    }
+
+
     AbstractFieldOrArgument parse(ParserRuleContext c, TerminalNode nameReader, TerminalNode tagReader, TypeContext type) {
         comment = MsdlComment.parseComments(file.antlrFile.getTokenStream(), c);
         parseName(c, nameReader);
@@ -74,7 +78,6 @@ public class AbstractFieldOrArgument implements FieldOrParameter {
         this.type.parse(file, type);
         return this;
     }
-
 
     void parseName(ParserRuleContext c, TerminalNode n) {
         name = n.getText();
@@ -92,9 +95,5 @@ public class AbstractFieldOrArgument implements FieldOrParameter {
         } catch (NumberFormatException e) {
             file.error(c, "A" + n() + " value must be less than " + Integer.MAX_VALUE + ", was " + value);
         }
-    }
-
-    public final String getName() {
-        return name;
     }
 }

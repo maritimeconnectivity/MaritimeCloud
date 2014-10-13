@@ -21,18 +21,19 @@ import java.lang.annotation.Annotation;
 import net.maritimecloud.msdl.model.MsdlFile;
 
 /**
- *
+ * An abstract container for endpoint, enum, message and broadcast message types.
+ * 
  * @author Kasper Nielsen
  */
 abstract class AbstractContainer {
 
     final AnnotationContainer ac;
 
-    final ParsedFile file;
+    final ParsedMsdlFile file;
 
     private String name;
 
-    AbstractContainer(ParsedFile file, AnnotationContainer ac) {
+    AbstractContainer(ParsedMsdlFile file, AnnotationContainer ac) {
         this.file = requireNonNull(file);
         this.ac = ac;
     }

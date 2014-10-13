@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.internal.msdl.parser;
+package net.maritimecloud.internal.msdl.parser.old;
 
 import java.nio.file.Path;
 
@@ -22,6 +22,7 @@ import net.maritimecloud.msdl.model.SourceToken;
  *
  * @author Kasper Nielsen
  */
+// moved from net.maritimecloud.internal.msdl.parser
 public class DefaultSourceToken implements SourceToken {
 
     private final int endColumn;

@@ -32,8 +32,15 @@ public class ParsedEndpoint extends AbstractContainer implements EndpointDefinit
 
     final LinkedHashMap<String, ParsedEndpointFunction> endpointFunction = new LinkedHashMap<>();
 
-    ParsedEndpoint(ParsedFile file, AnnotationContainer ac) {
+    ParsedEndpoint(ParsedMsdlFile file, AnnotationContainer ac) {
         super(file, ac);
+    }
+
+    /** {@inheritDoc} */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Override
+    public List<EndpointMethod> getFunctions() {
+        return (List) Collections.unmodifiableList(new ArrayList<>(endpointFunction.values()));
     }
 
     /**
@@ -54,12 +61,5 @@ public class ParsedEndpoint extends AbstractContainer implements EndpointDefinit
             }
         }
         return this;
-    }
-
-    /** {@inheritDoc} */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    @Override
-    public List<EndpointMethod> getFunctions() {
-        return (List) Collections.unmodifiableList(new ArrayList<>(endpointFunction.values()));
     }
 }

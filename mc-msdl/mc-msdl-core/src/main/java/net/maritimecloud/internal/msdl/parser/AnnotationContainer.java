@@ -41,9 +41,9 @@ import org.antlr.v4.runtime.tree.ParseTree;
 public class AnnotationContainer {
     private final Map<String, Anno> annotations = new LinkedHashMap<>();
 
-    final ParsedFile file;
+    final ParsedMsdlFile file;
 
-    AnnotationContainer(ParsedFile file) {
+    AnnotationContainer(ParsedMsdlFile file) {
         this.file = requireNonNull(file);
     }
 
@@ -109,15 +109,6 @@ public class AnnotationContainer {
         }
         return this;
     }
-
-    // public static void main(String[] args) {
-    // AnnotationContainer con = new AnnotationContainer();
-    //
-    // con.addAnnotation("JavaImplementation", new AbstractMap.SimpleImmutableEntry<>("value", "java.spos"));
-    //
-    // JavaImplementation annotation = con.getAnnotation(JavaImplementation.class);
-    // System.out.println(annotation.value());
-    // }
 
     static class Anno implements InvocationHandler {
         String name;

@@ -28,7 +28,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 class SourceTagHolder implements SourceToken {
 
-    final ParsedFile file;
+    final ParsedMsdlFile file;
 
     final int startCharPosition;
 
@@ -38,7 +38,7 @@ class SourceTagHolder implements SourceToken {
 
     final int stopLine;
 
-    SourceTagHolder(ParsedFile file, ParserRuleContext c) {
+    SourceTagHolder(ParsedMsdlFile file, ParserRuleContext c) {
         this.file = requireNonNull(file);
         this.startLine = c.getStart().getLine();
         this.startCharPosition = c.getStart().getCharPositionInLine();

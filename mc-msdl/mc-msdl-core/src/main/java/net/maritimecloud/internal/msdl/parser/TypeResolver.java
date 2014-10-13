@@ -29,20 +29,20 @@ import com.google.common.collect.Multimap;
  * @author Kasper Nielsen
  */
 class TypeResolver {
-    final Collection<ParsedFile> files;
+    final Collection<ParsedMsdlFile> files;
 
     final MsdlLogger logger;
 
     final Multimap<String, Object> types = ArrayListMultimap.create();
 
-    TypeResolver(MsdlLogger logger, Collection<ParsedFile> files) {
+    TypeResolver(MsdlLogger logger, Collection<ParsedMsdlFile> files) {
         this.files = requireNonNull(files);
         this.logger = requireNonNull(logger);
     }
 
 
     void resolve() {
-        for (ParsedFile f : files) {
+        for (ParsedMsdlFile f : files) {
             for (ParsedMessage m : f.listOf(ParsedMessage.class)) {
                 resolveMessage0(m);
             }
@@ -51,12 +51,12 @@ class TypeResolver {
             }
         }
 
-        for (ParsedFile f : files) {
+        for (ParsedMsdlFile f : files) {
             for (ParsedMessage m : f.listOf(ParsedMessage.class)) {
                 resolveMessage1(m);
             }
         }
-        for (ParsedFile f : files) {
+        for (ParsedMsdlFile f : files) {
             for (ParsedEndpoint e : f.listOf(ParsedEndpoint.class)) {
                 for (ParsedEndpointFunction fu : e.endpointFunction.values()) {
                     if (fu.returnType != null) {

@@ -12,16 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.internal.msdl.parser;
+package net.maritimecloud.internal.msdl.parser.old;
 
 import net.maritimecloud.msdl.MsdlLogger;
-
-import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  *
  * @author Kasper Nielsen
  */
+// moved from net.maritimecloud.internal.msdl.parser
 class ParserLogger extends MsdlLogger {
     private MsdlLogger delegate;
 
@@ -63,9 +62,5 @@ class ParserLogger extends MsdlLogger {
     /** {@inheritDoc} */
     public void warn(CharSequence message, Throwable error) {
         delegate.warn(message, error);
-    }
-
-    void error(ParsedFile file, ParserRuleContext context, String msg) {
-
     }
 }

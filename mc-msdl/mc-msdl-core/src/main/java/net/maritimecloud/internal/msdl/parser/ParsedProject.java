@@ -37,16 +37,16 @@ import net.maritimecloud.msdl.model.Project;
  */
 public class ParsedProject {
 
-    /** All source files that should be processed */
-    final Map<String, Path> sourceFiles;
+    final AtomicInteger errorCounter = new AtomicInteger();
+
+    final TreeMap<String, ParsedMsdlFile> files = new TreeMap<>();
 
     final ImportResolver importResolver;
 
     final MsdlLogger logger;
 
-    final AtomicInteger errorCounter = new AtomicInteger();
-
-    final Map<String, ParsedFile> files = new TreeMap<>();
+    /** All source files that should be processed */
+    final Map<String, Path> sourceFiles;
 
     public ParsedProject(Map<String, Path> sourceFiles, List<Path> directories, MsdlLogger logger) {
         this.sourceFiles = requireNonNull(sourceFiles);
@@ -66,12 +66,13 @@ public class ParsedProject {
     Project parse0() throws Exception {
         // parse all source files
         for (Map.Entry<String, Path> e : sourceFiles.entrySet()) {
-            ParsedFile file = parseFile(e.getValue());
-            if (file != null) {
+            ParsedMsdlFile file = parseFile(e.getValue());
+            if (file != null) { // only add it if successfully parsed
                 files.put(e.getKey(), file);
                 importResolver.resolvedDependency.put(e.getKey(), file);
             }
         }
+        // If we experience any errors exit now. Before trying to parse referenced files
         if (errorCounter.get() > 0) {
             return null;
         }
@@ -90,24 +91,25 @@ public class ParsedProject {
         return new ProjectImpl(new TreeMap<>(files));
     }
 
-    ParsedFile parseFile(Path p) throws IOException {
-        return cr(new AntlrFile(p, logger));
-    }
-
-    ParsedFile parseFile(URL p) throws IOException {
-        return cr(new AntlrFile(p, logger));
-    }
-
-    ParsedFile cr(AntlrFile af) {
+    private ParsedMsdlFile parseFile(AntlrFile af) {
         af.getCompilationUnit();
         if (errorCounter.get() > 0) {
             return null;
         }
-        ParsedFile f = new ParsedFile(this, af);
+        ParsedMsdlFile f = new ParsedMsdlFile(this, af);
         f.parse();
         return f;
     }
 
+    ParsedMsdlFile parseFile(Path p) throws IOException {
+        return parseFile(new AntlrFile(p, logger));
+    }
+
+    ParsedMsdlFile parseFile(URL p) throws IOException {
+        return parseFile(new AntlrFile(p, logger));
+    }
+
+    /** The default implementation of Project. */
     static class ProjectImpl implements Project {
         final Map<String, MsdlFile> files;
 
@@ -117,14 +119,14 @@ public class ParsedProject {
 
         /** {@inheritDoc} */
         @Override
-        public Iterator<MsdlFile> iterator() {
-            return files.values().iterator();
+        public Map<String, MsdlFile> getFiles() {
+            return files;
         }
 
         /** {@inheritDoc} */
         @Override
-        public Map<String, MsdlFile> getFiles() {
-            return files;
+        public Iterator<MsdlFile> iterator() {
+            return files.values().iterator();
         }
     }
 }

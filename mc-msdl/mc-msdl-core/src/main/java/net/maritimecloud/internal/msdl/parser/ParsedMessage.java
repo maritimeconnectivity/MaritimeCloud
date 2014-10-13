@@ -43,7 +43,7 @@ public class ParsedMessage extends AbstractContainer implements MessageDeclarati
 
     final List<ParsedEnum> messages = new ArrayList<>();
 
-    ParsedMessage(ParsedFile file, AnnotationContainer ac) {
+    ParsedMessage(ParsedMsdlFile file, AnnotationContainer ac) {
         super(file, ac);
     }
 

@@ -48,7 +48,7 @@ public class ParsedType {
 
     SourceTagHolder source;
 
-    ParsedType parse(ParsedFile file, TypeContext c) {
+    ParsedType parse(ParsedMsdlFile file, TypeContext c) {
         source = new SourceTagHolder(file, c);
         if (c.primitiveType() != null) {
             PrimitiveTypeContext ptc = c.primitiveType();
@@ -106,7 +106,7 @@ public class ParsedType {
         return this;
     }
 
-    private void reference(ParsedFile file, QualifiedNameContext con) {
+    private void reference(ParsedMsdlFile file, QualifiedNameContext con) {
         // Check name
         String name = con.Identifier().get(0).getText();
         if (name.equals("String")) {

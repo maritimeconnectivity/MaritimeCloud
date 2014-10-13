@@ -37,7 +37,7 @@ public class ParsedEnum extends AbstractContainer implements EnumDeclaration {
     /** The enum values keyed by their string name. */
     private final LinkedHashMap<String, Constant> byName = new LinkedHashMap<>();
 
-    ParsedEnum(ParsedFile file, AnnotationContainer ac) {
+    ParsedEnum(ParsedMsdlFile file, AnnotationContainer ac) {
         super(file, ac);
     }
 

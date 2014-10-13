@@ -40,13 +40,13 @@ import net.maritimecloud.msdl.MsdlPluginException;
  *
  * @author Kasper Nielsen
  */
-class ImportResolver implements Iterable<ParsedFile> {
+class ImportResolver implements Iterable<ParsedMsdlFile> {
 
     /** A map of all msdl files. */
     Map<String, Path> dependencies;
 
     /** A map of all parsed msdl files. */
-    Map<String, ParsedFile> resolvedDependency = new LinkedHashMap<>();
+    Map<String, ParsedMsdlFile> resolvedDependency = new LinkedHashMap<>();
 
     final List<Path> directories;
 
@@ -60,8 +60,8 @@ class ImportResolver implements Iterable<ParsedFile> {
         this.logger = requireNonNull(logger);
     }
 
-    ParsedFile resolveImport(ParsedProject project, String name) throws IOException {
-        ParsedFile f = resolvedDependency.get(name);
+    ParsedMsdlFile resolveImport(ParsedProject project, String name) throws IOException {
+        ParsedMsdlFile f = resolvedDependency.get(name);
         if (f != null) {
             return f;
         }
@@ -94,7 +94,6 @@ class ImportResolver implements Iterable<ParsedFile> {
         Path p = dependencies.get(name);
         if (p == null) {
             // add-> "Looked in ...." list of directories
-
             Enumeration<URL> resources = ImportResolver.class.getClassLoader().getResources(name);
             List<URL> l = Collections.list(resources);
             if (l.isEmpty()) {
@@ -136,13 +135,13 @@ class ImportResolver implements Iterable<ParsedFile> {
         return f;
     }
 
-    void resolveAll(ParsedProject project, Collection<ParsedFile> initial) throws IOException {
-        LinkedHashSet<ParsedFile> allFiles = new LinkedHashSet<>(initial);
-        LinkedList<ParsedFile> unImportedFiles = new LinkedList<>(initial);
+    void resolveAll(ParsedProject project, Collection<ParsedMsdlFile> initial) throws IOException {
+        LinkedHashSet<ParsedMsdlFile> allFiles = new LinkedHashSet<>(initial);
+        LinkedList<ParsedMsdlFile> unImportedFiles = new LinkedList<>(initial);
         while (!unImportedFiles.isEmpty()) {
-            ParsedFile pf = unImportedFiles.poll();
+            ParsedMsdlFile pf = unImportedFiles.poll();
             for (String importLocation : pf.imports) {
-                ParsedFile imp = resolveImport(project, importLocation);
+                ParsedMsdlFile imp = resolveImport(project, importLocation);
                 if (imp != null) {
                     if (!allFiles.contains(imp)) {
                         allFiles.add(imp);
@@ -156,7 +155,7 @@ class ImportResolver implements Iterable<ParsedFile> {
 
     /** {@inheritDoc} */
     @Override
-    public Iterator<ParsedFile> iterator() {
+    public Iterator<ParsedMsdlFile> iterator() {
         return resolvedDependency.values().iterator();
     }
 }

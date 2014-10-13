@@ -22,7 +22,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public class Checks {
 
-    public static boolean checkFirstLower(ParsedFile file, ParserRuleContext c, String prefix, String name) {
+    public static boolean checkFirstLower(ParsedMsdlFile file, ParserRuleContext c, String prefix, String name) {
         if (name == null || name.length() == 0 || !isAsciiAlphaLower(name.charAt(0))) {
             file.error(c, prefix + ", must start with an lowercase ascii character (a-z), was '" + name + "'");
             return false;
@@ -31,7 +31,7 @@ public class Checks {
     }
 
 
-    public static boolean checkFirstUpper(ParsedFile file, ParserRuleContext c, String prefix, String name) {
+    public static boolean checkFirstUpper(ParsedMsdlFile file, ParserRuleContext c, String prefix, String name) {
         if (name == null || name.length() == 0 || !isAsciiAlphaUpper(name.charAt(0))) {
             file.error(c, prefix + ", must start with an uppercase ascii character (A-Z), was '" + name + "'");
             return false;
@@ -39,7 +39,7 @@ public class Checks {
         return true;
     }
 
-    public static boolean checkAsciiNumber(ParsedFile file, ParserRuleContext c, String prefix, String name) {
+    public static boolean checkAsciiNumber(ParsedMsdlFile file, ParserRuleContext c, String prefix, String name) {
         if (!name.matches("[A-Z][a-zA-Z0-9_]*")) {
             file.error(c, prefix
                     + ", must consists only of ascii characters (a-zA-Z), numbers (1-9) and underscore (_) , was '"
@@ -49,7 +49,7 @@ public class Checks {
         return true;
     }
 
-    public static boolean checkAsciiUpperLowercase(ParsedFile file, ParserRuleContext c, String prefix, String name) {
+    public static boolean checkAsciiUpperLowercase(ParsedMsdlFile file, ParserRuleContext c, String prefix, String name) {
         if (!name.matches("[A-Z][A-Z0-9_]*")) {
             file.error(
                     c,
