@@ -59,7 +59,7 @@ public class Polygon extends Area {
     }
 
     boolean contains(double latitude, double longitude) {
-        Position p1;
+        // Position p1;
 
         throw new UnsupportedOperationException();
     }

@@ -14,6 +14,8 @@
  */
 package net.maritimecloud.msdl.parser;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 
 import org.junit.Test;
@@ -26,7 +28,7 @@ public class MessageExceptionsTest extends AbstractParserTest {
     @Test
     public void sameId() throws IOException {
         singleError(e -> {
-            System.out.println(e);
+            assertTrue(e.contains("String"));
         }, "message Foof {", " 1: String s;", "}");
     }
 }

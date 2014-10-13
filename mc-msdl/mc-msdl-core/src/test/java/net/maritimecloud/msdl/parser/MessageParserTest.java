@@ -83,8 +83,6 @@ public class MessageParserTest extends AbstractParserTest {
                 "34: timestamp ts;", //
 
                 "123: binary bfi;" //
-
-
                 , "}" };
 
         singleFile(e -> {

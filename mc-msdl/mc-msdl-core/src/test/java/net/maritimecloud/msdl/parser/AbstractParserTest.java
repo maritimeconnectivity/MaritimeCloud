@@ -82,7 +82,7 @@ public abstract class AbstractParserTest {
             assertNotNull(e);
 
             assertNull(tl.nextError());
-            System.out.println(e.getMessage());
+            consumer.accept(e.getMessage());
         }
     }
 

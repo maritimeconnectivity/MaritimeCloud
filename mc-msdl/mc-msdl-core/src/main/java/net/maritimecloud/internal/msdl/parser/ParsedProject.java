@@ -58,7 +58,7 @@ public class ParsedProject {
         try {
             return parse0();
         } catch (Exception e) {
-            logger.error("Failed to parse files " + e.getMessage(), e);
+            logger.error("Internal compiler error (please report bug) " + e.getMessage(), e);
         }
         return null;
     }
@@ -67,8 +67,10 @@ public class ParsedProject {
         // parse all source files
         for (Map.Entry<String, Path> e : sourceFiles.entrySet()) {
             ParsedFile file = parseFile(e.getValue());
-            files.put(e.getKey(), file);
-            importResolver.resolvedDependency.put(e.getKey(), file);
+            if (file != null) {
+                files.put(e.getKey(), file);
+                importResolver.resolvedDependency.put(e.getKey(), file);
+            }
         }
         if (errorCounter.get() > 0) {
             return null;
@@ -89,13 +91,19 @@ public class ParsedProject {
     }
 
     ParsedFile parseFile(Path p) throws IOException {
-        ParsedFile f = new ParsedFile(this, new AntlrFile(p, logger));
-        f.parse();
-        return f;
+        return cr(new AntlrFile(p, logger));
     }
 
     ParsedFile parseFile(URL p) throws IOException {
-        ParsedFile f = new ParsedFile(this, new AntlrFile(p, logger));
+        return cr(new AntlrFile(p, logger));
+    }
+
+    ParsedFile cr(AntlrFile af) {
+        af.getCompilationUnit();
+        if (errorCounter.get() > 0) {
+            return null;
+        }
+        ParsedFile f = new ParsedFile(this, af);
         f.parse();
         return f;
     }
