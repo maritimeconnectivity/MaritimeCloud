@@ -16,6 +16,8 @@ package net.maritimecloud.util.geometry;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -23,7 +25,14 @@ import net.maritimecloud.message.MessageReader;
 import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.message.MessageWriter;
 
-public class Polygon extends Area {
+/**
+ * A polygon consisting of multiple points.
+ *
+ * @author Kasper Nielsen
+ */
+public class Polygon extends Area implements Iterable<Position> {
+
+    /** The serializer of the polygon. */
     public static final MessageSerializer<Polygon> SERIALIZER = new MessageSerializer<Polygon>() {
 
         /** {@inheritDoc} */
@@ -34,7 +43,8 @@ public class Polygon extends Area {
         }
 
         public void write(Polygon message, MessageWriter writer) throws IOException {
-            writer.writeList(1, "points", Arrays.asList(message.positions), Position.SERIALIZER);
+            writer.writeList(1, "points", Collections.unmodifiableList(Arrays.asList(message.positions)),
+                    Position.SERIALIZER);
         }
     };
 
@@ -59,9 +69,20 @@ public class Polygon extends Area {
     }
 
     boolean contains(double latitude, double longitude) {
-        // Position p1;
+        // Use raycasting algorihm.
+        // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+        boolean result = false;
+        for (int i = 0, j = positions.length - 1; i < positions.length; j = i++) {
+            if (positions[i].latitude > latitude != positions[j].latitude > latitude) {
 
-        throw new UnsupportedOperationException();
+                if (longitude < (positions[j].longitude - positions[i].longitude) * (latitude - positions[i].latitude)
+                        / (positions[j].latitude - positions[i].latitude) + positions[i].longitude) {
+                    result = !result;
+                }
+
+            }
+        }
+        return result;
     }
 
     /** {@inheritDoc} */
@@ -83,7 +104,15 @@ public class Polygon extends Area {
     /** {@inheritDoc} */
     @Override
     public Position getRandomPosition(Random random) {
-        throw new UnsupportedOperationException();
+        Rectangle r = getBoundingBox();
+        for (int i = 0; i < 10000; i++) {
+            Position pos = r.getRandomPosition(random);
+            if (contains(pos)) {
+                return pos;
+            }
+        }
+        // Well we couldn't find a random position
+        throw new IllegalStateException("Could not find a valid random point");
     }
 
     /** {@inheritDoc} */
@@ -99,5 +128,15 @@ public class Polygon extends Area {
 
     public static Polygon create(Position... positions) {
         return new Polygon(positions);
+    }
+
+    public List<Position> getPoints() {
+        return Collections.unmodifiableList(Arrays.asList(positions));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Iterator<Position> iterator() {
+        return getPoints().iterator();
     }
 }
