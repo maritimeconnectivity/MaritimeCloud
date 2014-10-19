@@ -103,12 +103,12 @@ public class Circle extends Area {
     /** {@inheritDoc} */
     @Override
     public Rectangle getBoundingBox() {
-        double right = CoordinateSystem.CARTESIAN.pointOnBearing(center, radius, 0).latitude;
-        double left = CoordinateSystem.CARTESIAN.pointOnBearing(center, radius, 180).latitude;
-        double top = CoordinateSystem.CARTESIAN.pointOnBearing(center, radius, 90).longitude;
-        double buttom = CoordinateSystem.CARTESIAN.pointOnBearing(center, radius, 270).longitude;
-        Position topLeft = Position.create(left, top);
-        Position buttomRight = Position.create(right, buttom);
+        double top = CoordinateSystem.CARTESIAN.pointOnBearing(center, radius, 0).latitude;
+        double right = CoordinateSystem.CARTESIAN.pointOnBearing(center, radius, 90).longitude;
+        double bottom = CoordinateSystem.CARTESIAN.pointOnBearing(center, radius, 180).latitude;
+        double left = CoordinateSystem.CARTESIAN.pointOnBearing(center, radius, 270).longitude;
+        Position topLeft = Position.create(top, left);
+        Position buttomRight = Position.create(bottom, right);
         return Rectangle.create(topLeft, buttomRight);
     }
 
@@ -250,7 +250,7 @@ public class Circle extends Area {
     /**
      * Creates a message of this type from a JSON. Throwing a runtime exception if the format of the message does not
      * match.
-     * 
+     *
      * @param string
      *            the JSON string to parse
      * @return the parsed area
