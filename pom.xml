@@ -19,7 +19,7 @@
   <parent>
     <groupId>net.maritimecloud</groupId>
     <artifactId>mc-root-pom</artifactId>
-    <version>6</version>
+    <version>7</version>
   </parent>
   
   <modelVersion>4.0.0</modelVersion>

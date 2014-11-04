@@ -76,10 +76,5 @@
        <artifactId>mc-mms-common</artifactId>
        <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>net.maritimecloud</groupId>
-      <artifactId>mc-core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
   </dependencies>
 </project>
