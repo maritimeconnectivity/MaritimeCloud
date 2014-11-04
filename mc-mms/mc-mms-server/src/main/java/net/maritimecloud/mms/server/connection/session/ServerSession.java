@@ -28,13 +28,13 @@ import net.maritimecloud.util.Binary;
  */
 public class ServerSession {
 
-    private final ReentrantLock readLock = new ReentrantLock();
+    final ReentrantLock readLock = new ReentrantLock();
 
-    private final ReentrantLock writeLock = new ReentrantLock();
+    final ReentrantLock writeLock = new ReentrantLock();
 
-    private ServerTransport transport;
+    ServerTransport transport;
 
-    private final ServerTransportListener stl = new ServerTransportListener() {};
+    final ServerTransportListener stl = new ServerTransportListener() {};
 
     private final Binary sessionId = Binary.random(32);
 

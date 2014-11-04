@@ -54,6 +54,7 @@ import net.maritimecloud.util.geometry.PositionTime;
 
 import org.cakeframework.container.RunOnStop;
 import org.cakeframework.util.concurrent.ScheduleWithFixedDelay;
+import org.cakeframework.util.concurrent.ThreadManager;
 
 /**
  * Manages sending and receiving of broadcasts.
@@ -94,7 +95,7 @@ public class ClientBroadcastManager {
      *            the network
      */
     public ClientBroadcastManager(ClientInfo info, MmsThreadManager threadManager, ClientConnection connection,
-            org.cakeframework.util.concurrent.ThreadManager tmm) {
+            ThreadManager tmm) {
         this.connection = requireNonNull(connection);
         this.threadManager = requireNonNull(threadManager);
         this.info = requireNonNull(info);

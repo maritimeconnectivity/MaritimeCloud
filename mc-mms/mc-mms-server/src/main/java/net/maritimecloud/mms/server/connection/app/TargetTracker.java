@@ -21,5 +21,5 @@ import net.maritimecloud.mms.server.tracker.PositionTracker;
  * @author Kasper Nielsen
  */
 public class TargetTracker {
-    private final PositionTracker<AppLayer> tracker = new PositionTracker<>();
+    final PositionTracker<AppLayer> tracker = new PositionTracker<>();
 }
