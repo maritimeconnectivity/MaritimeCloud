@@ -1,0 +1,5 @@
+namespace net.maritimecloud.mms.tck.stubs;
+
+endpoint TestEndpoint {
+  int64 hello(1:int64 testId);
+}

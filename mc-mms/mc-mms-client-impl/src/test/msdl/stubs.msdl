@@ -1,0 +1,22 @@
+namespace net.maritimecloud.mms.stubs;
+
+message TestMessage {
+    1: list<int64> f1;
+}
+endpoint ShipEndpoint {
+  void hello(1:int64 foo, 2:text fff);
+  int64 fff();
+}
+   
+endpoint HelloWorldEndpoint {
+  text hello();
+}
+
+endpoint TestEndpoint {
+  list<int64> invokeIt(1:list<TestMessage> li);
+}
+
+broadcast BroadcastTestMessage {
+  1: text msg;
+  2: int id;  
+}

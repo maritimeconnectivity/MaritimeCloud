@@ -1,0 +1,58 @@
+namespace net.maritimecloud.mms.msdl.client;
+
+
+broadcast B0 {}
+
+broadcast B1 {
+  1: int f;
+}
+
+broadcast B2 {
+  1: int f1;
+  2: int64 f2;
+  3: varint f3;
+  
+  4: float f4;
+  5: double f5;
+  6: decimal f6;
+  
+  7: boolean f7;
+  8: binary f8;
+  9: text f9;
+  10: timestamp f10;
+  
+  11: position f11;
+  12: positiontime f12;
+  
+  13: list<int> f13;
+  14: list<int64> f14;
+  15: list<varint> f15;
+  
+  16: list<float> f16;
+  17: list<double> f17;
+  18: list<decimal> f18;
+  
+  19: list<boolean> f19;
+  20: list<binary> f20;
+  21: list<text> f21;
+  22: list<timestamp> f22;
+  
+  23: list<position> f23;
+  24: list<positiontime> f24;
+  
+  25: set<int> f25;
+  26: set<int64> f26;
+  27: set<varint> f27;
+  
+  28: set<float> f28;
+  29: set<double> f29;
+  30: set<decimal> f30;
+  
+  31: set<boolean> f31;
+  32: set<binary> f32;
+  33: set<text> f33;
+  34: set<timestamp> f34;
+  
+  35: set<position> f35;
+  36: set<positiontime> f36;
+}

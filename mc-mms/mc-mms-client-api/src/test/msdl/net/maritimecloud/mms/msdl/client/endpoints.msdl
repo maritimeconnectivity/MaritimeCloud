@@ -1,0 +1,107 @@
+namespace net.maritimecloud.mms.msdl.client;
+
+
+endpoint E1 {
+  void method();
+}
+
+endpoint E2 {
+  void foo();
+  int foo1();
+  int64 foo2();
+  varint foo3();
+  
+  float foo4();
+  double foo5();
+  decimal foo6();
+  
+  boolean foo7();
+  binary foo8();
+  text foo9();
+  timestamp foo10();
+  
+  position foo11();
+  positiontime foo12();
+  
+  list<int> foo13();
+  list<int64> foo14();
+  list<varint> foo15();
+  
+  list<float> foo16();
+  list<double> foo17();
+  list<decimal> foo18();
+  
+  list<boolean> foo19();
+  list<binary> foo20();
+  list<text> foo21();
+  list<timestamp> foo22();
+  
+  list<position> foo23();
+  list<positiontime> foo24();
+  
+  set<int> foo25();
+  set<int64> foo26();
+  set<varint> foo27();
+  
+  set<float> foo28();
+  set<double> foo29();
+  set<decimal> foo30();
+  
+  set<boolean> foo31();
+  set<binary> foo32();
+  set<text> foo33();
+  set<timestamp> foo34();
+  
+  set<position> foo35();
+  set<positiontime> foo36();
+}
+
+endpoint E3 {
+  int foo1(1:int  f);
+  int64 foo2(1:int64  f);
+  varint foo3(1:varint  f);
+  
+  float foo4(1:float  f);
+  double foo5(1:double  f);
+  decimal foo6(1:decimal  f);
+  
+  boolean foo7(1:boolean  f);
+  binary foo8(1:binary  f);
+  text foo9(1:text  f);
+  timestamp foo10(1:timestamp  f);
+  
+  position foo11(1:position  f);
+  positiontime foo12(1:positiontime  f);
+  
+  list<int> foo13(1:list<int>  f);
+  list<int64> foo14(1:list<int64>  f);
+  list<varint> foo15(1:list<varint>  f);
+  
+  list<float> foo16(1:list<float>  f);
+  list<double> foo17(1:list<double>  f);
+  list<decimal> foo18(1:list<decimal>  f);
+  
+  list<boolean> foo19(1:list<boolean>  f);
+  list<binary> foo20(1:list<binary>  f);
+  list<text> foo21(1:list<text>  f);
+  list<timestamp> foo22(1:list<timestamp>  f);
+  
+  list<position> foo23(1:list<position>  f);
+  list<positiontime> foo24(1:list<positiontime>  f);
+  
+  set<int> foo25(1:set<int>  f);
+  set<int64> foo26(1:set<int64>  f);
+  set<varint> foo27(1:set<varint>  f);
+  
+  set<float> foo28(1:set<float>  f);
+  set<double> foo29(1:set<double>  f);
+  set<decimal> foo30(1:set<decimal>  f);
+  
+  set<boolean> foo31(1:set<boolean>  f);
+  set<binary> foo32(1:set<binary>  f);
+  set<text> foo33(1:set<text>  f);
+  set<timestamp> foo34(1:set<timestamp>  f);
+  
+  set<position> foo35(1:set<position>  f);
+  set<positiontime> foo36(1:set<positiontime>  f);
+}
