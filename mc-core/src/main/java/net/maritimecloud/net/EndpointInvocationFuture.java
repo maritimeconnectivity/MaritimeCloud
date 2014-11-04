@@ -15,6 +15,7 @@
 package net.maritimecloud.net;
 
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -49,6 +50,18 @@ public interface EndpointInvocationFuture<T> extends DispatchedMessage, Future<T
      */
     void handle(BiConsumer<T, Throwable> consumer);
 
+    /**
+     * Returns the result of invoking the method when complete, or throws an (unchecked) exception if completed
+     * exceptionally. To better conform with the use of common functional forms, if a computation involved in the
+     * completion of this future threw an exception, this method throws an (unchecked) {@link CompletionException} with
+     * the underlying exception as its cause.
+     *
+     * @return the result value
+     * @throws CancellationException
+     *             if the invocation was cancelled
+     * @throws CompletionException
+     *             if this future completed exceptionally or the remote invocation threw an exception
+     */
     T join();
 
     <U> EndpointInvocationFuture<U> thenApply(Function<? super T, ? extends U> fn);

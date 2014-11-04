@@ -30,7 +30,7 @@ import net.maritimecloud.util.geometry.Position;
 public interface MessageHeader {
 
     /**
-     * Implementation <b>might</b> choose to provide additional properties to consumers of messages.
+     * Implementations <b>might</b> choose to provide additional properties to consumers of messages.
      *
      * @return a map containing additional properties about the message.
      */
