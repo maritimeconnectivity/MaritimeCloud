@@ -42,7 +42,7 @@ import org.cakeframework.container.RunOnStop;
  *
  * @author Kasper Nielsen
  */
-public class ThreadManager {
+public class MmsThreadManager {
 
     /** The prefix of each thread created by the client. */
     static final String THREAD_PREFIX = "MMSClient";

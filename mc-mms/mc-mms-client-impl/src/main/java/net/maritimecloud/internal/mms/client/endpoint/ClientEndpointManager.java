@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.mms.client.ClientInfo;
-import net.maritimecloud.internal.mms.client.ThreadManager;
+import net.maritimecloud.internal.mms.client.MmsThreadManager;
 import net.maritimecloud.internal.mms.client.connection.ClientConnection;
 import net.maritimecloud.internal.mms.messages.services.Services;
 import net.maritimecloud.internal.net.endpoint.EndpointManager;
@@ -51,7 +51,7 @@ public class ClientEndpointManager {
     /** The client container. */
     final ConcurrentHashMap<Binary, RemoteInvocation> invokers = new ConcurrentHashMap<>();
 
-    final ThreadManager threadManager;
+    final MmsThreadManager threadManager;
 
     /**
      * Creates a new instance of this class.
@@ -59,7 +59,7 @@ public class ClientEndpointManager {
      * @param network
      *            the network
      */
-    public ClientEndpointManager(ClientConnection connection, ThreadManager threadManager, ClientInfo clientInfo) {
+    public ClientEndpointManager(ClientConnection connection, MmsThreadManager threadManager, ClientInfo clientInfo) {
         this.connection = requireNonNull(connection);
         this.threadManager = requireNonNull(threadManager);
         this.clientInfo = requireNonNull(clientInfo);

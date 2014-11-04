@@ -27,7 +27,7 @@ import java.util.function.Consumer;
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.message.MessageHelper;
 import net.maritimecloud.internal.mms.client.ClientInfo;
-import net.maritimecloud.internal.mms.client.ThreadManager;
+import net.maritimecloud.internal.mms.client.MmsThreadManager;
 import net.maritimecloud.internal.mms.client.connection.ClientConnection;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.internal.net.messages.Broadcast;
@@ -81,7 +81,7 @@ public class ClientBroadcastManager {
     final ConcurrentHashMap<String, SubscriptionSet> subscribers = new ConcurrentHashMap<>();
 
     /** Thread manager takes care of asynchronous processing. */
-    private final ThreadManager threadManager;
+    private final MmsThreadManager threadManager;
 
     private final ClientInfo info;
 
@@ -93,7 +93,7 @@ public class ClientBroadcastManager {
      * @param network
      *            the network
      */
-    public ClientBroadcastManager(ClientInfo info, ThreadManager threadManager, ClientConnection connection,
+    public ClientBroadcastManager(ClientInfo info, MmsThreadManager threadManager, ClientConnection connection,
             org.cakeframework.util.concurrent.ThreadManager tmm) {
         this.connection = requireNonNull(connection);
         this.threadManager = requireNonNull(threadManager);
