@@ -14,7 +14,7 @@
  */
 package net.maritimecloud.internal.msdl.parser;
 
-import net.maritimecloud.internal.msdl.parser.antlr.MsdlParser.BroadcastDeclarationContext;
+import net.maritimecloud.internal.msdl.parser.antlr.generated.MsdlParser.BroadcastDeclarationContext;
 import net.maritimecloud.msdl.model.BroadcastMessageDeclaration;
 
 /**

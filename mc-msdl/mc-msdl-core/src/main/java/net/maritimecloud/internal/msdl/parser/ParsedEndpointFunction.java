@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import net.maritimecloud.internal.msdl.parser.antlr.MsdlParser.FunctionArgumentContext;
-import net.maritimecloud.internal.msdl.parser.antlr.MsdlParser.FunctionContext;
-import net.maritimecloud.internal.msdl.parser.antlr.MsdlParser.ReturnTypeContext;
+import net.maritimecloud.internal.msdl.parser.antlr.generated.MsdlParser.FunctionArgumentContext;
+import net.maritimecloud.internal.msdl.parser.antlr.generated.MsdlParser.FunctionContext;
+import net.maritimecloud.internal.msdl.parser.antlr.generated.MsdlParser.ReturnTypeContext;
 import net.maritimecloud.msdl.model.CommentDeclaration;
 import net.maritimecloud.msdl.model.EndpointMethod;
 import net.maritimecloud.msdl.model.FieldOrParameter;

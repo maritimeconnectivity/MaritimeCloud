@@ -51,7 +51,7 @@ public class MessageHelper {
         return value;
     }
 
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings("unchecked")
     private static <T> T convert(T value) {
         return value instanceof Message ? (T) ((Message) value).immutable() : value;
     }

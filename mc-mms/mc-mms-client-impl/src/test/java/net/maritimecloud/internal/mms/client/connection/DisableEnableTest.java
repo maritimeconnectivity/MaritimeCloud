@@ -23,7 +23,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import net.maritimecloud.internal.mms.client.ClientInfo;
-import net.maritimecloud.internal.mms.client.connection.ClientConnection;
 import net.maritimecloud.internal.net.messages.Broadcast;
 import net.maritimecloud.internal.net.messages.BroadcastAck;
 

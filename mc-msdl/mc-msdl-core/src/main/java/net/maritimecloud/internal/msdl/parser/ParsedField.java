@@ -14,7 +14,7 @@
  */
 package net.maritimecloud.internal.msdl.parser;
 
-import net.maritimecloud.internal.msdl.parser.antlr.MsdlParser.FieldContext;
+import net.maritimecloud.internal.msdl.parser.antlr.generated.MsdlParser.FieldContext;
 
 /**
  *

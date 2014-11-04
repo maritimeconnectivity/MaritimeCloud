@@ -29,7 +29,7 @@ public class ConnectionTransportFactoryJsr356 extends ConnectionTransportFactory
     static volatile WebSocketContainer CACHED_CONTAINER;
 
     /** A lock protecting the creation of the cached websocket container. */
-    private final static Object LOCK = new Object();
+    private static final Object LOCK = new Object();
 
     /** {@inheritDoc} */
     @Override

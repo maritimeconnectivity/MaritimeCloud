@@ -28,8 +28,6 @@ import javax.json.JsonReader;
 import javax.json.spi.JsonProvider;
 
 import net.maritimecloud.internal.message.TaggableMessageWriter;
-import net.maritimecloud.internal.message.text.json.JsonMessageReader;
-import net.maritimecloud.internal.message.text.json.JsonValueWriter;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageReader;
 import net.maritimecloud.message.MessageSerializer;

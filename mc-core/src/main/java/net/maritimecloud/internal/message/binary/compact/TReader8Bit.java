@@ -27,7 +27,7 @@ import net.maritimecloud.util.Binary;
  *
  * @author Kasper Nielsen
  */
-class TReader8Bit extends TReader {
+final class TReader8Bit extends TReader {
 
     private final int constant;
 

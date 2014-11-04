@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2008 Kasper Nielsen.
+/* Copyright (c) 2011 Danish Maritime Authority.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +22,7 @@ import java.util.logging.Logger;
 
 /**
  * A LazyLogger is lazily initialized whenever the first exception is raised.
- * 
+ *
  * @author Kasper Nielsen
  */
 public class LazyJdkLogger extends AbstractLogger {
@@ -44,7 +43,7 @@ public class LazyJdkLogger extends AbstractLogger {
 
     /**
      * Creates the default logger.
-     * 
+     *
      * @return the default logger
      */
     protected Logger createDefaultLogger() {
@@ -124,7 +123,7 @@ public class LazyJdkLogger extends AbstractLogger {
         /** Initializes the sourceClass and sourceMethod fields. */
         private void initSource() {
             if (!sourceInited) {
-                StackTraceElement[] elements = (new Throwable()).getStackTrace();
+                StackTraceElement[] elements = new Throwable().getStackTrace();
                 int i = 0;
                 while (i < elements.length) {
                     String current = elements[i].getClassName();

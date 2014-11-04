@@ -19,8 +19,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import net.maritimecloud.internal.msdl.parser.antlr.MsdlParser.EndpointDeclarationContext;
-import net.maritimecloud.internal.msdl.parser.antlr.MsdlParser.FunctionContext;
+import net.maritimecloud.internal.msdl.parser.antlr.generated.MsdlParser.EndpointDeclarationContext;
+import net.maritimecloud.internal.msdl.parser.antlr.generated.MsdlParser.FunctionContext;
 import net.maritimecloud.msdl.model.EndpointDefinition;
 import net.maritimecloud.msdl.model.EndpointMethod;
 

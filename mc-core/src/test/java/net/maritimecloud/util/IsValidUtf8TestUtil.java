@@ -1,3 +1,18 @@
+/* Copyright (c) 2011 Danish Maritime Authority.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
 // http://code.google.com/p/protobuf/
@@ -56,6 +71,7 @@ import java.util.logging.Logger;
  * @author jonp@google.com (Jon Perlow)
  * @author martinrb@google.com (Martin Buchholz)
  */
+// CHECKSTYLE:OFF
 class IsValidUtf8TestUtil {
     private static Logger logger = Logger.getLogger(IsValidUtf8TestUtil.class.getName());
 
@@ -70,9 +86,9 @@ class IsValidUtf8TestUtil {
 
     // 18,304
     static long EXPECTED_TWO_BYTE_ROUNDTRIPPABLE_COUNT =
-    // Both bytes are one byte characters
-    (long) Math.pow(EXPECTED_ONE_BYTE_ROUNDTRIPPABLE_COUNT, 2) +
-    // The possible number of two byte characters
+            // Both bytes are one byte characters
+            (long) Math.pow(EXPECTED_ONE_BYTE_ROUNDTRIPPABLE_COUNT, 2) +
+            // The possible number of two byte characters
             TWO_BYTE_ROUNDTRIPPABLE_CHARACTERS;
 
     // 2048
@@ -83,9 +99,9 @@ class IsValidUtf8TestUtil {
 
     // 2,650,112
     static long EXPECTED_THREE_BYTE_ROUNDTRIPPABLE_COUNT =
-    // All one byte characters
-    (long) Math.pow(EXPECTED_ONE_BYTE_ROUNDTRIPPABLE_COUNT, 3) +
-    // One two byte character and a one byte character
+            // All one byte characters
+            (long) Math.pow(EXPECTED_ONE_BYTE_ROUNDTRIPPABLE_COUNT, 3) +
+            // One two byte character and a one byte character
             2 * TWO_BYTE_ROUNDTRIPPABLE_CHARACTERS * ONE_BYTE_ROUNDTRIPPABLE_CHARACTERS +
             // Three byte characters
             THREE_BYTE_ROUNDTRIPPABLE_CHARACTERS;
@@ -95,8 +111,8 @@ class IsValidUtf8TestUtil {
 
     // 289,571,839
     static long EXPECTED_FOUR_BYTE_ROUNDTRIPPABLE_COUNT =
-    // All one byte characters
-    (long) Math.pow(EXPECTED_ONE_BYTE_ROUNDTRIPPABLE_COUNT, 4)
+            // All one byte characters
+            (long) Math.pow(EXPECTED_ONE_BYTE_ROUNDTRIPPABLE_COUNT, 4)
             +
             // One and three byte characters
             2 * THREE_BYTE_ROUNDTRIPPABLE_CHARACTERS * ONE_BYTE_ROUNDTRIPPABLE_CHARACTERS
@@ -109,25 +125,6 @@ class IsValidUtf8TestUtil {
             * ONE_BYTE_ROUNDTRIPPABLE_CHARACTERS +
             // Four byte characters
             FOUR_BYTE_ROUNDTRIPPABLE_CHARACTERS;
-
-    static class Shard {
-        final long index;
-
-        final long start;
-
-        final long lim;
-
-        final long expected;
-
-
-        public Shard(long index, long start, long lim, long expected) {
-            assertTrue(start < lim);
-            this.index = index;
-            this.start = start;
-            this.lim = lim;
-            this.expected = expected;
-        }
-    }
 
     static final long[] FOUR_BYTE_SHARDS_EXPECTED_ROUNTRIPPABLES = generateFourByteShardsExpectedRunnables();
 
@@ -398,4 +395,25 @@ class IsValidUtf8TestUtil {
         return s.toString();
     }
 
+
+    static class Shard {
+        final long index;
+
+        final long start;
+
+        final long lim;
+
+        final long expected;
+
+
+        public Shard(long index, long start, long lim, long expected) {
+            assertTrue(start < lim);
+            this.index = index;
+            this.start = start;
+            this.lim = lim;
+            this.expected = expected;
+        }
+    }
+
 }
+// CHECKSTYLE:ON

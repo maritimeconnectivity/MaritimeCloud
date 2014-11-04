@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 
 import net.maritimecloud.internal.mms.client.AbstractClientConnectionTest;
 import net.maritimecloud.internal.mms.client.ClientInfo;
-import net.maritimecloud.internal.mms.client.connection.ClientConnection;
 import net.maritimecloud.internal.mms.client.connection.transport.ConnectionTransportFactoryJetty;
 import net.maritimecloud.internal.mms.messages.Close;
 import net.maritimecloud.internal.mms.messages.Connected;

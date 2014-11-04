@@ -1,3 +1,18 @@
+/* Copyright (c) 2011 Danish Maritime Authority.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
 // http://code.google.com/p/protobuf/
@@ -44,8 +59,8 @@ import java.util.NoSuchElementException;
 import java.util.Stack;
 
 /**
- * Class to represent {@code Binarys} formed by concatenation of other Binarys, without copying the data in the
- * pieces. The concatenation is represented as a tree whose leaf nodes are each a {@link LiteralBinary}.
+ * Class to represent {@code Binarys} formed by concatenation of other Binarys, without copying the data in the pieces.
+ * The concatenation is represented as a tree whose leaf nodes are each a {@link LiteralBinary}.
  *
  * <p>
  * Most of the operation here is inspired by the now-famous paper <a
@@ -75,7 +90,7 @@ class RopeBinary extends Binary {
      * <p>
      * For 32-bit integers, this array has length 46.
      */
-    static final int[] minLengthByDepth;
+    static final int[] MIN_LENGTH_BY_DEPTH;
 
     static {
         // Dynamically generate the list of Fibonacci numbers the first time this
@@ -98,10 +113,10 @@ class RopeBinary extends Binary {
         // we include this here so that we can index this array to [x + 1] in the
         // loops below.
         numbers.add(Integer.MAX_VALUE);
-        minLengthByDepth = new int[numbers.size()];
-        for (int i = 0; i < minLengthByDepth.length; i++) {
+        MIN_LENGTH_BY_DEPTH = new int[numbers.size()];
+        for (int i = 0; i < MIN_LENGTH_BY_DEPTH.length; i++) {
             // unbox all the values
-            minLengthByDepth[i] = numbers.get(i);
+            MIN_LENGTH_BY_DEPTH[i] = numbers.get(i);
         }
     }
 
@@ -188,7 +203,7 @@ class RopeBinary extends Binary {
                 // Fine, we'll add a node and increase the tree depth--unless we
                 // rebalance ;^)
                 int newDepth = Math.max(left.getTreeDepth(), right.getTreeDepth()) + 1;
-                if (newLength >= minLengthByDepth[newDepth]) {
+                if (newLength >= MIN_LENGTH_BY_DEPTH[newDepth]) {
                     // The tree is shallow enough, so don't rebalance
                     result = new RopeBinary(left, right);
                 } else {
@@ -219,10 +234,9 @@ class RopeBinary extends Binary {
     }
 
     /**
-     * Create a new RopeBinary for testing only while bypassing all the defenses of
-     * {@link #concatenate(Binary, Binary)}. This allows testing trees of specific structure. We are also able to insert
-     * empty leaves, though these are dis-allowed, so that we can make sure the implementation can withstand their
-     * presence.
+     * Create a new RopeBinary for testing only while bypassing all the defenses of {@link #concatenate(Binary, Binary)}
+     * . This allows testing trees of specific structure. We are also able to insert empty leaves, though these are
+     * dis-allowed, so that we can make sure the implementation can withstand their presence.
      *
      * @param left
      *            string on the left of this node
@@ -285,7 +299,7 @@ class RopeBinary extends Binary {
      */
     @Override
     protected boolean isBalanced() {
-        return totalLength >= minLengthByDepth[treeDepth];
+        return totalLength >= MIN_LENGTH_BY_DEPTH[treeDepth];
     }
 
     /**
@@ -513,7 +527,7 @@ class RopeBinary extends Binary {
      * Cached hash value. Intentionally accessed via a data race, which is safe because of the Java Memory Model's
      * "no out-of-thin-air values" guarantees for ints.
      */
-    private int hash = 0;
+    private int hash;
 
     @Override
     public int hashCode() {
@@ -562,6 +576,14 @@ class RopeBinary extends Binary {
         return new RopeInputStream();
     }
 
+    // =================================================================
+    // ByteIterator
+
+    @Override
+    public ByteIterator iterator() {
+        return new RopeByteIterator();
+    }
+
     /**
      * This class implements the balancing algorithm of BAP95. In the paper the authors use an array to keep track of
      * pieces, while here we use a stack. The tree is balanced by traversing subtrees in left to right order, and the
@@ -604,8 +626,7 @@ class RopeBinary extends Binary {
                 doBalance(rbs.left);
                 doBalance(rbs.right);
             } else {
-                throw new IllegalArgumentException("Has a new type of Binary been created? Found "
-                        + root.getClass());
+                throw new IllegalArgumentException("Has a new type of Binary been created? Found " + root.getClass());
             }
         }
 
@@ -624,7 +645,7 @@ class RopeBinary extends Binary {
          */
         private void insert(Binary byteString) {
             int depthBin = getDepthBinForLength(byteString.size());
-            int binEnd = minLengthByDepth[depthBin + 1];
+            int binEnd = MIN_LENGTH_BY_DEPTH[depthBin + 1];
 
             // BAP95: Concatenate all trees occupying bins representing the length of
             // our new piece or of shorter pieces, to the extent that is possible.
@@ -633,7 +654,7 @@ class RopeBinary extends Binary {
             if (prefixesStack.isEmpty() || prefixesStack.peek().size() >= binEnd) {
                 prefixesStack.push(byteString);
             } else {
-                int binStart = minLengthByDepth[depthBin];
+                int binStart = MIN_LENGTH_BY_DEPTH[depthBin];
 
                 // Concatenate the subtrees of shorter length
                 Binary newTree = prefixesStack.pop();
@@ -648,7 +669,7 @@ class RopeBinary extends Binary {
                 // Continue concatenating until we land in an empty bin
                 while (!prefixesStack.isEmpty()) {
                     depthBin = getDepthBinForLength(newTree.size());
-                    binEnd = minLengthByDepth[depthBin + 1];
+                    binEnd = MIN_LENGTH_BY_DEPTH[depthBin + 1];
                     if (prefixesStack.peek().size() < binEnd) {
                         Binary left = prefixesStack.pop();
                         newTree = new RopeBinary(left, newTree);
@@ -661,7 +682,7 @@ class RopeBinary extends Binary {
         }
 
         private int getDepthBinForLength(int length) {
-            int depth = Arrays.binarySearch(minLengthByDepth, length);
+            int depth = Arrays.binarySearch(MIN_LENGTH_BY_DEPTH, length);
             if (depth < 0) {
                 // It wasn't an exact match, so convert to the index of the containing
                 // fragment, which is one less even than the insertion point.
@@ -739,13 +760,6 @@ class RopeBinary extends Binary {
         }
     }
 
-    // =================================================================
-    // ByteIterator
-
-    @Override
-    public ByteIterator iterator() {
-        return new RopeByteIterator();
-    }
 
     class RopeByteIterator implements Binary.ByteIterator {
 
@@ -809,7 +823,7 @@ class RopeBinary extends Binary {
         }
 
         @Override
-        public int read(byte b[], int offset, int length) {
+        public int read(byte[] b, int offset, int length) {
             if (b == null) {
                 throw new NullPointerException();
             } else if (offset < 0 || length < 0 || length > b.length - offset) {
@@ -836,7 +850,7 @@ class RopeBinary extends Binary {
          * <p>
          * Returns the actual number of bytes read or skipped.
          */
-        private int readSkipInternal(byte b[], int offset, int length) {
+        private int readSkipInternal(byte[] b, int offset, int length) {
             int bytesRemaining = length;
             while (bytesRemaining > 0) {
                 advanceIfCurrentPieceFullyRead();

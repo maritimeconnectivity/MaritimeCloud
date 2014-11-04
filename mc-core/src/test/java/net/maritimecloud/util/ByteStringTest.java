@@ -1,3 +1,18 @@
+/* Copyright (c) 2011 Danish Maritime Authority.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
 // http://code.google.com/p/protobuf/
@@ -51,6 +66,7 @@ import junit.framework.TestCase;
  *
  * @author carlanton@google.com (Carl Haverl)
  */
+// CHECKSTYLE:OFF
 public class ByteStringTest extends TestCase {
 
     private static final String UTF_16 = "UTF-16";
@@ -293,103 +309,6 @@ public class ByteStringTest extends TestCase {
         assertTrue("readFrom byte stream must contain the expected bytes", isArray(byteString.toByteArray(), bytes));
     }
 
-    // A stream that fails when read.
-    static final class FailStream extends InputStream {
-        @Override
-        public int read() throws IOException {
-            throw new IOException("synthetic failure");
-        }
-    }
-
-    // A stream that simulates blocking by only producing 250 characters
-    // per call to read(byte[]).
-    private static class ReluctantStream extends InputStream {
-        protected final byte[] data;
-
-        protected int pos = 0;
-
-        public ReluctantStream(byte[] data) {
-            this.data = data;
-        }
-
-        @Override
-        public int read() {
-            if (pos == data.length) {
-                return -1;
-            } else {
-                return data[pos++];
-            }
-        }
-
-        @Override
-        public int read(byte[] buf) {
-            return read(buf, 0, buf.length);
-        }
-
-        @Override
-        public int read(byte[] buf, int offset, int size) {
-            if (pos == data.length) {
-                return -1;
-            }
-            int count = Math.min(Math.min(size, data.length - pos), 250);
-            System.arraycopy(data, pos, buf, offset, count);
-            pos += count;
-            return count;
-        }
-    }
-
-    // Same as above, but also implements available().
-    private static final class AvailableStream extends ReluctantStream {
-        public AvailableStream(byte[] data) {
-            super(data);
-        }
-
-        @Override
-        public int available() {
-            return Math.min(250, data.length - pos);
-        }
-    }
-
-    // A stream which exposes the byte array passed into read(byte[], int, int).
-    static class EvilInputStream extends InputStream {
-        public byte[] capturedArray = null;
-
-        @Override
-        public int read(byte[] buf, int off, int len) {
-            if (capturedArray != null) {
-                return -1;
-            } else {
-                capturedArray = buf;
-                for (int x = 0; x < len; ++x) {
-                    buf[x] = (byte) x;
-                }
-                return len;
-            }
-        }
-
-        @Override
-        public int read() {
-            // Purposefully do nothing.
-            return -1;
-        }
-    }
-
-    // A stream which exposes the byte array passed into write(byte[], int, int).
-    static class EvilOutputStream extends OutputStream {
-        public byte[] capturedArray = null;
-
-        @Override
-        public void write(byte[] buf, int off, int len) {
-            if (capturedArray == null) {
-                capturedArray = buf;
-            }
-        }
-
-        @Override
-        public void write(int ignored) {
-            // Purposefully do nothing.
-        }
-    }
 
     public void testToStringUtf8() throws UnsupportedEncodingException {
         String testString = "I love unicode \u1234\u5678 characters";
@@ -597,8 +516,7 @@ public class ByteStringTest extends TestCase {
         Binary literalString = Binary.copyFrom(referenceBytes);
 
         Binary duo = RopeBinary.newInstanceForTest(literalString, literalString);
-        Binary temp = RopeBinary.newInstanceForTest(
-                RopeBinary.newInstanceForTest(literalString, Binary.EMPTY),
+        Binary temp = RopeBinary.newInstanceForTest(RopeBinary.newInstanceForTest(literalString, Binary.EMPTY),
                 RopeBinary.newInstanceForTest(Binary.EMPTY, literalString));
         Binary quintet = RopeBinary.newInstanceForTest(temp, Binary.EMPTY);
 
@@ -671,4 +589,104 @@ public class ByteStringTest extends TestCase {
         }
         return pieces;
     }
+
+    // A stream that fails when read.
+    static final class FailStream extends InputStream {
+        @Override
+        public int read() throws IOException {
+            throw new IOException("synthetic failure");
+        }
+    }
+
+    // A stream that simulates blocking by only producing 250 characters
+    // per call to read(byte[]).
+    private static class ReluctantStream extends InputStream {
+        protected final byte[] data;
+
+        protected int pos;
+
+        public ReluctantStream(byte[] data) {
+            this.data = data;
+        }
+
+        @Override
+        public int read() {
+            if (pos == data.length) {
+                return -1;
+            } else {
+                return data[pos++];
+            }
+        }
+
+        @Override
+        public int read(byte[] buf) {
+            return read(buf, 0, buf.length);
+        }
+
+        @Override
+        public int read(byte[] buf, int offset, int size) {
+            if (pos == data.length) {
+                return -1;
+            }
+            int count = Math.min(Math.min(size, data.length - pos), 250);
+            System.arraycopy(data, pos, buf, offset, count);
+            pos += count;
+            return count;
+        }
+    }
+
+    // Same as above, but also implements available().
+    private static final class AvailableStream extends ReluctantStream {
+        public AvailableStream(byte[] data) {
+            super(data);
+        }
+
+        @Override
+        public int available() {
+            return Math.min(250, data.length - pos);
+        }
+    }
+
+    // A stream which exposes the byte array passed into read(byte[], int, int).
+    static class EvilInputStream extends InputStream {
+        public byte[] capturedArray;
+
+        @Override
+        public int read(byte[] buf, int off, int len) {
+            if (capturedArray != null) {
+                return -1;
+            } else {
+                capturedArray = buf;
+                for (int x = 0; x < len; ++x) {
+                    buf[x] = (byte) x;
+                }
+                return len;
+            }
+        }
+
+        @Override
+        public int read() {
+            // Purposefully do nothing.
+            return -1;
+        }
+    }
+
+    // A stream which exposes the byte array passed into write(byte[], int, int).
+    static class EvilOutputStream extends OutputStream {
+        public byte[] capturedArray;
+
+        @Override
+        public void write(byte[] buf, int off, int len) {
+            if (capturedArray == null) {
+                capturedArray = buf;
+            }
+        }
+
+        @Override
+        public void write(int ignored) {
+            // Purposefully do nothing.
+        }
+    }
+
 }
+// CHECKSTYLE:ON

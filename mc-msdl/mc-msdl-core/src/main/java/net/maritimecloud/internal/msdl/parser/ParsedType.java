@@ -19,11 +19,11 @@ import static java.util.Objects.requireNonNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.maritimecloud.internal.msdl.parser.antlr.MsdlParser;
-import net.maritimecloud.internal.msdl.parser.antlr.MsdlParser.ComplexTypeContext;
-import net.maritimecloud.internal.msdl.parser.antlr.MsdlParser.PrimitiveTypeContext;
-import net.maritimecloud.internal.msdl.parser.antlr.MsdlParser.QualifiedNameContext;
-import net.maritimecloud.internal.msdl.parser.antlr.MsdlParser.TypeContext;
+import net.maritimecloud.internal.msdl.parser.antlr.generated.MsdlParser;
+import net.maritimecloud.internal.msdl.parser.antlr.generated.MsdlParser.ComplexTypeContext;
+import net.maritimecloud.internal.msdl.parser.antlr.generated.MsdlParser.PrimitiveTypeContext;
+import net.maritimecloud.internal.msdl.parser.antlr.generated.MsdlParser.QualifiedNameContext;
+import net.maritimecloud.internal.msdl.parser.antlr.generated.MsdlParser.TypeContext;
 import net.maritimecloud.msdl.model.BaseType;
 import net.maritimecloud.msdl.model.ListOrSetType;
 import net.maritimecloud.msdl.model.MapType;

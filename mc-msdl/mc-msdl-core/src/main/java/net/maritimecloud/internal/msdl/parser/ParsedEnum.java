@@ -20,8 +20,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import net.maritimecloud.internal.msdl.parser.antlr.MsdlParser.EnumDeclarationContext;
-import net.maritimecloud.internal.msdl.parser.antlr.MsdlParser.EnumTypeDeclarationContext;
+import net.maritimecloud.internal.msdl.parser.antlr.generated.MsdlParser.EnumDeclarationContext;
+import net.maritimecloud.internal.msdl.parser.antlr.generated.MsdlParser.EnumTypeDeclarationContext;
 import net.maritimecloud.msdl.model.BaseType;
 import net.maritimecloud.msdl.model.EnumDeclaration;
 

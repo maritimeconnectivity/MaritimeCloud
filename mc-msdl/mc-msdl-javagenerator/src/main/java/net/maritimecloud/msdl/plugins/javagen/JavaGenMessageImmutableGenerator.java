@@ -25,7 +25,7 @@ import org.cakeframework.internal.codegen.CodegenMethod;
  *
  * @author Kasper Nielsen
  */
-class JavaGenMessageImmutableGenerator {
+final class JavaGenMessageImmutableGenerator {
     final JavaGenMessageGenerator g;
 
     final CodegenClass c;

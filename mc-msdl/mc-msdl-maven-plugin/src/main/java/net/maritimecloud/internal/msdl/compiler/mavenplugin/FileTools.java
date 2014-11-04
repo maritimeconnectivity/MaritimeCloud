@@ -23,7 +23,7 @@ import java.util.Set;
  *
  * @author Kasper Nielsen
  */
-class FileHelper {
+class FileTools {
 
 
     /**

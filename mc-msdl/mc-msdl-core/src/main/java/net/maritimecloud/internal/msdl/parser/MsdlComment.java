@@ -16,7 +16,7 @@ package net.maritimecloud.internal.msdl.parser;
 
 import java.util.List;
 
-import net.maritimecloud.internal.msdl.parser.antlr.MsdlLexer;
+import net.maritimecloud.internal.msdl.parser.antlr.generated.MsdlLexer;
 import net.maritimecloud.msdl.model.CommentDeclaration;
 
 import org.antlr.v4.runtime.BufferedTokenStream;

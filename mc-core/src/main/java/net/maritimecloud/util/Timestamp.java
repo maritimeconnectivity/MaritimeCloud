@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 public class Timestamp {
 
     /** The default clock used for creating timestamps. */
-    final static Clock CLOCK = Clock.systemUTC();
+    static final Clock CLOCK = Clock.systemUTC();
 
     final long value;
 

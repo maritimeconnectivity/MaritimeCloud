@@ -30,7 +30,7 @@ import net.maritimecloud.util.Binary;
  */
 public class MessageStore<T extends StoredMessage> {
 
-    final static int HASH_LENGTH = 32;
+    static final int HASH_LENGTH = 32;
 
     final long timeToLiveNanos = TimeUnit.NANOSECONDS.convert(1, TimeUnit.HOURS);
 

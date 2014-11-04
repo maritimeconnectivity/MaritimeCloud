@@ -16,10 +16,6 @@ package net.maritimecloud.message;
 
 import java.io.IOException;
 
-import net.maritimecloud.message.MessageEnum;
-import net.maritimecloud.message.MessageEnumSerializer;
-import net.maritimecloud.message.MessageWriter;
-
 /**
  *
  * @author Kasper Nielsen

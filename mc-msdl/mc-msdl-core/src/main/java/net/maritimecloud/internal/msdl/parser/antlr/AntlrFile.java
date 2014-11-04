@@ -23,7 +23,9 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
-import net.maritimecloud.internal.msdl.parser.antlr.MsdlParser.CompilationUnitContext;
+import net.maritimecloud.internal.msdl.parser.antlr.generated.MsdlLexer;
+import net.maritimecloud.internal.msdl.parser.antlr.generated.MsdlParser;
+import net.maritimecloud.internal.msdl.parser.antlr.generated.MsdlParser.CompilationUnitContext;
 import net.maritimecloud.msdl.MsdlLogger;
 
 import org.antlr.v4.runtime.ANTLRInputStream;

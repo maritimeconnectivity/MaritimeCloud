@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.maritimecloud.internal.msdl.parser.antlr.MsdlParser.AnnotationContext;
-import net.maritimecloud.internal.msdl.parser.antlr.MsdlParser.ElementValueArrayInitializerContext;
-import net.maritimecloud.internal.msdl.parser.antlr.MsdlParser.ElementValueContext;
+import net.maritimecloud.internal.msdl.parser.antlr.generated.MsdlParser.AnnotationContext;
+import net.maritimecloud.internal.msdl.parser.antlr.generated.MsdlParser.ElementValueArrayInitializerContext;
+import net.maritimecloud.internal.msdl.parser.antlr.generated.MsdlParser.ElementValueContext;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;

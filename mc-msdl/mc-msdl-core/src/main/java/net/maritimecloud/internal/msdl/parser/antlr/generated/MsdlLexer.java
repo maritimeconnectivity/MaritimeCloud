@@ -1,5 +1,5 @@
 // Generated from Msdl.g4 by ANTLR 4.2
-package net.maritimecloud.internal.msdl.parser.antlr;
+package net.maritimecloud.internal.msdl.parser.antlr.generated;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.RuleContext;

@@ -38,7 +38,7 @@ import net.maritimecloud.util.geometry.PositionTime;
  *
  * @author Kasper Nielsen
  */
-public class SessionStateConnecting extends SessionState {
+public final class SessionStateConnecting extends SessionState {
 
     /** The logger. */
     static final Logger LOG = Logger.get(SessionStateConnecting.class);

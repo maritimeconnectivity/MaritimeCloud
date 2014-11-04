@@ -14,7 +14,7 @@
  */
 package net.maritimecloud.internal.msdl.parser;
 
-import net.maritimecloud.internal.msdl.parser.antlr.MsdlParser.TypeContext;
+import net.maritimecloud.internal.msdl.parser.antlr.generated.MsdlParser.TypeContext;
 import net.maritimecloud.msdl.model.CommentDeclaration;
 import net.maritimecloud.msdl.model.FieldOrParameter;
 import net.maritimecloud.msdl.model.Type;

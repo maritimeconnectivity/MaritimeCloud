@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2008 Kasper Nielsen.
+/* Copyright (c) 2011 Danish Maritime Authority.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +19,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.security.MessageDigest;
 
-import net.maritimecloud.internal.message.Hashing;
-
 import org.junit.Test;
 
 /**
@@ -33,8 +30,8 @@ public class HashingTest {
     static final byte[] A = new byte[] { 1 };
 
     static final byte[] B = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, -1, -2, -3, 1, 2, 3, 4, 5, 6, 7, 8, -1, -2, -3, 1, 2,
-        3, 4, 5, 6, 7, 8, -1, -2, -3, 1, 2, 3, 4, 5, 6, 7, 8, -1, -2, -3, 1, 2, 3, 4, 5, 6, 7, 8, -1, -2, -3, 1, 2,
-        3, 4, 5, 6, 7, 8, -1, -2, -3 };
+            3, 4, 5, 6, 7, 8, -1, -2, -3, 1, 2, 3, 4, 5, 6, 7, 8, -1, -2, -3, 1, 2, 3, 4, 5, 6, 7, 8, -1, -2, -3, 1, 2,
+            3, 4, 5, 6, 7, 8, -1, -2, -3 };
 
     @Test
     public void hashcode() {

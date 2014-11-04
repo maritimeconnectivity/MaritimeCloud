@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2008 Kasper Nielsen.
+/* Copyright (c) 2011 Danish Maritime Authority.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -268,7 +267,7 @@ public interface Logger {
         }
     }
 
-    public static Logger get(Class<?> cl) {
+    static Logger get(Class<?> cl) {
         return LogFactory.LOG_FACTORY.apply(cl);
     }
 }

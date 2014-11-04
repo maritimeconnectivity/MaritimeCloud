@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Set;
 
 import net.maritimecloud.message.MessageReader;
-import net.maritimecloud.message.SerializationException;
 import net.maritimecloud.message.ValueReader;
 import net.maritimecloud.message.ValueSerializer;
 import net.maritimecloud.util.Binary;
@@ -89,7 +88,7 @@ public abstract class AbstractMessageReader implements MessageReader {
 
     /** {@inheritDoc} */
     @Override
-    public Float readFloat(int tag, String name, Float defaultValue) throws SerializationException, IOException {
+    public Float readFloat(int tag, String name, Float defaultValue) throws IOException {
         ValueReader r = findOptional(tag, name);
         return r == null ? defaultValue : r.readFloat();
     }

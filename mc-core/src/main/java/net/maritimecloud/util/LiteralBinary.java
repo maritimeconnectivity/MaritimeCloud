@@ -1,3 +1,18 @@
+/* Copyright (c) 2011 Danish Maritime Authority.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
 // http://code.google.com/p/protobuf/
@@ -213,7 +228,7 @@ class LiteralBinary extends Binary {
      * Cached hash value. Intentionally accessed via a data race, which is safe because of the Java Memory Model's
      * "no out-of-thin-air values" guarantees for ints.
      */
-    private int hash = 0;
+    private int hash;
 
     /**
      * Compute the hashCode using the traditional algorithm from {@link Binary}.
@@ -274,13 +289,35 @@ class LiteralBinary extends Binary {
         return new LiteralByteIterator();
     }
 
+    // =================================================================
+    // Internal methods
+
+    @Override
+    protected int getTreeDepth() {
+        return 0;
+    }
+
+    @Override
+    protected boolean isBalanced() {
+        return true;
+    }
+
+    /**
+     * Offset into {@code bytes[]} to use, non-zero for substrings.
+     *
+     * @return always 0 for this class
+     */
+    protected int getOffsetIntoBytes() {
+        return 0;
+    }
+
+
     class LiteralByteIterator implements ByteIterator {
         private int position;
 
         private final int limit;
 
         LiteralByteIterator() {
-            position = 0;
             limit = size();
         }
 
@@ -306,25 +343,4 @@ class LiteralBinary extends Binary {
         }
     }
 
-    // =================================================================
-    // Internal methods
-
-    @Override
-    protected int getTreeDepth() {
-        return 0;
-    }
-
-    @Override
-    protected boolean isBalanced() {
-        return true;
-    }
-
-    /**
-     * Offset into {@code bytes[]} to use, non-zero for substrings.
-     *
-     * @return always 0 for this class
-     */
-    protected int getOffsetIntoBytes() {
-        return 0;
-    }
 }

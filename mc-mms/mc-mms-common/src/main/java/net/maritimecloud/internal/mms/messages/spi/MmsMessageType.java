@@ -104,7 +104,7 @@ enum MmsMessageType {
 
     public static MmsMessageType getTypeOf(Class<? extends Message> c) {
         requireNonNull(c);
-        return HelperHolder.map.get(c);
+        return HelperHolder.MAP.get(c);
     }
 
     public boolean isConnectionMessage() {
@@ -115,12 +115,12 @@ enum MmsMessageType {
     private static class HelperHolder {
         static MmsMessageType[] TYPES;
 
-        static final Map<Class<? extends Message>, MmsMessageType> map = new HashMap<>();
+        static final Map<Class<? extends Message>, MmsMessageType> MAP = new HashMap<>();
         static {
             TreeMap<Integer, MmsMessageType> m = new TreeMap<>();
             for (MmsMessageType mt : MmsMessageType.values()) {
                 m.put(mt.type, mt);
-                map.put(mt.cl, mt);
+                MAP.put(mt.cl, mt);
             }
             TYPES = new MmsMessageType[m.lastKey() + 1];
             for (Entry<Integer, MmsMessageType> e : m.entrySet()) {
