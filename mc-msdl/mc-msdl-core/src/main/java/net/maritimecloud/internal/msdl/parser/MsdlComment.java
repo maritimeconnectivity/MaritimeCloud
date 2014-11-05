@@ -50,6 +50,8 @@ public class MsdlComment implements CommentDeclaration {
     /**
      * @param comment
      *            the comment to set
+     * 
+     * @return this comment
      */
     public MsdlComment setComment(String comment) {
         this.comment = comment;

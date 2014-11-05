@@ -38,11 +38,11 @@ import net.maritimecloud.util.geometry.Position;
  */
 public class DefaultEndpointInvocationFuture<T> extends AbstractCompletor<T> implements EndpointInvocationFuture<T> {
 
+    final Binary messageId;
+
     public CompletableFuture<Void> recivedByCloud;
 
     final String requestId;
-
-    final Binary messageId;
 
     public DefaultEndpointInvocationFuture(ScheduledExecutorService tm, CompletableFuture<T> f, Binary messageId) {
         super(f, tm);
@@ -63,11 +63,7 @@ public class DefaultEndpointInvocationFuture<T> extends AbstractCompletor<T> imp
         return delegate.complete(m);
     }
 
-    /**
-     * @param ex
-     * @return
-     * @see jsr166e.CompletableFuture#completeExceptionally(java.lang.Throwable)
-     */
+    /** {@inheritDoc} */
     public boolean completeExceptionally(Throwable ex) {
         return delegate.completeExceptionally(ex);
     }
@@ -102,11 +98,7 @@ public class DefaultEndpointInvocationFuture<T> extends AbstractCompletor<T> imp
         });
     }
 
-    /**
-     * @param valueIfAbsent
-     * @return
-     * @see jsr166e.CompletableFuture#getNow(java.lang.Object)
-     */
+    /** {@inheritDoc} */
     public T join() {
         return delegate.join();
     }
@@ -117,11 +109,7 @@ public class DefaultEndpointInvocationFuture<T> extends AbstractCompletor<T> imp
         return new DefaultAcknowledgement(recivedByCloud, timeoutExecutor);
     }
 
-    /**
-     * @param block
-     * @return
-     * @see jsr166e.CompletableFuture#thenAcceptAsync(jsr166e.CompletableFuture.Action)
-     */
+    /** {@inheritDoc} */
     public CompletableFuture<Void> thenAcceptAsync(Consumer<? super T> block) {
         return delegate.thenAcceptAsync(e -> block.accept(e), timeoutExecutor);
     }
@@ -132,11 +120,7 @@ public class DefaultEndpointInvocationFuture<T> extends AbstractCompletor<T> imp
         return new DefaultEndpointInvocationFuture<>(timeoutExecutor, delegate.thenApply(fn), messageId);
     }
 
-    /**
-     * @param block
-     * @return
-     * @see jsr166e.CompletableFuture#thenAcceptAsync(jsr166e.CompletableFuture.Action)
-     */
+    /** {@inheritDoc} */
     public void thenRun(Runnable runnable) {
         delegate.thenRun(runnable);
     }

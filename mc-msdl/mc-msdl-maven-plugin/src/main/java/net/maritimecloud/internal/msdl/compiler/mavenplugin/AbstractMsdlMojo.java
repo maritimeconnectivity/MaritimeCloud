@@ -61,13 +61,8 @@ import com.google.common.collect.ImmutableSet;
 
 /**
  * Abstract Mojo implementation.
- * <p/>
- * This class is extended by {@link ProtocCompileMojo} and {@link ProtocTestCompileMojo} in order to override the
- * specific configuration for compiling the main or test classes respectively.
  *
- * @author Gregory Kick
- * @author David Trott
- * @author Brice Figureau
+ *
  */
 abstract class AbstractMsdlMojo extends AbstractMojo {
 
@@ -538,105 +533,3 @@ abstract class AbstractMsdlMojo extends AbstractMojo {
         return hexString.toString();
     }
 }
-
-
-// protected Set<File> findProtoFilesInDirectories(Iterable<File> directories) throws IOException {
-// requireNonNull(directories);
-// Set<File> protoFiles = new HashSet<>();
-// for (final File directory : directories) {
-// protoFiles.addAll(findMsdlFilesInDirectory(directory));
-// }
-// return ImmutableSet.copyOf(protoFiles);
-// }
-// /**
-// * Generates native launchers for java protoc plugins. These launchers will later be added as parameters for
-// protoc
-// * compiler.
-// *
-// * @throws MojoExecutionException
-// * if plugins launchers could not be created.
-// *
-// * @since 0.3.0
-// */
-// protected void createProtocPlugins() throws MojoExecutionException {
-// final String javaHome = detectJavaHome();
-//
-// for (final ProtocPlugin plugin : protocPlugins) {
-//
-// if (plugin.getJavaHome() != null) {
-// getLog().debug("Using javaHome defined in plugin definition: " + javaHome);
-// } else {
-// getLog().debug("Setting javaHome for plugin: " + javaHome);
-// plugin.setJavaHome(javaHome);
-// }
-//
-// getLog().info("Building protoc plugin: " + plugin.getId());
-// final ProtocPluginAssembler assembler = new ProtocPluginAssembler(plugin, project.getArtifact(),
-// artifactFactory, artifactResolver, artifactMetadataSource, localRepository, remoteRepositories,
-// protocPluginDirectory, getLog());
-// assembler.execute();
-// }
-// }
-
-// /**
-// * Attempts to detect java home directory, using {@code jdk} toolchain if available, with a fallback to
-// * {@code java.home} system property.
-// *
-// * @return path to java home directory.
-// */
-// protected String detectJavaHome() {
-// String javaHome = null;
-//
-// final Toolchain tc = toolchainManager.getToolchainFromBuildContext("jdk", session);
-// if (tc != null) {
-// if (tc instanceof DefaultJavaToolChain) {
-// javaHome = ((DefaultJavaToolChain) tc).getJavaHome();
-// if (javaHome != null) {
-// getLog().debug("Using javaHome from toolchain: " + javaHome);
-// }
-// } else {
-// // Try to infer JAVA_HOME from location of 'java' tool in toolchain, if available.
-// // We don't use 'java' directly because for Windows we need to find the path to
-// // jvm.dll instead, which the assembler tries to figure out relative to JAVA_HOME.
-// final String javaExecutable = tc.findTool("java");
-// if (javaExecutable != null) {
-// File parent = new File(javaExecutable).getParentFile();
-// if (parent != null) {
-// parent = parent.getParentFile();
-// if (parent != null && parent.isDirectory()) {
-// javaHome = parent.getAbsolutePath();
-// getLog().debug("Using javaHome based on 'java' location returned by toolchain: " + javaHome);
-// }
-// }
-// }
-// }
-// }
-// if (javaHome == null) {
-// // Default location is the current JVM's JAVA_HOME.
-// javaHome = System.getProperty("java.home");
-// getLog().debug("Using javaHome from java.home system property: " + javaHome);
-// }
-// return javaHome;
-// }
-
-// /**
-// * Adds mojo-specific parameters to the protoc builder.
-// *
-// * @param protocBuilder
-// * the builder to be modified.
-// */
-// protected void addProtocBuilderParameters(final Protoc.Builder protocBuilder) {
-// // if (protocPlugins != null) {
-// // for (final ProtocPlugin plugin : protocPlugins) {
-// // protocBuilder.addPlugin(plugin);
-// // }
-// // protocPluginDirectory.mkdirs();
-// // protocBuilder.setPluginDirectory(protocPluginDirectory);
-// // }
-// if (writeDescriptorSet) {
-// final File descriptorSetFile = new File(getDescriptorSetOutputDirectory(), descriptorSetFileName);
-// getLog().info("Will write descriptor set:");
-// getLog().info(" " + descriptorSetFile.getAbsolutePath());
-// protocBuilder.withDescriptorSetFile(descriptorSetFile, includeDependenciesInDescriptorSet);
-// }
-// }

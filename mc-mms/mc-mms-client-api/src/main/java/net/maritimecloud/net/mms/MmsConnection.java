@@ -55,7 +55,8 @@ public interface MmsConnection {
     boolean awaitDisconnected(long timeout, TimeUnit unit) throws InterruptedException;
 
     /**
-     * Connects to the MMS server. If the client is already connected to the cloud this call is ignored.
+     * Enables the connection to the MMS server. If the client is not already connected the client will automatically
+     * connect.
      *
      * @throws MmsClientClosedException
      *             if the client has been shutdown
@@ -76,9 +77,9 @@ public interface MmsConnection {
     boolean isConnected();
 
     /**
-     * Returns whether or not we are currently connected to the MMS server.
+     * Returns whether or not the connection to the MMS server is enabled.
      *
-     * @return whether or not we are currently connected to the MMS server
+     * @return whether or not the connection to the MMS server is enabled
      */
     boolean isEnabled();
 

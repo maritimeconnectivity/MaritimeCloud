@@ -22,7 +22,7 @@ import net.maritimecloud.util.geometry.Position;
  *
  * @author Kasper Nielsen
  */
-public interface RemoteActor {
+interface RemoteActor {
 
     MaritimeId getId();
 

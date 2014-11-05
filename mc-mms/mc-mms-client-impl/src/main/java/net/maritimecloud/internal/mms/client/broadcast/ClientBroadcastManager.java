@@ -88,12 +88,6 @@ public class ClientBroadcastManager {
 
     final ScheduledExecutorService ses;
 
-    /**
-     * Creates a new client broadcast manager.
-     *
-     * @param network
-     *            the network
-     */
     public ClientBroadcastManager(ClientInfo info, MmsThreadManager threadManager, ClientConnection connection,
             ThreadManager tmm) {
         this.connection = requireNonNull(connection);

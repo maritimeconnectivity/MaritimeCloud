@@ -21,10 +21,10 @@ import net.maritimecloud.net.EndpointInvocationFuture;
 
 /**
  * A simple service
- * 
+ *
  * @author Kasper Nielsen
  */
-public interface CoreServices {
+interface CoreServices {
 
     EndpointInvocationFuture<RemoteActor> getClientDetails(MaritimeId id);
 

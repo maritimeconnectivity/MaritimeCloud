@@ -70,7 +70,7 @@ public class DefaultMmsClient implements MmsClient {
     /**
      * Creates a new instance of this class.
      *
-     * @param builder
+     * @param configuration
      *            the configuration of the connection
      */
     public DefaultMmsClient(MmsClientConfiguration configuration) {

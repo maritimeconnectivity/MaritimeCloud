@@ -53,17 +53,18 @@ class DefaultEndpointLocator<T extends LocalEndpoint> implements MmsEndpointLoca
         return new DefaultEndpointLocator<>(cem, mirror, meters);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public EndpointInvocationFuture<T> findWithMMSINumber(int mmsiNumber) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public EndpointInvocationFuture<T> findNearest() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
+    //
+    // /** {@inheritDoc} */
+    // @Override
+    // public EndpointInvocationFuture<T> findWithMMSINumber(int mmsiNumber) {
+    // throw new UnsupportedOperationException("Not implemented yet");
+    // }
+    //
+    // /** {@inheritDoc} */
+    // @Override
+    // public EndpointInvocationFuture<T> findNearest() {
+    // throw new UnsupportedOperationException("Not implemented yet");
+    // }
 
     /** {@inheritDoc} */
     public EndpointInvocationFuture<List<T>> findAll() {

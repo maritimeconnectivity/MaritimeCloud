@@ -20,7 +20,7 @@ import java.util.concurrent.CompletionStage;
  *
  * @author Kasper Nielsen
  */
-public interface MmsClientShutdown {
+interface MmsClientShutdown {
 
     /**
      * Returns {@code true} if the shutdown completed. The return value of this method is identical to

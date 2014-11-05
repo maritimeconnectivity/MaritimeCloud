@@ -56,8 +56,12 @@ public class ClientEndpointManager {
     /**
      * Creates a new instance of this class.
      *
-     * @param network
-     *            the network
+     * @param connection
+     *            the client connection
+     * @param threadManager
+     *            the thread manager
+     * @param clientInfo
+     *            clientInfo
      */
     public ClientEndpointManager(ClientConnection connection, MmsThreadManager threadManager, ClientInfo clientInfo) {
         this.connection = requireNonNull(connection);
@@ -75,8 +79,12 @@ public class ClientEndpointManager {
     /**
      * Creates a ServiceLocator for a service of the specified type.
      *
-     * @param sip
-     *            the service initiation point
+     * @param id
+     *            the id to create an endpoint from
+     * @param endpointType
+     *            the type of endpoint to create
+     * @param <T>
+     *            the type of endpoint
      * @return a service locator object
      *
      * @throws MmsClientClosedException

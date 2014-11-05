@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.internal.id160;
+package net.maritimecloud.internal.message;
 
 /**
  * Various binary utility methods. No methods perform any kind of bound checks.

@@ -21,7 +21,7 @@ import static net.maritimecloud.util.geometry.CoordinateConverter.compass2cartes
 
 import java.io.IOException;
 
-import net.maritimecloud.internal.id160.BinaryUtil;
+import net.maritimecloud.internal.message.BinaryUtil;
 import net.maritimecloud.message.MessageReader;
 import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.message.MessageWriter;

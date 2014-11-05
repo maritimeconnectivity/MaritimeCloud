@@ -27,9 +27,9 @@ public interface MmsEndpointLocator<T extends LocalEndpoint> {
 
     MmsEndpointLocator<T> withinDistanceOf(int meters);
 
-    EndpointInvocationFuture<T> findWithMMSINumber(int mmsiNumber);
+    // EndpointInvocationFuture<T> findWithMMSINumber(int mmsiNumber);
 
-    EndpointInvocationFuture<T> findNearest();
+    // EndpointInvocationFuture<T> findNearest();
 
     EndpointInvocationFuture<List<T>> findAll();
 }

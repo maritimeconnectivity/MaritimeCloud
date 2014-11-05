@@ -38,7 +38,7 @@ import org.junit.Test;
 
 /**
  * Tests the future returned by {@link MmsClient#broadcast(BroadcastMessage)} and
- * {@link MmsClient#broadcastSpecial(BroadcastMessage).
+ * {@link MmsClient#broadcastSubscribe(Class, net.maritimecloud.net.BroadcastConsumer)}.
  *
  * @author Kasper Nielsen
  */

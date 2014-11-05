@@ -90,9 +90,6 @@ public class ServerConnectFuture {
         }
     }
 
-    /**
-     * @param msg
-     */
     public void onMessage(Message m) {
         if (m instanceof Hello) {
             Hello hm = (Hello) m;

@@ -47,10 +47,6 @@ public class ConnectionKeepAlive {
     /** Send out signals no more often than. */
     private final long minimumSignalDuration;
 
-    /**
-     * @param transport
-     * @param positionSupplier
-     */
     public ConnectionKeepAlive(ClientConnection connection, MmsClientConfiguration builder, ClientInfo clientInfo) {
         this.connection = requireNonNull(connection);
         this.clientInfo = requireNonNull(clientInfo);

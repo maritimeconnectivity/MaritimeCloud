@@ -33,61 +33,39 @@ public class DelegateConnectionListener implements MmsConnection.Listener {
         this.l = requireNonNull(l);
     }
 
-    /**
-     * @param message
-     * @see net.maritimecloud.net.mms.MmsConnection.Listener#binaryMessageReceived(byte[])
-     */
+    /** {@inheritDoc} */
     public void binaryMessageReceived(byte[] message) {
         l.binaryMessageReceived(message);
     }
 
-    /**
-     * @param message
-     * @see net.maritimecloud.net.mms.MmsConnection.Listener#binaryMessageSend(byte[])
-     */
+    /** {@inheritDoc} */
     public void binaryMessageSend(byte[] message) {
         l.binaryMessageSend(message);
     }
 
-    /**
-     *
-     * @see net.maritimecloud.net.mms.MmsConnection.Listener#connected()
-     */
+
+    /** {@inheritDoc} */
     public void connected(URI host) {
         l.connected(host);
     }
 
-    /**
-     * @param host
-     * @see net.maritimecloud.net.mms.MmsConnection.Listener#connecting(java.net.URI)
-     */
+    /** {@inheritDoc} */
     public void connecting(URI host) {
         l.connecting(host);
     }
 
-    /**
-     * @param closeReason
-     * @see net.maritimecloud.net.mms.MmsConnection.Listener#disconnected(net.maritimecloud.net.mms.MmsConnectionClosingCode)
-     */
+    /** {@inheritDoc} */
     public void disconnected(MmsConnectionClosingCode closeReason) {
         l.disconnected(closeReason);
     }
 
-    /**
-     * @param message
-     * @see net.maritimecloud.net.mms.MmsConnection.Listener#textMessageReceived(java.lang.String)
-     */
+    /** {@inheritDoc} */
     public void textMessageReceived(String message) {
         l.textMessageReceived(message);
     }
 
-    /**
-     * @param message
-     * @see net.maritimecloud.net.mms.MmsConnection.Listener#textMessageSend(java.lang.String)
-     */
+    /** {@inheritDoc} */
     public void textMessageSend(String message) {
         l.textMessageSend(message);
     }
-
-
 }

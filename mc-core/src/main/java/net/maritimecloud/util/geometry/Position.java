@@ -19,7 +19,7 @@ import java.io.Serializable;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-import net.maritimecloud.internal.id160.BinaryUtil;
+import net.maritimecloud.internal.message.BinaryUtil;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageReader;
 import net.maritimecloud.message.MessageSerializer;

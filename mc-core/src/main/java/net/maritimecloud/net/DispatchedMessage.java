@@ -19,7 +19,7 @@ import net.maritimecloud.util.Timestamp;
 import net.maritimecloud.util.geometry.Position;
 
 /**
- * An returned when sending a message.
+ * A dispatched message is returned when sending a message asynchronously.
  *
  * @author Kasper Nielsen
  */

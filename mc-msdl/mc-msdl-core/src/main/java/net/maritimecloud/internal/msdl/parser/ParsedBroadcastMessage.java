@@ -23,18 +23,10 @@ import net.maritimecloud.msdl.model.BroadcastMessageDeclaration;
  */
 public class ParsedBroadcastMessage extends ParsedMessage implements BroadcastMessageDeclaration {
 
-    /**
-     * @param file
-     * @param ac
-     */
     ParsedBroadcastMessage(ParsedMsdlFile file, AnnotationContainer ac) {
         super(file, ac);
     }
 
-    /**
-     * @param child
-     * @return
-     */
     public ParsedBroadcastMessage parse(BroadcastDeclarationContext c) {
         parse(c.Identifier(), c.fields());
         return this;

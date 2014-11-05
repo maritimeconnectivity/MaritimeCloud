@@ -31,11 +31,6 @@ import net.maritimecloud.util.geometry.Area;
  *
  * @author Kasper Nielsen
  */
-// MaritimeCloudClient -> MaritimeMessagingService / MmsClient
-// MaritimeCloud
-
-// shutdown
-// isTerminated -> isClosed
 public interface MmsClient {
 
     /**

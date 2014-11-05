@@ -16,7 +16,6 @@ package net.maritimecloud.internal.mms.client;
 
 import static java.util.Objects.requireNonNull;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import javax.servlet.http.HttpServlet;
@@ -88,13 +87,6 @@ public class TestWebSocketServer {
         }
     }
 
-    /**
-     * Invoked whenever a client has connected.
-     *
-     * @param supplier
-     *            a supplier used for creating new transports
-     * @throws IOException
-     */
     public void start() {
 
         // New handler

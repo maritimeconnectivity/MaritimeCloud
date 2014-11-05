@@ -27,9 +27,9 @@ public interface BroadcastSubscription {
     void cancel();
 
     /**
-     * Returns the type of broadcast message we are listening for.
+     * Returns the Java type of broadcast message we are listening for.
      *
-     * @return the type of broadcast message we are listening for
+     * @return the Java type of broadcast message we are listening for
      */
     Class<? extends BroadcastMessage> getBroadcastJavaType();
 
