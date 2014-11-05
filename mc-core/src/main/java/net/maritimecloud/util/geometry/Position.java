@@ -359,7 +359,7 @@ public class Position implements Message, Serializable {
     /**
      * Returns a 64 bit representation of this position. Encoded as decimal degress with 7 decimal places.
      *
-     * @return
+     * @return the position as a binary
      */
     public Binary toBinary() {
         byte[] b = new byte[4 + 4];

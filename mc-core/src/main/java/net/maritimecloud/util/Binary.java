@@ -393,7 +393,7 @@ public abstract class Binary implements Iterable<Byte>, Comparable<Binary> {
     /**
      * Returns a SHA-256 hash of this binary.
      *
-     * @return
+     * @return the hash
      */
     public final Binary sha256() {
         MessageDigest md;

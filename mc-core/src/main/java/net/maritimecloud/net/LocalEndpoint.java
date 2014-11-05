@@ -87,6 +87,8 @@ public abstract class LocalEndpoint {
          *            serializer for parameters
          * @param resultSerializer
          *            the serializer used for the result
+         * @param <T>
+         *            the type of result of the remote method
          * @return a future representing pending completion of the invocation
          */
         <T> EndpointInvocationFuture<T> invokeRemote(String endpoint, Message parameters,

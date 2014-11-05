@@ -73,7 +73,7 @@ public interface Acknowledgement {
      *
      * See the {@link CompletionStage} documentation for rules covering exceptional completion.
      *
-     * @param action
+     * @param runnable
      *            the action to perform before completing the returned Acknowledgement
      * @return the new Acknowledgement
      */
