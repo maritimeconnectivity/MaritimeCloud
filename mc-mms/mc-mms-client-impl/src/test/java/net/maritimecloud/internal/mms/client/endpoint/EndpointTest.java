@@ -112,7 +112,7 @@ public class EndpointTest extends AbstractClientConnectionTest {
         MmsClient c = createAndConnect();
 
         // Request
-        HelloWorldEndpoint hw = c.endpointFind(ID4, HelloWorldEndpoint.class);
+        HelloWorldEndpoint hw = c.endpointCreate(ID4, HelloWorldEndpoint.class);
         EndpointInvocationFuture<String> f = hw.hello();
 
         MethodInvoke fe = t.take(MethodInvoke.class);

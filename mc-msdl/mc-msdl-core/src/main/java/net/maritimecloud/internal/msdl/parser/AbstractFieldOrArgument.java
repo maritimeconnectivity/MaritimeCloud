@@ -96,4 +96,5 @@ public class AbstractFieldOrArgument implements FieldOrParameter {
             file.error(c, "A" + n() + " value must be less than " + Integer.MAX_VALUE + ", was " + value);
         }
     }
+
 }

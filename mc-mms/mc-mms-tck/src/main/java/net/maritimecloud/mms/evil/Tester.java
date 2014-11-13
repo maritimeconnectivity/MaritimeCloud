@@ -85,7 +85,7 @@ public class Tester {
         runners.put(fromId, () -> toId);
         runners.put(toId, () -> toId);
         long start = System.nanoTime();
-        EndpointInvocationFuture<Long> hello = form.endpointFind(to.getClientId(), TestEndpoint.class).hello(fromId);
+        EndpointInvocationFuture<Long> hello = form.endpointCreate(to.getClientId(), TestEndpoint.class).hello(fromId);
         hello.thenRun(() -> {
             System.out.println("Latency " + (System.nanoTime() - start));
         });

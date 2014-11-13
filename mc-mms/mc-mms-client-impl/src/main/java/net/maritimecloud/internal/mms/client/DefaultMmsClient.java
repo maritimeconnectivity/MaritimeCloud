@@ -32,11 +32,11 @@ import net.maritimecloud.net.DispatchedMessage;
 import net.maritimecloud.net.EndpointImplementation;
 import net.maritimecloud.net.EndpointRegistration;
 import net.maritimecloud.net.LocalEndpoint;
+import net.maritimecloud.net.mms.MmsBroadcastOptions;
 import net.maritimecloud.net.mms.MmsClient;
 import net.maritimecloud.net.mms.MmsClientConfiguration;
 import net.maritimecloud.net.mms.MmsConnection;
 import net.maritimecloud.net.mms.MmsEndpointLocator;
-import net.maritimecloud.net.mms.WithBroadcast;
 import net.maritimecloud.util.geometry.Area;
 
 import org.cakeframework.container.Container;
@@ -53,8 +53,11 @@ public class DefaultMmsClient implements MmsClient {
     /** The logger. */
     private static final Logger LOGGER = Logger.get(DefaultMmsClient.class);
 
+
     /** Responsible for listening and sending broadcasts. */
     private final ClientBroadcastManager broadcaster;
+
+    private final ClientInfo clientInfo;
 
     /** Manages registration of services. */
     private final MmsConnection connection;
@@ -64,8 +67,6 @@ public class DefaultMmsClient implements MmsClient {
 
     /** Manages registration of services. */
     private final ClientEndpointManager endpoints;
-
-    private final ClientInfo clientInfo;
 
     /**
      * Creates a new instance of this class.
@@ -85,6 +86,12 @@ public class DefaultMmsClient implements MmsClient {
     @Override
     public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
         return container.awaitState(State.TERMINATED, timeout, unit);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public DispatchedMessage broadcast(BroadcastMessage message, MmsBroadcastOptions options) {
+        return broadcaster.broadcast(message, options);
     }
 
     /** {@inheritDoc} */
@@ -116,6 +123,28 @@ public class DefaultMmsClient implements MmsClient {
 
     /** {@inheritDoc} */
     @Override
+    public <T extends LocalEndpoint> MmsEndpointLocator<T> endpointLocate(Class<T> endpointType) {
+        return endpoints.endpointFind(endpointType);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <T extends LocalEndpoint> T endpointCreate(MaritimeId id, Class<T> endpointType) {
+        return endpoints.endpointFrom(id, endpointType);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public EndpointRegistration endpointRegister(EndpointImplementation implementation) {
+        return endpoints.endpointRegister(implementation);
+    }
+
+    protected void finalize() {
+        close();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public final MaritimeId getClientId() {
         return clientInfo.getClientId();
     }
@@ -131,41 +160,6 @@ public class DefaultMmsClient implements MmsClient {
     public boolean isTerminated() {
         return container.getState() == State.TERMINATED;
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public <T extends LocalEndpoint> T endpointFind(MaritimeId id, Class<T> endpointType) {
-        return endpoints.endpointFrom(id, endpointType);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public <T extends LocalEndpoint> MmsEndpointLocator<T> endpointFind(Class<T> endpointType) {
-        return endpoints.endpointFind(endpointType);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public EndpointRegistration endpointRegister(EndpointImplementation implementation) {
-        return endpoints.endpointRegister(implementation);
-    }
-
-    protected void finalize() {
-        close();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public DispatchedMessage broadcast(BroadcastMessage message) {
-        return withBroadcast(message).send();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public WithBroadcast withBroadcast(BroadcastMessage message) {
-        return broadcaster.broadcast(message);
-    }
-
 
     static Container create(MmsClientConfiguration configuration) {
         MaritimeId clientId = requireNonNull(configuration.getId());

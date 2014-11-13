@@ -14,6 +14,7 @@
  */
 package net.maritimecloud.msdl.model;
 
+
 /**
  * The definition of a message field or an endpoint argument.
  *
@@ -48,4 +49,15 @@ public interface FieldOrParameter {
      * @return the type of the field
      */
     Type getType();
+
+    /**
+     * Returns the default value of the field or parameter.
+     * <p>
+     * Currently returns <code>null</code> always
+     *
+     * @return the default value of the field or parameter
+     */
+    default Object getDefaultValue() {
+        return null;
+    }
 }

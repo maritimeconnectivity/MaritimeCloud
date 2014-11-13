@@ -58,6 +58,7 @@ class ParsedMsdlFile implements MsdlFile {
     ParsedMsdlFile(ParsedProject project, AntlrFile antlrFile) {
         this.antlrFile = requireNonNull(antlrFile);
         this.project = requireNonNull(project);
+
     }
 
     void error(ParserRuleContext context, String msg) {
@@ -92,6 +93,13 @@ class ParsedMsdlFile implements MsdlFile {
     public List<MessageDeclaration> getMessages() {
         List<MessageDeclaration> msgs = listOf(MessageDeclaration.class);
         return msgs.stream().filter(e -> !(e instanceof BroadcastMessageDeclaration)).collect(Collectors.toList());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getName() {
+        String filename = antlrFile.getPath().getFileName().toString();
+        return filename.substring(0, filename.length() - 5);
     }
 
     /** {@inheritDoc} */

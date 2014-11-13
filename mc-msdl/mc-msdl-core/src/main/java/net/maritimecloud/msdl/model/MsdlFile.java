@@ -23,6 +23,8 @@ import java.util.List;
  */
 public interface MsdlFile {
 
+    String getName();
+
     /**
      * Returns a list of all broadcast messages defined in the MSDL file.
      *

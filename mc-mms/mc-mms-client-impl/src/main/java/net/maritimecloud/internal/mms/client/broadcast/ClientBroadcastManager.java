@@ -44,9 +44,9 @@ import net.maritimecloud.net.BroadcastMessage;
 import net.maritimecloud.net.BroadcastSubscription;
 import net.maritimecloud.net.DispatchedMessage;
 import net.maritimecloud.net.MessageHeader;
+import net.maritimecloud.net.mms.MmsBroadcastOptions;
 import net.maritimecloud.net.mms.MmsClient;
 import net.maritimecloud.net.mms.MmsClientClosedException;
-import net.maritimecloud.net.mms.WithBroadcast;
 import net.maritimecloud.util.Binary;
 import net.maritimecloud.util.geometry.Area;
 import net.maritimecloud.util.geometry.Circle;
@@ -97,10 +97,6 @@ public class ClientBroadcastManager {
 
         connection.subscribe(BroadcastAck.class, (a, e) -> onBroadcastAck(e));
         connection.subscribe(Broadcast.class, (a, e) -> onBroadcastMessage(e));
-    }
-
-    public WithBroadcast broadcast(BroadcastMessage message) {
-        return new DefaultWithBroadcast(this, message);
     }
 
     /**
@@ -250,5 +246,15 @@ public class ClientBroadcastManager {
         // Taenker den skal gemmes et sted paa connectionen istedet for
         // forEachEldestFirst(resend those that are not acked)
         // resend unacked broadcasts
+    }
+
+    /**
+     * @param message
+     * @param options
+     * @return
+     */
+    public DispatchedMessage broadcast(BroadcastMessage message, MmsBroadcastOptions options) {
+        MmsBroadcastOptions op = options.immutable();
+        return brodcast(message, op.getArea(), op.getRadius(), op.getRemoteReceive());
     }
 }

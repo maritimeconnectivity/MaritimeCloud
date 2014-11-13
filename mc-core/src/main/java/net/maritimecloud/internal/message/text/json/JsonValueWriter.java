@@ -44,7 +44,12 @@ public class JsonValueWriter extends AbstractTextValueWriter implements Taggable
     private final MessageWriter w = new TaggableMessageWriter(this);
 
     public JsonValueWriter(Writer w) {
+        this(w, 0);
+    }
+
+    public JsonValueWriter(Writer w, int indent) {
         this.pw = requireNonNull(w);
+        this.indent = indent;
     }
 
     /**
@@ -89,7 +94,7 @@ public class JsonValueWriter extends AbstractTextValueWriter implements Taggable
                 break;
             default:
                 if (ch >= '\u0000' && ch <= '\u001F' || ch >= '\u007F' && ch <= '\u009F' || ch >= '\u2000'
-                        && ch <= '\u20FF') {
+                && ch <= '\u20FF') {
                     String ss = Integer.toHexString(ch);
                     sb.append("\\u");
                     for (int k = 0; k < 4 - ss.length(); k++) {

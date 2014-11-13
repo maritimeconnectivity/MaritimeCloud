@@ -30,6 +30,7 @@ import net.maritimecloud.mms.stubs.BroadcastTestMessage;
 import net.maritimecloud.net.BroadcastMessage;
 import net.maritimecloud.net.DispatchedMessage;
 import net.maritimecloud.net.MessageHeader;
+import net.maritimecloud.net.mms.MmsBroadcastOptions;
 import net.maritimecloud.net.mms.MmsClient;
 import net.maritimecloud.util.Timestamp;
 import net.maritimecloud.util.geometry.Position;
@@ -66,8 +67,9 @@ public class BroadcastFutureTest extends AbstractClientConnectionTest {
         MmsClient c = createAndConnect();
 
 
-        DispatchedMessage bf = c.withBroadcast(new BroadcastTestMessage().setMsg("hello"))
-                .onRemoteReceive(e -> q.add(e)).send();
+        DispatchedMessage bf = c.broadcast(new BroadcastTestMessage().setMsg("hello"),
+                new MmsBroadcastOptions().onRemoteReceive(e -> q.add(e)));
+
         Broadcast mb = t.take(Broadcast.class);
         assertEquals("hello", ((BroadcastTestMessage) MmsMessage.tryRead(mb)).getMsg());
 

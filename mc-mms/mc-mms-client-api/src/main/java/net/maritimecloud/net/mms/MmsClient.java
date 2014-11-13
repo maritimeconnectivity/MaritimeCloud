@@ -50,7 +50,8 @@ public interface MmsClient {
     /**
      * Asynchronously broadcasts the specified message. No guarantees are made to the delivery of the specified message.
      *
-     * The future returned can be used to determine when the messages has been received by the MMS server.
+     * The future returned can be used to determine when the messages has been received by the MMS server. Invoking this
+     * method is equivalent to invoking {@code broadcast(message, new MmsBroadcastOptions())}.
      *
      * @return a future that can be used to determine when the broadcast messages is received by the MMS server
      *
@@ -60,9 +61,31 @@ public interface MmsClient {
      *             if the specified message is null
      * @throws MmsClientClosedException
      *             if the connection has been permanently closed
-     * @see #withBroadcast(BroadcastMessage)
+     * @see #broadcast(BroadcastMessage, MmsBroadcastOptions)
      */
-    DispatchedMessage broadcast(BroadcastMessage message);
+    default DispatchedMessage broadcast(BroadcastMessage message) {
+        return broadcast(message, new MmsBroadcastOptions());
+    }
+
+    /**
+     * Asynchronously broadcasts the specified message. No guarantees are made to the delivery of the specified message.
+     *
+     * The future returned can be used to determine when the messages has been received by the MMS server.
+     *
+     * @return a future that can be used to determine when the broadcast messages is received by the MMS server
+     *
+     * @param message
+     *            the message to broadcast
+     * @param options
+     *            broadcast options
+     * @throws NullPointerException
+     *             if the specified message or options object is null
+     * @throws MmsClientClosedException
+     *             if the connection has been permanently closed
+     * @see #broadcast(BroadcastMessage)
+     */
+    DispatchedMessage broadcast(BroadcastMessage message, MmsBroadcastOptions options);
+
 
     /**
      * Subscribes to the the specified type of broadcast messages.
@@ -116,10 +139,8 @@ public interface MmsClient {
      */
     MmsConnection connection();
 
-    <T extends LocalEndpoint> MmsEndpointLocator<T> endpointFind(Class<T> endpointType);
-
     /**
-     * Creates a ServiceLocator for a service of the specified type.
+     * Creates a local endpoint for a service of the specified type.
      *
      * @param id
      *            the id of the remote party
@@ -127,12 +148,14 @@ public interface MmsClient {
      *            the endpoint type
      * @param <T>
      *            the type of endpoint
-     * @return a service locator object
+     * @return a local endpoint
      *
      * @throws MmsClientClosedException
      *             if the connection has been permanently closed
      */
-    <T extends LocalEndpoint> T endpointFind(MaritimeId id, Class<T> endpointType);
+    <T extends LocalEndpoint> T endpointCreate(MaritimeId id, Class<T> endpointType);
+
+    <T extends LocalEndpoint> MmsEndpointLocator<T> endpointLocate(Class<T> endpointType);
 
     /**
      * Registers the specified endpoint with the maritime cloud. If a client is closed via {@link MmsClient#close()} the
@@ -168,6 +191,4 @@ public interface MmsClient {
      * @return {@code true} if all tasks have completed following shut down
      */
     boolean isTerminated();
-
-    WithBroadcast withBroadcast(BroadcastMessage message);
 }

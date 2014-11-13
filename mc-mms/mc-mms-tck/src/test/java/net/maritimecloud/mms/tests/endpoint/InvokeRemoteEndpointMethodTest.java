@@ -58,7 +58,7 @@ public class InvokeRemoteEndpointMethodTest extends AbstractNetworkTest {
         MmsClient c2 = newClient(ID2);
 
 
-        HelloWorldEndpoint ee = c2.endpointFind(ID1, HelloWorldEndpoint.class);
+        HelloWorldEndpoint ee = c2.endpointCreate(ID1, HelloWorldEndpoint.class);
         EndpointInvocationFuture<String> f = ee.hello();
         assertEquals("OK", f.join());
         assertEquals(f.getMessageId(), msgId.get());

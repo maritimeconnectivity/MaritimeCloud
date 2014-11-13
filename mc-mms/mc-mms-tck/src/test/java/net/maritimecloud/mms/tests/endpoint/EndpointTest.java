@@ -50,7 +50,7 @@ public class EndpointTest extends AbstractNetworkTest {
 
         MmsClient c2 = newClient(ID2);
 
-        EndpointInvocationFuture<List<HelloWorldEndpoint>> all = c2.endpointFind(HelloWorldEndpoint.class).findAll();
+        EndpointInvocationFuture<List<HelloWorldEndpoint>> all = c2.endpointLocate(HelloWorldEndpoint.class).findAll();
 
         List<HelloWorldEndpoint> list = all.get();
         assertEquals(1, list.size());
@@ -75,7 +75,7 @@ public class EndpointTest extends AbstractNetworkTest {
         assertTrue(sr1.awaitRegistered(10, TimeUnit.SECONDS));
 
 
-        EndpointInvocationFuture<List<TestEndpoint>> l = c2.endpointFind(TestEndpoint.class).findAll();
+        EndpointInvocationFuture<List<TestEndpoint>> l = c2.endpointLocate(TestEndpoint.class).findAll();
         assertEquals(1, l.get().size());
         assertEquals(ID1, l.get().get(0).getRemoteId());
     }
@@ -96,7 +96,7 @@ public class EndpointTest extends AbstractNetworkTest {
         assertTrue(sr.awaitRegistered(10, TimeUnit.SECONDS));
 
         MmsClient c2 = newClient(ID2);
-        TestEndpoint e = c2.endpointFind(ID1, TestEndpoint.class);
+        TestEndpoint e = c2.endpointCreate(ID1, TestEndpoint.class);
 
         List<TestMessage> l = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
