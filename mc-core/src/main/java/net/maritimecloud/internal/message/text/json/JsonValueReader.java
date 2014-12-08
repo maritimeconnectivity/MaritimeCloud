@@ -42,18 +42,6 @@ import net.maritimecloud.message.ValueSerializer;
  */
 public class JsonValueReader extends AbstractTextValueReader {
 
-    /** {@inheritDoc} */
-    @Override
-    public <T> List<T> readList(ValueSerializer<T> parser) throws IOException {
-        ArrayList<T> result = new ArrayList<>();
-        JsonArray a = (JsonArray) value;
-        for (int i = 0; i < a.size(); i++) {
-            T t = parser.read(new JsonValueReader(a.get(i)));
-            result.add(t);
-        }
-        return result;
-    }
-
     final JsonValue value;
 
     JsonValueReader(JsonValue value) {
@@ -119,6 +107,18 @@ public class JsonValueReader extends AbstractTextValueReader {
             return v.longValue();
         }
         throw new SerializationException("Was not a number");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <T> List<T> readList(ValueSerializer<T> parser) throws IOException {
+        ArrayList<T> result = new ArrayList<>();
+        JsonArray a = (JsonArray) value;
+        for (int i = 0; i < a.size(); i++) {
+            T t = parser.read(new JsonValueReader(a.get(i)));
+            result.add(t);
+        }
+        return result;
     }
 
     /** {@inheritDoc} */

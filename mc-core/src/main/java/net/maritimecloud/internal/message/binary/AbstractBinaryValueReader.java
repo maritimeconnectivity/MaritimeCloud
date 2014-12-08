@@ -50,7 +50,7 @@ public abstract class AbstractBinaryValueReader implements ValueReader {
 
     /** {@inheritDoc} */
     @Override
-    public final <T extends Enum<T> & MessageEnum> T readEnum(MessageEnumSerializer<T> factory) throws IOException {
+    public final <T extends /* Enum<T> & */MessageEnum> T readEnum(MessageEnumSerializer<T> factory) throws IOException {
         Integer i = readInt();
         return factory.from(i);
     }

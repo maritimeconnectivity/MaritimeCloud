@@ -16,34 +16,36 @@ package net.maritimecloud.internal.mms.client.endpoint;
 
 import static java.util.Objects.requireNonNull;
 import net.maritimecloud.core.id.MaritimeId;
-import net.maritimecloud.internal.net.endpoint.EndpointMirror;
-import net.maritimecloud.internal.net.messages.MethodInvoke;
-import net.maritimecloud.internal.net.util.DefaultEndpointInvocationFuture;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.message.ValueSerializer;
 import net.maritimecloud.net.EndpointInvocationFuture;
 import net.maritimecloud.net.LocalEndpoint;
-import net.maritimecloud.util.Binary;
 
 /**
+ * The default implementation of a local endpoint invocator.
  *
  * @author Kasper Nielsen
  */
-public class DefaultEndpointInvocator implements LocalEndpoint.Invocator {
+class DefaultEndpointInvocator implements LocalEndpoint.Invocator {
+
+    /** The client endpoint manager. */
+    private final ClientEndpointManager endpointManager;
 
     /** The id of the remote client. */
-    final MaritimeId receiver;
+    private final MaritimeId receiver;
 
-    final ClientEndpointManager cem;
-
-    final EndpointMirror mirror;
-
-    DefaultEndpointInvocator(ClientEndpointManager cem, MaritimeId receiver, EndpointMirror mirror) {
-        this.cem = requireNonNull(cem);
+    /**
+     * Creates a new default endpoint invocator.
+     *
+     * @param endpointManager
+     *            the endpoint manager
+     * @param receiver
+     *            the remote endpoint
+     */
+    DefaultEndpointInvocator(ClientEndpointManager endpointManager, MaritimeId receiver) {
+        this.endpointManager = requireNonNull(endpointManager);
         this.receiver = receiver;
-        this.mirror = requireNonNull(mirror);
-
     }
 
     /** {@inheritDoc} */
@@ -53,28 +55,9 @@ public class DefaultEndpointInvocator implements LocalEndpoint.Invocator {
     }
 
     /** {@inheritDoc} */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public <T> EndpointInvocationFuture<T> invokeRemote(String endpoint, Message parameters,
             MessageSerializer<? extends Message> serializer, ValueSerializer<T> resultParser) {
-        requireNonNull(endpoint, "endpoint is null");
-        requireNonNull(parameters, "parameters is null");
-
-        MethodInvoke ei = new MethodInvoke();
-        ei.setMessageId(Binary.random(32));
-        ei.setEndpointMethod(endpoint);
-        // Vi skal have en serializer med i metoden
-        ei.setParameters(MessageSerializer.writeToJSON(parameters, (MessageSerializer) serializer));
-        if (receiver != null) {
-            ei.setReceiverId(receiver.toString());
-        }
-        ei.setSenderId(cem.clientInfo.getClientId().toString());
-
-        final DefaultEndpointInvocationFuture<T> result = cem.threadManager.create(ei.getMessageId());
-
-        result.recivedByCloud = cem.connection.sendMessage(ei);
-        cem.invokers.put(ei.getMessageId(), new RemoteInvocation(result, mirror, resultParser));
-
-        return result;
+        return endpointManager.invokeRemote(receiver, endpoint, parameters, serializer, resultParser);
     }
 }

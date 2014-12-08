@@ -45,4 +45,9 @@ public interface BaseMessage extends Iterable<FieldOrParameter>, Annotatable {
     String getName();
 
 
+    default String getFullName() {
+        String namespace = getFile().getNamespace();
+        return namespace == null ? getName() : namespace + "." + getName();
+    }
+
 }

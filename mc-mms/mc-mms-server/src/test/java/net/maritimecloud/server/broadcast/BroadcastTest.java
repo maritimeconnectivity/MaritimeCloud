@@ -121,8 +121,7 @@ public class BroadcastTest extends AbstractServerConnectionTest {
         b.setSenderId(sender.toString());
         b.setBroadcastType(message.getClass().getName());
         b.setMessageId(Binary.random(32));
-        b.setPayload(Binary.copyFromUtf8(MessageSerializer.writeToJSON(message,
-                MessageHelper.getSerializer(message.getClass()))));
+        b.setPayload(Binary.copyFromUtf8(MessageSerializer.writeToJSON(message, MessageHelper.getSerializer(message))));
         // b.setMsg(MessageHelpers.persist(message));
 
 

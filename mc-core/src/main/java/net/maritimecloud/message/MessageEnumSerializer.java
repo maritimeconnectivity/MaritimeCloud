@@ -23,7 +23,7 @@ import java.io.IOException;
  *            the type of enum
  * @author Kasper Nielsen
  */
-public abstract class MessageEnumSerializer<T extends Enum<T> & MessageEnum> extends ValueSerializer<T> {
+public abstract class MessageEnumSerializer<T extends /* Enum<T> & */MessageEnum> extends ValueSerializer<T> {
 
     /**
      * Creates the enum from the specified integer value.
@@ -32,7 +32,7 @@ public abstract class MessageEnumSerializer<T extends Enum<T> & MessageEnum> ext
      *            the integer value to create the enum from
      * @return the new enum
      */
-    public abstract T from(int value);
+    public abstract T from(int value) throws IOException;
 
     /**
      * Creates the enum from the specified string
@@ -41,7 +41,7 @@ public abstract class MessageEnumSerializer<T extends Enum<T> & MessageEnum> ext
      *            the string value of this enum
      * @return the string value of this enum
      */
-    public abstract T from(String name);
+    public abstract T from(String name) throws IOException;
 
     /** {@inheritDoc} */
     @Override

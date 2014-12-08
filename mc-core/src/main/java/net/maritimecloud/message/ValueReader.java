@@ -64,7 +64,7 @@ public interface ValueReader {
     PositionTime readPositionTime() throws IOException;
 
 
-    <T extends Enum<T> & MessageEnum> T readEnum(MessageEnumSerializer<T> factory) throws IOException;
+    <T extends /* Enum<T> & */MessageEnum> T readEnum(MessageEnumSerializer<T> factory) throws IOException;
 
     <T extends Message> T readMessage(MessageSerializer<T> parser) throws IOException;
 

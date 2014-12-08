@@ -2,6 +2,11 @@ namespace testproject;
 
 import "core/geometry.msdl";
 
+enum Fffff {
+    RHUMB_LINE = 1;
+    GREAT_CIRCLE = 2;
+}
+
 message Geometry1 {
   1: Circle c1;
   2: Rectangle b1;

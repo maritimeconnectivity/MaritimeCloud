@@ -16,8 +16,10 @@ package net.maritimecloud.internal.mms.messages.spi;
 
 import static java.util.Objects.requireNonNull;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 
+import net.maritimecloud.internal.message.text.json.JsonMessageReader;
 import net.maritimecloud.internal.net.messages.Broadcast;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageSerializer;
@@ -185,6 +187,11 @@ public class MmsMessage {
         Class<BroadcastMessage> cl = (Class<BroadcastMessage>) Class.forName(name);
         Field field = cl.getField("SERIALIZER");
         MessageSerializer<BroadcastMessage> p = (MessageSerializer<BroadcastMessage>) field.get(null);
-        return MessageSerializer.readFromJSON(p, contents);
+        JsonMessageReader r = new JsonMessageReader(contents);
+        try {
+            return p.read(r);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read message from JSON", e);
+        }
     }
 }

@@ -18,6 +18,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.List;
 import java.util.Map;
@@ -189,5 +190,14 @@ public class JsonValueWriter extends AbstractTextValueWriter implements Taggable
         indent();
         pw.write("\"" + name + "\": ");
         return this;
+    }
+
+    public static <T extends Message> String writeMessageTo(int indent, T message, MessageSerializer<T> serializer)
+            throws IOException {
+        StringWriter sw = new StringWriter();
+        try (JsonValueWriter jvv = new JsonValueWriter(sw, indent)) {
+            jvv.writeMessage(message, serializer);
+        }
+        return sw.toString();
     }
 }

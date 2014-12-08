@@ -86,6 +86,7 @@ public enum BaseType {
     /** An arbitrary-precision integer type. */
     VARINT(BigInteger.class);
 
+    /** The corresponding Java type. */
     final Class<?> javaType;
 
     BaseType(Class<?> javaType) {

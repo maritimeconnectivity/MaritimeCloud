@@ -97,4 +97,7 @@ public class AbstractFieldOrArgument implements FieldOrParameter {
         }
     }
 
+    public String toString() {
+        return getTag() + ": " + getType() + " " + getName();
+    }
 }

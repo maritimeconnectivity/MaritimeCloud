@@ -95,4 +95,8 @@ public class ParsedMessage extends AbstractContainer implements MessageDeclarati
     public final Iterator<FieldOrParameter> iterator() {
         return getFields().iterator();
     }
+
+    public String toString() {
+        return getFullName();
+    }
 }

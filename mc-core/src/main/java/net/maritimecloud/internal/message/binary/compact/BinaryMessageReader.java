@@ -47,7 +47,7 @@ public class BinaryMessageReader extends AbstractMessageReader {
 
     /** {@inheritDoc} */
     @Override
-    public <T extends Enum<T> & MessageEnum> T readEnum(int tag, String name, MessageEnumSerializer<T> factory)
+    public <T extends MessageEnum> T readEnum(int tag, String name, MessageEnumSerializer<T> factory)
             throws IOException {
         int enumValue = readInt(tag, name);
         return factory.from(enumValue);

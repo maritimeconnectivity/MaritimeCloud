@@ -62,7 +62,7 @@ public abstract class AbstractTextValueReader implements ValueReader {
 
     /** {@inheritDoc} */
     @Override
-    public <T extends Enum<T> & MessageEnum> T readEnum(MessageEnumSerializer<T> factory) throws IOException {
+    public <T extends /* Enum<T> & */MessageEnum> T readEnum(MessageEnumSerializer<T> factory) throws IOException {
         String str = readString();
         T t = factory.from(str);
         if (t == null) {

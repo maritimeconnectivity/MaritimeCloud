@@ -66,6 +66,8 @@ public class JavaGenMessageGenerator {
 
     final String serializerName;
 
+    final String fullName;
+
     JavaGenMessageGenerator(CodegenClass parent, BaseMessage msg) {
         this.parent = parent;
         this.anno = msg;
@@ -75,17 +77,19 @@ public class JavaGenMessageGenerator {
         this.c = parent == null ? new CodegenClass() : parent.addInnerClass();
         this.isMessage = true;
         this.serializerName = "Serializer";
+        fullName = msg.getFullName();
     }
 
-    JavaGenMessageGenerator(CodegenClass parent, String name, EndpointDefinition def, EndpointMethod met) {
+    JavaGenMessageGenerator(CodegenClass parent, String name, EndpointMethod met) {
         this.parent = parent;
-        this.anno = def;
+        this.anno = met.getEndpoint();
         this.name = name;
-        this.file = def.getFile();
+        this.file = met.getEndpoint().getFile();
         this.fields = met.getParameters();
         this.c = parent == null ? new CodegenClass() : parent.addInnerClass();
         this.isMessage = false;
         this.serializerName = name + "Serializer";
+        fullName = met.getFullName();
     }
 
     JavaGenMessageGenerator generate() {
@@ -234,7 +238,7 @@ public class JavaGenMessageGenerator {
             c.setDefinition(isPublic, "static class ", name, " implements ", mType, imple);
         }
 
-        String fullName = file.getNamespace() + "." + name;
+        // String fullName = file.getNamespace() + "." + name;
         c.addFieldWithJavadoc("The full name of this message.", "public static final String NAME = \"", fullName, "\";");
 
         c.addImport(MessageSerializer.class);
@@ -488,7 +492,7 @@ public class JavaGenMessageGenerator {
         } else {
             MapType los = (MapType) type;
             return "MessageParser.ofMap(" + complexParser(c, los.getKeyType(), file) + ", "
-            + complexParser(c, los.getValueType(), file) + ")";
+                    + complexParser(c, los.getValueType(), file) + ")";
         }
     }
 
@@ -508,18 +512,18 @@ public class JavaGenMessageGenerator {
             ListOrSetType los = (ListOrSetType) f.getType();
             c.addImport(MessageHelper.class);
             return MessageHelper.class.getSimpleName() + ".readList(" + f.getTag() + ", \"" + f.getName() + "\", "
-            + readerName + ", " + complexParser(c, los.getElementType(), file) + ");";
+                    + readerName + ", " + complexParser(c, los.getElementType(), file) + ");";
         } else if (type == BaseType.SET) { // Complex type
             ListOrSetType los = (ListOrSetType) f.getType();
             c.addImport(MessageHelper.class);
             return MessageHelper.class.getSimpleName() + ".readSet(" + f.getTag() + ", \"" + f.getName() + "\", "
-            + readerName + ", " + complexParser(c, los.getElementType(), file) + ");";
+                    + readerName + ", " + complexParser(c, los.getElementType(), file) + ");";
         } else { // Complex type
             MapType los = (MapType) f.getType();
             c.addImport(MessageHelper.class);
             return MessageHelper.class.getSimpleName() + ".readMap(" + f.getTag() + ", \"" + f.getName() + "\", "
-            + readerName + ", " + complexParser(c, los.getKeyType(), file) + ", "
-            + complexParser(c, los.getValueType(), file) + ");";
+                    + readerName + ", " + complexParser(c, los.getKeyType(), file) + ", "
+                    + complexParser(c, los.getValueType(), file) + ");";
         }
     }
 

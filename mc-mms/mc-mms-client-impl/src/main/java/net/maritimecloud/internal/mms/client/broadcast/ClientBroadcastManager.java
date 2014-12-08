@@ -26,10 +26,10 @@ import java.util.function.Consumer;
 
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.message.MessageHelper;
+import net.maritimecloud.internal.message.text.json.JsonMessageReader;
 import net.maritimecloud.internal.mms.client.ClientInfo;
 import net.maritimecloud.internal.mms.client.MmsThreadManager;
 import net.maritimecloud.internal.mms.client.connection.ClientConnection;
-import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.internal.net.messages.Broadcast;
 import net.maritimecloud.internal.net.messages.BroadcastAck;
 import net.maritimecloud.internal.net.messages.MessageHasher;
@@ -111,14 +111,20 @@ public class ClientBroadcastManager {
      */
     public <T extends BroadcastMessage> BroadcastSubscription broadcastSubscribe(Class<T> messageType,
             BroadcastConsumer<T> listener, Area area) {
+        return broadcastSubscribe(BroadcastDeserializer.CLASSPATH_DESERIALIZER, MessageHelper.getName(messageType),
+                listener, area);
+    }
+
+    public <T extends BroadcastMessage> BroadcastSubscription broadcastSubscribe(BroadcastDeserializer bd, String type,
+            BroadcastConsumer<T> listener, Area area) {
         subscribeLock.readLock().lock();
         try {
             if (isShutdown) {
                 throw new MmsClientClosedException("The mms client has been shutdown");
             }
-            String type = MessageHelper.getName(messageType);
-            SubscriptionSet set = subscribers.computeIfAbsent(type, e -> new SubscriptionSet(this, type, messageType));
-            return set.newSubscription(listener, area == null ? Coverage.ALL : new Coverage.StaticAreaCoverage(area));
+            SubscriptionSet set = subscribers.computeIfAbsent(type, e -> new SubscriptionSet(this, type));
+            return set.newSubscription(bd, listener, area == null ? Coverage.ALL
+                    : new Coverage.StaticAreaCoverage(area));
         } finally {
             subscribeLock.readLock().unlock();
         }
@@ -126,7 +132,7 @@ public class ClientBroadcastManager {
 
     DispatchedMessage brodcast(BroadcastMessage message, Area area, int radius,
             Consumer<? super MessageHeader> ackConsumer) {
-        String broadcastType = MessageHelper.getName(message.getClass());
+        String broadcastType = MessageHelper.getName(message);
 
         Broadcast broadcast = new Broadcast();
         broadcast.setBroadcastType(broadcastType);
@@ -145,7 +151,7 @@ public class ClientBroadcastManager {
         broadcast.setArea(broadcastArea);
         broadcast.setAckBroadcast(ackConsumer != null);
         broadcast.setPayload(Binary.copyFromUtf8(MessageSerializer.writeToJSON(message,
-                MessageHelper.getSerializer(message.getClass()))));
+                MessageHelper.getSerializer(message))));
 
         broadcast.setMessageId(MessageHasher.calculateSHA256(broadcast));
 
@@ -193,20 +199,20 @@ public class ClientBroadcastManager {
     private void onBroadcastMessage(Broadcast broadcast) {
         SubscriptionSet set = subscribers.get(broadcast.getBroadcastType());
         if (set != null && !set.listeners.isEmpty()) {
-            final BroadcastMessage message;
-            try {
-                message = MmsMessage.tryRead(broadcast);
-            } catch (Exception e) {
-                LOG.error(
-                        "Error while trying to deserialize an incoming broadcast message [text="
-                                + MmsMessage.toText(broadcast) + "]", e);
-                return;
-            }
             MessageHeader header = new DefaultMessageHeader(MaritimeId.create(broadcast.getSenderId()),
                     broadcast.getMessageId(), broadcast.getSenderTimestamp(), broadcast.getSenderPosition());
 
             // Deliver to each listener
             for (SubscriptionSet.DefaultSubscription s : set.listeners) {
+                BroadcastMessage message;
+                JsonMessageReader r = new JsonMessageReader(broadcast.getPayload().toStringUtf8());
+                try {
+                    message = s.bd.convert(broadcast.getBroadcastType(), r);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return;
+                }
+
                 threadManager.execute(() -> s.deliver(header, message));
             }
         }

@@ -24,6 +24,7 @@ import net.maritimecloud.internal.msdl.parser.antlr.generated.MsdlParser.Functio
 import net.maritimecloud.internal.msdl.parser.antlr.generated.MsdlParser.FunctionContext;
 import net.maritimecloud.internal.msdl.parser.antlr.generated.MsdlParser.ReturnTypeContext;
 import net.maritimecloud.msdl.model.CommentDeclaration;
+import net.maritimecloud.msdl.model.EndpointDefinition;
 import net.maritimecloud.msdl.model.EndpointMethod;
 import net.maritimecloud.msdl.model.FieldOrParameter;
 import net.maritimecloud.msdl.model.Type;
@@ -110,5 +111,11 @@ public class ParsedEndpointFunction implements EndpointMethod {
     @Override
     public List<FieldOrParameter> getParameters() {
         return (List) new ArrayList<>(parametersByName.values());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public EndpointDefinition getEndpoint() {
+        return endpoint;
     }
 }

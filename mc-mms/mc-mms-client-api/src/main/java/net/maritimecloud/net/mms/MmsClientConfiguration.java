@@ -173,7 +173,8 @@ public class MmsClientConfiguration {
      * @param autoConnect
      *            the autoConnect to set
      */
-    public void setAutoConnect(boolean autoConnect) {
+    // setDisabledOnStart?
+    public void setEnabledOnStartup(boolean autoConnect) {
         this.autoConnect = autoConnect;
     }
 

@@ -51,8 +51,7 @@ public interface MessageReader extends Closeable {
 
     Double readDouble(int tag, String name, Double defaultValue) throws IOException;
 
-    <T extends Enum<T> & MessageEnum> T readEnum(int tag, String name, MessageEnumSerializer<T> factory)
-            throws IOException;
+    <T extends MessageEnum> T readEnum(int tag, String name, MessageEnumSerializer<T> factory) throws IOException;
 
     float readFloat(int tag, String name) throws IOException;
 

@@ -14,8 +14,11 @@
  */
 package net.maritimecloud.msdl.plugins.javagen;
 
+import java.io.IOException;
+
 import net.maritimecloud.message.MessageEnum;
 import net.maritimecloud.message.MessageEnumSerializer;
+import net.maritimecloud.message.MessageWriter;
 import net.maritimecloud.msdl.model.EnumDeclaration;
 import net.maritimecloud.msdl.model.EnumDeclaration.Constant;
 
@@ -49,7 +52,16 @@ class JavaGenEnumGenerator {
         }
         m.add("default: return null;");
         m.add("}");
+
+
+        c.addImport(MessageWriter.class, IOException.class);
+
+        m = i.addMethod("public void write(int tag, String name,", c.getSimpleName(),
+                " value, MessageWriter writer) throws IOException");
+
+        m.add("writer.writeEnum(tag, name, value);");
     }
+
 
     static CodegenEnum generateEnum(CodegenClass parent, EnumDeclaration def) {
         CodegenEnum c = new CodegenEnum();

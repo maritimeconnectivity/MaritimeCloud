@@ -61,6 +61,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ThreadLocalRandom;
 
+import javax.xml.bind.DatatypeConverter;
+
 /**
  * Immutable sequence of bytes. Substring is supported by sharing the reference to the immutable underlying bytes, as
  * with {@link String} (previous to Java 7). Concatenation is likewise supported without copying (long strings) by
@@ -120,6 +122,10 @@ public abstract class Binary implements Iterable<Byte>, Comparable<Binary> {
 
     public String base64encode() {
         return Base64.getEncoder().encodeToString(toByteArray());
+    }
+
+    public String hexString() {
+        return DatatypeConverter.printHexBinary(toByteArray());
     }
 
     /**
@@ -632,6 +638,10 @@ public abstract class Binary implements Iterable<Byte>, Comparable<Binary> {
 
     // =================================================================
     // Input stream
+
+    public static Binary copyFromHex(String text) {
+        return copyFrom(DatatypeConverter.parseHexBinary(text));
+    }
 
     public static Binary copyFromBase64(String text) {
         return copyFrom(Base64.getDecoder().decode(text));

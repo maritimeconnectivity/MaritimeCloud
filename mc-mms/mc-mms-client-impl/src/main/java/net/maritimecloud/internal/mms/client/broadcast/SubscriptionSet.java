@@ -16,6 +16,8 @@ package net.maritimecloud.internal.mms.client.broadcast;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -43,21 +45,19 @@ class SubscriptionSet {
     /** The type of broadcast messages. */
     final String broadcastType;
 
-    /** The type of broadcasts we can handle. */
-    final Class<? extends BroadcastMessage> broadcastJavaType;
-
     /** A list of all listeners for the particular type. */
     final CopyOnWriteArrayList<DefaultSubscription> listeners = new CopyOnWriteArrayList<>();
 
-    SubscriptionSet(ClientBroadcastManager broadcastManager, String broadcastType,
-            Class<? extends BroadcastMessage> type) {
+    volatile Set<BroadcastDeserializer> deserializers = new HashSet<>();
+
+    SubscriptionSet(ClientBroadcastManager broadcastManager, String broadcastType) {
         this.broadcastManager = requireNonNull(broadcastManager);
         this.broadcastType = requireNonNull(broadcastType);
-        this.broadcastJavaType = requireNonNull(type);
     }
 
-    BroadcastSubscription newSubscription(BroadcastConsumer<? extends BroadcastMessage> listener, Coverage coverage) {
-        DefaultSubscription bs = new DefaultSubscription(listener, coverage);
+    BroadcastSubscription newSubscription(BroadcastDeserializer bd,
+            BroadcastConsumer<? extends BroadcastMessage> listener, Coverage coverage) {
+        DefaultSubscription bs = new DefaultSubscription(bd, listener, coverage);
         listeners.add(bs);
         return bs;
     }
@@ -84,7 +84,11 @@ class SubscriptionSet {
 
         final Coverage coverage;
 
-        DefaultSubscription(BroadcastConsumer<? extends BroadcastMessage> listener, Coverage coverage) {
+        final BroadcastDeserializer bd;
+
+        DefaultSubscription(BroadcastDeserializer bd, BroadcastConsumer<? extends BroadcastMessage> listener,
+                Coverage coverage) {
+            this.bd = requireNonNull(bd);
             this.listener = requireNonNull(listener);
             this.coverage = coverage;
         }
@@ -110,12 +114,6 @@ class SubscriptionSet {
                     LOG.error("Exception while handling an incoming broadcast message of type " + message.getClass(), e);
                 }
             }
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Class<? extends BroadcastMessage> getBroadcastJavaType() {
-            return broadcastJavaType;
         }
 
         /** {@inheritDoc} */

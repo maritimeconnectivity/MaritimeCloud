@@ -43,4 +43,9 @@ public interface EndpointDefinition extends Annotatable {
      * @return the name of the message
      */
     String getName();
+
+    default String getFullName() {
+        String namespace = getFile().getNamespace();
+        return namespace == null ? getName() : namespace + "." + getName();
+    }
 }

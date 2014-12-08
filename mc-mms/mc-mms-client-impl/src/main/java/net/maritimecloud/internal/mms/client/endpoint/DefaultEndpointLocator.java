@@ -78,7 +78,7 @@ class DefaultEndpointLocator<T extends LocalEndpoint> implements MmsEndpointLoca
         List<T> l = new ArrayList<>();
         for (String str : ids) {
             MaritimeId id = MaritimeId.create(str);
-            l.add((T) mirror.instantiate(new DefaultEndpointInvocator(cem, id, mirror)));
+            l.add((T) mirror.instantiate(new DefaultEndpointInvocator(cem, id)));
         }
         return l;
     }

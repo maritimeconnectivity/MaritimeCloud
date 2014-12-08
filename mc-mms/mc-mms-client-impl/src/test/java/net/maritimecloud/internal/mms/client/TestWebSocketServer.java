@@ -98,10 +98,11 @@ public class TestWebSocketServer {
         context.addServlet(new ServletHolder(new DumpServlet()), "/*");
 
         // Enable javax.websocket configuration for the context
-        wsContainer = WebSocketServerContainerInitializer.configureContext(context);
 
         // Add our default endpoint.
         try {
+            wsContainer = WebSocketServerContainerInitializer.configureContext(context);
+
             server.start();
             // LOG.info("System is ready accept client connections on " + sa);
         } catch (Exception e) {
@@ -130,10 +131,10 @@ public class TestWebSocketServer {
          * response.getWriter().println("servletPath=" + request.getServletPath());
          * response.getWriter().println("pathInfo=" + request.getPathInfo()); response.getWriter().println("session=" +
          * request.getSession(true).getId());
-         * 
+         *
          * String r = request.getParameter("resource"); if (r != null) { response.getWriter().println("resource(" + r +
          * ")=" + getServletContext().getResource(r)); }
-         * 
+         *
          * response.getWriter().println("</pre>"); }
          */
     }

@@ -22,6 +22,8 @@ import java.util.List;
  */
 public interface EndpointMethod {
 
+    EndpointDefinition getEndpoint();
+
     /**
      * Returns a non-null comment for this method.
      *
@@ -49,4 +51,8 @@ public interface EndpointMethod {
      * @return the return type of the method
      */
     Type getReturnType();
+
+    default String getFullName() {
+        return getEndpoint().getFullName() + "." + getName();
+    }
 }

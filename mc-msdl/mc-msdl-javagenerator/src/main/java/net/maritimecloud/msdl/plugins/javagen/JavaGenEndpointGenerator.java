@@ -19,10 +19,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import net.maritimecloud.internal.msdl.parser.antlr.StringUtil;
-import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageReader;
 import net.maritimecloud.message.ValueWriter;
-import net.maritimecloud.msdl.model.BaseType;
 import net.maritimecloud.msdl.model.EndpointDefinition;
 import net.maritimecloud.msdl.model.EndpointMethod;
 import net.maritimecloud.msdl.model.FieldOrParameter;
@@ -31,7 +29,6 @@ import net.maritimecloud.net.EndpointImplementation;
 import net.maritimecloud.net.EndpointInvocationFuture;
 import net.maritimecloud.net.LocalEndpoint;
 import net.maritimecloud.net.MessageHeader;
-import net.maritimecloud.util.Binary;
 
 import org.cakeframework.internal.codegen.CodegenBlock;
 import org.cakeframework.internal.codegen.CodegenClass;
@@ -79,8 +76,8 @@ public class JavaGenEndpointGenerator {
         cClient.setDefinition("public final class ", ed.getName(), " extends ", LocalEndpoint.class);// ,
         // "<",
 
-        cClient.addFieldWithJavadoc("The name of the endpoint.", "public static final String NAME = \"", ed.getName(),
-                "\";");
+        cClient.addFieldWithJavadoc("The name of the endpoint.", "public static final String NAME = \"",
+                ed.getFullName(), "\";");
         CodegenMethod con = cClient.addMethod("public ", cClient.getSimpleName(), "(", LocalEndpoint.Invocator.class,
                 " ei)");
         con.add("super(ei);");
@@ -94,36 +91,14 @@ public class JavaGenEndpointGenerator {
                 m.add("arguments.", new JavaGenType(p.getType()).setOrGetAll(p), "(", p.getName(), ");");
             }
             // new ", className, "(", args, ")
-            m.add("return invokeRemote(\"", ed.getName(), ".", f.getName(), "\", arguments, ", className,
-                    ".SERIALIZER, ", JavaGenMessageGenerator.complexParser(cClient, f.getReturnType(), file), ");");
+            m.add("return invokeRemote(\"", f.getFullName(), "\", arguments, ", className, ".SERIALIZER, ",
+                    JavaGenMessageGenerator.complexParser(cClient, f.getReturnType(), file), ");");
             generateTmpClass(className, f);
         }
     }
 
     void generateTmpClass(String className, EndpointMethod f) {
-        new JavaGenMessageGenerator(cClient, className, ed, f).generate();
-    }
-
-    void generateTmpClassOld(String className, EndpointMethod ef) {
-        cClient.addImport(Message.class);
-        CodegenClass cc = cClient.addInnerClass("static final class ", className, " implements ", Message.class);
-        for (FieldOrParameter f : ef.getParameters()) {
-            JavaGenType ty = new JavaGenType(f.getType());
-            cc.addField("private final ", ty.render(cc, file), " ", f.getName(), ";");
-            if (f.getType().getBaseType() == BaseType.BINARY) {
-                cClient.addImport(Binary.class);
-            }
-        }
-        if (ef.getParameters().size() > 0) {
-            String args = ef.getParameters().stream()
-                    .map(e -> JavaGenType.render(cClient, e.getType(), file) + " " + e.getName())
-                    .collect(Collectors.joining(", "));
-            CodegenMethod con = cc.addMethod(className, "(", args, ")");
-            for (FieldOrParameter f : ef.getParameters()) {
-                con.add("this.", f.getName(), " = ", f.getName(), ";");
-            }
-        }
-        JavaGenMessageGenerator.generateWriteTo(cc, ef.getParameters(), file);
+        new JavaGenMessageGenerator(cClient, className, f).generate();
     }
 
     void generateServer() {
@@ -162,7 +137,7 @@ public class JavaGenEndpointGenerator {
         m.throwNewUnsupportedOperationException("Unknown method '\" + name + \"'");
 
         CodegenMethod name = cServer.addMethod("public final String getEndpointName()");
-        name.add("return \"", ed.getName(), "\";");
+        name.add("return \"", ed.getFullName(), "\";");
 
     }
 

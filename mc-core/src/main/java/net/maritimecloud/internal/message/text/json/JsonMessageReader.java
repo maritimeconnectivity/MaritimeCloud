@@ -52,7 +52,7 @@ public class JsonMessageReader extends AbstractMessageReader {
         this(JsonProvider.provider().createReader(new StringReader(s.toString())));
     }
 
-    JsonMessageReader(JsonObject o) {
+    public JsonMessageReader(JsonObject o) {
         this.r = null;
         this.iter = new JsonIterator(o);
     }
@@ -92,7 +92,7 @@ public class JsonMessageReader extends AbstractMessageReader {
 
     /** {@inheritDoc} */
     @Override
-    public <T extends Enum<T> & MessageEnum> T readEnum(int tag, String name, MessageEnumSerializer<T> factory)
+    public <T extends MessageEnum> T readEnum(int tag, String name, MessageEnumSerializer<T> factory)
             throws IOException {
         ValueReader r = find(tag, name);
 

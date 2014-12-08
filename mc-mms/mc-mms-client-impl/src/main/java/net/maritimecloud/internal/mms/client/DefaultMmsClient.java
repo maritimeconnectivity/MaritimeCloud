@@ -19,17 +19,22 @@ import static java.util.Objects.requireNonNull;
 import java.util.concurrent.TimeUnit;
 
 import net.maritimecloud.core.id.MaritimeId;
+import net.maritimecloud.internal.mms.client.broadcast.BroadcastDeserializer;
 import net.maritimecloud.internal.mms.client.broadcast.ClientBroadcastManager;
 import net.maritimecloud.internal.mms.client.connection.ClientConnection;
 import net.maritimecloud.internal.mms.client.connection.DefaultMmsConnection;
 import net.maritimecloud.internal.mms.client.connection.transport.ConnectionTransportFactory;
 import net.maritimecloud.internal.mms.client.endpoint.ClientEndpointManager;
 import net.maritimecloud.internal.util.logging.Logger;
+import net.maritimecloud.message.Message;
+import net.maritimecloud.message.MessageSerializer;
+import net.maritimecloud.message.ValueSerializer;
 import net.maritimecloud.net.BroadcastConsumer;
 import net.maritimecloud.net.BroadcastMessage;
 import net.maritimecloud.net.BroadcastSubscription;
 import net.maritimecloud.net.DispatchedMessage;
 import net.maritimecloud.net.EndpointImplementation;
+import net.maritimecloud.net.EndpointInvocationFuture;
 import net.maritimecloud.net.EndpointRegistration;
 import net.maritimecloud.net.LocalEndpoint;
 import net.maritimecloud.net.mms.MmsBroadcastOptions;
@@ -53,7 +58,6 @@ public class DefaultMmsClient implements MmsClient {
     /** The logger. */
     private static final Logger LOGGER = Logger.get(DefaultMmsClient.class);
 
-
     /** Responsible for listening and sending broadcasts. */
     private final ClientBroadcastManager broadcaster;
 
@@ -75,7 +79,7 @@ public class DefaultMmsClient implements MmsClient {
      *            the configuration of the connection
      */
     public DefaultMmsClient(MmsClientConfiguration configuration) {
-        container = create(configuration);
+        container = createClient(configuration);
         broadcaster = container.getService(ClientBroadcastManager.class);
         connection = container.getService(MmsConnection.class);
         endpoints = container.getService(ClientEndpointManager.class);
@@ -94,13 +98,18 @@ public class DefaultMmsClient implements MmsClient {
         return broadcaster.broadcast(message, options);
     }
 
+    public <T extends BroadcastMessage> BroadcastSubscription broadcastSubscribe(BroadcastDeserializer bd, String type,
+            BroadcastConsumer<T> listener, Area area) {
+        return broadcaster.broadcastSubscribe(bd, type, listener, area);
+    }
+
     /** {@inheritDoc} */
     @Override
     public <T extends BroadcastMessage> BroadcastSubscription broadcastSubscribe(Class<T> messageType,
             BroadcastConsumer<T> consumer) {
         return broadcaster.broadcastSubscribe(messageType, consumer, null);
-
     }
+
 
     /** {@inheritDoc} */
     @Override
@@ -123,14 +132,14 @@ public class DefaultMmsClient implements MmsClient {
 
     /** {@inheritDoc} */
     @Override
-    public <T extends LocalEndpoint> MmsEndpointLocator<T> endpointLocate(Class<T> endpointType) {
-        return endpoints.endpointFind(endpointType);
+    public <T extends LocalEndpoint> T endpointCreate(MaritimeId id, Class<T> endpointType) {
+        return endpoints.endpointFrom(id, endpointType);
     }
 
     /** {@inheritDoc} */
     @Override
-    public <T extends LocalEndpoint> T endpointCreate(MaritimeId id, Class<T> endpointType) {
-        return endpoints.endpointFrom(id, endpointType);
+    public <T extends LocalEndpoint> MmsEndpointLocator<T> endpointLocate(Class<T> endpointType) {
+        return endpoints.endpointFind(endpointType);
     }
 
     /** {@inheritDoc} */
@@ -149,6 +158,11 @@ public class DefaultMmsClient implements MmsClient {
         return clientInfo.getClientId();
     }
 
+    public <T> EndpointInvocationFuture<T> invokeRemote(MaritimeId receiver, String endpoint, Message parameters,
+            MessageSerializer<? extends Message> serializer, ValueSerializer<T> resultParser) {
+        return endpoints.invokeRemote(receiver, endpoint, parameters, serializer, resultParser);
+    }
+
     /** {@inheritDoc} */
     @Override
     public boolean isClosed() {
@@ -161,7 +175,7 @@ public class DefaultMmsClient implements MmsClient {
         return container.getState() == State.TERMINATED;
     }
 
-    static Container create(MmsClientConfiguration configuration) {
+    public static Container createClient(MmsClientConfiguration configuration) {
         MaritimeId clientId = requireNonNull(configuration.getId());
 
         ContainerConfiguration cc = new ContainerConfiguration();

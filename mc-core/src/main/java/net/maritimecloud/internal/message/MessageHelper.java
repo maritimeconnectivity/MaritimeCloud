@@ -18,6 +18,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -105,32 +106,67 @@ public class MessageHelper {
     }
 
     public static <T extends Message> MessageSerializer<T> getSerializer(T message) {
-        return getSerializer(message.getClass());
+        return getSerializer(message, message.getClass());
     }
 
+    //
+    // @SuppressWarnings("unchecked")
+    // private static <T extends Message> MessageSerializer<T> getSerializer(Class<?> c) {
+    // return getSerializer(null, message.getClass());
+    // }
+
     @SuppressWarnings("unchecked")
-    public static <T extends Message> MessageSerializer<T> getSerializer(Class<?> c) {
+    private static <T extends Message> MessageSerializer<T> getSerializer(T message, Class<?> messageType) {
         try {
-            Field field = c.getField("SERIALIZER");
+            Field field = messageType.getField("SERIALIZER");
             return (MessageSerializer<T>) field.get(null);
         } catch (NoSuchFieldException e) {
+            if (message != null) {
+                try {
+                    Method m = messageType.getMethod("serializer");
+                    return (MessageSerializer<T>) m.invoke(message);
+                } catch (ReflectiveOperationException e1) {
+                    throw new RuntimeException(
+                            "All messages must have a public static final String NAME field or a name() method, offending class = "
+                                    + messageType.getCanonicalName(), e1);
+                }
+            }
             throw new RuntimeException("All messages must have a public static final "
                     + MessageSerializer.class.getSimpleName() + " SERIALIZER field, offending class = "
-                    + c.getCanonicalName());
+                    + messageType.getCanonicalName());
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
 
+    public static String getName(Message message) {
+        return getName(message, message.getClass());
+    }
+
     public static String getName(Class<? extends Message> messageType) {
+        return getName(null, messageType);
+    }
+
+    private static String getName(Message message, Class<? extends Message> messageType) {
         requireNonNull(messageType, "message type is null");
         try {
             Field field = messageType.getField("NAME");
             return (String) field.get(null);
         } catch (NoSuchFieldException e) {
+            // Lets see if they have a name method
+            if (message != null) {
+                try {
+                    Method m = messageType.getMethod("name");
+                    return (String) m.invoke(message);
+                } catch (ReflectiveOperationException e1) {
+                    throw new RuntimeException(
+                            "All messages must have a public static final String NAME field or a name() method, offending class = "
+                                    + messageType.getCanonicalName(), e1);
+                }
+            }
             throw new RuntimeException(
                     "All messages must have a public static final String NAME field, offending class = "
-                            + messageType.getCanonicalName());
+                            + messageType.getCanonicalName(), e);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }

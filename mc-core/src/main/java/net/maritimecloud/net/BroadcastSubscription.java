@@ -26,12 +26,13 @@ public interface BroadcastSubscription {
     /** Permanently stops receiving broadcast for this subscription. */
     void cancel();
 
-    /**
-     * Returns the Java type of broadcast message we are listening for.
-     *
-     * @return the Java type of broadcast message we are listening for
-     */
-    Class<? extends BroadcastMessage> getBroadcastJavaType();
+    //
+    // /**
+    // * Returns the Java type of broadcast message we are listening for.
+    // *
+    // * @return the Java type of broadcast message we are listening for
+    // */
+    // Class<? extends BroadcastMessage> getBroadcastJavaType();
 
     /**
      * Returns the type of broadcast messages that we are listening for.

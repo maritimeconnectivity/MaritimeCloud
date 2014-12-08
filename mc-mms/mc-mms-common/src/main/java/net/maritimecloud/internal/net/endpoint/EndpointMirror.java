@@ -40,11 +40,6 @@ public class EndpointMirror {
         return name;
     }
 
-    public Class<? extends LocalEndpoint> getType() {
-        return c;
-    }
-
-
     public LocalEndpoint instantiate(LocalEndpoint.Invocator invocator) {
         Constructor<?> con;
         try {

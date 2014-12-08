@@ -27,7 +27,12 @@ import net.maritimecloud.internal.net.endpoint.EndpointManager;
 import net.maritimecloud.internal.net.endpoint.EndpointMirror;
 import net.maritimecloud.internal.net.messages.MethodInvoke;
 import net.maritimecloud.internal.net.messages.MethodInvokeResult;
+import net.maritimecloud.internal.net.util.DefaultEndpointInvocationFuture;
+import net.maritimecloud.message.Message;
+import net.maritimecloud.message.MessageSerializer;
+import net.maritimecloud.message.ValueSerializer;
 import net.maritimecloud.net.EndpointImplementation;
+import net.maritimecloud.net.EndpointInvocationFuture;
 import net.maritimecloud.net.EndpointRegistration;
 import net.maritimecloud.net.LocalEndpoint;
 import net.maritimecloud.net.mms.MmsClient;
@@ -93,7 +98,31 @@ public class ClientEndpointManager {
     @SuppressWarnings("unchecked")
     public <T extends LocalEndpoint> T endpointFrom(MaritimeId id, Class<? extends T> endpointType) {
         EndpointMirror m = EndpointMirror.from(endpointType);
-        return (T) m.instantiate(new DefaultEndpointInvocator(this, id, m));
+        return (T) m.instantiate(new DefaultEndpointInvocator(this, id));
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public <T> EndpointInvocationFuture<T> invokeRemote(MaritimeId receiver, String endpoint, Message parameters,
+            MessageSerializer<? extends Message> serializer, ValueSerializer<T> resultParser) {
+        requireNonNull(endpoint, "endpoint is null");
+        requireNonNull(parameters, "parameters is null");
+
+        MethodInvoke ei = new MethodInvoke();
+        ei.setMessageId(Binary.random(32));
+        ei.setEndpointMethod(endpoint);
+        // Vi skal have en serializer med i metoden
+        ei.setParameters(MessageSerializer.writeToJSON(parameters, (MessageSerializer) serializer));
+        if (receiver != null) {
+            ei.setReceiverId(receiver.toString());
+        }
+        ei.setSenderId(clientInfo.getClientId().toString());
+
+        DefaultEndpointInvocationFuture<T> result = threadManager.create(ei.getMessageId());
+
+        result.recivedByCloud = connection.sendMessage(ei);
+        invokers.put(ei.getMessageId(), new RemoteInvocation(result, resultParser));
+
+        return result;
     }
 
     /**

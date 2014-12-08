@@ -22,8 +22,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.maritimecloud.msdl.MsdlPlugin;
+import net.maritimecloud.msdl.MsdlProcessor;
 import net.maritimecloud.msdl.model.BroadcastMessageDeclaration;
 import net.maritimecloud.msdl.model.EndpointDefinition;
 import net.maritimecloud.msdl.model.EnumDeclaration;
@@ -137,5 +140,16 @@ public class JavaGenPlugin extends MsdlPlugin {
 
     public static JavaGenPlugin create(String path) {
         return create(Paths.get(path));
+    }
+
+    public static void generateSingleFile(String source, String file, String destination) {
+        Logger lo = Logger.getLogger("msdl");
+        lo.setLevel(Level.FINE);
+        MsdlProcessor g = new MsdlProcessor();
+        g.setSourceDirectory(Paths.get(source));
+        g.addDependencyDirectory(Paths.get(source));
+        g.addFile(file);
+        g.addPlugin(JavaGenPlugin.create(destination));
+        g.executePlugins();
     }
 }
