@@ -62,6 +62,7 @@ public final class ConnectionTransportJsr356 extends ConnectionTransport { // Cl
 
     /** {@inheritDoc} */
     public void connectBlocking(URI uri, long time, TimeUnit unit) throws IOException {
+        System.out.println("Trying to connect");
         CountDownLatch done = new CountDownLatch(1);
         Thread t = Thread.currentThread();
         Runnable r = () -> {

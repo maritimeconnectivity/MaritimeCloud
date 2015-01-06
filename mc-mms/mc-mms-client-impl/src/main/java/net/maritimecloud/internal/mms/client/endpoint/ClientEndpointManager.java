@@ -39,6 +39,7 @@ import net.maritimecloud.net.mms.MmsClient;
 import net.maritimecloud.net.mms.MmsClientClosedException;
 import net.maritimecloud.net.mms.MmsEndpointLocator;
 import net.maritimecloud.util.Binary;
+import net.maritimecloud.util.Timestamp;
 
 /**
  *
@@ -115,6 +116,7 @@ public class ClientEndpointManager {
         if (receiver != null) {
             ei.setReceiverId(receiver.toString());
         }
+        ei.setSenderTimestamp(Timestamp.now());
         ei.setSenderId(clientInfo.getClientId().toString());
 
         DefaultEndpointInvocationFuture<T> result = threadManager.create(ei.getMessageId());
@@ -146,7 +148,7 @@ public class ClientEndpointManager {
     }
 
     void onMethodInvoke(MethodInvoke message) {
-        connection.sendMessage(em.execute(message));
+        em.execute(message, e -> connection.sendMessage(e));
     }
 
     void onMethodInvokeResult(MethodInvokeResult m) {

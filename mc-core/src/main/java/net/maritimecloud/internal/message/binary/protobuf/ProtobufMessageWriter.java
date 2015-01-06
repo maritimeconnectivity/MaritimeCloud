@@ -20,12 +20,11 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Map;
 
+import net.maritimecloud.internal.core.com.google.protobuf.CodedOutputStream;
 import net.maritimecloud.internal.message.binary.AbstractBinaryMessageWriter;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.message.ValueSerializer;
-
-import com.google.protobuf.CodedOutputStream;
 
 /**
  *

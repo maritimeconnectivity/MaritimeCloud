@@ -18,13 +18,12 @@ import java.util.Collections;
 
 import net.maritimecloud.internal.net.endpoint.EndpointManager;
 import net.maritimecloud.internal.net.messages.MethodInvoke;
-import net.maritimecloud.internal.net.messages.MethodInvokeResult;
 import net.maritimecloud.mms.server.connectionold.ServerConnection;
 import net.maritimecloud.net.EndpointImplementation;
 import net.maritimecloud.net.MessageHeader;
 
 import org.cakeframework.container.Container;
-import org.cakeframework.container.spi.InstanceofHandler;
+import org.cakeframework.container.lifecycle.InstanceofHandler;
 
 /**
  *
@@ -43,8 +42,7 @@ public class ServerEndpointManager extends InstanceofHandler<Container, Endpoint
     }
 
     public void invokeLocally(ServerConnection con, MethodInvoke i) {
-        MethodInvokeResult result = em.execute(i, Collections.singletonMap(CONNECTION, con));
-        con.messageSend(result);
+        em.execute(i, Collections.singletonMap(CONNECTION, con), e -> con.messageSend(e));
     }
 
     public static ServerConnection connection(MessageHeader header) {

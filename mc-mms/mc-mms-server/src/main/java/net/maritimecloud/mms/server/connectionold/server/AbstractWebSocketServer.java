@@ -33,8 +33,8 @@ import net.maritimecloud.mms.server.MmsServerConfiguration;
 import net.maritimecloud.mms.server.connectionold.transport.DefaultServerEndpoint;
 import net.maritimecloud.mms.server.connectionold.transport.ServerTransport;
 
-import org.cakeframework.container.RunOnStart;
-import org.cakeframework.container.RunOnStop;
+import org.cakeframework.container.lifecycle.RunOnStart;
+import org.cakeframework.container.lifecycle.RunOnStop;
 import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;

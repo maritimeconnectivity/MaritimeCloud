@@ -21,14 +21,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import net.maritimecloud.internal.core.com.google.protobuf.CodedOutputStream;
 import net.maritimecloud.internal.message.binary.AbstractBinaryValueWriter;
 import net.maritimecloud.internal.message.binary.BinaryUtils;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.message.ValueSerializer;
 import net.maritimecloud.util.Binary;
-
-import com.google.protobuf.CodedOutputStream;
 
 /**
  * A compact binary value writer.

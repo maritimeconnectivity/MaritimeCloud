@@ -20,6 +20,9 @@ import static java.util.Objects.requireNonNull;
 import static net.maritimecloud.util.geometry.CoordinateConverter.compass2cartesian;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
 
 import net.maritimecloud.internal.message.BinaryUtil;
 import net.maritimecloud.message.MessageReader;
@@ -208,6 +211,32 @@ public class PositionTime extends Position {
 
     public static PositionTime create(Position position, long time) {
         return create(position.latitude, position.longitude, time);
+    }
+
+    public static PositionTime create(String pos) {
+        String[] spli = pos.split(",");
+
+        if (spli.length == 2 || spli.length == 3) {
+            DecimalFormat df = new DecimalFormat();
+            DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+            symbols.setDecimalSeparator('.');
+            symbols.setGroupingSeparator(' ');
+            df.setDecimalFormatSymbols(symbols);
+            double lat, lon;
+            try {
+                lat = df.parse(spli[0]).doubleValue();
+            } catch (ParseException e) {
+                throw new IllegalArgumentException("'" + spli[0] + "' is not a valid degree latitude");
+            }
+            try {
+                lon = df.parse(spli[1]).doubleValue();
+            } catch (ParseException e) {
+                throw new IllegalArgumentException("'" + spli[1] + "' is not a valid degree longitude");
+            }
+            return PositionTime.create(lat, lon, System.currentTimeMillis());
+        }
+        throw new IllegalArgumentException("Position was not valid '" + pos
+                + "' must be lat, lon in decimal degrees, example '23.23, -23.12'");
     }
 
     static final double linearInterpolation(double y1, long x1, double y2, long x2, long x) {

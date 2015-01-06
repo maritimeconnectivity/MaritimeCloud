@@ -23,12 +23,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.json.JsonObject;
-import javax.json.JsonReader;
-import javax.json.JsonString;
-import javax.json.JsonValue;
-import javax.json.spi.JsonProvider;
-
+import net.maritimecloud.internal.core.javax.json.JsonObject;
+import net.maritimecloud.internal.core.javax.json.JsonReader;
+import net.maritimecloud.internal.core.javax.json.JsonString;
+import net.maritimecloud.internal.core.javax.json.JsonValue;
+import net.maritimecloud.internal.core.javax.json.spi.JsonProvider;
 import net.maritimecloud.internal.message.AbstractMessageReader;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageEnum;
@@ -146,9 +145,9 @@ public class JsonMessageReader extends AbstractMessageReader {
     }
 
     static class JsonIterator {
-        Iterator<Entry<String, javax.json.JsonValue>> iter;
+        Iterator<Entry<String, net.maritimecloud.internal.core.javax.json.JsonValue>> iter;
 
-        private Entry<String, javax.json.JsonValue> next;
+        private Entry<String, net.maritimecloud.internal.core.javax.json.JsonValue> next;
 
         final JsonObject o;
 
@@ -164,8 +163,8 @@ public class JsonMessageReader extends AbstractMessageReader {
             return next != null;
         }
 
-        Entry<String, javax.json.JsonValue> next() {
-            Entry<String, javax.json.JsonValue> n = next;
+        Entry<String, net.maritimecloud.internal.core.javax.json.JsonValue> next() {
+            Entry<String, net.maritimecloud.internal.core.javax.json.JsonValue> n = next;
             if (iter.hasNext()) {
                 next = iter.next();
             } else {
@@ -174,7 +173,7 @@ public class JsonMessageReader extends AbstractMessageReader {
             return n;
         }
 
-        Entry<String, javax.json.JsonValue> peek() {
+        Entry<String, net.maritimecloud.internal.core.javax.json.JsonValue> peek() {
             return next;
         }
     }

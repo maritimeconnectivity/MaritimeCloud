@@ -28,29 +28,17 @@ import net.maritimecloud.msdl.model.MsdlFile;
  */
 public class Directory {
 
-    final Directory parent;
+    final TreeMap<String, Directory> directory = new TreeMap<>();
+
+    final TreeMap<String, MsdlFile> files = new TreeMap<>();
 
     final String name;
+
+    final Directory parent;
 
     Directory(Directory parent, String name) {
         this.parent = parent;
         this.name = name;
-    }
-
-    final TreeMap<String, MsdlFile> files = new TreeMap<>();
-
-    final TreeMap<String, Directory> directory = new TreeMap<>();
-
-
-    MessageDeclaration getMessage(String name) {
-        for (MsdlFile f : files.values()) {
-            for (MessageDeclaration d : f.getMessages()) {
-                if (d.getName().equals(name)) {
-                    return d;
-                }
-            }
-        }
-        return null;
     }
 
     BroadcastMessageDeclaration getBroadcastMessage(String name) {
@@ -64,16 +52,34 @@ public class Directory {
         return null;
     }
 
-
-    EndpointMethod getEndpointMethod(String endpointName, String functionName) {
+    EndpointDefinition getEndpointDefinition(String endpointName) {
         for (MsdlFile f : files.values()) {
             for (EndpointDefinition d : f.getEndpoints()) {
                 if (d.getName().equals(endpointName)) {
-                    for (EndpointMethod m : d.getFunctions()) {
-                        if (m.getName().equals(functionName)) {
-                            return m;
-                        }
-                    }
+                    return d;
+                }
+            }
+        }
+        return null;
+    }
+
+    EndpointMethod getEndpointMethod(String endpointName, String functionName) {
+        EndpointDefinition def = getEndpointDefinition(endpointName);
+        if (def != null) {
+            for (EndpointMethod m : def.getFunctions()) {
+                if (m.getName().equals(functionName)) {
+                    return m;
+                }
+            }
+        }
+        return null;
+    }
+
+    MessageDeclaration getMessage(String name) {
+        for (MsdlFile f : files.values()) {
+            for (MessageDeclaration d : f.getMessages()) {
+                if (d.getName().equals(name)) {
+                    return d;
                 }
             }
         }

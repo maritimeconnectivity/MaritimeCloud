@@ -24,9 +24,8 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.json.JsonReader;
-import javax.json.spi.JsonProvider;
-
+import net.maritimecloud.internal.core.javax.json.JsonReader;
+import net.maritimecloud.internal.core.javax.json.spi.JsonProvider;
 import net.maritimecloud.internal.message.TaggableMessageWriter;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageReader;

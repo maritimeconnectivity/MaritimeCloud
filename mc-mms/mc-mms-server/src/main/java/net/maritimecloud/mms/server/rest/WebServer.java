@@ -22,9 +22,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.maritimecloud.mms.server.MmsServerConfiguration;
 
-import org.cakeframework.container.RunOnStart;
-import org.cakeframework.container.RunOnStop;
 import org.cakeframework.container.ServiceManager;
+import org.cakeframework.container.lifecycle.RunOnStart;
+import org.cakeframework.container.lifecycle.RunOnStop;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;

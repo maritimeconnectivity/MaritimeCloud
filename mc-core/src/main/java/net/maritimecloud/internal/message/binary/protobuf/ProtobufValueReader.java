@@ -21,13 +21,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import net.maritimecloud.internal.core.com.google.protobuf.CodedInputStream;
 import net.maritimecloud.internal.message.binary.AbstractBinaryValueReader;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.message.ValueSerializer;
 import net.maritimecloud.util.Binary;
-
-import com.google.protobuf.CodedInputStream;
 
 /**
  *

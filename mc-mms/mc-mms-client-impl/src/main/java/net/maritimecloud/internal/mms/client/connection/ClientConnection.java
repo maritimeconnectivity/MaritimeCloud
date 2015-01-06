@@ -35,7 +35,7 @@ import net.maritimecloud.net.mms.MmsClientConfiguration;
 import net.maritimecloud.net.mms.MmsConnection;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 
-import org.cakeframework.container.RunOnStop;
+import org.cakeframework.container.lifecycle.RunOnStop;
 
 /**
  *

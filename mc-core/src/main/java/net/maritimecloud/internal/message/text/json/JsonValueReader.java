@@ -24,12 +24,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.json.JsonArray;
-import javax.json.JsonNumber;
-import javax.json.JsonObject;
-import javax.json.JsonString;
-import javax.json.JsonValue;
-
+import net.maritimecloud.internal.core.javax.json.JsonArray;
+import net.maritimecloud.internal.core.javax.json.JsonNumber;
+import net.maritimecloud.internal.core.javax.json.JsonObject;
+import net.maritimecloud.internal.core.javax.json.JsonString;
+import net.maritimecloud.internal.core.javax.json.JsonValue;
 import net.maritimecloud.internal.message.text.AbstractTextValueReader;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageSerializer;

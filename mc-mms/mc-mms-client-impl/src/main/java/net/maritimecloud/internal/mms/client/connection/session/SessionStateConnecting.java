@@ -145,7 +145,6 @@ public final class SessionStateConnecting extends SessionState {
         if (session.sessionId != null) { // reconnecting or not
             h.setSessionId(session.sessionId);
             h.setLastReceivedMessageId(session.latestReceivedId);
-
         }
 
         // Set current position

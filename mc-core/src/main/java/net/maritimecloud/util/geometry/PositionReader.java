@@ -16,6 +16,14 @@ package net.maritimecloud.util.geometry;
 
 import static java.util.Objects.requireNonNull;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+
 /**
  * A interface describing a way to get the current position (and timestamp of the reading) for an object.
  * <p>
@@ -76,5 +84,45 @@ public abstract class PositionReader {
     public static PositionReader nativeReader() {
         // Taenker man saetter en System property, og saa cacher vi den
         throw new UnsupportedOperationException("This method is not supported on the current platform");
+    }
+
+    public static PositionReader fromString(String pos) {
+        pos = pos.trim();
+        if (pos.startsWith("file:///")) {
+            try {
+                URL url = new URL(pos);
+                Path p = Paths.get(url.toURI());
+                return new FileReader(p);
+            } catch (IOException | URISyntaxException e) {
+                throw new IllegalArgumentException("Not a valid file url '" + pos + "'", e);
+            }
+        } else {
+            return fixedPosition(PositionTime.create(pos));
+        }
+    }
+
+    static class FileReader extends PositionReader {
+
+        final Path p;
+
+        FileReader(Path p) {
+            this.p = requireNonNull(p);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public PositionTime getCurrentPosition() {
+            try {
+                List<String> readAllLines = Files.readAllLines(p);
+                if (readAllLines.size() > 0) {
+                    return PositionTime.create(readAllLines.get(0));
+                }
+                throw new IllegalStateException("File was empty at '" + p + "'");
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                throw new IllegalStateException("Could not read position from '" + p + "'", e);
+            }
+        }
+
     }
 }

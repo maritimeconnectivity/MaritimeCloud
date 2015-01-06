@@ -33,5 +33,10 @@
       <artifactId>mc-core</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>net.maritimecloud.msdl</groupId>
+      <artifactId>mc-msdl-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 </project>

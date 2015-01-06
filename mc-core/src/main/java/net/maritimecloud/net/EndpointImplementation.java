@@ -14,6 +14,8 @@
  */
 package net.maritimecloud.net;
 
+import java.util.concurrent.CompletableFuture;
+
 import net.maritimecloud.message.MessageReader;
 import net.maritimecloud.message.ValueWriter;
 
@@ -47,4 +49,9 @@ public interface EndpointImplementation {
      */
     void invoke(String name, MessageHeader header, MessageReader parameterReader, ValueWriter resultWriter)
             throws Exception;
+
+    default void invokeAsync(String name, MessageHeader header, MessageReader parameterReader,
+            ValueWriter resultWriter, CompletableFuture<Void> f) {
+        throw new UnsupportedOperationException();
+    }
 }

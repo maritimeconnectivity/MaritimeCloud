@@ -79,8 +79,12 @@ public class ServerServices extends AbstractServices {
 
         // Sort by distance
         List<Entry<Target, PositionTime>> l = new ArrayList<>(map.entrySet());
-        Collections.sort(l, (o1, o2) -> Double.compare(o1.getValue().geodesicDistanceTo(pos), o2.getValue()
-                .geodesicDistanceTo(pos)));
+        if (pos != null) {
+            Collections.sort(
+                    l,
+                    (o1, o2) -> Double.compare(o1.getValue().geodesicDistanceTo(pos),
+                            o2.getValue().geodesicDistanceTo(pos)));
+        }
 
         // If we have a maximum number of results, filter the list
         if (l.size() > max) {

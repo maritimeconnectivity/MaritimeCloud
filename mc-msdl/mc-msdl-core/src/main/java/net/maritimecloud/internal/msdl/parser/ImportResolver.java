@@ -33,6 +33,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import net.maritimecloud.internal.msdl.parser.ParsedMsdlFile.Import;
 import net.maritimecloud.msdl.MsdlLogger;
 import net.maritimecloud.msdl.MsdlPluginException;
 
@@ -60,7 +61,8 @@ class ImportResolver implements Iterable<ParsedMsdlFile> {
         this.logger = requireNonNull(logger);
     }
 
-    ParsedMsdlFile resolveImport(ParsedProject project, String name) throws IOException {
+    ParsedMsdlFile resolveImport(ParsedProject project, ParsedMsdlFile file, Import imp) throws IOException {
+        String name = imp.getName();
         ParsedMsdlFile f = resolvedDependency.get(name);
         if (f != null) {
             return f;
@@ -97,7 +99,7 @@ class ImportResolver implements Iterable<ParsedMsdlFile> {
             Enumeration<URL> resources = ImportResolver.class.getClassLoader().getResources(name);
             List<URL> l = Collections.list(resources);
             if (l.isEmpty()) {
-                logger.error("Could not find import " + name);
+                file.error(imp.importContext, "Could not find import '" + name + "'");
             } else if (l.size() == 1) {
                 f = project.parseFile(l.get(0));
                 if (l.size() > 1) {
@@ -140,8 +142,8 @@ class ImportResolver implements Iterable<ParsedMsdlFile> {
         LinkedList<ParsedMsdlFile> unImportedFiles = new LinkedList<>(initial);
         while (!unImportedFiles.isEmpty()) {
             ParsedMsdlFile pf = unImportedFiles.poll();
-            for (String importLocation : pf.imports) {
-                ParsedMsdlFile imp = resolveImport(project, importLocation);
+            for (Import importLocation : pf.imports) {
+                ParsedMsdlFile imp = resolveImport(project, pf, importLocation);
                 if (imp != null) {
                     if (!allFiles.contains(imp)) {
                         allFiles.add(imp);

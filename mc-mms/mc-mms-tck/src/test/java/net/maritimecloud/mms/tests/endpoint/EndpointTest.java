@@ -14,6 +14,7 @@
  */
 package net.maritimecloud.mms.tests.endpoint;
 
+import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -65,6 +66,7 @@ public class EndpointTest extends AbstractNetworkTest {
         EndpointRegistration sr1 = c1.endpointRegister(new AbstractTestEndpoint() {
             @Override
             protected List<Long> invokeIt(MessageHeader context, List<TestMessage> li) {
+                requireNonNull(context.getSenderTime());
                 ArrayList<Long> result = new ArrayList<>();
                 for (TestMessage m : li) {
                     result.add(m.getF1().stream().mapToLong(e -> e).sum());
@@ -86,6 +88,8 @@ public class EndpointTest extends AbstractNetworkTest {
         EndpointRegistration sr = c1.endpointRegister(new AbstractTestEndpoint() {
             @Override
             protected List<Long> invokeIt(MessageHeader context, List<TestMessage> li) {
+                requireNonNull(context.getSenderTime());
+
                 ArrayList<Long> result = new ArrayList<>();
                 for (TestMessage m : li) {
                     result.add(m.getF1().stream().mapToLong(e -> e).sum());

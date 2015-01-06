@@ -34,7 +34,7 @@ import net.maritimecloud.net.MessageHeader;
 import net.maritimecloud.util.geometry.Area;
 import net.maritimecloud.util.geometry.PositionTime;
 
-import org.cakeframework.container.RunOnStart;
+import org.cakeframework.container.lifecycle.RunOnStart;
 import org.cakeframework.util.concurrent.ThreadManager;
 
 /**

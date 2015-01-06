@@ -47,7 +47,7 @@ class ParsedMsdlFile implements MsdlFile {
 
     final List<AbstractContainer> containers = new ArrayList<>();
 
-    final ArrayList<String> imports = new ArrayList<>();
+    final ArrayList<Import> imports = new ArrayList<>();
 
     String namespace;
 
@@ -128,9 +128,7 @@ class ParsedMsdlFile implements MsdlFile {
     private void parseImports() {
         for (ImportDeclarationContext importContext : antlrFile.getCompilationUnit().importDeclaration()) {
             if (importContext.getChild(1) != null) {
-                String p = importContext.getChild(1).getText();
-                p = p.substring(1, p.length() - 1);
-                imports.add(p);
+                imports.add(new Import(importContext));
             }
         }
     }
@@ -162,5 +160,18 @@ class ParsedMsdlFile implements MsdlFile {
 
     public String toString() {
         return antlrFile.getPath().toString();
+    }
+
+    static class Import {
+        final ImportDeclarationContext importContext;
+
+        Import(ImportDeclarationContext importContext) {
+            this.importContext = requireNonNull(importContext);
+        }
+
+        public String getName() {
+            String p = importContext.getChild(1).getText();
+            return p.substring(1, p.length() - 1);
+        }
     }
 }

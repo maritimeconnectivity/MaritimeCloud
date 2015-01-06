@@ -57,7 +57,7 @@ public final class SessionStateConnected extends SessionState {
         s.fullyLock();
         try {
             if (s.state == connecting) {
-
+                LOGGER.info("Connected to  " + connecting.uri);
                 if (existingSessionId == null) { // New session
                     LOGGER.debug("Created new session with id " + newSessionId);
                     s.sessionId = newSessionId;

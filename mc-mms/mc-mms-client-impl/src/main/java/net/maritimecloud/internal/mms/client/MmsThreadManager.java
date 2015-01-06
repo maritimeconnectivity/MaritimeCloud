@@ -35,8 +35,8 @@ import net.maritimecloud.internal.util.ConcurrentWeakHashSet;
 import net.maritimecloud.net.mms.MmsClientClosedException;
 import net.maritimecloud.util.Binary;
 
-import org.cakeframework.container.RunOnStart;
-import org.cakeframework.container.RunOnStop;
+import org.cakeframework.container.lifecycle.RunOnStart;
+import org.cakeframework.container.lifecycle.RunOnStop;
 
 /**
  *

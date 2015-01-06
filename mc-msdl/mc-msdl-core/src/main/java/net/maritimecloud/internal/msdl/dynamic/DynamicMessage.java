@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +55,7 @@ public class DynamicMessage implements Message {
 
     final String fullName;
 
-    final HashMap<FieldOrParameter, Object> values = new HashMap<>();
+    final LinkedHashMap<FieldOrParameter, Object> values = new LinkedHashMap<>();
 
     public DynamicMessage(String fullName, Collection<FieldOrParameter> col) {
         this.fullName = fullName;

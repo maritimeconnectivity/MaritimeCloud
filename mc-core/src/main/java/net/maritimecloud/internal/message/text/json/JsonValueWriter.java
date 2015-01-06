@@ -200,4 +200,12 @@ public class JsonValueWriter extends AbstractTextValueWriter implements Taggable
         }
         return sw.toString();
     }
+
+    public static <T> String writeValueTo(int indent, T message, ValueSerializer<T> serializer) throws IOException {
+        StringWriter sw = new StringWriter();
+        try (JsonValueWriter jvv = new JsonValueWriter(sw, indent)) {
+            serializer.write(message, jvv);
+        }
+        return sw.toString();
+    }
 }

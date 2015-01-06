@@ -16,8 +16,8 @@ package net.maritimecloud.internal.mms.client.connection.transport;
 
 import net.maritimecloud.net.mms.MmsConnection;
 
-import org.cakeframework.container.RunOnStart;
-import org.cakeframework.container.RunOnStop;
+import org.cakeframework.container.lifecycle.RunOnStart;
+import org.cakeframework.container.lifecycle.RunOnStop;
 import org.eclipse.jetty.websocket.jsr356.ClientContainer;
 
 /**

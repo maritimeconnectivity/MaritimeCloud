@@ -16,6 +16,7 @@ package net.maritimecloud.internal.msdl.db;
 
 import net.maritimecloud.internal.msdl.parser.antlr.StringUtil;
 import net.maritimecloud.msdl.model.BroadcastMessageDeclaration;
+import net.maritimecloud.msdl.model.EndpointDefinition;
 import net.maritimecloud.msdl.model.EndpointMethod;
 import net.maritimecloud.msdl.model.MessageDeclaration;
 import net.maritimecloud.msdl.model.MsdlFile;
@@ -63,6 +64,20 @@ public class DefaultMsdlDatabase {
             }
         }
         return current.getBroadcastMessage(spl[spl.length - 1]);
+    }
+
+    public EndpointDefinition getEndpointDefinition(String path) {
+        Directory current = root;
+        String[] spl = path.split("\\.");
+        if (spl.length > 1) {
+            for (int i = 0; i < spl.length - 1; i++) {
+                if (!current.directory.containsKey(spl[i])) {
+                    return null;
+                }
+                current = current.directory.get(spl[i]);
+            }
+        }
+        return current.getEndpointDefinition(spl[spl.length - 1]);
     }
 
     public EndpointMethod getEndpointMethod(String path) {

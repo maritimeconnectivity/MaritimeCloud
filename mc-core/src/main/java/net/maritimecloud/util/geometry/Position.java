@@ -140,6 +140,12 @@ public class Position implements Message, Serializable {
                 other.getLongitude(), VincentyCalculationType.INITIAL_BEARING);
     }
 
+    public static void main(String[] args) {
+        System.out.println(Position.create(0, 0).getCell(1));
+        System.out.println(Position.create(-90, -180).getCell(1));
+        System.out.println(Position.create(-90, 180).getCell(1));
+    }
+
     public long getCell(double degress) {
         if (degress < 0.0001) {
             throw new IllegalArgumentException("degress = " + degress);
