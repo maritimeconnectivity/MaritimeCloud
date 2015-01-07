@@ -60,16 +60,21 @@ class DefaultEndpointLocator<T extends LocalEndpoint> implements MmsEndpointLoca
     // throw new UnsupportedOperationException("Not implemented yet");
     // }
     //
-    // /** {@inheritDoc} */
-    // @Override
-    // public EndpointInvocationFuture<T> findNearest() {
-    // throw new UnsupportedOperationException("Not implemented yet");
-    // }
+    /** {@inheritDoc} */
+    @Override
+    public EndpointInvocationFuture<T> findNearest() {
+        Services s = cem.endpointFrom(null, Services.class);
+        EndpointInvocationFuture<List<String>> f = s.locate(mirror.getName(), distance, 1);
+        return f.thenApply(e -> {
+            List<T> li = fromIds(e);
+            return li.isEmpty() ? null : li.get(0);
+        });
+    }
 
     /** {@inheritDoc} */
-    public EndpointInvocationFuture<List<T>> findAll() {
+    public EndpointInvocationFuture<List<T>> findAll(int maximumResults) {
         Services s = cem.endpointFrom(null, Services.class);
-        EndpointInvocationFuture<List<String>> f = s.locate(mirror.getName(), distance, Integer.MAX_VALUE);
+        EndpointInvocationFuture<List<String>> f = s.locate(mirror.getName(), distance, maximumResults);
         return f.thenApply(e -> fromIds(e));
     }
 

@@ -16,6 +16,7 @@ package net.maritimecloud.internal.mms.client.endpoint;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.maritimecloud.core.id.MaritimeId;
@@ -40,6 +41,7 @@ import net.maritimecloud.net.mms.MmsClientClosedException;
 import net.maritimecloud.net.mms.MmsEndpointLocator;
 import net.maritimecloud.util.Binary;
 import net.maritimecloud.util.Timestamp;
+import net.maritimecloud.util.geometry.PositionTime;
 
 /**
  *
@@ -117,6 +119,10 @@ public class ClientEndpointManager {
             ei.setReceiverId(receiver.toString());
         }
         ei.setSenderTimestamp(Timestamp.now());
+        Optional<PositionTime> r = clientInfo.getCurrentPosition();
+        if (r.isPresent()) {
+            ei.setSenderPosition(r.get());
+        }
         ei.setSenderId(clientInfo.getClientId().toString());
 
         DefaultEndpointInvocationFuture<T> result = threadManager.create(ei.getMessageId());

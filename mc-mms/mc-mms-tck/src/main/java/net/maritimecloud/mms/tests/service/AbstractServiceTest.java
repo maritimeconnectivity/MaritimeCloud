@@ -14,7 +14,12 @@
  */
 package net.maritimecloud.mms.tests.service;
 
+import java.util.concurrent.TimeUnit;
+
+import net.maritimecloud.mms.stubs.AbstractHelloWorldEndpoint;
 import net.maritimecloud.mms.tests.AbstractNetworkTest;
+import net.maritimecloud.net.MessageHeader;
+import net.maritimecloud.net.mms.MmsClient;
 
 /**
  *
@@ -22,9 +27,14 @@ import net.maritimecloud.mms.tests.AbstractNetworkTest;
  */
 public abstract class AbstractServiceTest extends AbstractNetworkTest {
 
-    // public MaritimeCloudClient registerService(MaritimeCloudClient pnc, String reply) throws Exception {
-    // pnc.serviceRegister(HelloService.GET_NAME, HelloService.create(reply)).awaitRegistered(5, TimeUnit.SECONDS);
-    // return pnc;
-    // }
+    public MmsClient registerService(MmsClient pnc, String reply) throws Exception {
+        pnc.endpointRegister(new AbstractHelloWorldEndpoint() {
+            @Override
+            protected String hello(MessageHeader context) {
+                return "hello";
+            }
+        }).awaitRegistered(5, TimeUnit.SECONDS);
+        return pnc;
+    }
 
 }

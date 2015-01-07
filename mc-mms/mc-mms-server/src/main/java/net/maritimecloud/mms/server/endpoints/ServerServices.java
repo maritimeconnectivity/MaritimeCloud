@@ -28,7 +28,6 @@ import net.maritimecloud.mms.server.targets.Target;
 import net.maritimecloud.mms.server.targets.TargetManager;
 import net.maritimecloud.net.MessageHeader;
 import net.maritimecloud.util.geometry.Area;
-import net.maritimecloud.util.geometry.Circle;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
 
@@ -55,7 +54,7 @@ public class ServerServices extends AbstractServices {
      * @return a sorted list of the targets that was found sorted by distance to the target doing the search
      */
     List<Entry<Target, PositionTime>> findServices(Target target, String endpointName, Position pos, double m, int max) {
-        double meters = m <= 0 ? Integer.MAX_VALUE : m;
+        double meters = m <= 0 ? Double.MAX_VALUE : m;
 
         final ConcurrentHashMap<Target, PositionTime> map = new ConcurrentHashMap<>();
 
@@ -66,11 +65,12 @@ public class ServerServices extends AbstractServices {
                 }
             });
         } else {
-            Area a = Circle.create(pos, meters);
             // Find all services with the area
-            tracker.forEachWithinArea(a, (tt, r) -> {
+            tracker.forEachTarget((tt, pt) -> {
                 if (tt.getEndpointManager().hasService(endpointName)) {
-                    map.put(tt, r);
+                    if (pt.geodesicDistanceTo(pos) <= meters) {
+                        map.put(tt, pt);
+                    }
                 }
             });
         }
@@ -88,7 +88,7 @@ public class ServerServices extends AbstractServices {
 
         // If we have a maximum number of results, filter the list
         if (l.size() > max) {
-            l = l.subList(0, max);
+            l = new ArrayList<>(l.subList(0, max));
         }
 
         return l;

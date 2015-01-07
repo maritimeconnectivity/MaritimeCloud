@@ -29,7 +29,16 @@ public interface MmsEndpointLocator<T extends LocalEndpoint> {
 
     // EndpointInvocationFuture<T> findWithMMSINumber(int mmsiNumber);
 
-    // EndpointInvocationFuture<T> findNearest();
+    EndpointInvocationFuture<T> findNearest();
 
-    EndpointInvocationFuture<List<T>> findAll();
+    /**
+     * Find all endpoints.
+     *
+     * @return the endpoints
+     */
+    default EndpointInvocationFuture<List<T>> findAll() {
+        return findAll(Integer.MAX_VALUE);
+    }
+
+    EndpointInvocationFuture<List<T>> findAll(int maximum);
 }
