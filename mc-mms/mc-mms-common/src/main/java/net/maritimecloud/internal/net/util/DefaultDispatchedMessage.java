@@ -29,7 +29,7 @@ import net.maritimecloud.util.geometry.Position;
  */
 public class DefaultDispatchedMessage implements DispatchedMessage, StoredMessage {
 
-    protected final DefaultAcknowledgement acknowledgement;
+    protected final DefaultAcknowledgement relayed;
 
     protected final Binary hash;
 
@@ -44,7 +44,7 @@ public class DefaultDispatchedMessage implements DispatchedMessage, StoredMessag
         this.hash = requireNonNull(hash);
         this.position = requireNonNull(position);
         this.timestamp = requireNonNull(timestamp);
-        this.acknowledgement = requireNonNull(acknowledgement);
+        this.relayed = requireNonNull(acknowledgement);
     }
 
     /** {@inheritDoc} */
@@ -68,7 +68,7 @@ public class DefaultDispatchedMessage implements DispatchedMessage, StoredMessag
     /** {@inheritDoc} */
     @Override
     public Acknowledgement relayed() {
-        return acknowledgement;
+        return relayed;
     }
 
     /** {@inheritDoc} */

@@ -27,14 +27,14 @@ import net.maritimecloud.net.MessageHeader;
 import net.maritimecloud.net.mms.MmsClientClosedException;
 
 /**
- * A dispatched broadcast.
+ * A broadcast that has been sent. Is primarily used for relaying acks back to a user that specifies an ack consumers.
  *
  * @author Kasper Nielsen
  */
 class DispatchedBroadcast extends DefaultDispatchedMessage {
 
-    /** The logger. */
-    private static final Logger LOG = Logger.get(DispatchedBroadcast.class);
+    /** A logger. */
+    static final Logger LOG = Logger.get(DispatchedBroadcast.class);
 
     /** An optional consumer of broadcast acks. */
     final Consumer<? super MessageHeader> ackConsumer;
@@ -56,7 +56,7 @@ class DispatchedBroadcast extends DefaultDispatchedMessage {
      *            the close exception that we should complete with
      */
     void shutdownClient(MmsClientClosedException e) {
-        super.acknowledgement.completeExceptionally(e); // only completes if not allready done so
+        super.relayed.completeExceptionally(e); // only completes if not already complete
     }
 
     /**
@@ -66,15 +66,15 @@ class DispatchedBroadcast extends DefaultDispatchedMessage {
      *            the ack that we received
      */
     void acked(BroadcastAck ack) {
-        if (ackConsumer != null) { // only makes sense if we have ack consumer
+        if (ackConsumer != null) { // only makes sense if user has specified an ack consumer
             try {
                 MaritimeId id = MaritimeId.create(ack.getReceiverId());
                 MessageHeader header = new DefaultMessageHeader(id, ack.getAckForMessageId(),
                         ack.getReceiverTimestamp(), ack.getReceiverPosition());
-                if (!acknowledgement.isDone()) {
-                    // highly unlikely we will get an ack back before the actual acknowledgement.
-                    // But not impossible. So complete it just in case
-                    acknowledgement.complete(null);
+                if (!relayed.isDone()) {
+                    // highly unlikely we will get an ack back before we have registered that the mms server has
+                    // received it. But not impossible. So complete it just in case
+                    relayed.complete(null);
                 }
                 ackConsumer.accept(header);
             } catch (Exception e) {

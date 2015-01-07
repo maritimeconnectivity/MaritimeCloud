@@ -27,16 +27,19 @@ import net.maritimecloud.net.BroadcastMessage;
  */
 public interface BroadcastDeserializer {
 
-    public static final BroadcastDeserializer CLASSPATH_DESERIALIZER = new Impl();
+    /** A deserializer that expects received messages to be on the classpath. */
+    BroadcastDeserializer CLASSPATH_DESERIALIZER = new ClasspathDeserializer();
 
     BroadcastMessage convert(String name, MessageReader r) throws Exception;
 
-    static class Impl implements BroadcastDeserializer {
+    /** An implementation that looks for messages on the classpath. */
+    static class ClasspathDeserializer implements BroadcastDeserializer {
 
         /** {@inheritDoc} */
         @Override
         @SuppressWarnings("unchecked")
         public BroadcastMessage convert(String name, MessageReader r) throws Exception {
+            // right now: msdl message name == full Java class name
             Class<BroadcastMessage> cl = (Class<BroadcastMessage>) Class.forName(name);
             Field field = cl.getField("SERIALIZER");
             MessageSerializer<BroadcastMessage> p = (MessageSerializer<BroadcastMessage>) field.get(null);

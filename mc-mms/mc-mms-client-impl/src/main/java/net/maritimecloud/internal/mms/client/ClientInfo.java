@@ -65,9 +65,13 @@ public class ClientInfo {
 
         try {
             String remote = configuration.getHost();
+
+            // Add default port, if no specific port has been specified
             if (!remote.contains(":")) {
                 remote += ":43234";
             }
+
+            // use standard http (ws instead of wss)
             remote = "ws://" + remote;
 
             // Tomcat does not automatically append a '/' to the host address

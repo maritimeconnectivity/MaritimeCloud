@@ -64,7 +64,7 @@ import org.cakeframework.util.concurrent.ThreadManager;
 public class ClientBroadcastManager {
 
     /** The logger. */
-    private static final Logger LOG = Logger.get(ClientBroadcastManager.class);
+    static final Logger LOG = Logger.get(ClientBroadcastManager.class);
 
     /** The network */
     private final ClientConnection connection;
