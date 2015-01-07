@@ -20,19 +20,19 @@ import net.maritimecloud.internal.util.logging.Logger;
 import net.maritimecloud.util.Binary;
 
 /**
+ * A session is in the connected state whenever there exist an open websocket connection between the client and a MMS
+ * server.
  *
  * @author Kasper Nielsen
  */
 public final class SessionStateConnected extends SessionState {
 
     /** The logger. */
-    private static final Logger LOGGER = Logger.get(SessionStateConnected.class);
+    static final Logger LOGGER = Logger.get(SessionStateConnected.class);
 
+    /** The actual transport used for sending and receiving messages. */
     final ConnectionTransport transport;
 
-    /**
-     * @param session
-     */
     private SessionStateConnected(Session session, ConnectionTransport transport) {
         super(session);
         this.transport = transport;
@@ -51,29 +51,45 @@ public final class SessionStateConnected extends SessionState {
         }
     }
 
-    static void connected(SessionStateConnecting connecting, Binary existingSessionId, Binary newSessionId,
+    /**
+     * Invoked whenever a remote connection has been successfully created.
+     *
+     * @param connectingState
+     *            the connecting state we are transitioning from
+     * @param existingSessionId
+     *            an existing session id if we are reconnecting
+     * @param newSessionId
+     *            a new session id if it is the initial connection
+     * @param lastReceivedMessage
+     *            the id of the last received message id
+     */
+    static void connected(SessionStateConnecting connectingState, Binary existingSessionId, Binary newSessionId,
             long lastReceivedMessage) {
-        Session s = connecting.session;
-        s.fullyLock();
+        Session session = connectingState.session;
+        session.fullyLock();
         try {
-            if (s.state == connecting) {
-                LOGGER.info("Connected to  " + connecting.uri);
+            // only update state if the current state == expected state after fully locking
+            if (session.state == connectingState) {
+                LOGGER.info("Connected to  " + connectingState.uri);
+
                 if (existingSessionId == null) { // New session
                     LOGGER.debug("Created new session with id " + newSessionId);
-                    s.sessionId = newSessionId;
+                    session.sessionId = newSessionId;
                 }
 
-                s.state = new SessionStateConnected(s, connecting.transport);
+                session.state = new SessionStateConnected(session, connectingState.transport);
 
+                // If we are reconnecting make sure we resend messages that have not been acknowledged
                 if (existingSessionId != null) {
                     LOGGER.debug("Reconnected with session id " + existingSessionId);
-                    s.sender.reconnectUnderLock(lastReceivedMessage);
+                    session.sender.reconnectUnderLock(lastReceivedMessage);
                 }
 
-                s.connectionListener.connected(connecting.uri);
+                // invoke user specified connection listeners.
+                session.connectionListener.connected(connectingState.uri);
             }
         } finally {
-            s.fullyUnlock();
+            session.fullyUnlock();
         }
     }
 }

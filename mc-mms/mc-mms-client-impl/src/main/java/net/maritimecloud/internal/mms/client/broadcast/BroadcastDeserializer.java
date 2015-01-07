@@ -22,6 +22,7 @@ import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.net.BroadcastMessage;
 
 /**
+ * A broadcast deserializer takes care of creating {@link BroadcastMessage} instances.
  *
  * @author Kasper Nielsen
  */

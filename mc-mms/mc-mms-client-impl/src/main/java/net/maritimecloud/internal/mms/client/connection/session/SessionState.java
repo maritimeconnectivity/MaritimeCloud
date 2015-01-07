@@ -18,10 +18,12 @@ import static java.util.Objects.requireNonNull;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 
 /**
+ * A particular state in a session.
  *
  * @author Kasper Nielsen
  */
 public class SessionState {
+
     final Session session;
 
     SessionState(Session session) {
