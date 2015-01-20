@@ -61,12 +61,24 @@ class ImportResolver implements Iterable<ParsedMsdlFile> {
         this.logger = requireNonNull(logger);
     }
 
+    void addResolvedFile(String name, ParsedMsdlFile f) {
+        logger.debug("Adding resolved file " + name + " -> " + f.antlrFile.getPath() + " as dependency");
+        name = name.replace('\\', '/'); // handling windows paths
+        resolvedDependency.put(name, f);
+    }
+
     ParsedMsdlFile resolveImport(ParsedProject project, ParsedMsdlFile file, Import imp) throws IOException {
+
+        logger.debug("Trying to resolve import: " + imp.importContext);
+
         String name = imp.getName();
+        // lets see if we already resolved it
         ParsedMsdlFile f = resolvedDependency.get(name);
         if (f != null) {
             return f;
         }
+
+        // make sure we have found all dependencies
         if (dependencies == null) {
             dependencies = new LinkedHashMap<>();
             for (final Path root : directories) {
@@ -79,6 +91,7 @@ class ImportResolver implements Iterable<ParsedMsdlFile> {
                                 logger.warn("Multiple files named '" + p + " existed, ignore second file, first = "
                                         + dependencies.get(p) + ", second = " + file);
                             } else {
+                                logger.debug("Adding " + p + " -> " + file + " as dependency");
                                 dependencies.put(p, file);
                             }
                         }
@@ -93,6 +106,8 @@ class ImportResolver implements Iterable<ParsedMsdlFile> {
                 }
             }
         }
+
+
         Path p = dependencies.get(name);
         if (p == null) {
             // add-> "Looked in ...." list of directories
@@ -100,39 +115,19 @@ class ImportResolver implements Iterable<ParsedMsdlFile> {
             List<URL> l = Collections.list(resources);
             if (l.isEmpty()) {
                 file.error(imp.importContext, "Could not find import '" + name + "'");
-            } else if (l.size() == 1) {
+            } else {
                 f = project.parseFile(l.get(0));
                 if (l.size() > 1) {
                     logger.warn("Multiple files named '" + name + "' existed on the classpath, will use first file: "
                             + l.get(0) + " All = " + l);
                 }
             }
-
-            // List<URL> l;
-            // try {
-            // l = Collections.list(loader == null ? ClassLoader.getSystemResources(name) : loader.getResources(name));
-            // } catch (IOException e) {
-            // throw new ConfigurationException("Error while locating configuration file on the classpath, name =" +
-            // name,
-            // e);
-            // }
-            // if (l.isEmpty()) {
-            // throw new ConfigurationException("Could not locate a configuration file on the classpath named '" + name
-            // + "'");
-            // } else if (l.size() > 1) {
-            // throw new ConfigurationException("Found multiple configuration files named '" + name
-            // + "' on the classpath, paths = " + l);
-            // }
-            // return Configuration.fromURL(l.iterator().next(), charset);
-            //
-            //
-            // look on class path
         } else {
             f = project.parseFile(p);
         }
 
         if (f != null) {
-            resolvedDependency.put(name, f);
+            addResolvedFile(name, f);
         }
         return f;
     }

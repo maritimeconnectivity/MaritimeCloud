@@ -33,6 +33,8 @@ import net.maritimecloud.util.geometry.PositionTime;
  */
 public interface ValueWriter {
 
+    MessageFormatType getFormatType();
+
     @SuppressWarnings("unused")
     default void close() throws IOException {}
 

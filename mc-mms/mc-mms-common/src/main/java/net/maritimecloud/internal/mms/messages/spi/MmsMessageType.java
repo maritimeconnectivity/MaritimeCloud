@@ -51,7 +51,6 @@ enum MmsMessageType {
     /** The final handshake massage from the server, contains the connection id */
     CONNECTED(3, Connected.class, Connected.SERIALIZER), // 2. message from server 2 client
 
-
     /** The final handshake massage from the server, contains the connection id */
     CLOSE(4, Close.class, Close.SERIALIZER), // 2. message from server 2 client
 

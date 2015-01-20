@@ -15,30 +15,15 @@ namespaceDeclaration
     ;
     
 importDeclaration
- //  :   'import' '"' qualifiedName ('.')? '"' ';'
-  :   'import' StringLiteral ';'
-//    :  'import' StringLiteral ';'
+    :   'import' StringLiteral ';'
     ;  
     
 typeDeclaration
-    :   annotation* serviceDeclaration
-    |   annotation* enumDeclaration
+    :   annotation* enumDeclaration
     |   annotation* messageDeclaration
     |   annotation* broadcastDeclaration
     |   annotation* endpointDeclaration
     |   ';'
-    ;
-    
-serviceDeclaration
-    :   'service' Identifier
-        '{'  (serviceBody)*  '}'
-    ;
-
-serviceBody
-    :   messageDeclaration
-    |   enumDeclaration
-    |   broadcastDeclaration
-    |   endpointDeclaration
     ;
 
 messageDeclaration
@@ -49,7 +34,6 @@ messageDeclaration
 broadcastDeclaration
     :    'broadcast' Identifier
          fields
-       //  '=' Digits ';'
     ;
 
 endpointDeclaration
@@ -59,9 +43,7 @@ endpointDeclaration
 
 function
     :    returnType Identifier
-        '('
-        functionArgument? (',' functionArgument)*
-         ')' ';'
+        '(' functionArgument? (',' functionArgument)* ')' ';'
     ;
     
 functionArgument
@@ -69,16 +51,16 @@ functionArgument
     ;
     
 returnType
-    :   'void' |
-        type
+    :   'void' 
+    |   type
     ;
     
 fields
-    :   '{' field*  '}'
+    :   '{' field* '}'
     ;
 
 field 
-    : annotation* Digits ':'  required? type Identifier ';'
+    : annotation* Digits ':' required? type Identifier ';'
     ;
 
 required
@@ -96,20 +78,17 @@ enumBody
 
 
 enumTypeDeclaration
-    :  Identifier '=' Digits ';'
+    :   Identifier '=' Digits ';'
     ;
 
-
-
-
-
-// ANNOTATIONS
 
 annotation
     :   '@' annotationName ( '(' ( elementValuePairs | elementValue )? ')' )?
     ;
 
-annotationName : qualifiedName ;
+annotationName 
+    :   qualifiedName 
+    ;
 
 elementValuePairs
     :   elementValuePair (',' elementValuePair)*
@@ -132,7 +111,6 @@ elementValueArrayInitializer
 qualifiedName
     :   Identifier ('.' Identifier)*
     ;
-
 
 BooleanLiteral
     :   'true'
@@ -166,7 +144,6 @@ StringCharacters
 fragment
 StringCharacter
     :   ~["\\]
-//    |   EscapeSequence
     ;
 
 type
@@ -194,7 +171,6 @@ mapKeyType
    |  'binary'       // Arbitrary bytes (no validation), expressed as hexadecimal
    |  'text'         // UTF-8 encoded string
    |  'timestamp'    // Date plus time since epoch, 64-bit resolution
-   // What about enums, I think they should be okay, only problem is stuff that maps to two values??
    ;    
    
 primitiveType
@@ -226,7 +202,6 @@ SET : 'set';
 MAP : 'map';
 VOID      : 'void';
 
-SERVICE   : 'service';
 ENUM      : 'enum';
 MESSAGE   : 'message';
 ENDPOINT  : 'endpoint';
@@ -271,12 +246,12 @@ CARET           : '^';
 MOD             : '%';
         
 Identifier
-    :   JavaLetter JavaLetterOrDigit*
+    :   Letter LetterOrDigit*
     ;
 
 
 fragment
-JavaLetter
+Letter
     :   [a-zA-Z$_] // these are the "java letters" below 0xFF
     |   // covers all characters above 0xFF which are not a surrogate
         ~[\u0000-\u00FF\uD800-\uDBFF]
@@ -287,7 +262,7 @@ JavaLetter
     ;
 
 fragment
-JavaLetterOrDigit
+LetterOrDigit
     :   [a-zA-Z0-9$_] // these are the "java letters or digits" below 0xFF
     |   // covers all characters above 0xFF which are not a surrogate
         ~[\u0000-\u00FF\uD800-\uDBFF]

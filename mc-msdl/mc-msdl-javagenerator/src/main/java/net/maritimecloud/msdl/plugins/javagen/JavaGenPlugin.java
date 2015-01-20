@@ -46,6 +46,8 @@ public class JavaGenPlugin extends MsdlPlugin {
 
     Path fileHeader;
 
+    boolean implementsSerializable;
+
     String license;
 
     Path outputPath;
@@ -69,20 +71,20 @@ public class JavaGenPlugin extends MsdlPlugin {
         // Generate ordinary messages in the file
         for (MessageDeclaration md : file.getMessages()) {
             if (!md.isAnnotationPresent(JavaImplementation.class)) {
-                classes.add(new JavaGenMessageGenerator(null, md).generate().c);
+                classes.add(new JavaGenMessageGenerator(this, null, md).generate().c);
             }
         }
 
         // Generate broadcast messages in the file
         for (BroadcastMessageDeclaration bd : file.getBroadcasts()) {
             if (!bd.isAnnotationPresent(JavaImplementation.class)) {
-                classes.add(new JavaGenBroadcastMessageGenerator(null, bd).generate().c);
+                classes.add(new JavaGenBroadcastMessageGenerator(this, null, bd).generate().c);
             }
         }
 
         // Generate endpoints in the file
         for (EndpointDefinition ed : file.getEndpoints()) {
-            JavaGenEndpointGenerator g = new JavaGenEndpointGenerator(null, ed).generate();
+            JavaGenEndpointGenerator g = new JavaGenEndpointGenerator(this, null, ed).generate();
             classes.add(g.cClient); // add client part of endpoint
             classes.add(g.cServer); // add server part of endpoint
         }
@@ -100,6 +102,13 @@ public class JavaGenPlugin extends MsdlPlugin {
                 getLogger().info("Wrote " + path);
             }
         }
+    }
+
+    /**
+     * @return the implementsSerializable
+     */
+    public boolean isImplementsSerializable() {
+        return implementsSerializable;
     }
 
     /** {@inheritDoc} */
@@ -122,6 +131,11 @@ public class JavaGenPlugin extends MsdlPlugin {
 
     public JavaGenPlugin setHeader(Path path) {
         this.fileHeader = path;
+        return this;
+    }
+
+    public JavaGenPlugin setImplementsSerializable(boolean implementsSerializable) {
+        this.implementsSerializable = implementsSerializable;
         return this;
     }
 

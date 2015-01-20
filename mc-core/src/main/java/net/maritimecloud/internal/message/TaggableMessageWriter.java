@@ -23,6 +23,7 @@ import java.util.Set;
 
 import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageEnum;
+import net.maritimecloud.message.MessageFormatType;
 import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.message.MessageWriter;
 import net.maritimecloud.message.ValueSerializer;
@@ -55,6 +56,12 @@ public class TaggableMessageWriter implements MessageWriter {
     @Override
     public void flush() throws IOException {
         w.flush();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public MessageFormatType getFormatType() {
+        return MessageFormatType.HUMAN_READABLE;
     }
 
     /** {@inheritDoc} */

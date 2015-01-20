@@ -34,6 +34,8 @@ import net.maritimecloud.util.geometry.PositionTime;
  */
 public interface MessageReader extends Closeable {
 
+    MessageFormatType getFormatType();
+
     default void close() throws IOException {};
 
     boolean isNext(int tag, String name) throws IOException;

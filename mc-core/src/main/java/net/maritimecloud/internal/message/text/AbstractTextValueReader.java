@@ -18,6 +18,7 @@ import java.io.IOException;
 
 import net.maritimecloud.message.MessageEnum;
 import net.maritimecloud.message.MessageEnumSerializer;
+import net.maritimecloud.message.MessageFormatType;
 import net.maritimecloud.message.SerializationException;
 import net.maritimecloud.message.ValueReader;
 import net.maritimecloud.util.Binary;
@@ -32,14 +33,8 @@ public abstract class AbstractTextValueReader implements ValueReader {
 
     /** {@inheritDoc} */
     @Override
-    public Position readPosition() throws IOException {
-        return readMessage(Position.SERIALIZER);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PositionTime readPositionTime() throws IOException {
-        return readMessage(PositionTime.SERIALIZER);
+    public final MessageFormatType getFormatType() {
+        return MessageFormatType.HUMAN_READABLE;
     }
 
     /** {@inheritDoc} */
@@ -55,13 +50,6 @@ public abstract class AbstractTextValueReader implements ValueReader {
 
     /** {@inheritDoc} */
     @Override
-    public String readText() throws IOException {
-        String str = readString();
-        return unescape(str);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public <T extends /* Enum<T> & */MessageEnum> T readEnum(MessageEnumSerializer<T> factory) throws IOException {
         String str = readString();
         T t = factory.from(str);
@@ -71,9 +59,28 @@ public abstract class AbstractTextValueReader implements ValueReader {
         return t;
     }
 
-    protected String unescape(String value) {
-        return value;
+    /** {@inheritDoc} */
+    @Override
+    public Position readPosition() throws IOException {
+        return readMessage(Position.SERIALIZER);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public PositionTime readPositionTime() throws IOException {
+        return readMessage(PositionTime.SERIALIZER);
     }
 
     protected abstract String readString() throws IOException;
+
+    /** {@inheritDoc} */
+    @Override
+    public String readText() throws IOException {
+        String str = readString();
+        return unescape(str);
+    }
+
+    protected String unescape(String value) {
+        return value;
+    }
 }

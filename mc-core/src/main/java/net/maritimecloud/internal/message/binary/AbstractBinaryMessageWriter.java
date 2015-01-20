@@ -25,6 +25,7 @@ import java.util.Set;
 import net.maritimecloud.internal.message.MessageHelper;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageEnum;
+import net.maritimecloud.message.MessageFormatType;
 import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.message.MessageWriter;
 import net.maritimecloud.message.ValueSerializer;
@@ -39,6 +40,12 @@ import net.maritimecloud.util.geometry.PositionTime;
  * @author Kasper Nielsen
  */
 public abstract class AbstractBinaryMessageWriter implements MessageWriter {
+
+    /** {@inheritDoc} */
+    @Override
+    public final MessageFormatType getFormatType() {
+        return MessageFormatType.MACHINE_READABLE;
+    }
 
     protected abstract void writeBinary(int tag, byte[] bin) throws IOException;
 
@@ -58,6 +65,8 @@ public abstract class AbstractBinaryMessageWriter implements MessageWriter {
         }
     }
 
+    protected abstract void writeDecimal0(int tag, BigDecimal bd) throws IOException;
+
     /** {@inheritDoc} */
     @Override
     public final void writeDouble(int tag, String name, Double value) throws IOException {
@@ -65,6 +74,42 @@ public abstract class AbstractBinaryMessageWriter implements MessageWriter {
             writeDouble0(tag, MessageHelper.checkDouble(value));
         }
     }
+
+    protected void writeDouble0(int tag, double value) throws IOException {
+        long val = Double.doubleToLongBits(MessageHelper.checkDouble(value));
+        writeInt640(tag, val);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public final void writeEnum(int tag, String name, MessageEnum serializable) throws IOException {
+        if (serializable != null) {
+            writeInt0(tag, serializable.getValue());
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public final void writeFloat(int tag, String name, Float value) throws IOException {
+        if (value != null) {
+            writeFloat0(tag, MessageHelper.checkFloat(value));
+        }
+    }
+
+    protected void writeFloat0(int tag, float value) throws IOException {
+        int val = Float.floatToIntBits(MessageHelper.checkFloat(value));
+        writeInt0(tag, val);
+    };
+
+    /** {@inheritDoc} */
+    @Override
+    public void writeInt(int tag, String name, Integer value) throws IOException {
+        if (value != null) {
+            writeInt0(tag, value);
+        }
+    }
+
+    protected abstract void writeInt0(int tag, int value) throws IOException;
 
     /** {@inheritDoc} */
     @Override
@@ -75,6 +120,30 @@ public abstract class AbstractBinaryMessageWriter implements MessageWriter {
     }
 
     protected abstract void writeInt640(int tag, long value) throws IOException;
+
+    protected abstract void writeInt640(int tag, String name, long value) throws IOException;
+
+    /** {@inheritDoc} */
+    @Override
+    public final <T> void writeList(int tag, String name, List<T> list, ValueSerializer<T> serializer)
+            throws IOException {
+        if (list != null && list.size() > 0) {
+            writeSetOrList(tag, null, serializer);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <K, V> void writeMap(int tag, String name, Map<K, V> map, ValueSerializer<K> keySerializer,
+            ValueSerializer<V> valueSerializer) throws IOException {
+        if (map != null && map.size() > 0) {
+            writeMap0(tag, map, keySerializer, valueSerializer);
+        }
+    }
+
+
+    protected abstract <K, V> void writeMap0(int tag, Map<K, V> map, ValueSerializer<K> keySerializer,
+            ValueSerializer<V> valueSerializer) throws IOException;
 
     /** {@inheritDoc} */
     @Override
@@ -90,20 +159,17 @@ public abstract class AbstractBinaryMessageWriter implements MessageWriter {
 
     /** {@inheritDoc} */
     @Override
-    public final void writeFloat(int tag, String name, Float value) throws IOException {
+    public void writePosition(int tag, String name, Position value) throws IOException {
         if (value != null) {
-            writeFloat0(tag, MessageHelper.checkFloat(value));
+            writeBinary(tag, name, value.toBinary());
         }
     };
 
-    protected abstract void writeInt640(int tag, String name, long value) throws IOException;
-
     /** {@inheritDoc} */
     @Override
-    public final <T> void writeList(int tag, String name, List<T> list, ValueSerializer<T> serializer)
-            throws IOException {
-        if (list != null && list.size() > 0) {
-            writeSetOrList(tag, null, serializer);
+    public void writePositionTime(int tag, String name, PositionTime value) throws IOException {
+        if (value != null) {
+            writeBinary(tag, name, value.toBinary());
         }
     }
 
@@ -112,73 +178,6 @@ public abstract class AbstractBinaryMessageWriter implements MessageWriter {
     public final <T> void writeSet(int tag, String name, Set<T> set, ValueSerializer<T> serializer) throws IOException {
         if (set != null && set.size() > 0) {
             writeSetOrList(tag, set, serializer);
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public final void writeTimestamp(int tag, String name, Timestamp value) throws IOException {
-        if (value != null) {
-            writeInt640(tag, name, value.getTime());
-        }
-    }
-
-    protected abstract void writeDecimal0(int tag, BigDecimal bd) throws IOException;
-
-    protected void writeDouble0(int tag, double value) throws IOException {
-        long val = Double.doubleToLongBits(MessageHelper.checkDouble(value));
-        writeInt640(tag, val);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public final void writeEnum(int tag, String name, MessageEnum serializable) throws IOException {
-        if (serializable != null) {
-            writeInt0(tag, serializable.getValue());
-        }
-    }
-
-
-    protected void writeFloat0(int tag, float value) throws IOException {
-        int val = Float.floatToIntBits(MessageHelper.checkFloat(value));
-        writeInt0(tag, val);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void writeInt(int tag, String name, Integer value) throws IOException {
-        if (value != null) {
-            writeInt0(tag, value);
-        }
-    }
-
-    protected abstract void writeInt0(int tag, int value) throws IOException;
-
-    /** {@inheritDoc} */
-    @Override
-    public <K, V> void writeMap(int tag, String name, Map<K, V> map, ValueSerializer<K> keySerializer,
-            ValueSerializer<V> valueSerializer) throws IOException {
-        if (map != null && map.size() > 0) {
-            writeMap0(tag, map, keySerializer, valueSerializer);
-        }
-    };
-
-    protected abstract <K, V> void writeMap0(int tag, Map<K, V> map, ValueSerializer<K> keySerializer,
-            ValueSerializer<V> valueSerializer) throws IOException;
-
-    /** {@inheritDoc} */
-    @Override
-    public void writePosition(int tag, String name, Position value) throws IOException {
-        if (value != null) {
-            writeBinary(tag, name, value.toBinary());
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void writePositionTime(int tag, String name, PositionTime value) throws IOException {
-        if (value != null) {
-            writeBinary(tag, name, value.toBinary());
         }
     }
 
@@ -191,6 +190,14 @@ public abstract class AbstractBinaryMessageWriter implements MessageWriter {
         if (value != null) {
             byte[] text = value.getBytes("UTF-8");
             writeBinary(tag, text);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public final void writeTimestamp(int tag, String name, Timestamp value) throws IOException {
+        if (value != null) {
+            writeInt640(tag, name, value.getTime());
         }
     }
 

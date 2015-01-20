@@ -22,6 +22,7 @@ import net.maritimecloud.internal.message.AbstractMessageReader;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageEnum;
 import net.maritimecloud.message.MessageEnumSerializer;
+import net.maritimecloud.message.MessageFormatType;
 import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.message.SerializationException;
 import net.maritimecloud.message.ValueReader;
@@ -33,6 +34,12 @@ import net.maritimecloud.util.Binary;
  * @author Kasper Nielsen
  */
 public class BinaryMessageReader extends AbstractMessageReader {
+
+    /** {@inheritDoc} */
+    @Override
+    public MessageFormatType getFormatType() {
+        return MessageFormatType.MACHINE_READABLE;
+    }
 
     final BinaryInputStream bis;
 

@@ -20,6 +20,7 @@ import java.math.BigInteger;
 
 import net.maritimecloud.internal.message.MessageHelper;
 import net.maritimecloud.message.MessageEnum;
+import net.maritimecloud.message.MessageFormatType;
 import net.maritimecloud.message.ValueWriter;
 import net.maritimecloud.util.Binary;
 import net.maritimecloud.util.geometry.Position;
@@ -47,6 +48,12 @@ public abstract class AbstractBinaryValueWriter implements ValueWriter {
     @Override
     public final void writeEnum(MessageEnum serializable) throws IOException {
         writeInt(serializable.getValue());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public final MessageFormatType getFormatType() {
+        return MessageFormatType.MACHINE_READABLE;
     }
 
     /** {@inheritDoc} */

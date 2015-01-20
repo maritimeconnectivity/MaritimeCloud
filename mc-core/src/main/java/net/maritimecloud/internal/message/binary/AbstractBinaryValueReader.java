@@ -20,6 +20,7 @@ import java.math.BigInteger;
 
 import net.maritimecloud.message.MessageEnum;
 import net.maritimecloud.message.MessageEnumSerializer;
+import net.maritimecloud.message.MessageFormatType;
 import net.maritimecloud.message.ValueReader;
 import net.maritimecloud.util.Binary;
 import net.maritimecloud.util.geometry.Position;
@@ -60,6 +61,12 @@ public abstract class AbstractBinaryValueReader implements ValueReader {
     public final Float readFloat() throws IOException {
         int i = readInt();
         return Float.intBitsToFloat(i);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public final MessageFormatType getFormatType() {
+        return MessageFormatType.MACHINE_READABLE;
     }
 
     /** {@inheritDoc} */

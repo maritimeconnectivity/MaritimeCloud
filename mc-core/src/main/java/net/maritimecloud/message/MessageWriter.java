@@ -36,6 +36,8 @@ import net.maritimecloud.util.geometry.PositionTime;
  */
 public interface MessageWriter extends Closeable, Flushable {
 
+    MessageFormatType getFormatType();
+
     default void writeBinary(int tag, String name, byte[] bytes) throws IOException {
         writeBinary(tag, name, bytes, 0, bytes.length);
     }

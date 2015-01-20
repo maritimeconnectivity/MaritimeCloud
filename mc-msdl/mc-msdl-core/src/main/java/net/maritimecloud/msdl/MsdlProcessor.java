@@ -153,7 +153,9 @@ public class MsdlProcessor {
         }
 
         AtomicInteger errorCounter = new AtomicInteger();
+
         log = MsdlLogger.errorCountingLogger(log, errorCounter);
+
 
         Map<String, Path> sourceFiles = checkFiles(log);
         if (errorCounter.get() > 0) {

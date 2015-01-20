@@ -24,6 +24,7 @@ import java.util.Map;
 import net.maritimecloud.internal.message.MessageHelper;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageEnum;
+import net.maritimecloud.message.MessageFormatType;
 import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.message.ValueSerializer;
 import net.maritimecloud.message.ValueWriter;
@@ -36,6 +37,16 @@ import net.maritimecloud.util.geometry.PositionTime;
  * @author Kasper Nielsen
  */
 public abstract class AbstractTextValueWriter implements ValueWriter {
+
+    protected String escape(String value) {
+        return value;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public final MessageFormatType getFormatType() {
+        return MessageFormatType.HUMAN_READABLE;
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -51,18 +62,17 @@ public abstract class AbstractTextValueWriter implements ValueWriter {
 
     /** {@inheritDoc} */
     @Override
-    public <K, V> void writeMap(Map<K, V> map, ValueSerializer<K> keySerializer, ValueSerializer<V> valueSerializer)
-            throws IOException {}
-
-    /** {@inheritDoc} */
-    @Override
-    public <T extends Message> void writeMessage(T message, MessageSerializer<T> serializer) throws IOException {}
-
-    /** {@inheritDoc} */
-    @Override
     public void writeDouble(Double value) throws IOException {
         writeNumber(Double.toString(MessageHelper.checkDouble(value)));
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public final void writeEnum(MessageEnum serializable) throws IOException {
+        writeEscapedString(serializable.getName());
+    }
+
+    protected abstract void writeEscapedString(String value) throws IOException;
 
     /** {@inheritDoc} */
     @Override
@@ -84,22 +94,14 @@ public abstract class AbstractTextValueWriter implements ValueWriter {
 
     /** {@inheritDoc} */
     @Override
-    public final void writeVarInt(BigInteger value) throws IOException {
-        writeNumber(value.toString());
-    }
+    public <K, V> void writeMap(Map<K, V> map, ValueSerializer<K> keySerializer, ValueSerializer<V> valueSerializer)
+            throws IOException {}
 
     /** {@inheritDoc} */
     @Override
-    public final void writeEnum(MessageEnum serializable) throws IOException {
-        writeEscapedString(serializable.getName());
-    }
+    public <T extends Message> void writeMessage(T message, MessageSerializer<T> serializer) throws IOException {}
 
-    /** {@inheritDoc} */
-    @Override
-    public final void writeText(String value) throws IOException {
-        requireNonNull(value, "value is null");
-        writeEscapedString(escape(value));
-    }
+    protected abstract void writeNumber(String value) throws IOException;
 
     /** {@inheritDoc} */
     @Override
@@ -113,11 +115,16 @@ public abstract class AbstractTextValueWriter implements ValueWriter {
         writeMessage(value, PositionTime.SERIALIZER);
     }
 
-    protected abstract void writeEscapedString(String value) throws IOException;
+    /** {@inheritDoc} */
+    @Override
+    public final void writeText(String value) throws IOException {
+        requireNonNull(value, "value is null");
+        writeEscapedString(escape(value));
+    }
 
-    protected abstract void writeNumber(String value) throws IOException;
-
-    protected String escape(String value) {
-        return value;
+    /** {@inheritDoc} */
+    @Override
+    public final void writeVarInt(BigInteger value) throws IOException {
+        writeNumber(value.toString());
     }
 }

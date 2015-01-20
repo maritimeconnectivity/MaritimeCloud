@@ -69,7 +69,7 @@ public class ParsedProject {
             ParsedMsdlFile file = parseFile(e.getValue());
             if (file != null) { // only add it if successfully parsed
                 files.put(e.getKey(), file);
-                importResolver.resolvedDependency.put(e.getKey(), file);
+                importResolver.addResolvedFile(e.getKey(), file);
             }
         }
         // If we experience any errors exit now. Before trying to parse referenced files

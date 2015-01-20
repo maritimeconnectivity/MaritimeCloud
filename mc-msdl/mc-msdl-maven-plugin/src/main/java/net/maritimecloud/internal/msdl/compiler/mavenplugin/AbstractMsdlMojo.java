@@ -90,6 +90,10 @@ abstract class AbstractMsdlMojo extends AbstractMojo {
     @Parameter(required = true, readonly = true, property = "localRepository")
     private ArtifactRepository localRepository;
 
+    /** This is the path to the local maven {@code repository}. */
+    @Parameter(required = false)
+    private boolean implementsSerializable;
+
     /** Additional source paths for {@code .proto} definitions. */
     @Parameter(required = false)
     private File[] additionalProtoPathElements = {};
@@ -240,6 +244,8 @@ abstract class AbstractMsdlMojo extends AbstractMojo {
                         g.addFile(f.toPath());
                     }
                     JavaGenPlugin javaPlugin = JavaGenPlugin.create(outputDirectory.toPath());
+                    javaPlugin.setImplementsSerializable(implementsSerializable);
+                    getLog().debug("Setting implements serialiable = " + implementsSerializable);
                     g.addPlugin(javaPlugin);
 
                     if (headerLocation != null) {

@@ -32,6 +32,7 @@ import net.maritimecloud.internal.message.AbstractMessageReader;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageEnum;
 import net.maritimecloud.message.MessageEnumSerializer;
+import net.maritimecloud.message.MessageFormatType;
 import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.message.SerializationException;
 import net.maritimecloud.message.ValueReader;
@@ -49,6 +50,12 @@ public class JsonMessageReader extends AbstractMessageReader {
 
     public JsonMessageReader(CharSequence s) {
         this(JsonProvider.provider().createReader(new StringReader(s.toString())));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public final MessageFormatType getFormatType() {
+        return MessageFormatType.HUMAN_READABLE;
     }
 
     public JsonMessageReader(JsonObject o) {

@@ -14,7 +14,10 @@
  */
 package net.maritimecloud.msdl.plugins.javagen;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -68,7 +71,9 @@ public class JavaGenMessageGenerator {
 
     final String fullName;
 
-    JavaGenMessageGenerator(CodegenClass parent, BaseMessage msg) {
+    final JavaGenPlugin plugin;
+
+    JavaGenMessageGenerator(JavaGenPlugin plugin, CodegenClass parent, BaseMessage msg) {
         this.parent = parent;
         this.anno = msg;
         this.name = msg.getName();
@@ -78,9 +83,10 @@ public class JavaGenMessageGenerator {
         this.isMessage = true;
         this.serializerName = "Serializer";
         fullName = msg.getFullName();
+        this.plugin = requireNonNull(plugin);
     }
 
-    JavaGenMessageGenerator(CodegenClass parent, String name, EndpointMethod met) {
+    JavaGenMessageGenerator(JavaGenPlugin plugin, CodegenClass parent, String name, EndpointMethod met) {
         this.parent = parent;
         this.anno = met.getEndpoint();
         this.name = name;
@@ -90,6 +96,7 @@ public class JavaGenMessageGenerator {
         this.isMessage = false;
         this.serializerName = name + "Serializer";
         fullName = met.getFullName();
+        this.plugin = requireNonNull(plugin);
     }
 
     JavaGenMessageGenerator generate() {
@@ -225,6 +232,11 @@ public class JavaGenMessageGenerator {
         }
 
         String imple = "";
+        if (plugin.isImplementsSerializable()) {
+            imple += ", " + Serializable.class.getSimpleName();
+            c.addImport(Serializable.class);
+        }
+
         if (anno.isAnnotationPresent(JavaImplements.class)) {
             for (String s : anno.getAnnotation(JavaImplements.class).value()) {
                 imple += ", " + s;
@@ -492,7 +504,7 @@ public class JavaGenMessageGenerator {
         } else {
             MapType los = (MapType) type;
             return "MessageParser.ofMap(" + complexParser(c, los.getKeyType(), file) + ", "
-                    + complexParser(c, los.getValueType(), file) + ")";
+            + complexParser(c, los.getValueType(), file) + ")";
         }
     }
 
@@ -512,18 +524,18 @@ public class JavaGenMessageGenerator {
             ListOrSetType los = (ListOrSetType) f.getType();
             c.addImport(MessageHelper.class);
             return MessageHelper.class.getSimpleName() + ".readList(" + f.getTag() + ", \"" + f.getName() + "\", "
-                    + readerName + ", " + complexParser(c, los.getElementType(), file) + ");";
+            + readerName + ", " + complexParser(c, los.getElementType(), file) + ");";
         } else if (type == BaseType.SET) { // Complex type
             ListOrSetType los = (ListOrSetType) f.getType();
             c.addImport(MessageHelper.class);
             return MessageHelper.class.getSimpleName() + ".readSet(" + f.getTag() + ", \"" + f.getName() + "\", "
-                    + readerName + ", " + complexParser(c, los.getElementType(), file) + ");";
+            + readerName + ", " + complexParser(c, los.getElementType(), file) + ");";
         } else { // Complex type
             MapType los = (MapType) f.getType();
             c.addImport(MessageHelper.class);
             return MessageHelper.class.getSimpleName() + ".readMap(" + f.getTag() + ", \"" + f.getName() + "\", "
-                    + readerName + ", " + complexParser(c, los.getKeyType(), file) + ", "
-                    + complexParser(c, los.getValueType(), file) + ");";
+            + readerName + ", " + complexParser(c, los.getKeyType(), file) + ", "
+            + complexParser(c, los.getValueType(), file) + ");";
         }
     }
 

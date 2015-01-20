@@ -32,6 +32,7 @@ import net.maritimecloud.util.geometry.PositionTime;
  * @author Kasper Nielsen
  */
 public interface ValueReader {
+    MessageFormatType getFormatType();
 
     Integer readInt() throws IOException;
 

@@ -12,24 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.msdl.plugins.javagen;
-
-import net.maritimecloud.msdl.model.BaseMessage;
-
-import org.cakeframework.internal.codegen.CodegenClass;
-
+package net.maritimecloud.message;
 
 /**
  *
  * @author Kasper Nielsen
  */
-public class JavaGenBroadcastMessageGenerator extends JavaGenMessageGenerator {
-
-    /**
-     * @param parent
-     * @param msg
-     */
-    JavaGenBroadcastMessageGenerator(JavaGenPlugin plugin, CodegenClass parent, BaseMessage msg) {
-        super(plugin, parent, msg);
-    }
+public enum MessageFormatType {
+    HUMAN_READABLE, MACHINE_READABLE;
 }

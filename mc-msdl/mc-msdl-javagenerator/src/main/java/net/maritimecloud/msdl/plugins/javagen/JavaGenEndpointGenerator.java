@@ -14,6 +14,8 @@
  */
 package net.maritimecloud.msdl.plugins.javagen;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,21 +46,24 @@ public class JavaGenEndpointGenerator {
 
     final CodegenClass cServer;
 
-    final CodegenClass parent;
-
     final EndpointDefinition ed;
-
-    final List<EndpointMethod> functions;
 
     final MsdlFile file;
 
-    JavaGenEndpointGenerator(CodegenClass parent, EndpointDefinition ed) {
+    final List<EndpointMethod> functions;
+
+    final CodegenClass parent;
+
+    final JavaGenPlugin plugin;
+
+    JavaGenEndpointGenerator(JavaGenPlugin plugin, CodegenClass parent, EndpointDefinition ed) {
         this.parent = parent;
         this.ed = ed;
         this.functions = ed.getFunctions();
         this.cClient = new CodegenClass();
         this.cServer = new CodegenClass();
         this.file = ed.getFile();
+        this.plugin = requireNonNull(plugin);
     }
 
 
@@ -95,10 +100,6 @@ public class JavaGenEndpointGenerator {
                     JavaGenMessageGenerator.complexParser(cClient, f.getReturnType(), file), ");");
             generateTmpClass(className, f);
         }
-    }
-
-    void generateTmpClass(String className, EndpointMethod f) {
-        new JavaGenMessageGenerator(cClient, className, f).generate();
     }
 
     void generateServer() {
@@ -159,6 +160,10 @@ public class JavaGenEndpointGenerator {
             s += " " + d.getName();
         }
         return s + ")";
+    }
+
+    void generateTmpClass(String className, EndpointMethod f) {
+        new JavaGenMessageGenerator(plugin, cClient, className, f).generate();
     }
 
     String type(CodegenClass cc, EndpointMethod f, boolean isClient) {
