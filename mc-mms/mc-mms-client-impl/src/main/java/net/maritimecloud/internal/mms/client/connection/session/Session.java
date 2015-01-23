@@ -21,8 +21,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import net.maritimecloud.internal.mms.client.ClientInfo;
 import net.maritimecloud.internal.mms.client.DefaultMmsClient;
-import net.maritimecloud.internal.mms.client.connection.transport.ConnectionTransportFactory;
-import net.maritimecloud.internal.mms.client.connection.transport.ConnectionTransportListener;
+import net.maritimecloud.internal.mms.client.connection.transport.ClientTransportFactory;
+import net.maritimecloud.internal.mms.client.connection.transport.ClientTransportListener;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.internal.util.logging.Logger;
 import net.maritimecloud.message.Message;
@@ -41,7 +41,7 @@ public class Session {
 
     final MmsConnection.Listener connectionListener;
 
-    final ConnectionTransportFactory ctm;
+    final ClientTransportFactory ctm;
 
     final ClientInfo info;
 
@@ -62,16 +62,16 @@ public class Session {
     /** The current state of this session must only changed when fully locked. Is null when the session is dead. */
     volatile SessionState state;
 
-    final ConnectionTransportListener tl;
+    final ClientTransportListener tl;
 
-    Session(ConnectionTransportFactory ctm, ClientInfo info, SessionListener listener,
+    Session(ClientTransportFactory ctm, ClientInfo info, SessionListener listener,
             MmsConnection.Listener connectionListener) {
         this.ctm = requireNonNull(ctm);
         this.info = requireNonNull(info);
         this.sender = new SessionSender(this);
         this.listener = requireNonNull(listener);
         this.connectionListener = requireNonNull(connectionListener);
-        this.tl = new ConnectionTransportListener() {
+        this.tl = new ClientTransportListener() {
             @Override
             public void onClose(MmsConnectionClosingCode closingCode) {
                 listenerOnClose(closingCode);
@@ -167,7 +167,7 @@ public class Session {
         sender.send(message, onAck);
     }
 
-    public static Session createNewSessionAndConnect(ConnectionTransportFactory ctm, ClientInfo info,
+    public static Session createNewSessionAndConnect(ClientTransportFactory ctm, ClientInfo info,
             SessionListener listener, MmsConnection.Listener connectionListener) {
         LOGGER.debug("Creating new session");
         Session session = new Session(ctm, info, listener, connectionListener);

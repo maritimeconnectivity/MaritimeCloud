@@ -14,7 +14,7 @@
  */
 package net.maritimecloud.internal.mms.client.connection.session;
 
-import net.maritimecloud.internal.mms.client.connection.transport.ConnectionTransport;
+import net.maritimecloud.internal.mms.client.connection.transport.ClientTransport;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.internal.util.logging.Logger;
 import net.maritimecloud.util.Binary;
@@ -31,9 +31,9 @@ public final class SessionStateConnected extends SessionState {
     static final Logger LOGGER = Logger.get(SessionStateConnected.class);
 
     /** The actual transport used for sending and receiving messages. */
-    final ConnectionTransport transport;
+    final ClientTransport transport;
 
-    private SessionStateConnected(Session session, ConnectionTransport transport) {
+    private SessionStateConnected(Session session, ClientTransport transport) {
         super(session);
         this.transport = transport;
     }

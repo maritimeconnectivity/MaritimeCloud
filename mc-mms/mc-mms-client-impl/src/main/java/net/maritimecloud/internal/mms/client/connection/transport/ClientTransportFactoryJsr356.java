@@ -23,7 +23,7 @@ import net.maritimecloud.net.mms.MmsConnection;
  *
  * @author Kasper Nielsen
  */
-public class ConnectionTransportFactoryJsr356 extends ConnectionTransportFactory {
+public class ClientTransportFactoryJsr356 extends ClientTransportFactory {
 
     /** The single instance of a WebSocketContainer. */
     static volatile WebSocketContainer CACHED_CONTAINER;
@@ -33,7 +33,7 @@ public class ConnectionTransportFactoryJsr356 extends ConnectionTransportFactory
 
     /** {@inheritDoc} */
     @Override
-    public ConnectionTransport create(ConnectionTransportListener listener, MmsConnection.Listener connectionListener) {
+    public ClientTransport create(ClientTransportListener listener, MmsConnection.Listener connectionListener) {
         WebSocketContainer container = CACHED_CONTAINER;
         if (container == null) {
             synchronized (LOCK) {
@@ -47,6 +47,6 @@ public class ConnectionTransportFactoryJsr356 extends ConnectionTransportFactory
                 CACHED_CONTAINER = container;
             }
         }
-        return new ConnectionTransportJsr356(listener, connectionListener, container);
+        return new ClientTransportJsr356(listener, connectionListener, container);
     }
 }

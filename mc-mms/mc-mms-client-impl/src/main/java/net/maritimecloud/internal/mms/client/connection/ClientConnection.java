@@ -27,7 +27,7 @@ import java.util.function.Consumer;
 import net.maritimecloud.internal.mms.client.ClientInfo;
 import net.maritimecloud.internal.mms.client.connection.session.Session;
 import net.maritimecloud.internal.mms.client.connection.session.SessionListener;
-import net.maritimecloud.internal.mms.client.connection.transport.ConnectionTransportFactory;
+import net.maritimecloud.internal.mms.client.connection.transport.ClientTransportFactory;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.internal.util.logging.Logger;
 import net.maritimecloud.message.Message;
@@ -51,7 +51,7 @@ public class ClientConnection {
     final ClientInfo clientInfo;
 
     /** The manager responsible for creating new WebSockets. */
-    private final ConnectionTransportFactory ctm;
+    private final ClientTransportFactory ctm;
 
     /** Whether or not the connection is enabled. */
     private volatile boolean isEnabled;
@@ -79,7 +79,7 @@ public class ClientConnection {
     /** Consumers of messages. */
     private final CopyOnWriteArraySet<Consumer<MmsMessage>> subscribers = new CopyOnWriteArraySet<>();
 
-    public ClientConnection(ConnectionTransportFactory ctm, ClientInfo info, MmsClientConfiguration b) {
+    public ClientConnection(ClientTransportFactory ctm, ClientInfo info, MmsClientConfiguration b) {
         this.ctm = requireNonNull(ctm);
         this.clientInfo = requireNonNull(info);
         this.mmsListener = new MmsConnectionListenerInvoker(this, b);

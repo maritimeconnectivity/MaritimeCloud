@@ -20,7 +20,7 @@ import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCode;
 import javax.websocket.Session;
 
-import net.maritimecloud.internal.mms.client.connection.transport.ConnectionTransport;
+import net.maritimecloud.internal.mms.client.connection.transport.ClientTransport;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 
@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 public class ServerTransport {
 
     /** The logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(ConnectionTransport.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ClientTransport.class);
 
     /** non-null while connecting. */
     final ServerTransportListener listener;

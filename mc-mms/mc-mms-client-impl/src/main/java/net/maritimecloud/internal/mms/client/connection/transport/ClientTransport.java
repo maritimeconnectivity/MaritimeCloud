@@ -31,18 +31,18 @@ import net.maritimecloud.net.mms.MmsConnectionClosingCode;
  *
  * @author Kasper Nielsen
  */
-public abstract class ConnectionTransport {
+public abstract class ClientTransport {
 
     /** The logger. */
-    private static final Logger LOGGER = Logger.get(ConnectionTransport.class);
+    private static final Logger LOGGER = Logger.get(ClientTransport.class);
 
     /** The listener of transport events. */
-    final ConnectionTransportListener listener;
+    final ClientTransportListener listener;
 
     /** A listener for changes to the connection */
     final MmsConnection.Listener connectionListener;
 
-    protected ConnectionTransport(ConnectionTransportListener listener, MmsConnection.Listener connectionListener) {
+    protected ClientTransport(ClientTransportListener listener, MmsConnection.Listener connectionListener) {
         this.listener = requireNonNull(listener);
         this.connectionListener = requireNonNull(connectionListener);
     }

@@ -68,7 +68,7 @@ public class Subscription<T> {
      * @param consumer
      *            the consumer
      */
-    public void forEachTrackedObject(final Consumer<T> consumer) {
+    public void forEachTrackedObject(Consumer<T> consumer) {
         requireNonNull(consumer, "consumer is null");
         trackedObjects.forEachKey(PositionTracker.THRESHOLD, t -> consumer.accept(t));
     }
@@ -79,14 +79,14 @@ public class Subscription<T> {
      * @param consumer
      *            the consumer
      */
-    public void forEachTrackedObject(final BiConsumer<T, Position> consumer) {
+    public void forEachTrackedObject(BiConsumer<T, Position> consumer) {
         requireNonNull(consumer, "consumer is null");
         trackedObjects.forEach(PositionTracker.THRESHOLD, (t, pt) -> {
             // pt.time is from the first time we encountered the position.
             // We might have gotten messages with the position but different timestamps
             // To avoid confusion we do not export the timestamp out
-            consumer.accept(t, Position.create(pt.getLatitude(), pt.getLongitude()));
-        });
+                consumer.accept(t, Position.create(pt.getLatitude(), pt.getLongitude()));
+            });
     }
 
     /**

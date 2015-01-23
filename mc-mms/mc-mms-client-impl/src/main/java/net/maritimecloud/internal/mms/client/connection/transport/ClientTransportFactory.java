@@ -23,11 +23,11 @@ import net.maritimecloud.net.mms.MmsConnection;
  * @author Kasper Nielsen
  */
 @SuppressWarnings("unchecked")
-public abstract class ConnectionTransportFactory {
+public abstract class ClientTransportFactory {
 
-    static final Class<? extends ConnectionTransportFactory> FACTORY;
+    static final Class<? extends ClientTransportFactory> FACTORY;
 
-    static final String PREFIX = ConnectionTransportFactory.class.getCanonicalName();
+    static final String PREFIX = ClientTransportFactory.class.getCanonicalName();
 
     static {
         final String name;
@@ -39,7 +39,7 @@ public abstract class ConnectionTransportFactory {
             name = PREFIX + "Jsr356";
         }
         try {
-            FACTORY = (Class<? extends ConnectionTransportFactory>) Class.forName(name);
+            FACTORY = (Class<? extends ClientTransportFactory>) Class.forName(name);
         } catch (ClassNotFoundException e) {
             throw new Error(e);
         }
@@ -52,7 +52,7 @@ public abstract class ConnectionTransportFactory {
      * @param connectionListener
      * @return the transport
      */
-    public abstract ConnectionTransport create(ConnectionTransportListener listener,
+    public abstract ClientTransport create(ClientTransportListener listener,
             MmsConnection.Listener connectionListener);
 
     static boolean classExists(String className) {
@@ -69,7 +69,7 @@ public abstract class ConnectionTransportFactory {
      *
      * @return a new connection transport factory
      */
-    public static ConnectionTransportFactory create() {
+    public static ClientTransportFactory create() {
         try {
             return FACTORY.newInstance();
         } catch (ReflectiveOperationException e) {

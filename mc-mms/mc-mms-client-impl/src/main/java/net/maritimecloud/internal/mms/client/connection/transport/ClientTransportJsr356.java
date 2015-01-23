@@ -43,10 +43,10 @@ import net.maritimecloud.net.mms.MmsConnectionClosingCode;
  * @author Kasper Nielsen
  */
 @ClientEndpoint
-public final class ConnectionTransportJsr356 extends ConnectionTransport { // Class must be public to be detected
+public final class ClientTransportJsr356 extends ClientTransport { // Class must be public to be detected
 
     /** The logger. */
-    static final Logger LOG = Logger.get(ConnectionTransportJsr356.class);
+    static final Logger LOG = Logger.get(ClientTransportJsr356.class);
 
     /** The WebSocket container. */
     private final WebSocketContainer container;
@@ -54,7 +54,7 @@ public final class ConnectionTransportJsr356 extends ConnectionTransport { // Cl
     /** The WebSocket session object set after having connected. */
     volatile Session session;
 
-    ConnectionTransportJsr356(ConnectionTransportListener listener, MmsConnection.Listener connectionListener,
+    ClientTransportJsr356(ClientTransportListener listener, MmsConnection.Listener connectionListener,
             WebSocketContainer container) {
         super(listener, connectionListener);
         this.container = requireNonNull(container);

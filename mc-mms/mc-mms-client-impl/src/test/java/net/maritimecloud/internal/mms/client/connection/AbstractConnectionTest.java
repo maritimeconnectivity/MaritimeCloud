@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import net.maritimecloud.internal.mms.client.AbstractClientConnectionTest;
 import net.maritimecloud.internal.mms.client.ClientInfo;
-import net.maritimecloud.internal.mms.client.connection.transport.ConnectionTransportFactoryJetty;
+import net.maritimecloud.internal.mms.client.connection.transport.ClientTransportFactoryJetty;
 import net.maritimecloud.internal.mms.messages.Close;
 import net.maritimecloud.internal.mms.messages.Connected;
 import net.maritimecloud.internal.mms.messages.Hello;
@@ -36,7 +36,7 @@ import org.junit.Before;
  */
 public class AbstractConnectionTest extends AbstractClientConnectionTest {
 
-    ConnectionTransportFactoryJetty ctm = new ConnectionTransportFactoryJetty();
+    ClientTransportFactoryJetty ctm = new ClientTransportFactoryJetty();
 
     @Before
     public void setup() throws Exception {

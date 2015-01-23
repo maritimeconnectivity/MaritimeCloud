@@ -62,11 +62,11 @@ public class TestConnectionTransport {
 
     ServerTestEndpoint st;
 
-    ConnectionTransportFactoryJetty tm;
+    ClientTransportFactoryJetty tm;
 
     @Before
     public void before() throws Exception {
-        tm = new ConnectionTransportFactoryJetty();
+        tm = new ClientTransportFactoryJetty();
         tm.start();
         clientPort = ThreadLocalRandom.current().nextInt(40000, 50000);
         ws = new TestWebSocketServer(clientPort);
@@ -92,7 +92,7 @@ public class TestConnectionTransport {
         CountDownLatch onOpenInvoke = new CountDownLatch(1);
         CountDownLatch close = new CountDownLatch(1);
 
-        ConnectionTransport tr = tm.create(new ConnectionTransportListener() {
+        ClientTransport tr = tm.create(new ClientTransportListener() {
             public void onOpen() {
                 onOpenInvoke.countDown();
             }
@@ -118,7 +118,7 @@ public class TestConnectionTransport {
         CountDownLatch onOpenInvoke = new CountDownLatch(1);
         CountDownLatch close = new CountDownLatch(1);
 
-        ConnectionTransport tr = tm.create(new ConnectionTransportListener() {
+        ClientTransport tr = tm.create(new ClientTransportListener() {
             public void onOpen() {
                 onOpenInvoke.countDown();
             }
@@ -144,7 +144,7 @@ public class TestConnectionTransport {
     public void connect() throws Exception {
         CountDownLatch onOpenInvoke = new CountDownLatch(1);
 
-        ConnectionTransport tr = tm.create(new ConnectionTransportListener() {
+        ClientTransport tr = tm.create(new ClientTransportListener() {
             public void onOpen() {
                 onOpenInvoke.countDown();
             }
@@ -158,7 +158,7 @@ public class TestConnectionTransport {
     @Test
     public void connectTimedOut() throws Exception {
         try (ServerSocket ss = new ServerSocket(55555)) {
-            ConnectionTransport tr = tm.create(new ConnectionTransportListener() {}, new MmsConnection.Listener() {});
+            ClientTransport tr = tm.create(new ClientTransportListener() {}, new MmsConnection.Listener() {});
             try {
                 tr.connectBlocking(new URI("ws://localhost:55555"), 100, TimeUnit.MILLISECONDS);
                 fail("Should fail");
@@ -170,7 +170,7 @@ public class TestConnectionTransport {
     public void receive() throws Exception {
         CountDownLatch textReceived = new CountDownLatch(1);
         CountDownLatch onMessage = new CountDownLatch(1);
-        ConnectionTransport tr = tm.create(new ConnectionTransportListener() {
+        ClientTransport tr = tm.create(new ClientTransportListener() {
             /** {@inheritDoc} */
             @Override
             public void onMessage(MmsMessage message) {
@@ -202,7 +202,7 @@ public class TestConnectionTransport {
         CountDownLatch onOpenInvoke = new CountDownLatch(1);
         CountDownLatch textSend = new CountDownLatch(1);
         AtomicReference<String> ar = new AtomicReference<>();
-        ConnectionTransport tr = tm.create(new ConnectionTransportListener() {
+        ClientTransport tr = tm.create(new ClientTransportListener() {
             public void onOpen() {
                 onOpenInvoke.countDown();
             }
@@ -233,7 +233,7 @@ public class TestConnectionTransport {
     @Ignore
     public void receiveInvalid() throws Exception {
         CountDownLatch cdl = new CountDownLatch(1);
-        ConnectionTransport tr = tm.create(new ConnectionTransportListener() {
+        ClientTransport tr = tm.create(new ClientTransportListener() {
 
         }, new MmsConnection.Listener() {
             /** {@inheritDoc} */

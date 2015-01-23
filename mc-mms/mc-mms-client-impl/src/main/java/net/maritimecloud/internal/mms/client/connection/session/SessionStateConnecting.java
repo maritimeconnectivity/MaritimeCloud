@@ -23,7 +23,7 @@ import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import net.maritimecloud.internal.mms.client.connection.transport.ConnectionTransport;
+import net.maritimecloud.internal.mms.client.connection.transport.ClientTransport;
 import net.maritimecloud.internal.mms.messages.Connected;
 import net.maritimecloud.internal.mms.messages.Hello;
 import net.maritimecloud.internal.mms.messages.Welcome;
@@ -49,7 +49,7 @@ public final class SessionStateConnecting extends SessionState {
     /** Whether or not we have received a hello message. */
     private boolean receivedHelloMessage /* = false */;
 
-    final ConnectionTransport transport;
+    final ClientTransport transport;
 
     /** The URI to connect to. */
     final URI uri;

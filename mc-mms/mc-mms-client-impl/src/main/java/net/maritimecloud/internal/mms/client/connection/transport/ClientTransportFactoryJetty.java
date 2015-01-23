@@ -25,15 +25,15 @@ import org.eclipse.jetty.websocket.jsr356.ClientContainer;
  *
  * @author Kasper Nielsen
  */
-public class ConnectionTransportFactoryJetty extends ConnectionTransportFactory {
+public class ClientTransportFactoryJetty extends ClientTransportFactory {
 
     /** The single instance of a WebSocketContainer. */
     private final ClientContainer container = new ClientContainer();
 
     /** {@inheritDoc} */
     @Override
-    public ConnectionTransport create(ConnectionTransportListener listener, MmsConnection.Listener connectionListener) {
-        return new ConnectionTransportJsr356(listener, connectionListener, container);
+    public ClientTransport create(ClientTransportListener listener, MmsConnection.Listener connectionListener) {
+        return new ClientTransportJsr356(listener, connectionListener, container);
     }
 
     /**

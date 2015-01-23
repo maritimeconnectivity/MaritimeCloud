@@ -118,11 +118,11 @@
       <artifactId>javax.ws.rs-api</artifactId>
       <version>2.0</version>
     </dependency>
-    <dependency>
-      <groupId>org.cakeframework</groupId>
-      <artifactId>cake-container</artifactId>
-      <version>0.8-SNAPSHOT</version>
-    </dependency>
+<dependency>
+    <groupId>net.maritimecloud.3rdparty</groupId>
+    <artifactId>org.cakeframework.container</artifactId>
+    <version>0.8</version>
+</dependency>
     <dependency>
       <groupId>javax.inject</groupId>
       <artifactId>javax.inject</artifactId>

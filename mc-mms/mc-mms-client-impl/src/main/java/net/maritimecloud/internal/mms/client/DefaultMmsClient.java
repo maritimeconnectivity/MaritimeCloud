@@ -23,7 +23,7 @@ import net.maritimecloud.internal.mms.client.broadcast.BroadcastDeserializer;
 import net.maritimecloud.internal.mms.client.broadcast.ClientBroadcastManager;
 import net.maritimecloud.internal.mms.client.connection.ClientConnection;
 import net.maritimecloud.internal.mms.client.connection.DefaultMmsConnection;
-import net.maritimecloud.internal.mms.client.connection.transport.ConnectionTransportFactory;
+import net.maritimecloud.internal.mms.client.connection.transport.ClientTransportFactory;
 import net.maritimecloud.internal.mms.client.endpoint.ClientEndpointManager;
 import net.maritimecloud.internal.util.logging.Logger;
 import net.maritimecloud.message.Message;
@@ -189,7 +189,7 @@ public class DefaultMmsClient implements MmsClient {
         cc.addService(DefaultMmsConnection.class);
         cc.addService(MmsThreadManager.class);
         cc.addService(ClientConnection.class);
-        cc.addService(ConnectionTransportFactory.create());
+        cc.addService(ClientTransportFactory.create());
         LOGGER.debug("Creating client for " + clientId);
         return cc.create();
     }

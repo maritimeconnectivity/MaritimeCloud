@@ -23,7 +23,7 @@ import java.util.function.Consumer;
 
 import net.maritimecloud.internal.mms.client.AbstractClientConnectionTest;
 import net.maritimecloud.internal.mms.client.ClientInfo;
-import net.maritimecloud.internal.mms.client.connection.transport.ConnectionTransportFactoryJetty;
+import net.maritimecloud.internal.mms.client.connection.transport.ClientTransportFactoryJetty;
 import net.maritimecloud.internal.mms.messages.Connected;
 import net.maritimecloud.internal.mms.messages.Hello;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
@@ -42,7 +42,7 @@ public class AbstractSessionTest extends AbstractClientConnectionTest {
 
     volatile Consumer<MmsConnectionClosingCode> connectedNormallySessionCloseConsumer;
 
-    ConnectionTransportFactoryJetty ctm = new ConnectionTransportFactoryJetty();
+    ClientTransportFactoryJetty ctm = new ClientTransportFactoryJetty();
 
     Session connectNormally(Consumer<MmsMessage> c) throws InterruptedException {
         return connectNormally(c, new MmsConnection.Listener() {});

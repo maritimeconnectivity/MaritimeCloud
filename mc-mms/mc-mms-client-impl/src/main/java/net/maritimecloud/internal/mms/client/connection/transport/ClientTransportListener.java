@@ -22,7 +22,7 @@ import net.maritimecloud.net.mms.MmsConnectionClosingCode;
  *
  * @author Kasper Nielsen
  */
-public interface ConnectionTransportListener {
+public interface ClientTransportListener {
 
     /**
      * Invoked whenever the transport has been closed. Either remote or locally.
