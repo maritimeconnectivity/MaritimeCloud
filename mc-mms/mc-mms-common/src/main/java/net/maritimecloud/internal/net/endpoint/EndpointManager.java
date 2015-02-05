@@ -160,6 +160,7 @@ public class EndpointManager {
             }
         }
 
+        @SuppressWarnings({ "rawtypes", "unchecked" })
         void executeAsync(MethodInvoke ei, MethodInvokeResult ack, Map<String, Object> context,
                 Consumer<MethodInvokeResult> consumer) {
             MaritimeId sourceId = MaritimeId.create(ei.getSenderId());

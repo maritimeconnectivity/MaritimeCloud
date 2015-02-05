@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import net.maritimecloud.core.id.MaritimeId;
+import net.maritimecloud.internal.util.logging.Logger;
 import net.maritimecloud.net.mms.MmsClientConfiguration;
 import net.maritimecloud.util.Timestamp;
 import net.maritimecloud.util.geometry.PositionReader;
@@ -34,6 +35,8 @@ import net.maritimecloud.util.geometry.PositionTime;
  * @author Kasper Nielsen
  */
 public class ClientInfo {
+
+    private static final Logger LOGGER = Logger.get(ClientInfo.class);
 
     final Map<String, String> clientConnectString;
 
@@ -114,6 +117,7 @@ public class ClientInfo {
         try {
             return Optional.of(positionReader.getCurrentPosition());
         } catch (Exception e) {
+            LOGGER.error("Failed to get position, reporting no position", e);
             return Optional.empty();
         }
     }

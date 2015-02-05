@@ -57,7 +57,7 @@ public class ConnectionTest extends AbstractNetworkTest {
         pc.connection().awaitConnected(1, TimeUnit.SECONDS);
         assertEquals(1, clients(si).size());
 
-        assertTrue(pc1.isClosed());
+        assertTrue(pc1.isShutdown());
         pc1.awaitTermination(1, TimeUnit.SECONDS);
         for (int i = 0; i < 100; i++) {
             if (clients(si).size() == 0) {

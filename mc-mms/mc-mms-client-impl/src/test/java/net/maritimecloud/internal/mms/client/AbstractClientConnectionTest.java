@@ -101,7 +101,7 @@ public class AbstractClientConnectionTest {
     @After
     public void after() throws Exception {
         if (client != null) {
-            client.close();
+            client.shutdown();
             assertTrue(client.awaitTermination(5, TimeUnit.SECONDS));
         }
         ws.stop();

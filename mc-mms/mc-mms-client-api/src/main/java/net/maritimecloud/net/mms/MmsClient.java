@@ -126,11 +126,11 @@ public interface MmsClient {
     <T extends BroadcastMessage> BroadcastSubscription broadcastSubscribe(Class<T> messageType,
             BroadcastConsumer<T> consumer, Area area);
 
-    /**
-     * Asynchronously shutdowns this client. use {@link #awaitTermination(long, TimeUnit)} to await complete termination
-     * (acknowledgment by the remote side).
-     */
-    void close();
+    /** use {@link #shutdown()} instead. */
+    @Deprecated
+    default void close() {
+        shutdown();
+    }
 
     /**
      * Returns details about the actual connection to a server.
@@ -158,8 +158,8 @@ public interface MmsClient {
     <T extends LocalEndpoint> MmsEndpointLocator<T> endpointLocate(Class<T> endpointType);
 
     /**
-     * Registers the specified endpoint with the maritime cloud. If a client is closed via {@link MmsClient#close()} the
-     * server will automatically deregister all endpoints.
+     * Registers the specified endpoint with the maritime cloud. If a client is closed via {@link MmsClient#shutdown()}
+     * the server will automatically deregister all endpoints.
      *
      * @param implementation
      *            the endpoint implementation
@@ -177,12 +177,18 @@ public interface MmsClient {
      */
     MaritimeId getClientId();
 
+    /** use {@link #isShutdown()} instead. */
+    @Deprecated
+    default boolean isClosed() {
+        return isShutdown();
+    }
+
     /**
-     * Returns {@code true} if this executor has been shut down.
+     * Returns {@code true} if this client has been shut down.
      *
-     * @return {@code true} if this executor has been shut down
+     * @return {@code true} if this client has been shut down
      */
-    boolean isClosed();
+    boolean isShutdown();
 
     /**
      * Returns {@code true} if all tasks have completed following shut down. Note that {@code isTerminated} is never
@@ -191,4 +197,10 @@ public interface MmsClient {
      * @return {@code true} if all tasks have completed following shut down
      */
     boolean isTerminated();
+
+    /**
+     * Asynchronously shutdowns this client. use {@link #awaitTermination(long, TimeUnit)} to await complete termination
+     * (acknowledgment by the remote side).
+     */
+    void shutdown();
 }

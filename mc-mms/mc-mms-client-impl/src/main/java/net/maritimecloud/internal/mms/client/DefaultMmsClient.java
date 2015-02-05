@@ -120,7 +120,7 @@ public class DefaultMmsClient implements MmsClient {
 
     /** {@inheritDoc} */
     @Override
-    public void close() {
+    public void shutdown() {
         container.shutdown();
     }
 
@@ -149,7 +149,7 @@ public class DefaultMmsClient implements MmsClient {
     }
 
     protected void finalize() {
-        close();
+        shutdown();
     }
 
     /** {@inheritDoc} */
@@ -165,7 +165,7 @@ public class DefaultMmsClient implements MmsClient {
 
     /** {@inheritDoc} */
     @Override
-    public boolean isClosed() {
+    public boolean isShutdown() {
         return container.getState().isShutdown();
     }
 

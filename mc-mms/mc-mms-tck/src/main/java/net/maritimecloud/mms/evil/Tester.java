@@ -65,7 +65,7 @@ public class Tester {
 
     public void close() {
         for (int i = 0; i < clients.length; i++) {
-            clients[i].close();
+            clients[i].shutdown();
         }
         for (int i = 0; i < clients.length; i++) {
             try {

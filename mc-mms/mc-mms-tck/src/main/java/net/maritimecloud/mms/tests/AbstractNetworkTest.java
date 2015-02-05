@@ -195,7 +195,7 @@ public abstract class AbstractNetworkTest {
         for (final MmsClient c : clients.values()) {
             es.execute(new Runnable() {
                 public void run() {
-                    c.close();
+                    c.shutdown();
                 }
             });
         }

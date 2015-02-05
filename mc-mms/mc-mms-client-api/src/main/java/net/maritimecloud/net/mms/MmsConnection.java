@@ -64,7 +64,7 @@ public interface MmsConnection {
     void enable();
 
     /**
-     * Disconnects from the MMS server. Unlike {@link MmsClient#close()} invoking this method allows for connecting
+     * Disconnects from the MMS server. Unlike {@link MmsClient#shutdown()} invoking this method allows for connecting
      * again later via {@link #enable()}.
      */
     void disable();

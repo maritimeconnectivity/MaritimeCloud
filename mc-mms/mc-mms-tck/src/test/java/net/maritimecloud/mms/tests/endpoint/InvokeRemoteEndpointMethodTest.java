@@ -62,7 +62,7 @@ public class InvokeRemoteEndpointMethodTest extends AbstractNetworkTest {
         EndpointInvocationFuture<String> f = ee.hello();
         assertEquals("OK", f.join());
         assertEquals(f.getMessageId(), msgId.get());
-        c2.close();
+        c2.shutdown();
         assertTrue(c2.awaitTermination(1, TimeUnit.SECONDS));
     }
 }

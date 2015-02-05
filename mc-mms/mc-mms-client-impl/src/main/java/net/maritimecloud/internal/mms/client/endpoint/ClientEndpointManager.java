@@ -134,7 +134,7 @@ public class ClientEndpointManager {
     }
 
     /**
-     * Registers the specified endpoint with the maritime cloud. If a client is closed via {@link MmsClient#close()} the
+     * Registers the specified endpoint with the maritime cloud. If a client is closed via {@link MmsClient#shutdown()} the
      * server will automatically deregister all endpoints.
      *
      * @param implementation

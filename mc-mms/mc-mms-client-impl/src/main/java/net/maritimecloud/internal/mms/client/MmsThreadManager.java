@@ -16,11 +16,9 @@ package net.maritimecloud.internal.mms.client;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -181,14 +179,6 @@ public class MmsThreadManager {
         }
     }
 
-    /**
-     * @param task
-     * @return
-     * @see java.util.concurrent.AbstractExecutorService#submit(java.util.concurrent.Callable)
-     */
-    public <T> Future<T> submit(Callable<T> task) {
-        return es.submit(task);
-    }
 
     static class DefaultThreadFactory implements ThreadFactory {
         private final ThreadFactory delegate;
