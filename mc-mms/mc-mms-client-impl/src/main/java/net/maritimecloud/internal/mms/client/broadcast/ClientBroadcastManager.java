@@ -213,7 +213,7 @@ public class ClientBroadcastManager {
                     return;
                 }
 
-                threadManager.execute(() -> s.deliver(header, message));
+                threadManager.broadcastReceived(() -> s.deliver(header, message));
             }
         }
     }

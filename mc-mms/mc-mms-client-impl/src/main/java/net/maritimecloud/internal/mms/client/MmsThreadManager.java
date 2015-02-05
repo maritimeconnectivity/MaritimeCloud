@@ -37,6 +37,9 @@ import org.cakeframework.container.lifecycle.RunOnStart;
 import org.cakeframework.container.lifecycle.RunOnStop;
 
 /**
+ * A central place for all threads that are spawned within the MMS Client.
+ * <p>
+ * This does not include the threads used for handling websocket connections.
  *
  * @author Kasper Nielsen
  */
@@ -46,7 +49,7 @@ public class MmsThreadManager {
     static final String THREAD_PREFIX = "MMSClient";
 
     /** An {@link ExecutorService} for running various tasks. */
-    final ThreadPoolExecutor es = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS,
+    final ThreadPoolExecutor es = new ThreadPoolExecutor(0, 100, 60L, TimeUnit.SECONDS,
             new SynchronousQueue<Runnable>(), new DefaultThreadFactory("GeneralPool", Executors.defaultThreadFactory()));
 
     /** A list of all outstanding futures. Is used to cancel each future in case of shutdown. */
@@ -57,51 +60,15 @@ public class MmsThreadManager {
             Executors.defaultThreadFactory()));
 
     public <T> DefaultEndpointInvocationFuture<T> create(Binary messageId) {
-        DefaultEndpointInvocationFuture<T> t = new DefaultEndpointInvocationFuture<>(getScheduler(),
-                new CompletableFuture<T>(), messageId);
+        DefaultEndpointInvocationFuture<T> t = new DefaultEndpointInvocationFuture<>(ses, new CompletableFuture<T>(),
+                messageId);
         futures.add(t);
         return t;
     }
 
 
-    public void execute(Runnable r) {
+    public void broadcastReceived(Runnable r) {
         es.execute(r);
-    }
-
-
-    /**
-     * Returns the scheduled executor.
-     *
-     * @return the scheduled executor
-     */
-    public ScheduledThreadPoolExecutor getScheduler() {
-        return ses;
-    }
-
-    /**
-     * @param command
-     * @param initialDelay
-     * @param period
-     * @param unit
-     * @return
-     * @see java.util.concurrent.ScheduledThreadPoolExecutor#scheduleAtFixedRate(java.lang.Runnable, long, long,
-     *      java.util.concurrent.TimeUnit)
-     */
-    public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
-        return ses.scheduleAtFixedRate(command, initialDelay, period, unit);
-    }
-
-    /**
-     * @param command
-     * @param initialDelay
-     * @param delay
-     * @param unit
-     * @return
-     * @see java.util.concurrent.ScheduledThreadPoolExecutor#scheduleWithFixedDelay(java.lang.Runnable, long, long,
-     *      java.util.concurrent.TimeUnit)
-     */
-    public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
-        return ses.scheduleWithFixedDelay(command, initialDelay, delay, unit);
     }
 
     @RunOnStart
@@ -118,36 +85,28 @@ public class MmsThreadManager {
      * @param runnable
      */
     public void startCloseThread(Runnable runnable) {
-        Thread t = new Thread(runnable);
-        t.setName(THREAD_PREFIX + "-ClosingThread");
-        t.setDaemon(true);
-        t.start();
+        runDaemonThread(THREAD_PREFIX + "-ClosingThread", runnable);
     }
 
     public void startConnectingManager(Runnable runnable) {
-        Thread t = new Thread(runnable);
-        t.setName(THREAD_PREFIX + "-ConnectionManager");
-        t.setDaemon(true);
-        t.start();
+        runDaemonThread(THREAD_PREFIX + "-ConnectionManager", runnable);
     }
 
     public void startConnectingThread(Runnable runnable) {
-        Thread t = new Thread(runnable);
-        t.setName(THREAD_PREFIX + "-ConnectingThread");
-        t.setDaemon(true);
-        t.start();
+        runDaemonThread(THREAD_PREFIX + "-ConnectingThread", runnable);
     }
 
     public void startDisconnectingThread(Runnable runnable) {
-        Thread t = new Thread(runnable);
-        t.setName(THREAD_PREFIX + "-DisconnectingThread");
-        t.setDaemon(true);
-        t.start();
+        runDaemonThread(THREAD_PREFIX + "-DisconnectingThread", runnable);
     }
 
     public void startWorkerThread(Runnable runnable) {
+        runDaemonThread(THREAD_PREFIX + "-MessageProcessor", runnable);
+    }
+
+    void runDaemonThread(String name, Runnable runnable) {
         Thread t = new Thread(runnable);
-        t.setName(THREAD_PREFIX + "-MessageProcessor");
+        t.setName(name);
         t.setDaemon(true);
         t.start();
     }
