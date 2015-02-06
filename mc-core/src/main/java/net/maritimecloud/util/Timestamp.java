@@ -17,6 +17,7 @@ package net.maritimecloud.util;
 import java.nio.ByteBuffer;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 
@@ -58,7 +59,8 @@ public class Timestamp {
 
     public Timestamp plus(long value, TimeUnit unit) {
         checkValue(value);
-        return new Timestamp(value <= Long.MAX_VALUE - this.value ? value + this.value : Long.MAX_VALUE);
+        long millis = unit.toMillis(value);
+        return new Timestamp(millis <= Long.MAX_VALUE - this.value ? millis + this.value : Long.MAX_VALUE);
     }
 
 
@@ -85,5 +87,10 @@ public class Timestamp {
      */
     public static Timestamp now() {
         return new Timestamp(CLOCK.millis());
+    }
+    
+    @Override
+    public String toString() {
+        return new Date(getTime()).toString();
     }
 }
