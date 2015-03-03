@@ -15,9 +15,15 @@
 package net.maritimecloud.message;
 
 /**
+ * The type of serialization protocol.
  *
  * @author Kasper Nielsen
  */
 public enum MessageFormatType {
-    HUMAN_READABLE, MACHINE_READABLE;
+
+    /** The serialization protocol write messages in a human readable format. */
+    HUMAN_READABLE,
+
+    /** The serialization protocol write messages in a compact, no-human readable format. */
+    MACHINE_READABLE;
 }

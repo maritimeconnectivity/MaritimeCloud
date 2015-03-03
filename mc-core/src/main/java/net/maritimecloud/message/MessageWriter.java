@@ -36,6 +36,11 @@ import net.maritimecloud.util.geometry.PositionTime;
  */
 public interface MessageWriter extends Closeable, Flushable {
 
+    /**
+     * Returns the type of the underlying serialization protocol.
+     *
+     * @return the type of the underlying serialization protocol
+     */
     MessageFormatType getFormatType();
 
     default void writeBinary(int tag, String name, byte[] bytes) throws IOException {

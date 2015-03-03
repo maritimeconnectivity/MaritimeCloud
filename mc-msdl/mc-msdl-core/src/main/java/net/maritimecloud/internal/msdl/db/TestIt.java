@@ -14,6 +14,16 @@
  */
 package net.maritimecloud.internal.msdl.db;
 
+import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import net.maritimecloud.msdl.MsdlPlugin;
+import net.maritimecloud.msdl.MsdlProcessor;
+import net.maritimecloud.msdl.model.EndpointDefinition;
+import net.maritimecloud.msdl.model.MsdlFile;
+import net.maritimecloud.msdl.model.Project;
+
 
 /**
  *
@@ -22,8 +32,25 @@ package net.maritimecloud.internal.msdl.db;
 public class TestIt {
 
     public static void main(String[] args) {
-        // MmsClientConfiguration ccc = MmsClientConfiguration.create("mmsi:123123");
-        // ccc.addListener(MmsConnection.Listener)
-        // ccc.build();
+        Logger.getLogger("msdl").setLevel(Level.FINE);
+
+        MsdlProcessor processor = new MsdlProcessor();
+        processor.setSourceDirectory(Paths.get("/Users/kasperni/dma-workspace/MaritimeCloud/private/msdl/"));
+        // processor.addDependencyDirectory(Paths.get("/Users/kasperni/dma-workspace/MaritimeCloud/private/msdl/"));
+        processor.addFile("cmm.msdl"); // relative to source directory
+        processor.addFile("mms.msdl"); // relative to source directory
+
+        processor.addPlugin(new MsdlPlugin() {
+
+            @Override
+            protected void process(Project project) throws Exception {
+                for (MsdlFile f : project) {
+                    for (EndpointDefinition e : f.getEndpoints()) {
+                        System.out.println(e.getFullName());
+                    }
+                }
+            }
+        });
+        processor.executePlugins();
     }
 }

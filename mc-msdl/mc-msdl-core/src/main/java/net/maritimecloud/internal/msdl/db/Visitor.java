@@ -12,15 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.msdl.model;
+package net.maritimecloud.internal.msdl.db;
 
 import net.maritimecloud.msdl.MsdlPlugin;
+import net.maritimecloud.msdl.model.MessageDeclaration;
+import net.maritimecloud.msdl.model.MsdlFile;
+import net.maritimecloud.msdl.model.Project;
 
 /**
  *
  * @author Kasper Nielsen
  */
-public abstract class Visitor extends MsdlPlugin {
+abstract class Visitor extends MsdlPlugin {
 
     /** {@inheritDoc} */
     @Override

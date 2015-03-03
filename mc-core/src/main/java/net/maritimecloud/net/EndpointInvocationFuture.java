@@ -64,10 +64,6 @@ public interface EndpointInvocationFuture<T> extends DispatchedMessage, Future<T
      */
     T join();
 
-    <U> EndpointInvocationFuture<U> thenApply(Function<? super T, ? extends U> fn);
-
-    void thenRun(Runnable action);
-
     /**
      * Creates a new EndpointInvocationFuture that will time out via {@link TimeoutException} if this task has not
      * completed within the specified time.
@@ -78,5 +74,16 @@ public interface EndpointInvocationFuture<T> extends DispatchedMessage, Future<T
      *            the time unit of the timeout argument
      * @return the new future
      */
-    EndpointInvocationFuture<T> timeout(long timeout, TimeUnit unit);
+    EndpointInvocationFuture<T> orTimeout(long timeout, TimeUnit unit);
+
+    <U> EndpointInvocationFuture<U> thenApply(Function<? super T, ? extends U> fn);
+
+    void thenRun(Runnable action);
+
+    /** use {@link #orTimeout(long, TimeUnit)} */
+    @Deprecated
+    default EndpointInvocationFuture<T> timeout(long timeout, TimeUnit unit) {
+        return orTimeout(timeout, unit);
+    }
+
 }

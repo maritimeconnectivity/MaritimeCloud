@@ -79,6 +79,13 @@ public interface Acknowledgement {
      */
     Acknowledgement thenRun(Runnable runnable);
 
+
+    /** use {@link #orTimeout(long, TimeUnit)} */
+    @Deprecated
+    default Acknowledgement timeout(long timeout, TimeUnit unit) {
+        return orTimeout(timeout, unit);
+    }
+
     /**
      * Creates a new acknowledgement that will time out via {@link TimeoutException} if the message has not been
      * acknowledgement within the specified timeout.
@@ -89,7 +96,7 @@ public interface Acknowledgement {
      *            the time unit of the timeout argument
      * @return the new acknowledgement
      */
-    Acknowledgement timeout(long timeout, TimeUnit unit);
+    Acknowledgement orTimeout(long timeout, TimeUnit unit);
 
     /**
      * Returns a {@link CompletableFuture} maintaining the same completion properties as this acknowledgement.

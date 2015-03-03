@@ -61,15 +61,17 @@ class ImportResolver implements Iterable<ParsedMsdlFile> {
         this.logger = requireNonNull(logger);
     }
 
-    void addResolvedFile(String name, ParsedMsdlFile f) {
-        logger.debug("Adding resolved file " + name + " -> " + f.antlrFile.getPath() + " as dependency");
+    void addResolvedFile(String name, ParsedMsdlFile f, boolean isDependency) {
+        if (isDependency) {
+            logger.debug("Adding resolved file " + name + " -> " + f.antlrFile.getPath() + " as dependency");
+        }
         name = name.replace('\\', '/'); // handling windows paths
         resolvedDependency.put(name, f);
     }
 
     ParsedMsdlFile resolveImport(ParsedProject project, ParsedMsdlFile file, Import imp) throws IOException {
 
-        logger.debug("Trying to resolve import: " + imp.importContext);
+        logger.debug("Trying to resolve import: " + imp.importContext.getChild(1).getText());
 
         String name = imp.getName();
         // lets see if we already resolved it
@@ -127,7 +129,7 @@ class ImportResolver implements Iterable<ParsedMsdlFile> {
         }
 
         if (f != null) {
-            addResolvedFile(name, f);
+            addResolvedFile(name, f, true);
         }
         return f;
     }

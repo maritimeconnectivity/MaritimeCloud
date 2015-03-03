@@ -22,7 +22,6 @@ import java.util.function.Consumer;
 
 import net.maritimecloud.msdl.MsdlProcessor;
 import net.maritimecloud.msdl.model.MsdlFile;
-import net.maritimecloud.msdl.model.Visitor;
 
 /**
  *

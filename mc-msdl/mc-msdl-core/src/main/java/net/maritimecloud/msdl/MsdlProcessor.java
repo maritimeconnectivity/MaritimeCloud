@@ -119,7 +119,7 @@ public class MsdlProcessor {
                     logger.error("Could not find file " + p + " at " + file);
                 }
                 m.put(getSourceDirectory().relativize(file).toString(), file.toAbsolutePath());
-                logger.debug("Found file: " + file.toAbsolutePath());
+                logger.debug("Adding source file: " + file.toAbsolutePath());
             }
         }
         return m;

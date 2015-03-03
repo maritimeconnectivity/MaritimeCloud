@@ -64,12 +64,13 @@ public class ParsedProject {
     }
 
     Project parse0() throws Exception {
+        logger.debug("Start parsing of source files");
         // parse all source files
         for (Map.Entry<String, Path> e : sourceFiles.entrySet()) {
             ParsedMsdlFile file = parseFile(e.getValue());
             if (file != null) { // only add it if successfully parsed
                 files.put(e.getKey(), file);
-                importResolver.addResolvedFile(e.getKey(), file);
+                importResolver.addResolvedFile(e.getKey(), file, false);
             }
         }
         // If we experience any errors exit now. Before trying to parse referenced files
@@ -77,6 +78,7 @@ public class ParsedProject {
             return null;
         }
 
+        logger.debug("All source files was succesfully parsed, resolving imports");
         // resolve and parse imports
         importResolver.resolveAll(this, files.values());
         if (errorCounter.get() > 0) {
