@@ -17,7 +17,6 @@ package net.maritimecloud.internal.mms.client.broadcast;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -37,6 +36,7 @@ import net.maritimecloud.internal.net.util.DefaultAcknowledgement;
 import net.maritimecloud.internal.net.util.DefaultMessageHeader;
 import net.maritimecloud.internal.util.Coverage;
 import net.maritimecloud.internal.util.MessageStore;
+import net.maritimecloud.internal.util.concurrent.CompletableFuture;
 import net.maritimecloud.internal.util.logging.Logger;
 import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.net.BroadcastConsumer;
@@ -155,7 +155,7 @@ public class ClientBroadcastManager {
 
         broadcast.setMessageId(MessageHasher.calculateSHA256(broadcast));
 
-        DefaultAcknowledgement ack = new DefaultAcknowledgement(ses);
+        DefaultAcknowledgement ack = new DefaultAcknowledgement();
         DispatchedBroadcast db = new DispatchedBroadcast(broadcast, ack, ackConsumer);
 
         sendLock.readLock().lock();
@@ -165,7 +165,7 @@ public class ClientBroadcastManager {
             CompletableFuture<Void> om = connection.sendMessage(broadcast);
             om.handle((ac, cause) -> {
                 if (cause == null) {
-                    ack.complete(null);
+                    ack.complete();
                 } else {
                     ack.completeExceptionally(cause);
                 }

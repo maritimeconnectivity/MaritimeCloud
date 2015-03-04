@@ -18,7 +18,7 @@
  * Expert Group and released to the public domain, as explained at
  * http://creativecommons.org/publicdomain/zero/1.0/
  */
-package net.maritimecloud.internal.util;
+package net.maritimecloud.internal.util.concurrent;
 
 import java.io.IOException;
 import java.io.Serializable;

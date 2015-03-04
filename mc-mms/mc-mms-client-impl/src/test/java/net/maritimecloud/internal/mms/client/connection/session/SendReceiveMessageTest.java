@@ -17,12 +17,12 @@ package net.maritimecloud.internal.mms.client.connection.session;
 import static org.junit.Assert.assertEquals;
 
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.internal.net.messages.Broadcast;
+import net.maritimecloud.internal.util.concurrent.CompletableFuture;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 
 import org.junit.Test;

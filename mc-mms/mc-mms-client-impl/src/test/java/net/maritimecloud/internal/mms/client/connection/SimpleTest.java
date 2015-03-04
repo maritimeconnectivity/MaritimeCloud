@@ -18,7 +18,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -28,6 +27,7 @@ import net.maritimecloud.internal.mms.messages.Connected;
 import net.maritimecloud.internal.mms.messages.Hello;
 import net.maritimecloud.internal.net.messages.Broadcast;
 import net.maritimecloud.internal.net.messages.BroadcastAck;
+import net.maritimecloud.internal.util.concurrent.CompletableFuture;
 import net.maritimecloud.util.Binary;
 
 import org.junit.Test;

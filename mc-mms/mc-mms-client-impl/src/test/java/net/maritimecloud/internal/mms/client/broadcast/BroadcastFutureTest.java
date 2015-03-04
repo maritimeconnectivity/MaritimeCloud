@@ -57,7 +57,7 @@ public class BroadcastFutureTest extends AbstractClientConnectionTest {
         t.send(bsa, 0, 1);
 
         // make sure it is received on the server
-        bf.relayed().timeout(1, TimeUnit.SECONDS).join();
+        bf.relayed().orTimeout(1, TimeUnit.SECONDS).join();
     }
 
     @Test
@@ -78,7 +78,7 @@ public class BroadcastFutureTest extends AbstractClientConnectionTest {
         t.send(bsa, 0, 1);
 
         // make sure it is received on the server
-        bf.relayed().timeout(1, TimeUnit.SECONDS).join();
+        bf.relayed().orTimeout(1, TimeUnit.SECONDS).join();
 
         BroadcastAck ba = new BroadcastAck();
         ba.setReceiverId(ID3.toString());

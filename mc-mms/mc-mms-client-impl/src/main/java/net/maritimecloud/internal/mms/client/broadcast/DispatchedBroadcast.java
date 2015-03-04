@@ -74,7 +74,7 @@ class DispatchedBroadcast extends DefaultDispatchedMessage {
                 if (!relayed.isDone()) {
                     // highly unlikely we will get an ack back before we have registered that the mms server has
                     // received it. But not impossible. So complete it just in case
-                    relayed.complete(null);
+                    relayed.complete();
                 }
                 ackConsumer.accept(header);
             } catch (Exception e) {

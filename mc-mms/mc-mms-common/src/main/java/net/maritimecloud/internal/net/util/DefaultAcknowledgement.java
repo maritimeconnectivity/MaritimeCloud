@@ -14,26 +14,46 @@
  */
 package net.maritimecloud.internal.net.util;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ScheduledExecutorService;
+import static java.util.Objects.requireNonNull;
+
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import net.maritimecloud.internal.util.AbstractCompletor;
+import net.maritimecloud.internal.util.concurrent.CompletableFuture;
 import net.maritimecloud.net.Acknowledgement;
 
 /**
  *
  * @author Kasper Nielsen
  */
-public class DefaultAcknowledgement extends AbstractCompletor<Void> implements Acknowledgement {
+public class DefaultAcknowledgement implements Acknowledgement {
 
-    public DefaultAcknowledgement(ScheduledExecutorService timeoutExecutor) {
-        super(new CompletableFuture<Void>(), timeoutExecutor);
+    public final CompletableFuture<Void> delegate;
+
+    public DefaultAcknowledgement() {
+        this(new CompletableFuture<Void>());
     }
 
-    public DefaultAcknowledgement(CompletableFuture<Void> f, ScheduledExecutorService timeoutExecutor) {
-        super(f, timeoutExecutor);
+    DefaultAcknowledgement(CompletableFuture<Void> delegate) {
+        this.delegate = requireNonNull(delegate);
+    }
+
+    /**
+     * @param value
+     * @return
+     * @see java.util.concurrent.CompletableFuture#complete(java.lang.Object)
+     */
+    public boolean complete() {
+        return delegate.complete(null);
+    }
+
+    /**
+     * @param ex
+     * @return
+     * @see java.util.concurrent.CompletableFuture#completeExceptionally(java.lang.Throwable)
+     */
+    public boolean completeExceptionally(Throwable ex) {
+        return delegate.completeExceptionally(ex);
     }
 
     /** {@inheritDoc} */
@@ -42,13 +62,19 @@ public class DefaultAcknowledgement extends AbstractCompletor<Void> implements A
         return new DefaultAcknowledgement(delegate.handle((a, b) -> {
             fn.accept(b);
             return null;
-        }), timeoutExecutor);
+        }));
     }
 
     /** {@inheritDoc} */
     @Override
     public boolean isAcknowledged() {
-        return isCompletedNormally();
+        return delegate.isDone() && !delegate.isCompletedExceptionally();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isDone() {
+        return delegate.isDone();
     }
 
     /** {@inheritDoc} */
@@ -59,19 +85,19 @@ public class DefaultAcknowledgement extends AbstractCompletor<Void> implements A
 
     /** {@inheritDoc} */
     @Override
+    public Acknowledgement orTimeout(long timeout, TimeUnit unit) {
+        return new DefaultAcknowledgement(delegate.orTimeout(timeout, unit));
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Acknowledgement thenRun(Runnable runnable) {
-        return new DefaultAcknowledgement(delegate.thenRun(runnable), timeoutExecutor);
+        return new DefaultAcknowledgement(delegate.thenRun(runnable));
     }
 
     /** {@inheritDoc} */
     @Override
-    public Acknowledgement timeout(long timeout, TimeUnit unit) {
-        return new DefaultAcknowledgement(withTimeout(timeout, unit), timeoutExecutor);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public CompletableFuture<Void> toCompletableFuture() {
-        return withImmutable();
+    public java.util.concurrent.CompletableFuture<Void> toCompletableFuture() {
+        return delegate.toCompletableFutureJUC();
     }
 }

@@ -25,7 +25,7 @@ import net.maritimecloud.util.Binary;
  *
  * @author Kasper Nielsen
  */
-public final class SessionStateConnected extends SessionState {
+final class SessionStateConnected extends SessionState {
 
     /** The logger. */
     static final Logger LOGGER = Logger.get(SessionStateConnected.class);

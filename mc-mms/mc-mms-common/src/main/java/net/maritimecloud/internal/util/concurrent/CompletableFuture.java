@@ -4,7 +4,7 @@
  * http://creativecommons.org/publicdomain/zero/1.0/
  */
 
-package net.maritimecloud.internal.jsr166z;
+package net.maritimecloud.internal.util.concurrent;
 
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletionException;
@@ -2848,7 +2848,7 @@ public class CompletableFuture<T> implements Future<T>, CompletionStage<T> {
     }
 
     // Unsafe mechanics
-    private static final sun.misc.Unsafe U = sun.misc.Unsafe.getUnsafe();
+    private static final sun.misc.Unsafe U = getUnsafe();
 
     private static final long RESULT;
 
@@ -2863,5 +2863,49 @@ public class CompletableFuture<T> implements Future<T>, CompletionStage<T> {
         } catch (ReflectiveOperationException e) {
             throw new Error(e);
         }
+    }
+
+    /**
+     * Returns a sun.misc.Unsafe. Suitable for use in a 3rd party package. Replace with a simple call to
+     * Unsafe.getUnsafe when integrating into a jdk.
+     *
+     * @return a sun.misc.Unsafe
+     */
+    private static sun.misc.Unsafe getUnsafe() {
+        try {
+            return sun.misc.Unsafe.getUnsafe();
+        } catch (SecurityException tryReflectionInstead) {}
+        try {
+            return java.security.AccessController
+                    .doPrivileged(new java.security.PrivilegedExceptionAction<sun.misc.Unsafe>() {
+                        public sun.misc.Unsafe run() throws Exception {
+                            Class<sun.misc.Unsafe> k = sun.misc.Unsafe.class;
+                            for (java.lang.reflect.Field f : k.getDeclaredFields()) {
+                                f.setAccessible(true);
+                                Object x = f.get(null);
+                                if (k.isInstance(x)) {
+                                    return k.cast(x);
+                                }
+                            }
+                            throw new NoSuchFieldError("the Unsafe");
+                        }
+                    });
+        } catch (java.security.PrivilegedActionException e) {
+            throw new RuntimeException("Could not initialize intrinsics", e.getCause());
+        }
+    }
+
+
+    public java.util.concurrent.CompletableFuture<T> toCompletableFutureJUC() {
+        java.util.concurrent.CompletableFuture<T> cf = new java.util.concurrent.CompletableFuture<>();
+        handle((a, b) -> {
+            if (b == null) {
+                cf.complete(a);
+            } else {
+                cf.completeExceptionally(b);
+            }
+            return null;
+        });
+        return cf;
     }
 }

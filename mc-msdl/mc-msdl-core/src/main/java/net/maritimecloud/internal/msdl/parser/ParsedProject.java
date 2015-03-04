@@ -78,7 +78,7 @@ public class ParsedProject {
             return null;
         }
 
-        logger.debug("All source files was succesfully parsed, resolving imports");
+        logger.debug("All source files was succesfully parsed, resolving imports+" + "");
         // resolve and parse imports
         importResolver.resolveAll(this, files.values());
         if (errorCounter.get() > 0) {

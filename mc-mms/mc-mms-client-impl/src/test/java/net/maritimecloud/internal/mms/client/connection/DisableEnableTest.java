@@ -18,13 +18,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import net.maritimecloud.internal.mms.client.ClientInfo;
 import net.maritimecloud.internal.net.messages.Broadcast;
 import net.maritimecloud.internal.net.messages.BroadcastAck;
+import net.maritimecloud.internal.util.concurrent.CompletableFuture;
 
 import org.junit.Test;
 

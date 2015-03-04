@@ -36,8 +36,12 @@ import net.maritimecloud.mms.server.connectionold.transport.ServerTransport;
 import org.cakeframework.container.lifecycle.RunOnStart;
 import org.cakeframework.container.lifecycle.RunOnStop;
 import org.eclipse.jetty.jmx.MBeanContainer;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.NCSARequestLog;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
@@ -69,6 +73,8 @@ public abstract class AbstractWebSocketServer {
         // Sets the sockets reuse address to true
         ServerConnector connector = (ServerConnector) server.getConnectors()[0];
         connector.setReuseAddress(true);
+
+
     }
 
     abstract boolean isSecure();
@@ -82,7 +88,23 @@ public abstract class AbstractWebSocketServer {
         // New handler
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
-        server.setHandler(context);
+
+
+        HandlerCollection handlers = new HandlerCollection();
+        // ContextHandlerCollection contexts = new ContextHandlerCollection();
+        RequestLogHandler requestLogHandler = new RequestLogHandler();
+        handlers.setHandlers(new Handler[] { context, requestLogHandler });
+        server.setHandler(handlers);
+
+        NCSARequestLog requestLog = new NCSARequestLog("./logs/jetty-yyyy_mm_dd.request.log");
+        requestLog.setRetainDays(90);
+        requestLog.setAppend(true);
+        requestLog.setExtended(false);
+        requestLog.setLogTimeZone("GMT");
+        requestLogHandler.setRequestLog(requestLog);
+
+        // server.setHandler(context);
+
 
         // Jetty needs to have at least 1 servlet, so we add this dummy servlet
         context.addServlet(new ServletHolder(new DumpServlet()), "/*");
@@ -105,7 +127,6 @@ public abstract class AbstractWebSocketServer {
         server.start();
         LOG.info("System is ready accept client connections on " + sa);
     }
-
 
     @RunOnStop
     public void stop() throws Exception {

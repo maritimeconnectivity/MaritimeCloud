@@ -22,7 +22,7 @@ import net.maritimecloud.net.mms.MmsConnectionClosingCode;
  *
  * @author Kasper Nielsen
  */
-public final class SessionStateDisconnecting extends SessionState {
+final class SessionStateDisconnecting extends SessionState {
 
     /**
      * @param session
@@ -37,7 +37,7 @@ public final class SessionStateDisconnecting extends SessionState {
     static void disconnectWhileFullyLocked(SessionStateConnected connected, MmsConnectionClosingCode reason) {
         Session s = connected.session;
         Close close = new Close().setCloseCode(1)/* .setMaintainSession(false) */
-                .setLastReceivedMessageId(s.latestReceivedId);
+        .setLastReceivedMessageId(s.latestReceivedId);
         MmsMessage mm = new MmsMessage(close);
         connected.transport.sendMessage(mm);
         s.state = new SessionStateDisconnecting(s);

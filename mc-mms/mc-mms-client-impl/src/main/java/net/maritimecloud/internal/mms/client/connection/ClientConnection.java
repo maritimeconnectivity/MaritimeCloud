@@ -16,7 +16,6 @@ package net.maritimecloud.internal.mms.client.connection;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
@@ -29,6 +28,7 @@ import net.maritimecloud.internal.mms.client.connection.session.Session;
 import net.maritimecloud.internal.mms.client.connection.session.SessionListener;
 import net.maritimecloud.internal.mms.client.connection.transport.ClientTransportFactory;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
+import net.maritimecloud.internal.util.concurrent.CompletableFuture;
 import net.maritimecloud.internal.util.logging.Logger;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.net.mms.MmsClientConfiguration;
@@ -56,7 +56,7 @@ public class ClientConnection {
     /** Whether or not the connection is enabled. */
     private volatile boolean isEnabled;
 
-    final ReentrantLock lock = new ReentrantLock();
+    private final ReentrantLock lock = new ReentrantLock();
 
     volatile Session session;
 
@@ -137,18 +137,14 @@ public class ClientConnection {
     }
 
     public CompletableFuture<Void> sendMessage(Message b) {
-        lock.lock();
-        try {
-            if (!isEnabled) {
-                throw new IllegalStateException("The mms connection has not been enabled.");
-            }
-            Session session = this.session;
+        Session session = this.session;
+        if (session == null) {
+            throw new IllegalStateException("The mms connection has not been enabled.");
+        } else {
             CompletableFuture<Void> result = new CompletableFuture<>();
             // Save message for later sending
             session.sendMessage(b, result);
             return result;
-        } finally {
-            lock.unlock();
         }
     }
 
@@ -188,5 +184,14 @@ public class ClientConnection {
                 consumer.accept(m, (T) e);
             }
         });
+    }
+
+    void disconnectedOrConnected() {
+        lock.lock();
+        try {
+            stateChange.signalAll();
+        } finally {
+            lock.unlock();
+        }
     }
 }

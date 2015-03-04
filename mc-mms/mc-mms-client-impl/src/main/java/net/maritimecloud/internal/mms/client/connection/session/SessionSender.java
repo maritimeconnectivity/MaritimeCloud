@@ -18,12 +18,12 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.LinkedList;
 import java.util.Map.Entry;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
+import net.maritimecloud.internal.util.concurrent.CompletableFuture;
 import net.maritimecloud.message.Message;
 
 /**
@@ -48,6 +48,7 @@ class SessionSender extends Thread {
     SessionSender(Session session) {
         this.session = requireNonNull(session);
         setDaemon(true);
+        setName("MMSClient-SessionSender");
     }
 
     void completeAll() {

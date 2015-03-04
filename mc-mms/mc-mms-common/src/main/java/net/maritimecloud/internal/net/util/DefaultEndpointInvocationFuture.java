@@ -16,15 +16,15 @@ package net.maritimecloud.internal.net.util;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import net.maritimecloud.internal.util.AbstractCompletor;
+import net.maritimecloud.internal.util.concurrent.CompletableFuture;
 import net.maritimecloud.net.Acknowledgement;
 import net.maritimecloud.net.EndpointInvocationFuture;
 import net.maritimecloud.util.Binary;
@@ -36,7 +36,9 @@ import net.maritimecloud.util.geometry.Position;
  *
  * @author Kasper Nielsen
  */
-public class DefaultEndpointInvocationFuture<T> extends AbstractCompletor<T> implements EndpointInvocationFuture<T> {
+public class DefaultEndpointInvocationFuture<T> implements EndpointInvocationFuture<T> {
+
+    public final CompletableFuture<T> delegate;
 
     final Binary messageId;
 
@@ -44,8 +46,8 @@ public class DefaultEndpointInvocationFuture<T> extends AbstractCompletor<T> imp
 
     final String requestId;
 
-    public DefaultEndpointInvocationFuture(ScheduledExecutorService tm, CompletableFuture<T> f, Binary messageId) {
-        super(f, tm);
+    public DefaultEndpointInvocationFuture(CompletableFuture<T> f, Binary messageId) {
+        this.delegate = requireNonNull(f);
         this.requestId = "fixme";
         this.messageId = requireNonNull(messageId);
     }
@@ -53,7 +55,7 @@ public class DefaultEndpointInvocationFuture<T> extends AbstractCompletor<T> imp
     /** {@inheritDoc} */
     @Override
     public boolean cancel(boolean mayInterruptIfRunning) {
-        return false;
+        return delegate.cancel(mayInterruptIfRunning);
     }
 
     /**
@@ -70,8 +72,26 @@ public class DefaultEndpointInvocationFuture<T> extends AbstractCompletor<T> imp
 
     /** {@inheritDoc} */
     @Override
+    public T get() throws InterruptedException, ExecutionException {
+        return delegate.get();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+        return delegate.get(timeout, unit);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Binary getMessageId() {
         return messageId;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public T getNow(T valueIfAbsent) {
+        return delegate.getNow(valueIfAbsent);
     }
 
     /** {@inheritDoc} */
@@ -99,34 +119,45 @@ public class DefaultEndpointInvocationFuture<T> extends AbstractCompletor<T> imp
     }
 
     /** {@inheritDoc} */
+    @Override
+    public boolean isCancelled() {
+        return delegate.isCancelled();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isDone() {
+        return delegate.isDone();
+    }
+
+    /** {@inheritDoc} */
     public T join() {
         return delegate.join();
+    }
+
+    public DefaultEndpointInvocationFuture<T> orTimeout(final long timeout, final TimeUnit unit) {
+        return new DefaultEndpointInvocationFuture<>(delegate.orTimeout(timeout, unit), messageId);
     }
 
     /** {@inheritDoc} */
     @Override
     public Acknowledgement relayed() {
-        return new DefaultAcknowledgement(recivedByCloud, timeoutExecutor);
+        return new DefaultAcknowledgement(recivedByCloud);
     }
 
     /** {@inheritDoc} */
     public CompletableFuture<Void> thenAcceptAsync(Consumer<? super T> block) {
-        return delegate.thenAcceptAsync(e -> block.accept(e), timeoutExecutor);
+        return delegate.thenAcceptAsync(e -> block.accept(e));
     }
 
     /** {@inheritDoc} */
     @Override
     public <U> EndpointInvocationFuture<U> thenApply(Function<? super T, ? extends U> fn) {
-        return new DefaultEndpointInvocationFuture<>(timeoutExecutor, delegate.thenApply(fn), messageId);
+        return new DefaultEndpointInvocationFuture<>(delegate.thenApply(fn), messageId);
     }
 
     /** {@inheritDoc} */
     public void thenRun(Runnable runnable) {
         delegate.thenRun(runnable);
-    }
-
-    public DefaultEndpointInvocationFuture<T> timeout(final long timeout, final TimeUnit unit) {
-        return new DefaultEndpointInvocationFuture<>(timeoutExecutor, withTimeout(timeout, unit), messageId);
-
     }
 }

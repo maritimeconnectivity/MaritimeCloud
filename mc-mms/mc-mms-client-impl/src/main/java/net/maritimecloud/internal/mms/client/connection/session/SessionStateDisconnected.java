@@ -18,7 +18,7 @@ package net.maritimecloud.internal.mms.client.connection.session;
  *
  * @author Kasper Nielsen
  */
-public final class SessionStateDisconnected extends SessionState {
+final class SessionStateDisconnected extends SessionState {
 
     /**
      * @param session

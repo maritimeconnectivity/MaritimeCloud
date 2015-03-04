@@ -141,7 +141,6 @@ public class ServerTransport {
             try {
                 msg = MmsMessage.parseTextMessage(textMessage);
             } catch (Exception e) {
-                e.printStackTrace();
                 LOG.error("Failed to parse incoming message", e);
                 doClose(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage(e.getMessage()));
                 return;

@@ -36,10 +36,10 @@ class MmsConnectionListenerInvoker implements MmsConnection.Listener {
     /** Listeners for updates to the connection status. */
     final CopyOnWriteArraySet<MmsConnection.Listener> listeners = new CopyOnWriteArraySet<>();
 
-    final ClientConnection dcc;
+    final ClientConnection clientConnection;
 
     MmsConnectionListenerInvoker(ClientConnection dcc, MmsClientConfiguration b) {
-        this.dcc = requireNonNull(dcc);
+        this.clientConnection = requireNonNull(dcc);
         for (MmsConnection.Listener listener : b.getListeners()) {
             listeners.add(requireNonNull(listener));
         }
@@ -72,19 +72,13 @@ class MmsConnectionListenerInvoker implements MmsConnection.Listener {
     /** {@inheritDoc} */
     @Override
     public void connected(URI host) {
-        dcc.lock.lock();
-        try {
-            dcc.stateChange.signalAll();
-        } finally {
-            dcc.lock.unlock();
-        }
+        clientConnection.disconnectedOrConnected();
         for (MmsConnection.Listener l : listeners) {
             try {
                 l.connected(host);
             } catch (Exception e) {
                 LOGGER.error("Failure", e);
             }
-
         }
     }
 
@@ -97,19 +91,13 @@ class MmsConnectionListenerInvoker implements MmsConnection.Listener {
             } catch (Exception e) {
                 LOGGER.error("Failure", e);
             }
-
         }
     }
 
     /** {@inheritDoc} */
     @Override
     public void disconnected(MmsConnectionClosingCode closeReason) {
-        dcc.lock.lock();
-        try {
-            dcc.stateChange.signalAll();
-        } finally {
-            dcc.lock.unlock();
-        }
+        clientConnection.disconnectedOrConnected();
         for (MmsConnection.Listener l : listeners) {
             try {
                 l.disconnected(closeReason);

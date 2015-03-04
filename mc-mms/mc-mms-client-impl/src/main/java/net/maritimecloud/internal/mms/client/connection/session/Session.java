@@ -16,14 +16,13 @@ package net.maritimecloud.internal.mms.client.connection.session;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReentrantLock;
 
 import net.maritimecloud.internal.mms.client.ClientInfo;
-import net.maritimecloud.internal.mms.client.DefaultMmsClient;
 import net.maritimecloud.internal.mms.client.connection.transport.ClientTransportFactory;
 import net.maritimecloud.internal.mms.client.connection.transport.ClientTransportListener;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
+import net.maritimecloud.internal.util.concurrent.CompletableFuture;
 import net.maritimecloud.internal.util.logging.Logger;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.net.mms.MmsConnection;
@@ -37,7 +36,7 @@ import net.maritimecloud.util.Binary;
 public class Session {
 
     /** The logger. */
-    private static final Logger LOGGER = Logger.get(DefaultMmsClient.class);
+    private static final Logger LOGGER = Logger.get(Session.class);
 
     final MmsConnection.Listener connectionListener;
 
@@ -142,7 +141,7 @@ public class Session {
                     connectionListener.disconnected(closingCode);
                 }
             } else if (!isClosed) { // Was not closed properly, lets reconnect
-                SessionStateConnecting ssc = new SessionStateConnecting(this, info.getServerURI());
+                SessionStateConnecting ssc = new SessionStateConnecting(this, info);
                 this.state = ssc;
                 ssc.connectAsynchronously();
             }
@@ -173,7 +172,7 @@ public class Session {
         Session session = new Session(ctm, info, listener, connectionListener);
         session.fullyLock();
         try {
-            SessionStateConnecting ssc = new SessionStateConnecting(session, info.getServerURI());
+            SessionStateConnecting ssc = new SessionStateConnecting(session, info);
             session.state = ssc;
             ssc.connectAsynchronously();
 

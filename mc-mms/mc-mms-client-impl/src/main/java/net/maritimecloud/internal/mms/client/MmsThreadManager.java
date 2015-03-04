@@ -16,7 +16,6 @@ package net.maritimecloud.internal.mms.client;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -29,7 +28,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.maritimecloud.internal.net.util.DefaultEndpointInvocationFuture;
-import net.maritimecloud.internal.util.ConcurrentWeakHashSet;
+import net.maritimecloud.internal.util.concurrent.CompletableFuture;
+import net.maritimecloud.internal.util.concurrent.ConcurrentWeakHashSet;
 import net.maritimecloud.net.mms.MmsClientClosedException;
 import net.maritimecloud.util.Binary;
 
@@ -60,7 +60,7 @@ public class MmsThreadManager {
             Executors.defaultThreadFactory()));
 
     public <T> DefaultEndpointInvocationFuture<T> create(Binary messageId) {
-        DefaultEndpointInvocationFuture<T> t = new DefaultEndpointInvocationFuture<>(ses, new CompletableFuture<T>(),
+        DefaultEndpointInvocationFuture<T> t = new DefaultEndpointInvocationFuture<>(new CompletableFuture<T>(),
                 messageId);
         futures.add(t);
         return t;

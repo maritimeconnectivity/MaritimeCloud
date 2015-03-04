@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import net.maritimecloud.internal.mms.client.ClientInfo;
 import net.maritimecloud.internal.mms.client.connection.transport.ClientTransport;
 import net.maritimecloud.internal.mms.messages.Connected;
 import net.maritimecloud.internal.mms.messages.Hello;
@@ -38,7 +39,7 @@ import net.maritimecloud.util.geometry.PositionTime;
  *
  * @author Kasper Nielsen
  */
-public final class SessionStateConnecting extends SessionState {
+final class SessionStateConnecting extends SessionState {
 
     /** The logger. */
     static final Logger LOG = Logger.get(SessionStateConnecting.class);
@@ -56,12 +57,15 @@ public final class SessionStateConnecting extends SessionState {
 
     final Thread connectThread = new Thread(() -> run0(), "MMS-ConnectThread");
 
+    final ClientInfo info;
+
     /**
      * @param session
      */
-    SessionStateConnecting(Session session, URI uri) {
+    SessionStateConnecting(Session session, ClientInfo info) {
         super(session);
-        this.uri = requireNonNull(uri);
+        this.uri = requireNonNull(info.getServerURI());
+        this.info = info;
         transport = session.ctm.create(session.tl, session.connectionListener);
         connectThread.setDaemon(true);
     }
@@ -83,11 +87,21 @@ public final class SessionStateConnecting extends SessionState {
     }
 
     void run0() {
+        // To avoid a situation where we constantly reconnect
+        // we make sure that there is at lease 2000 milliseconds
+        long awaitMillis = Math.max(2000 - (System.currentTimeMillis() - info.getLatestConnectionAttempt()), 0);
+        if (awaitMillis > 0) {
+            LOG.info("Sleeping for" + awaitMillis + " before connecting.");
+            try {
+                Thread.sleep(awaitMillis);
+            } catch (InterruptedException ignore) {}
+        }
         LOG.info("Trying to connect to " + uri);
         session.connectionListener.connecting(uri);
 
         while (this == session.state && cancel.getCount() > 0) {
             try {
+                info.setLatestConnectionAttempt(System.currentTimeMillis());
                 transport.connectBlocking(uri);
                 return;
             } catch (IllegalStateException e) {

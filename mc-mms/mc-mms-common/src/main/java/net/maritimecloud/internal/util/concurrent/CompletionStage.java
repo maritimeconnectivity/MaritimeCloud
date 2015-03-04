@@ -4,7 +4,7 @@
  * http://creativecommons.org/publicdomain/zero/1.0/
  */
 
-package net.maritimecloud.internal.jsr166z;
+package net.maritimecloud.internal.util.concurrent;
 
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;

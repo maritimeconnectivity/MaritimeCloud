@@ -19,8 +19,8 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.URI;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
@@ -33,6 +33,7 @@ import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
+import net.maritimecloud.internal.util.concurrent.CompletableFuture;
 import net.maritimecloud.internal.util.logging.Logger;
 import net.maritimecloud.net.mms.MmsConnection;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
@@ -51,8 +52,8 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
     /** The WebSocket container. */
     private final WebSocketContainer container;
 
-    /** The WebSocket session object set after having connected. */
-    volatile Session session;
+    /** The WebSocket session object set after having successfully connected. */
+    private volatile Session wsSession;
 
     ClientTransportJsr356(ClientTransportListener listener, MmsConnection.Listener connectionListener,
             WebSocketContainer container) {
@@ -62,20 +63,17 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
 
     /** {@inheritDoc} */
     public void connectBlocking(URI uri, long time, TimeUnit unit) throws IOException {
-        System.out.println("Trying to connect");
-        CountDownLatch done = new CountDownLatch(1);
+        // Someone forgot to add a timeout argument to the javax.websocket.WebSocketContainer.connectToServer, sigh...
+        CompletableFuture<Void> cf = new CompletableFuture<>();
         Thread t = Thread.currentThread();
-        Runnable r = () -> {
-            try {
-                if (!done.await(time, unit)) {
-                    LOG.error("Connect timed out after " + time + " " + unit);
-                    t.interrupt();
-                }
-            } catch (InterruptedException ignore) {}
-        };
-        // We spawn a separate thread to monitor whether or not we have timed out. Because someone forgot
-        // to add a timeout argument to the javax.websocket.WebSocketContainer.connectToServer, sigh...
-        new Thread(r, "Connect timeout thread").start();
+        cf.orTimeout(time, unit).handle((v, tt) -> {
+            if (tt instanceof TimeoutException) {
+                LOG.error("Connect timed out after " + time + " " + unit);
+                t.interrupt();
+            }
+            return v;
+        });
+
         try {
             container.connectToServer(this, uri);
         } catch (DeploymentException e) {
@@ -86,13 +84,13 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
             }
             throw e;
         } finally {
-            done.countDown();
+            cf.complete(null);
         }
     }
 
     /** {@inheritDoc} */
     public void closeTransport(MmsConnectionClosingCode reason) {
-        Session session = this.session;
+        Session session = this.wsSession;
         if (session != null) {
             CloseReason cr = new CloseReason(new CloseCode() {
                 public int getCode() {
@@ -111,7 +109,7 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
     /** {@inheritDoc} */
     @OnClose
     public void onClose(CloseReason closeReason) {
-        session = null;
+        wsSession = null;
         MmsConnectionClosingCode reason = MmsConnectionClosingCode.create(closeReason.getCloseCode().getCode(),
                 closeReason.getReasonPhrase());
         listener.onClose(reason);
@@ -120,7 +118,7 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
 
     @OnOpen
     public void onOpen(Session session) {
-        this.session = session; // wait on the server to send a hello message
+        this.wsSession = session; // wait on the server to send a hello message
         session.setMaxTextMessageBufferSize(10 * 1024 * 1024);
         listener.onOpen();
     }
@@ -128,12 +126,12 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
     /** {@inheritDoc} */
     @OnMessage
     public void onTextMessage(String textMessage) {
-        super.onTextMessage(textMessage);
+        super.onTextMessage(textMessage); // overridden for the @OnMessage annotation
     }
 
     /** {@inheritDoc} */
     public void sendMessage(MmsMessage message) {
-        Session session = this.session;
+        Session session = this.wsSession;
         if (session != null) {
             String textToSend = message.toText();
             connectionListener.textMessageSend(textToSend);

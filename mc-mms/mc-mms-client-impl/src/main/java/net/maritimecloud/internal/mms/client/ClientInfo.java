@@ -49,6 +49,23 @@ public class ClientInfo {
     /** The URI to connect to. Is constant. */
     final URI serverUri;
 
+    private volatile long latestConnectionAttempt = -1;
+
+    /**
+     * @return the latestConnectionAttempt
+     */
+    public long getLatestConnectionAttempt() {
+        return latestConnectionAttempt;
+    }
+
+    /**
+     * @param latestConnectionAttempt
+     *            the latestConnectionAttempt to set
+     */
+    public void setLatestConnectionAttempt(long latestConnectionAttempt) {
+        this.latestConnectionAttempt = latestConnectionAttempt;
+    }
+
     public ClientInfo(MmsClientConfiguration configuration) {
         this.clientId = requireNonNull(configuration.getId());
         this.positionReader = configuration.getPositionReader();

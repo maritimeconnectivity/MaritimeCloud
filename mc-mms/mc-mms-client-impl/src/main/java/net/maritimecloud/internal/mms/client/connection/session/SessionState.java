@@ -22,7 +22,7 @@ import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
  *
  * @author Kasper Nielsen
  */
-public class SessionState {
+abstract class SessionState {
 
     final Session session;
 

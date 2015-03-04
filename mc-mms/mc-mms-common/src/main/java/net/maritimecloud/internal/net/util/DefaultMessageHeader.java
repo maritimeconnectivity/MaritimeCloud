@@ -26,13 +26,14 @@ import net.maritimecloud.util.Timestamp;
 import net.maritimecloud.util.geometry.Position;
 
 /**
- * Properties conveyed to receivers of broadcast messages.
+ * The default implementation of {@link MessageHeader}.
  *
  * @author Kasper Nielsen
  */
 public class DefaultMessageHeader implements MessageHeader {
 
-    final Map<String, Object> context;
+    /** A map of custom context objects. */
+    private final Map<String, Object> context;
 
     /** The id of the ship sending the broadcast. */
     private final MaritimeId id;

@@ -30,7 +30,8 @@ public abstract class AbstractClients implements EndpointImplementation {
 
     /** {@inheritDoc} */
     @Override
-    public final void invoke(String name, MessageHeader header, MessageReader reader, ValueWriter writer) throws IOException {
+    public final void invoke(String name, MessageHeader header, MessageReader reader, ValueWriter writer)
+            throws IOException {
         if (name.equals("getAllClient")) {
             List<ClientInfo> result = getAllClient(header);
             writer.writeList(result, ClientInfo.SERIALIZER);

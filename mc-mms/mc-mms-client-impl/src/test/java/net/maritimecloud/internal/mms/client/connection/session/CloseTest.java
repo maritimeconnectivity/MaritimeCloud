@@ -17,7 +17,6 @@ package net.maritimecloud.internal.mms.client.connection.session;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -25,6 +24,7 @@ import net.maritimecloud.internal.mms.client.MoreAsserts;
 import net.maritimecloud.internal.mms.messages.Close;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.internal.net.messages.Broadcast;
+import net.maritimecloud.internal.util.concurrent.CompletableFuture;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 
 import org.junit.Test;

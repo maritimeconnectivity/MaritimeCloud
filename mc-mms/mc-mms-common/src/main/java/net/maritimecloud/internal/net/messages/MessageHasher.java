@@ -30,6 +30,7 @@ import net.maritimecloud.util.geometry.Position;
  * @author Kasper Nielsen
  */
 public class MessageHasher {
+
     static Binary binaryOf(Broadcast br) {
         Binary b = Binary.EMPTY;
         b = b.concat(from(br.getBroadcastType(), false, "broadcastType"));
