@@ -5,6 +5,8 @@ target
 .settings
 .project
 .classpath
+.idea
+*.iml
 /_old
 mc-msdl/*.msdl
 mc-msdl/generated
