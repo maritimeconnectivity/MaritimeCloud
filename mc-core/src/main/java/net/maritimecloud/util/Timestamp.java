@@ -14,6 +14,7 @@
  */
 package net.maritimecloud.util;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.time.Clock;
 import java.time.Instant;
@@ -25,7 +26,9 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Kasper Nielsen
  */
-public class Timestamp {
+public class Timestamp implements Serializable {
+
+    private static final long serialVersionUID = -1966283025437623663L;
 
     /** The default clock used for creating timestamps. */
     static final Clock CLOCK = Clock.systemUTC();
