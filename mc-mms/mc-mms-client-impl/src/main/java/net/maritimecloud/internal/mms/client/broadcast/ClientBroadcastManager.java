@@ -52,9 +52,9 @@ import net.maritimecloud.util.geometry.Area;
 import net.maritimecloud.util.geometry.Circle;
 import net.maritimecloud.util.geometry.PositionTime;
 
+import org.cakeframework.container.concurrent.ScheduleWithFixedDelay;
+import org.cakeframework.container.concurrent.ThreadManager;
 import org.cakeframework.container.lifecycle.RunOnStop;
-import org.cakeframework.util.concurrent.ScheduleWithFixedDelay;
-import org.cakeframework.util.concurrent.ThreadManager;
 
 /**
  * Manages sending and receiving of broadcasts.

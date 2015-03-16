@@ -65,6 +65,7 @@ public class AbstractClientConnectionTest {
 
     @Before
     public void before() {
+        ClientInfo.RECONNECT_TIME_DELAY = 0;
         clientPort = ThreadLocalRandom.current().nextInt(40000, 50000);
         ws = new TestWebSocketServer(clientPort);
         ws.start();

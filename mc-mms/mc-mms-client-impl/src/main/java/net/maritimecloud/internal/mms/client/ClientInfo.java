@@ -36,6 +36,8 @@ import net.maritimecloud.util.geometry.PositionTime;
  */
 public class ClientInfo {
 
+    public static int RECONNECT_TIME_DELAY = 2000;
+
     private static final Logger LOGGER = Logger.get(ClientInfo.class);
 
     final Map<String, String> clientConnectString;

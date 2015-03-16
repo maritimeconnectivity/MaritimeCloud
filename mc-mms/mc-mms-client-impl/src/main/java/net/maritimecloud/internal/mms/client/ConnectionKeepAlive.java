@@ -23,7 +23,7 @@ import net.maritimecloud.internal.mms.messages.PositionReport;
 import net.maritimecloud.internal.util.logging.Logger;
 import net.maritimecloud.net.mms.MmsClientConfiguration;
 
-import org.cakeframework.util.concurrent.ScheduleAtFixedRate;
+import org.cakeframework.container.concurrent.ScheduleAtFixedRate;
 
 /**
  * Takes care of sending out keep alive signals.

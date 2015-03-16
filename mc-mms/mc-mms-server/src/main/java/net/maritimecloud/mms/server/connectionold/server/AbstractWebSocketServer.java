@@ -65,6 +65,8 @@ public abstract class AbstractWebSocketServer {
 
     final MmsServer is;
 
+    final String accessLogPath;
+
     public AbstractWebSocketServer(MmsServerConfiguration configuration, MmsServer is) {
         this.sa = new InetSocketAddress(configuration.getServerPort());
         this.is = requireNonNull(is);
@@ -73,7 +75,7 @@ public abstract class AbstractWebSocketServer {
         // Sets the sockets reuse address to true
         ServerConnector connector = (ServerConnector) server.getConnectors()[0];
         connector.setReuseAddress(true);
-
+        accessLogPath = configuration.getLogRequestDirectory();
 
     }
 
@@ -90,20 +92,22 @@ public abstract class AbstractWebSocketServer {
         context.setContextPath("/");
 
 
-        HandlerCollection handlers = new HandlerCollection();
         // ContextHandlerCollection contexts = new ContextHandlerCollection();
-        RequestLogHandler requestLogHandler = new RequestLogHandler();
-        handlers.setHandlers(new Handler[] { context, requestLogHandler });
-        server.setHandler(handlers);
+        if (accessLogPath != null) {
+            HandlerCollection handlers = new HandlerCollection();
+            RequestLogHandler requestLogHandler = new RequestLogHandler();
+            handlers.setHandlers(new Handler[] { context, requestLogHandler });
+            server.setHandler(handlers);
 
-        NCSARequestLog requestLog = new NCSARequestLog("./logs/jetty-yyyy_mm_dd.request.log");
-        requestLog.setRetainDays(90);
-        requestLog.setAppend(true);
-        requestLog.setExtended(false);
-        requestLog.setLogTimeZone("GMT");
-        requestLogHandler.setRequestLog(requestLog);
-
-        // server.setHandler(context);
+            NCSARequestLog requestLog = new NCSARequestLog("./logs/jetty-yyyy_mm_dd.request.log");
+            requestLog.setRetainDays(90);
+            requestLog.setAppend(true);
+            requestLog.setExtended(false);
+            requestLog.setLogTimeZone("GMT");
+            requestLogHandler.setRequestLog(requestLog);
+        } else {
+            server.setHandler(context);
+        }
 
 
         // Jetty needs to have at least 1 servlet, so we add this dummy servlet

@@ -36,6 +36,9 @@ public class MmsServerConfiguration {
     /** The id of the server, hard coded for now */
     ServerId id = new ServerId(1);
 
+    @Parameter(names = "-accessLogs", description = "The directory to write access logs into")
+    String logRequestDirectory;
+
     @Parameter(names = "-port", description = "The (unsecure) port to listen for MMS connections on")
     int port = DEFAULT_PORT;
 
@@ -50,6 +53,13 @@ public class MmsServerConfiguration {
      */
     public ServerId getId() {
         return id;
+    }
+
+    /**
+     * @return the logRequestDirectory
+     */
+    public String getLogRequestDirectory() {
+        return logRequestDirectory;
     }
 
     /**
@@ -81,6 +91,14 @@ public class MmsServerConfiguration {
     public MmsServerConfiguration setId(ServerId id) {
         this.id = id;
         return this;
+    }
+
+    /**
+     * @param logRequestDirectory
+     *            the logRequestDirectory to set
+     */
+    public void setLogRequestDirectory(String logRequestDirectory) {
+        this.logRequestDirectory = logRequestDirectory;
     }
 
     /**
