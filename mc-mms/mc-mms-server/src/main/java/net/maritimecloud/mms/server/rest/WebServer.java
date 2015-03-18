@@ -66,6 +66,8 @@ public class WebServer {
         config.register(sm.inject(JSONMessageBodyWriter.class));
         config.register(sm.inject(EndpointInvoke.class));
         config.register(sm.inject(ClientResource.class));
+        config.register(sm.inject(MetricsResource.class));
+        config.register(sm.inject(JSONMetricRegistryBodyWriter.class));
         config.register(sm.inject(DmaExceptionMapper.class));
 
 

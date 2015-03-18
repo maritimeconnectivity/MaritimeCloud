@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
 import net.maritimecloud.internal.mms.messages.services.AbstractServices;
 import net.maritimecloud.mms.server.connectionold.ServerConnection;
 import net.maritimecloud.mms.server.targets.Target;
@@ -40,8 +42,15 @@ public class ServerServices extends AbstractServices {
 
     final TargetManager tracker;
 
-    public ServerServices(TargetManager tm) {
+    // Metrics
+    final Meter endpointRegistrationsMeter;
+    final Meter serviceLocatesMeter;
+
+    public ServerServices(TargetManager tm, MetricRegistry metrics) {
         this.tracker = requireNonNull(tm);
+
+        endpointRegistrationsMeter = metrics.meter("endpointRegistrations");
+        serviceLocatesMeter = metrics.meter("serviceLocates");
     }
 
     /**
@@ -104,6 +113,10 @@ public class ServerServices extends AbstractServices {
         for (Entry<Target, PositionTime> e : findService) {
             result.add(e.getKey().getId().toString());
         }
+
+        // Update metrics
+        serviceLocatesMeter.mark();
+
         return result;
     }
 
@@ -113,6 +126,9 @@ public class ServerServices extends AbstractServices {
         ServerConnection con = ServerEndpointManager.connection(header);
         TargetEndpointManager services = con.getTarget().getEndpointManager();
         services.registerEndpoint(endpointName);
+
+        // Update metrics
+        endpointRegistrationsMeter.mark();
     }
 
     /** {@inheritDoc} */

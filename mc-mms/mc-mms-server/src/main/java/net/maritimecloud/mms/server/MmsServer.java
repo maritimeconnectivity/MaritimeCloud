@@ -18,6 +18,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.concurrent.TimeUnit;
 
+import com.codahale.metrics.MetricRegistry;
 import net.maritimecloud.core.id.ServerId;
 import net.maritimecloud.mms.server.broadcast.ServerBroadcastManager;
 import net.maritimecloud.mms.server.connectionold.ConnectionManager;
@@ -69,6 +70,7 @@ public class MmsServer {
         if (configuration.getWebserverPort() > 0) {
             conf.addService(WebServer.class);
         }
+        conf.addService(MetricRegistry.class);
         container = conf.create();
     }
 

@@ -40,6 +40,7 @@ public class MessageStore<T extends StoredMessage> {
     /** All messages ordered by time, uses hash for breaking ties. */
     final ConcurrentSkipListMap<Key, T> messagesByTime = new ConcurrentSkipListMap<>();
 
+    // Peder: Should it not be added to messagesByTime?
     public void addMessage(T m) {
         messages.put(m.getMessageId(), m);
     }
