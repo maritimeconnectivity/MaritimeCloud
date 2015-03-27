@@ -99,7 +99,7 @@ public abstract class AbstractBinaryMessageWriter implements MessageWriter {
     protected void writeFloat0(int tag, float value) throws IOException {
         int val = Float.floatToIntBits(MessageHelper.checkFloat(value));
         writeInt0(tag, val);
-    };
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -128,7 +128,7 @@ public abstract class AbstractBinaryMessageWriter implements MessageWriter {
     public final <T> void writeList(int tag, String name, List<T> list, ValueSerializer<T> serializer)
             throws IOException {
         if (list != null && list.size() > 0) {
-            writeSetOrList(tag, null, serializer);
+            writeSetOrList(tag, list, serializer);
         }
     }
 
@@ -163,7 +163,7 @@ public abstract class AbstractBinaryMessageWriter implements MessageWriter {
         if (value != null) {
             writeBinary(tag, name, value.toBinary());
         }
-    };
+    }
 
     /** {@inheritDoc} */
     @Override

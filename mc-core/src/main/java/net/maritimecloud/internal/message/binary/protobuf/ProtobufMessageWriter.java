@@ -14,35 +14,40 @@
  */
 package net.maritimecloud.internal.message.binary.protobuf;
 
+import net.maritimecloud.internal.core.com.google.protobuf.CodedOutputStream;
+import net.maritimecloud.internal.message.binary.AbstractBinaryMessageWriter;
+import net.maritimecloud.internal.message.binary.BinaryUtils;
+import net.maritimecloud.message.Message;
+import net.maritimecloud.message.MessageSerializer;
+import net.maritimecloud.message.ValueSerializer;
+import net.maritimecloud.util.Binary;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Map;
 
-import net.maritimecloud.internal.core.com.google.protobuf.CodedOutputStream;
-import net.maritimecloud.internal.message.binary.AbstractBinaryMessageWriter;
-import net.maritimecloud.message.Message;
-import net.maritimecloud.message.MessageSerializer;
-import net.maritimecloud.message.ValueSerializer;
-
 /**
- *
+ * Implementation of a message writer that uses the Google Protobuf wire format
  * @author Kasper Nielsen
  */
 public class ProtobufMessageWriter extends AbstractBinaryMessageWriter {
 
     final CodedOutputStream cos;
 
-    ProtobufMessageWriter(OutputStream os) {
-        // this.os = requireNonNull(os);
+    /**
+     * Constructor
+     * @param os the nested output stream
+     */
+    public ProtobufMessageWriter(OutputStream os) {
         cos = CodedOutputStream.newInstance(os);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void writeBoolean(int tag, String name, Boolean value) throws IOException {
-
+    public void close() throws IOException {
     }
 
     /** {@inheritDoc} */
@@ -53,42 +58,87 @@ public class ProtobufMessageWriter extends AbstractBinaryMessageWriter {
 
     /** {@inheritDoc} */
     @Override
+    public void writeBoolean(int tag, String name, Boolean value) throws IOException {
+        cos.writeBool(tag, value);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     protected void writeBinary(int tag, byte[] bin) throws IOException {
         cos.writeByteArray(tag, bin);
     }
 
     /** {@inheritDoc} */
     @Override
-    protected void writeInt640(int tag, long value) throws IOException {}
+    protected void writeInt640(int tag, long value) throws IOException {
+        cos.writeSInt64(tag, value);
+    }
 
     /** {@inheritDoc} */
     @Override
     protected <T extends Message> void writeMessage0(int tag, T message, MessageSerializer<T> serializer)
-            throws IOException {}
+            throws IOException {
+        byte[] bytes = ProtobufValueWriter.writeWithValueWriter(w -> serializer.write(message, w));
+        cos.writeByteArray(tag, bytes);
+    }
 
     /** {@inheritDoc} */
     @Override
-    protected void writeInt640(int tag, String name, long value) throws IOException {}
+    protected void writeInt640(int tag, String name, long value) throws IOException {
+        writeInt640(tag, value);
+    }
 
     /** {@inheritDoc} */
     @Override
-    protected void writeDecimal0(int tag, BigDecimal bd) throws IOException {}
+    protected void writeDecimal0(int tag, BigDecimal bd) throws IOException {
+        Binary value = BinaryUtils.encodeBigDecimal(bd);
+        writeBinary(tag, value.toByteArray());
+    }
 
     /** {@inheritDoc} */
     @Override
-    protected void writeInt0(int tag, int value) throws IOException {}
+    protected void writeInt0(int tag, int value) throws IOException {
+        cos.writeSInt32(tag, value);
+    }
 
     /** {@inheritDoc} */
     @Override
     protected <K, V> void writeMap0(int tag, Map<K, V> map, ValueSerializer<K> keySerializer,
-            ValueSerializer<V> valueSerializer) throws IOException {}
+            ValueSerializer<V> valueSerializer) throws IOException {
+        byte[] bytes = ProtobufValueWriter.writeWithValueWriter(w -> {
+            for (Map.Entry<K, V> e : map.entrySet()) {
+                keySerializer.write(e.getKey(), w);
+                valueSerializer.write(e.getValue(), w);
+            }
+        });
+        cos.writeByteArray(tag, bytes);
+    }
 
     /** {@inheritDoc} */
     @Override
-    protected <T> void writeSetOrList(int tag, Collection<T> set, ValueSerializer<T> serializer) throws IOException {}
+    protected <T> void writeSetOrList(int tag, Collection<T> col, ValueSerializer<T> serializer) throws IOException {
+        byte[] bytes = ProtobufValueWriter.writeWithValueWriter(e -> {
+            for (T t : col) {
+                if (t != null) {
+                    serializer.write(t, e);
+                }
+            }
+        });
+        cos.writeByteArray(tag, bytes);
+    }
 
-    /** {@inheritDoc} */
-    @Override
-    public void close() throws IOException {}
+    /**
+     * Writes the message as a byte array in the Protobuf format
+     * @param message the message
+     * @param serializer the message serializer
+     * @return the bytes
+     */
+    public static <T extends Message> byte[] write(T message, MessageSerializer<T> serializer) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ProtobufMessageWriter bvw = new ProtobufMessageWriter(out);
+        serializer.write(message, bvw);
+        bvw.flush();
+        return out.toByteArray();
+    }
 
 }
