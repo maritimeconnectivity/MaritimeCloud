@@ -41,7 +41,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * Protobuf CodedMessageReader is used, the message is initially read into
  * a {@code fieldValues} map, that maps the field tags to ValueReaders.
  */
-@SuppressWarnings("unused")
 public class ProtobufMessageReader extends AbstractMessageReader {
 
     /**

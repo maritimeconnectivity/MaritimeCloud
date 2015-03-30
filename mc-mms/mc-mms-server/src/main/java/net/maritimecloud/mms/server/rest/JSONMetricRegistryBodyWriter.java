@@ -28,6 +28,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -70,6 +71,7 @@ public class JSONMetricRegistryBodyWriter implements MessageBodyWriter<MetricReg
     /**
      * This method is more or less copied from the ConsoleReporter class.
      */
+    @SuppressWarnings("rawtypes") 
     public void report(PrintWriter output,
                        SortedMap<String, Gauge> gauges,
                        SortedMap<String, Counter> counters,
@@ -147,7 +149,7 @@ public class JSONMetricRegistryBodyWriter implements MessageBodyWriter<MetricReg
         output.printf(locale, "             count = %d%n", entry.getValue().getCount());
     }
 
-    private void printGauge(PrintWriter output, Locale locale, Map.Entry<String, Gauge> entry) {
+    private void printGauge(PrintWriter output, Locale locale, @SuppressWarnings("rawtypes") Map.Entry<String, Gauge> entry) {
         output.printf(locale, "             value = %s%n", entry.getValue().getValue());
     }
 

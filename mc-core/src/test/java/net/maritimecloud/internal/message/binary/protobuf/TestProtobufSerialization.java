@@ -91,7 +91,7 @@ public class TestProtobufSerialization extends AbstractProtobufTest {
      * @return the value or null
      */
     private static <T> T rndValue(int pct, T val) {
-        return  (Math.random() * 100.0 < (double)pct) ? val : null;
+        return  (Math.random() * 100.0 < pct) ? val : null;
     }
 
     /**
