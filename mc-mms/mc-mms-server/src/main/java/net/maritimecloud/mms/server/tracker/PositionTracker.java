@@ -33,7 +33,8 @@ import net.maritimecloud.util.geometry.PositionTime;
  * @author Kasper Nielsen
  */
 public class PositionTracker<T> {
-
+    // Good description of why we use brute force
+    // http://www.jandrewrogers.com/2015/03/02/geospatial-databases-are-hard/?h
     /** Magic constant. */
     static final int THRESHOLD = 1;
 
