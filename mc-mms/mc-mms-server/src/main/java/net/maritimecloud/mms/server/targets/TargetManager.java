@@ -24,6 +24,8 @@ import java.util.concurrent.atomic.LongAdder;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.mms.messages.services.AbstractClients;
 import net.maritimecloud.internal.mms.messages.services.ClientInfo;
@@ -129,7 +131,10 @@ public class TargetManager extends AbstractClients implements Iterable<Target> {
     }
 
     @RunOnStart
-    public void start(ThreadManager tm) {
+    public void start(ThreadManager tm, MetricRegistry metrics) {
         tracker.schedule(tm.getScheduledExecutor(), 1000);
+
+        // Add metrics gauges
+        metrics.register(MetricRegistry.name("targets", "size"), (Gauge<Integer>) targets::size);
     }
 }

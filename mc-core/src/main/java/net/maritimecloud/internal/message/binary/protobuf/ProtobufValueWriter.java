@@ -23,49 +23,58 @@ import java.util.Map;
 
 import net.maritimecloud.internal.core.com.google.protobuf.CodedOutputStream;
 import net.maritimecloud.internal.message.binary.AbstractBinaryValueWriter;
-import net.maritimecloud.internal.message.binary.BinaryUtils;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.message.ValueSerializer;
 import net.maritimecloud.util.Binary;
 
 /**
- * A compact binary value writer.
+ * A compact Protobuf value writer.
  *
  * @author Kasper Nielsen
  */
 public class ProtobufValueWriter extends AbstractBinaryValueWriter {
 
     /** The output stream to write to. */
-    final CodedOutputStream bos;
+    final CodedOutputStream cos;
 
-    ProtobufValueWriter(CodedOutputStream bos) {
-        this.bos = requireNonNull(bos);
+    /**
+     * Constructor
+     * @param cos the coded output stream
+     */
+    ProtobufValueWriter(CodedOutputStream cos) {
+        this.cos = requireNonNull(cos);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void flush() throws IOException {
+        cos.flush();
     }
 
     /** {@inheritDoc} */
     @Override
     public void writeBinary(Binary binary) throws IOException {
         byte[] b = binary.toByteArray();
-        bos.writeByteArrayNoTag(b);
+        cos.writeByteArrayNoTag(b);
     }
 
     /** {@inheritDoc} */
     @Override
     public void writeInt(Integer value) throws IOException {
-        bos.writeRawVarint32(BinaryUtils.encodeZigZag32(value));
+        cos.writeSInt32NoTag(value);
     }
 
     /** {@inheritDoc} */
     @Override
     public void writeInt64(Long value) throws IOException {
-        bos.writeRawVarint64(BinaryUtils.encodeZigZag64(value));
+        cos.writeSInt64NoTag(value);
     }
 
     /** {@inheritDoc} */
     @Override
     public <T> void writeList(List<T> list, ValueSerializer<T> serializer) throws IOException {
-        byte[] b = writeWithWriter(e -> {
+        byte[] b = writeWithValueWriter(e -> {
             for (T t : list) {
                 if (t != null) {
                     serializer.write(t, e);
@@ -79,7 +88,7 @@ public class ProtobufValueWriter extends AbstractBinaryValueWriter {
     @Override
     public <K, V> void writeMap(Map<K, V> map, ValueSerializer<K> keySerializer, ValueSerializer<V> valueSerializer)
             throws IOException {
-        byte[] b = writeWithWriter(e -> {
+        byte[] b = writeWithValueWriter(e -> {
             for (Map.Entry<K, V> entry : map.entrySet()) {
                 K key = entry.getKey();
                 V value = entry.getValue();
@@ -95,16 +104,34 @@ public class ProtobufValueWriter extends AbstractBinaryValueWriter {
     /** {@inheritDoc} */
     @Override
     public <T extends Message> void writeMessage(T message, MessageSerializer<T> serializer) throws IOException {
-        byte[] b = writeWithWriter(e -> serializer.write(message, e));
+        byte[] b = writeWithMessageWriter(e -> serializer.write(message, e));
         writeBinary(Binary.copyFrom(b));
     }
 
-    static byte[] writeWithWriter(IOEConsumer<ProtobufValueWriter> w) throws IOException {
+    /**
+     * Helper function. Generate the Protobuf byte array for the value writer consumer
+     * @param w the value writer consumer
+     * @return the Protobuf bytes
+     */
+    static byte[] writeWithValueWriter(IOEConsumer<ProtobufValueWriter> w) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         CodedOutputStream bos = CodedOutputStream.newInstance(baos);
         ProtobufValueWriter bvw = new ProtobufValueWriter(bos);
         w.consume(bvw);
         bvw.flush();
+        return baos.toByteArray();
+    }
+
+    /**
+     * Helper function. Generate the Protobuf byte array for the message writer consumer
+     * @param w the message writer consumer
+     * @return the Protobuf bytes
+     */
+    static byte[] writeWithMessageWriter(IOEConsumer<ProtobufMessageWriter> w) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ProtobufMessageWriter bmw = new ProtobufMessageWriter(baos);
+        w.consume(bmw);
+        bmw.flush();
         return baos.toByteArray();
     }
 

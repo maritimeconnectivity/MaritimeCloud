@@ -15,6 +15,9 @@
 package net.maritimecloud.mms.server.connectionold;
 
 import static java.util.Objects.requireNonNull;
+
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.mms.messages.PositionReport;
 import net.maritimecloud.internal.net.messages.Broadcast;
@@ -38,9 +41,20 @@ public class MmsServerConnectionBus {
 
     final ServerEndpointManager sem;
 
-    public MmsServerConnectionBus(ServerEndpointManager sem, TargetManager tm) {
+    // Metrics
+    final Meter broadcastsMeter;
+    final Meter methodInvokesMeter;
+    final Meter positionReportsMeter;
+
+
+    public MmsServerConnectionBus(ServerEndpointManager sem, TargetManager tm, MetricRegistry metrics) {
         this.tm = requireNonNull(tm);
         this.sem = sem;
+
+        // Metrics
+        broadcastsMeter = metrics.meter("broadcasts");
+        methodInvokesMeter = metrics.meter("methodInvokes");
+        positionReportsMeter = metrics.meter("positionReports");
     }
 
     public void onBroadcast(ServerConnection connection, Broadcast message) {
@@ -56,11 +70,14 @@ public class MmsServerConnectionBus {
     public void onMessage(ServerConnection connection, Message message) {
         if (message instanceof PositionReport) {
             connection.getTarget().setLatestPosition(((PositionReport) message).getPositionTime());
+            positionReportsMeter.mark();
         } else if (message instanceof Broadcast) {
             onBroadcast(connection, (Broadcast) message);
+            broadcastsMeter.mark();
         } else if (message instanceof MethodInvoke) {
             MethodInvoke mi = (MethodInvoke) message;
             onMethodInvoke(connection, message, mi.getReceiverId(), mi.getSenderId());
+            methodInvokesMeter.mark();
         } else if (message instanceof MethodInvokeResult) {
             MethodInvokeResult mi = (MethodInvokeResult) message;
             onMethodInvoke(connection, message, mi.getOriginalSenderId(), mi.getReceiverId());

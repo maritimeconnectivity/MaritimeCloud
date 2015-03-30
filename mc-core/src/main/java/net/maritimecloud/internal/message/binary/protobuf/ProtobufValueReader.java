@@ -14,13 +14,6 @@
  */
 package net.maritimecloud.internal.message.binary.protobuf;
 
-import static java.util.Objects.requireNonNull;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import net.maritimecloud.internal.core.com.google.protobuf.CodedInputStream;
 import net.maritimecloud.internal.message.binary.AbstractBinaryValueReader;
 import net.maritimecloud.message.Message;
@@ -28,52 +21,102 @@ import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.message.ValueSerializer;
 import net.maritimecloud.util.Binary;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.Objects.requireNonNull;
+
 /**
+ * A compact Protobuf value reader.
+ * <p>
+ * The reader is used by the {@code ProtobufMessageReader}, which pre-loads a map of
+ * all field value readers.
+ * <p>
+ * The reader may be initialized with either a Long value, used as the basis for
+ * WIRETYPE_VARINT data blobs, or a CodedInputStream used as the basis for
+ * WIRETYPE_LENGTH_DELIMITED data blobs.
  *
  * @author Kasper Nielsen
  */
 public class ProtobufValueReader extends AbstractBinaryValueReader {
 
-    CodedInputStream bis;
+    CodedInputStream cis;
+    Long value;
 
-    ProtobufValueReader(CodedInputStream bis) {
-        this.bis = requireNonNull(bis);
+    /**
+     * Constructor
+     * @param cis the coded input stream
+     */
+    ProtobufValueReader(CodedInputStream cis) {
+        this.cis = requireNonNull(cis);
+    }
+
+    /**
+     * Constructor
+     * @param value the value
+     */
+    ProtobufValueReader(Long value) {
+        this.value = requireNonNull(value);
+    }
+
+    /** Throws an exception unless the value reader was instantiated with a coded input stream */
+    private void checkFromInputStream() throws IOException {
+        if (cis == null) {
+            throw new IOException("The value reader is not based on a CodedInputStream");
+        }
+    }
+
+    /** Throws an exception unless the value reader was instantiated with a Long value */
+    private void checkFromLongValue() throws IOException {
+        if (value == null) {
+            throw new IOException("The value reader is not based on a Long value");
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public Binary readBinary() throws IOException {
-        byte[] a = bis.readByteArray();
+        checkFromInputStream();
+        byte[] a = cis.readByteArray();
         return Binary.copyFrom(a);
     }
 
     /** {@inheritDoc} */
     @Override
     public Integer readInt() throws IOException {
-        return bis.readInt32();
+        checkFromLongValue();
+        return value.intValue();
     }
 
     /** {@inheritDoc} */
     @Override
     public Long readInt64() throws IOException {
-        return null;
+        checkFromLongValue();
+        return value;
     }
 
     /** {@inheritDoc} */
     @Override
     public <T extends Message> T readMessage(MessageSerializer<T> parser) throws IOException {
-        return null;
+        checkFromInputStream();
+        byte[] b = cis.readByteArray();
+        CodedInputStream mis = CodedInputStream.newInstance(b);
+        ProtobufMessageReader reader = new ProtobufMessageReader(mis);
+        return parser.read(reader);
     }
 
     /** {@inheritDoc} */
     @Override
     public <T> List<T> readList(ValueSerializer<T> parser) throws IOException {
-        byte[] b = bis.readByteArray();
-
-        CodedInputStream cis = CodedInputStream.newInstance(b);
+        checkFromInputStream();
+        byte[] b = cis.readByteArray();
+        CodedInputStream lis = CodedInputStream.newInstance(b);
         ArrayList<T> list = new ArrayList<>();
-        ProtobufValueReader r = new ProtobufValueReader(cis);
-        while (!cis.isAtEnd()) {
+        ProtobufValueReader r = new ProtobufValueReader(lis);
+        while (!lis.isAtEnd()) {
             T t = parser.read(r);
             if (t != null) {
                 list.add(t);
@@ -85,7 +128,19 @@ public class ProtobufValueReader extends AbstractBinaryValueReader {
     /** {@inheritDoc} */
     @Override
     public <K, V> Map<K, V> readMap(ValueSerializer<K> keyParser, ValueSerializer<V> valueParser) throws IOException {
-        return null;
+        checkFromInputStream();
+        byte[] b = cis.readByteArray();
+        CodedInputStream mis = CodedInputStream.newInstance(b);
+        Map<K, V> map = new HashMap<>();
+        ProtobufValueReader r = new ProtobufValueReader(mis);
+        while (!mis.isAtEnd()) {
+            K key = keyParser.read(r);
+            V value = valueParser.read(r);
+            if (key != null && value != null) {
+                map.put(key, value);
+            }
+        }
+        return map;
     }
 
 }
