@@ -20,7 +20,6 @@ package net.maritimecloud.internal.message.binary.protobuf;
  * The primary reason for copying the class is that {@code getTagWireType()}
  * has package scope access, and we need access to the internal data representation.
  */
-@SuppressWarnings("unused")
 public class ProtobufWireFormat {
 
     public static final int WIRETYPE_VARINT           = 0;
