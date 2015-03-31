@@ -14,22 +14,22 @@
  */
 package net.maritimecloud.util.geometry;
 
-import static java.lang.Math.cos;
-import static java.lang.Math.sin;
-import static java.util.Objects.requireNonNull;
-import static net.maritimecloud.util.geometry.CoordinateConverter.compass2cartesian;
-
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.ParseException;
-
 import net.maritimecloud.internal.message.BinaryUtil;
 import net.maritimecloud.message.MessageReader;
 import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.message.MessageWriter;
 import net.maritimecloud.util.Binary;
 import net.maritimecloud.util.Timestamp;
+
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
+
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+import static java.util.Objects.requireNonNull;
+import static net.maritimecloud.util.geometry.CoordinateConverter.compass2cartesian;
 
 /**
  * A position couple with a timestamp.
@@ -65,7 +65,13 @@ public class PositionTime extends Position {
     }
 
     public static PositionTime fromBinary(Binary b) {
-        return null;
+        byte[] bytes = b.toByteArray();
+        PositionTime pt = PositionTime.create(
+                BinaryUtil.readInt(bytes, 0) / POS_INT_SCALE,
+                BinaryUtil.readInt(bytes, 4) / POS_INT_SCALE,
+                BinaryUtil.readLong(bytes, 8)
+        );
+        return pt;
     }
 
     public Binary toBinary() {
@@ -239,7 +245,7 @@ public class PositionTime extends Position {
                 + "' must be lat, lon in decimal degrees, example '23.23, -23.12'");
     }
 
-    static final double linearInterpolation(double y1, long x1, double y2, long x2, long x) {
+    static double linearInterpolation(double y1, long x1, double y2, long x2, long x) {
         return y1 + (y2 - y1) / (x2 - x1) * (x - x1);
     }
 

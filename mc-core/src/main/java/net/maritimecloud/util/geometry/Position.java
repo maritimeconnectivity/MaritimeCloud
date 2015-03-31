@@ -32,6 +32,8 @@ import net.maritimecloud.util.geometry.CoordinateSystem.VincentyCalculationType;
  */
 public class Position implements Message, Serializable {
 
+    static final double POS_INT_SCALE = 10_000_000d;
+
     public static final MessageSerializer<Position> SERIALIZER = new MessageSerializer<Position>() {
 
         /** {@inheritDoc} */
@@ -320,11 +322,11 @@ public class Position implements Message, Serializable {
     }
 
     int getLatitudeAsInt() {
-        return (int) (latitude * 10_000_000d);
+        return (int) (latitude * POS_INT_SCALE);
     }
 
     int getLongitudeAsInt() {
-        return (int) (longitude * 10_000_000d);
+        return (int) (longitude * POS_INT_SCALE);
     }
 
     /**
@@ -357,6 +359,20 @@ public class Position implements Message, Serializable {
     }
 
     /**
+     * Returns a position from a 64 bit byte array encoded as decimal degress with 7 decimal places.
+     *
+     * @return the position from a binary array
+     */
+    public static Position fromBinary(Binary b) {
+        byte[] bytes = b.toByteArray();
+        Position pos = Position.create(
+                BinaryUtil.readInt(bytes, 0) / POS_INT_SCALE,
+                BinaryUtil.readInt(bytes, 4) / POS_INT_SCALE
+        );
+        return pos;
+    }
+
+    /**
      * Returns a 64 bit representation of this position. Encoded as decimal degress with 7 decimal places.
      *
      * @return the position as a binary
@@ -382,10 +398,6 @@ public class Position implements Message, Serializable {
             return "0" + value;
         }
         return Integer.toString(value);
-    }
-
-    public static Position fromBinary(Binary b) {
-        return null;
     }
 
     public static Position fromPackedLong(long l) {

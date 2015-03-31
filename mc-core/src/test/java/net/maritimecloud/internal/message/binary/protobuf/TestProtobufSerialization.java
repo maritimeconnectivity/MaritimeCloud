@@ -15,11 +15,14 @@
 package net.maritimecloud.internal.message.binary.protobuf;
 
 import net.maritimecloud.util.Timestamp;
+import net.maritimecloud.util.geometry.Position;
+import net.maritimecloud.util.geometry.PositionTime;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.util.Random;
 
 /**
@@ -65,12 +68,12 @@ public class TestProtobufSerialization extends AbstractProtobufTest {
         m.d = rndValue(50, (Double.MAX_VALUE * Math.random()) + (Double.MIN_VALUE * Math.random()));
         m.t = rndValue(50, Timestamp.now());
         m.bytes = rndValue(50, rndString(10).getBytes());
+        m.bd = rndValue(50, BigDecimal.valueOf((Double.MAX_VALUE * Math.random()) + (Double.MIN_VALUE * Math.random())));
 
-        // TODO: BigDecimal is not properly handler, methinks
-        //m.bd = rndValue(50, BigDecimal.valueOf((Double.MAX_VALUE * Math.random()) + (Double.MIN_VALUE * Math.random())));
-
-        // TODO: PositionTime (and others) do not implement fromBinary yet
-        //m.pt = PositionTime.create(55, 11, System.currentTimeMillis());
+        // NB: Positions are loosing precision when they are serialized (bad idea, methinks)
+        // Round them to integers in this test.
+        Position pt = Position.random();
+        m.pt = PositionTime.create((int)pt.getLatitude(), (int)pt.getLongitude(), System.currentTimeMillis());
 
         if (nested && Math.random() < 0.5) {
             int nestedMsgCnt = (int) (Math.random() * 10);

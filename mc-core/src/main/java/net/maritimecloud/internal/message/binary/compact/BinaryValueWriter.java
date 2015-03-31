@@ -14,19 +14,19 @@
  */
 package net.maritimecloud.internal.message.binary.compact;
 
-import static java.util.Objects.requireNonNull;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
 import net.maritimecloud.internal.message.binary.AbstractBinaryValueWriter;
 import net.maritimecloud.internal.message.binary.BinaryUtils;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.message.ValueSerializer;
 import net.maritimecloud.util.Binary;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * A compact binary value writer.

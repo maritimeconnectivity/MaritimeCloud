@@ -67,7 +67,7 @@ public class BinaryUtil {
      *            the array to write the value into
      * @return the specified byte array
      */
-    public static final byte[] writeInt(int value, byte[] bytes, int offset) {
+    public static byte[] writeInt(int value, byte[] bytes, int offset) {
         bytes[offset] = (byte) (value >>> 24);
         bytes[offset + 1] = (byte) (value >>> 16);
         bytes[offset + 2] = (byte) (value >>> 8);
@@ -86,7 +86,7 @@ public class BinaryUtil {
      *            the array to write the value into
      * @return the specified byte array
      */
-    public static final byte[] writeLong(long value, byte[] bytes, int offset) {
+    public static byte[] writeLong(long value, byte[] bytes, int offset) {
         bytes[offset] = (byte) (value >>> 56);
         bytes[offset + 1] = (byte) (value >>> 48);
         bytes[offset + 2] = (byte) (value >>> 40);
@@ -97,4 +97,25 @@ public class BinaryUtil {
         bytes[offset + 7] = (byte) value;
         return bytes;
     }
+
+    /**
+     * Reads a long using big-endian convention from the specified offset.
+     *
+     * @param bytes
+     *            The array to read from
+     * @param offset
+     *            the position to start reading from
+     * @return the long corresponding to the 4 bytes that was read
+     */
+    public static long readLong(byte[] bytes, int offset) {
+        return ((long)bytes[offset] << 56) +
+                (((long)bytes[offset + 1] & 0xff) << 48) +
+                (((long)bytes[offset + 2] & 0xff) << 40) +
+                (((long)bytes[offset + 3] & 0xff) << 32) +
+                (((long)bytes[offset + 4] & 0xff) << 24) +
+                (((long)bytes[offset + 5] & 0xff) << 16) +
+                (((long)bytes[offset + 6] & 0xff) << 8) +
+                ((long)bytes[offset + 7] & 0xff);
+    }
+
 }

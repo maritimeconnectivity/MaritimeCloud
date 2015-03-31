@@ -16,16 +16,15 @@ package net.maritimecloud.internal.message.binary.protobuf;
 
 import net.maritimecloud.internal.core.com.google.protobuf.CodedOutputStream;
 import net.maritimecloud.internal.message.binary.AbstractBinaryMessageWriter;
-import net.maritimecloud.internal.message.binary.BinaryUtils;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.message.ValueSerializer;
-import net.maritimecloud.util.Binary;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
@@ -91,8 +90,8 @@ public class ProtobufMessageWriter extends AbstractBinaryMessageWriter {
     /** {@inheritDoc} */
     @Override
     protected void writeDecimal0(int tag, BigDecimal bd) throws IOException {
-        Binary value = BinaryUtils.encodeBigDecimal(bd);
-        writeBinary(tag, value.toByteArray());
+        byte[] bytes = ProtobufValueWriter.writeWithValueWriter(w -> w.writeDecimal(bd));
+        cos.writeByteArray(tag, bytes);
     }
 
     /** {@inheritDoc} */
@@ -105,25 +104,14 @@ public class ProtobufMessageWriter extends AbstractBinaryMessageWriter {
     @Override
     protected <K, V> void writeMap0(int tag, Map<K, V> map, ValueSerializer<K> keySerializer,
             ValueSerializer<V> valueSerializer) throws IOException {
-        byte[] bytes = ProtobufValueWriter.writeWithValueWriter(w -> {
-            for (Map.Entry<K, V> e : map.entrySet()) {
-                keySerializer.write(e.getKey(), w);
-                valueSerializer.write(e.getValue(), w);
-            }
-        });
+        byte[] bytes = ProtobufValueWriter.writeWithValueWriter(w -> w.writeMap(map, keySerializer, valueSerializer));
         cos.writeByteArray(tag, bytes);
     }
 
     /** {@inheritDoc} */
     @Override
     protected <T> void writeSetOrList(int tag, Collection<T> col, ValueSerializer<T> serializer) throws IOException {
-        byte[] bytes = ProtobufValueWriter.writeWithValueWriter(e -> {
-            for (T t : col) {
-                if (t != null) {
-                    serializer.write(t, e);
-                }
-            }
-        });
+        byte[] bytes = ProtobufValueWriter.writeWithValueWriter(w -> w.writeList(new ArrayList<>(col), serializer));
         cos.writeByteArray(tag, bytes);
     }
 

@@ -22,6 +22,8 @@ import net.maritimecloud.message.ValueSerializer;
 import net.maritimecloud.util.Binary;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -96,6 +98,17 @@ public class ProtobufValueReader extends AbstractBinaryValueReader {
     public Long readInt64() throws IOException {
         checkFromLongValue();
         return value;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public BigDecimal readDecimal() throws IOException {
+        checkFromInputStream();
+        byte[] b = readBinary().toByteArray();
+        CodedInputStream bdis = CodedInputStream.newInstance(b);
+        int scale = bdis.readSInt32();
+        BigInteger unscaled = new BigInteger(bdis.readByteArray());
+        return new BigDecimal(unscaled, scale);
     }
 
     /** {@inheritDoc} */

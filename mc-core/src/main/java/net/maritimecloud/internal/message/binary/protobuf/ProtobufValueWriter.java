@@ -14,19 +14,20 @@
  */
 package net.maritimecloud.internal.message.binary.protobuf;
 
-import static java.util.Objects.requireNonNull;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
 import net.maritimecloud.internal.core.com.google.protobuf.CodedOutputStream;
 import net.maritimecloud.internal.message.binary.AbstractBinaryValueWriter;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.message.ValueSerializer;
 import net.maritimecloud.util.Binary;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * A compact Protobuf value writer.
@@ -73,32 +74,33 @@ public class ProtobufValueWriter extends AbstractBinaryValueWriter {
 
     /** {@inheritDoc} */
     @Override
+    public void writeDecimal(BigDecimal value) throws IOException {
+        writeInt(value.scale());
+        writeBinary(Binary.copyFrom(value.unscaledValue().toByteArray()));
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public <T> void writeList(List<T> list, ValueSerializer<T> serializer) throws IOException {
-        byte[] b = writeWithValueWriter(e -> {
-            for (T t : list) {
-                if (t != null) {
-                    serializer.write(t, e);
-                }
+        for (T t : list) {
+            if (t != null) {
+                serializer.write(t, this);
             }
-        });
-        writeBinary(Binary.copyFrom(b));
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public <K, V> void writeMap(Map<K, V> map, ValueSerializer<K> keySerializer, ValueSerializer<V> valueSerializer)
             throws IOException {
-        byte[] b = writeWithValueWriter(e -> {
-            for (Map.Entry<K, V> entry : map.entrySet()) {
-                K key = entry.getKey();
-                V value = entry.getValue();
-                if (key != null && value != null) {
-                    keySerializer.write(key, e);
-                    valueSerializer.write(value, e);
-                }
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            K key = entry.getKey();
+            V value = entry.getValue();
+            if (key != null && value != null) {
+                keySerializer.write(key, this);
+                valueSerializer.write(value, this);
             }
-        });
-        writeBinary(Binary.copyFrom(b));
+        }
     }
 
     /** {@inheritDoc} */

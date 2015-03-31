@@ -58,7 +58,7 @@ public abstract class AbstractBinaryValueWriter implements ValueWriter {
 
     /** {@inheritDoc} */
     @Override
-    public final void writeDecimal(BigDecimal value) throws IOException {
+    public void writeDecimal(BigDecimal value) throws IOException {
         writeBinary(BinaryUtils.encodeBigDecimal(value));
     }
 
