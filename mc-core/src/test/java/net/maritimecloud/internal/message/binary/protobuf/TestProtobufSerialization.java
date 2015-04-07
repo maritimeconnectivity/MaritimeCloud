@@ -73,7 +73,7 @@ public class TestProtobufSerialization extends AbstractProtobufTest {
         // NB: Positions are loosing precision when they are serialized (bad idea, methinks)
         // Round them to integers in this test.
         Position pt = Position.random();
-        m.pt = PositionTime.create((int)pt.getLatitude(), (int)pt.getLongitude(), System.currentTimeMillis());
+        m.pt = rndValue(50, PositionTime.create((int)pt.getLatitude(), (int)pt.getLongitude(), System.currentTimeMillis()));
 
         if (nested && Math.random() < 0.5) {
             int nestedMsgCnt = (int) (Math.random() * 10);
