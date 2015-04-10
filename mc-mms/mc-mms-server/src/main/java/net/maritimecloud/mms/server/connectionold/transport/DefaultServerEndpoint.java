@@ -59,4 +59,9 @@ public class DefaultServerEndpoint {
     public void onTextMessage(String textMessage) {
         transport.onTextMessage(textMessage);
     }
+
+    @OnMessage
+    public void onBinaryMessage(byte[] binaryMessage) {
+        transport.onBinaryMessage(binaryMessage);
+    }
 }

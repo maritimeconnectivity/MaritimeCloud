@@ -14,16 +14,21 @@
  */
 package net.maritimecloud.internal.mms.messages.spi;
 
-import static java.util.Objects.requireNonNull;
-
-import java.io.IOException;
-import java.lang.reflect.Field;
-
+import net.maritimecloud.internal.message.MessageHelper;
+import net.maritimecloud.internal.message.binary.protobuf.ProtobufMessageReader;
+import net.maritimecloud.internal.message.binary.protobuf.ProtobufMessageWriter;
 import net.maritimecloud.internal.message.text.json.JsonMessageReader;
 import net.maritimecloud.internal.net.messages.Broadcast;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.net.BroadcastMessage;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.lang.reflect.Field;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  *
@@ -175,6 +180,42 @@ public class MmsMessage {
 
         Message tm = MessageSerializer.readFromJSON(p, msg);
         pm.m = tm;
+        return pm;
+    }
+
+    /**
+     * Returns a binary representation of the MmsMessage
+     * @return a binary representation of the MmsMessage
+     */
+    public byte[] toBinary() throws IOException {
+        MmsMessageType mt = MmsMessageType.getTypeOf(m.getClass());
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ProtobufMessageWriter bvw = new ProtobufMessageWriter(baos);
+        bvw.writeInt(1, null, mt.type);
+        if (mt.isConnectionMessage()) {
+            bvw.writeInt64(2, null, oldMessageId);
+            bvw.writeInt64(3, null, latestReceivedId);
+        }
+        bvw.writeMessage(4, null, m, MessageHelper.getSerializer(m));
+        bvw.flush();
+        return baos.toByteArray();
+    }
+
+    /**
+     * Parses the byte array as an MmsMessage
+     * @param msg the bytes of the message
+     * @return the parsed message
+     */
+    public static MmsMessage parseBinaryMessage(byte[] msg) throws IOException {
+        MmsMessage pm = new MmsMessage();
+        ByteArrayInputStream bain = new ByteArrayInputStream(msg);
+        ProtobufMessageReader bmr = new ProtobufMessageReader(bain);
+        int type = bmr.readInt(1, null);
+        if (type > 7) {
+            pm.setMessageId(bmr.readInt64(2, null));
+            pm.setLatestReceivedId(bmr.readInt64(3, null));
+        }
+        pm.m = bmr.readMessage(4, null, MmsMessageType.getParser(type));
         return pm;
     }
 

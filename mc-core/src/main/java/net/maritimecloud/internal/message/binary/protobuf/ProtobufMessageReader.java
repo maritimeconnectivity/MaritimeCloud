@@ -25,12 +25,11 @@ import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.message.SerializationException;
 import net.maritimecloud.message.ValueReader;
 import net.maritimecloud.message.ValueSerializer;
-import net.maritimecloud.util.Binary;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -124,33 +123,15 @@ public class ProtobufMessageReader extends AbstractMessageReader {
     @Override
     public <K, V> Map<K, V> readMap(int tag, String name, ValueSerializer<K> keyParser, ValueSerializer<V> valueParser)
             throws IOException {
-        Binary bin = readBinary(tag, name, Binary.EMPTY);
-        if (bin != null) {
-            CodedInputStream mis = CodedInputStream.newInstance(bin.toByteArray());
-            Map<K, V> map = new HashMap<>();
-            ProtobufValueReader r = new ProtobufValueReader(mis);
-            while (!mis.isAtEnd()) {
-                K key = keyParser.read(r);
-                V value = valueParser.read(r);
-                if (key != null && value != null) {
-                    map.put(key, value);
-                }
-            }
-            return map;
-        }
-        return null;
+        ValueReader r = findOptional(tag, name);
+        return r == null ? (Map) Collections.emptyMap() : r.readMap(keyParser, valueParser);
     }
 
     /** {@inheritDoc} */
     @Override
     public <T extends Message> T readMessage(int tag, String name, MessageSerializer<T> parser) throws IOException {
-        Binary bin = readBinary(tag, name, Binary.EMPTY);
-        if (bin != null) {
-            CodedInputStream mis = CodedInputStream.newInstance(bin.toByteArray());
-            ProtobufMessageReader bmr = new ProtobufMessageReader(mis);
-            return parser.read(bmr);
-        }
-        return null;
+        ValueReader valueReader = findOptional(tag, name);
+        return valueReader == null ? null :  valueReader.readMessage(parser);
     }
 
     /** {@inheritDoc} */

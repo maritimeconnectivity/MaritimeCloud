@@ -14,12 +14,11 @@
  */
 package net.maritimecloud.server;
 
-import static java.util.Objects.requireNonNull;
-
-import java.io.IOException;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.TimeUnit;
+import net.maritimecloud.internal.message.MessageHelper;
+import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
+import net.maritimecloud.internal.net.MmsWireProtocol;
+import net.maritimecloud.message.Message;
+import net.maritimecloud.message.MessageSerializer;
 
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
@@ -27,11 +26,13 @@ import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.RemoteEndpoint.Basic;
 import javax.websocket.Session;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.TimeUnit;
 
-import net.maritimecloud.internal.message.MessageHelper;
-import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
-import net.maritimecloud.message.Message;
-import net.maritimecloud.message.MessageSerializer;
+import static java.util.Objects.requireNonNull;
 
 /**
  *
@@ -52,8 +53,17 @@ public class TesstEndpoint {
     }
 
     @OnMessage
-    public final void messageReceived(String msg) throws InterruptedException {
+    public final void onTextMessageReceived(String msg) throws InterruptedException {
+        System.out.println("TEST: Received text: " + msg);
         MmsMessage tm = MmsMessage.parseTextMessage(msg);
+        // System.out.println("GOT " + tm);
+        m.put(tm);
+    }
+
+    @OnMessage
+    public final void onBinaryMessageReceived(byte[] msg) throws InterruptedException, IOException {
+        MmsMessage tm = MmsMessage.parseBinaryMessage(msg);
+        System.out.println("TEST: Received binary: " + tm.toText());
         // System.out.println("GOT " + tm);
         m.put(tm);
     }
@@ -69,23 +79,6 @@ public class TesstEndpoint {
 
     public void send(Message m) {
         send(m, 0, 0);
-        //
-        // if (!(m instanceof ConnectionMessage)) {
-        // String msg = m.toJSON();
-        // MessageSerializer<?> p = MessageHelper.getSerializer((Message) m);
-        // // MessageSerializer<?> p = (MessageSerializer<?>) m.getClass().getField("PARSER").get(null);
-        //
-        // MessageSerializer.readFromJSON(p, msg);
-        // // assertEquals(m, des);
-        // }
-        // MmsMessage mms = new MmsMessage();
-        // mms.setM(m);
-        // Basic r = session.getBasicRemote();
-        // try {
-        // r.sendText(mms.toText());
-        // } catch (IOException e) {
-        // throw new AssertionError(e);
-        // }
     }
 
     public void send(Message m, long msgId, long latestReceivedId) {
@@ -106,7 +99,11 @@ public class TesstEndpoint {
         }
         Basic r = session.getBasicRemote();
         try {
-            r.sendText(mms.toText());
+            if (MmsWireProtocol.USE_BINARY) {
+                r.sendBinary(ByteBuffer.wrap(mms.toBinary()));
+            } else {
+                r.sendText(mms.toText());
+            }
         } catch (IOException e) {
             throw new AssertionError(e);
         }

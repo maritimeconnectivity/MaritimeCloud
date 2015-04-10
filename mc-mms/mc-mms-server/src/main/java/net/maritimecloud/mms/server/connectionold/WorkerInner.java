@@ -134,10 +134,8 @@ public class WorkerInner {
             om.id = nextSendId++;
             cm.setMessageId(om.id);
             cm.setLatestReceivedId(latestReceivedMessageId);
-            String message = cm.toText();
             written.add(om);
-            // System.out.println("Adding " + om.id + " to written");
-            transport.sendText(message);
+            transport.sendMessage(cm);
         } else {
             try {
                 Thread.sleep(10);

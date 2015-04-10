@@ -39,6 +39,7 @@ import javax.websocket.server.ServerEndpoint;
 import net.maritimecloud.internal.mms.client.TestWebSocketServer;
 import net.maritimecloud.internal.mms.messages.Hello;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
+import net.maritimecloud.internal.net.MmsWireProtocol;
 import net.maritimecloud.net.mms.MmsClient;
 import net.maritimecloud.net.mms.MmsConnection;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
@@ -52,6 +53,7 @@ import org.junit.Test;
  *
  * @author Kasper Nielsen
  */
+@SuppressWarnings("unused")
 public class TestConnectionTransport {
 
     TestWebSocketServer ws;
@@ -64,8 +66,14 @@ public class TestConnectionTransport {
 
     ClientTransportFactoryJetty tm;
 
+    boolean wasSendBinary = MmsWireProtocol.USE_BINARY;
+
     @Before
     public void before() throws Exception {
+
+        // Force text over the wire protocol
+        MmsWireProtocol.USE_BINARY = false;
+
         tm = new ClientTransportFactoryJetty();
         tm.start();
         clientPort = ThreadLocalRandom.current().nextInt(40000, 50000);
@@ -85,6 +93,9 @@ public class TestConnectionTransport {
             }
             assertTrue(st.receivedTests.isEmpty());
         }
+
+        // Restore the wire protocol
+        MmsWireProtocol.USE_BINARY = wasSendBinary;
     }
 
     @Test

@@ -14,29 +14,29 @@
  */
 package net.maritimecloud.internal.mms.client.connection.transport;
 
-import static java.util.Objects.requireNonNull;
-
-import java.io.IOException;
-import java.io.InterruptedIOException;
-import java.net.URI;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
+import net.maritimecloud.internal.net.MmsWireProtocol;
+import net.maritimecloud.internal.util.concurrent.CompletableFuture;
+import net.maritimecloud.internal.util.logging.Logger;
+import net.maritimecloud.net.mms.MmsConnection;
+import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
-import javax.websocket.CloseReason.CloseCode;
 import javax.websocket.DeploymentException;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
+import java.io.IOException;
+import java.io.InterruptedIOException;
+import java.net.URI;
+import java.nio.ByteBuffer;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
-import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
-import net.maritimecloud.internal.util.concurrent.CompletableFuture;
-import net.maritimecloud.internal.util.logging.Logger;
-import net.maritimecloud.net.mms.MmsConnection;
-import net.maritimecloud.net.mms.MmsConnectionClosingCode;
+import static java.util.Objects.requireNonNull;
 
 /**
  * The default implementation of a connection transport.
@@ -62,6 +62,7 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
     }
 
     /** {@inheritDoc} */
+    @Override
     public void connectBlocking(URI uri, long time, TimeUnit unit) throws IOException {
         // Someone forgot to add a timeout argument to the javax.websocket.WebSocketContainer.connectToServer, sigh...
         CompletableFuture<Void> cf = new CompletableFuture<>();
@@ -89,14 +90,11 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
     }
 
     /** {@inheritDoc} */
+    @Override
     public void closeTransport(MmsConnectionClosingCode reason) {
         Session session = this.wsSession;
         if (session != null) {
-            CloseReason cr = new CloseReason(new CloseCode() {
-                public int getCode() {
-                    return reason.getId();
-                }
-            }, reason.getMessage());
+            CloseReason cr = new CloseReason(reason::getId, reason.getMessage());
 
             try {
                 session.close(cr);
@@ -106,7 +104,10 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * Called when a web socket connection is closed
+     * @param closeReason the close reason
+     */
     @OnClose
     public void onClose(CloseReason closeReason) {
         wsSession = null;
@@ -116,6 +117,7 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
         connectionListener.disconnected(reason);
     }
 
+    /** Called when a new web socket connection is opened */
     @OnOpen
     public void onOpen(Session session) {
         this.wsSession = session; // wait on the server to send a hello message
@@ -125,17 +127,37 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
 
     /** {@inheritDoc} */
     @OnMessage
+    @Override
     public void onTextMessage(String textMessage) {
         super.onTextMessage(textMessage); // overridden for the @OnMessage annotation
     }
 
     /** {@inheritDoc} */
+    @OnMessage
+    @Override
+    public void onBinaryMessage(byte[] binaryMessage) {
+        super.onBinaryMessage(binaryMessage); // overridden for the @OnMessage annotation
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void sendMessage(MmsMessage message) {
         Session session = this.wsSession;
         if (session != null) {
-            String textToSend = message.toText();
-            connectionListener.textMessageSend(textToSend);
-            session.getAsyncRemote().sendText(textToSend);
+            if (MmsWireProtocol.USE_BINARY) {
+                try {
+                    byte[] data = message.toBinary();
+                    connectionListener.binaryMessageSend(data);
+                    session.getAsyncRemote().sendBinary(ByteBuffer.wrap(data));
+                } catch (IOException e) {
+                    // TODO: Proper error handling
+                    throw new RuntimeException("Error sending binary message", e);
+                }
+            } else {
+                String textToSend = message.toText();
+                connectionListener.textMessageSend(textToSend);
+                session.getAsyncRemote().sendText(textToSend);
+            }
         }
     }
 }

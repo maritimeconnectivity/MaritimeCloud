@@ -58,13 +58,17 @@ public class ProtobufMessageWriter extends AbstractBinaryMessageWriter {
     /** {@inheritDoc} */
     @Override
     public void writeBoolean(int tag, String name, Boolean value) throws IOException {
-        cos.writeBool(tag, value);
+        if (value != null) {
+            cos.writeBool(tag, value);
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     protected void writeBinary(int tag, byte[] bin) throws IOException {
-        cos.writeByteArray(tag, bin);
+        if (bin != null) {
+            cos.writeByteArray(tag, bin);
+        }
     }
 
     /** {@inheritDoc} */
@@ -77,7 +81,7 @@ public class ProtobufMessageWriter extends AbstractBinaryMessageWriter {
     @Override
     protected <T extends Message> void writeMessage0(int tag, T message, MessageSerializer<T> serializer)
             throws IOException {
-        byte[] bytes = ProtobufValueWriter.writeWithValueWriter(w -> serializer.write(message, w));
+        byte[] bytes = ProtobufValueWriter.writeWithMessageWriter(w -> serializer.write(message, w));
         cos.writeByteArray(tag, bytes);
     }
 

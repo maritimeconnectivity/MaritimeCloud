@@ -79,7 +79,7 @@ public class ServerConnectFuture {
             if (isReconnect) {} else {
                 new Thread(connection.worker).start();
             }
-            serverTransport.sendText(MmsMessage.toText(new Connected().setSessionId(connection.id)
+            serverTransport.sendMessage(new MmsMessage(new Connected().setSessionId(connection.id)
                     .setLastReceivedMessageId(id)));
             serverTransport.connection = connection;
             serverTransport.connectFuture = null;

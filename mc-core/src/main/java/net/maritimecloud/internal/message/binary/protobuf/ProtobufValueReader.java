@@ -71,13 +71,6 @@ public class ProtobufValueReader extends AbstractBinaryValueReader {
         }
     }
 
-    /** Throws an exception unless the value reader was instantiated with a Long value */
-    private void checkFromLongValue() throws IOException {
-        if (value == null) {
-            throw new IOException("The value reader is not based on a Long value");
-        }
-    }
-
     /** {@inheritDoc} */
     @Override
     public Binary readBinary() throws IOException {
@@ -89,15 +82,23 @@ public class ProtobufValueReader extends AbstractBinaryValueReader {
     /** {@inheritDoc} */
     @Override
     public Integer readInt() throws IOException {
-        checkFromLongValue();
-        return value.intValue();
+        if (value != null) {
+            return value.intValue();
+        }
+
+        checkFromInputStream();
+        return cis.readSInt32();
     }
 
     /** {@inheritDoc} */
     @Override
     public Long readInt64() throws IOException {
-        checkFromLongValue();
-        return value;
+        if (value != null) {
+            return value;
+        }
+
+        checkFromInputStream();
+        return cis.readSInt64();
     }
 
     /** {@inheritDoc} */

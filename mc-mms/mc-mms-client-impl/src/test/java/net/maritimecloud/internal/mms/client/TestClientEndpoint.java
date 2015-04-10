@@ -14,29 +14,28 @@
  */
 package net.maritimecloud.internal.mms.client;
 
-import static java.util.Objects.requireNonNull;
-
-import java.io.IOException;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import net.maritimecloud.internal.mms.messages.Welcome;
+import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
+import net.maritimecloud.internal.net.MmsWireProtocol;
+import net.maritimecloud.message.Message;
+import org.eclipse.jetty.websocket.common.WebSocketSession;
+import org.eclipse.jetty.websocket.common.io.AbstractWebSocketConnection;
 
 import javax.websocket.CloseReason;
-import javax.websocket.CloseReason.CloseCode;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.RemoteEndpoint.Basic;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
-import net.maritimecloud.internal.mms.messages.Welcome;
-import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
-import net.maritimecloud.message.Message;
-
-import org.eclipse.jetty.websocket.common.WebSocketSession;
-import org.eclipse.jetty.websocket.common.io.AbstractWebSocketConnection;
+import static java.util.Objects.requireNonNull;
 
 /**
  *
@@ -66,11 +65,7 @@ public class TestClientEndpoint {
     }
 
     public void close(int code, String reason) throws IOException {
-        session.close(new CloseReason(new CloseCode() {
-            public int getCode() {
-                return code;
-            }
-        }, reason));
+        session.close(new CloseReason(() -> code, reason));
     }
 
 
@@ -97,6 +92,15 @@ public class TestClientEndpoint {
             return;// ignore
         }
         MmsMessage tm = MmsMessage.parseTextMessage(msg);
+        m.put(tm);
+    }
+
+    @OnMessage
+    public final void messageReceived(byte[] msg, Session userSession) throws InterruptedException, IOException {
+        if (session != userSession) {
+            return;// ignore
+        }
+        MmsMessage tm = MmsMessage.parseBinaryMessage(msg);
         m.put(tm);
     }
 
@@ -131,7 +135,11 @@ public class TestClientEndpoint {
         }
         Basic r = session.getBasicRemote();
         try {
-            r.sendText(mms.toText());
+            if (MmsWireProtocol.USE_BINARY) {
+                r.sendBinary(ByteBuffer.wrap(mms.toBinary()));
+            } else {
+                r.sendText(mms.toText());
+            }
         } catch (IOException e) {
             throw new AssertionError(e);
         }

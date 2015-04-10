@@ -63,13 +63,36 @@ public abstract class ClientTransport {
 
     public abstract void closeTransport(MmsConnectionClosingCode reason);
 
+    /**
+     * Called when a text message is received over the wire
+     *
+     * @param textMessage the text message
+     */
     void onTextMessage(String textMessage) {
         MmsMessage msg;
         connectionListener.textMessageReceived(textMessage);
         try {
             msg = MmsMessage.parseTextMessage(textMessage);
         } catch (Exception e) {
-            LOGGER.error("Failed to parse incoming message", e);
+            LOGGER.error("Failed to parse incoming text message", e);
+            closeTransport(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage(e.getMessage()));
+            return;
+        }
+        listener.onMessage(msg);
+    }
+
+    /**
+     * Called when a binary message is received over the wire
+     *
+     * @param binaryMessage the text message
+     */
+    void onBinaryMessage(byte[] binaryMessage) {
+        MmsMessage msg;
+        connectionListener.binaryMessageReceived(binaryMessage);
+        try {
+            msg = MmsMessage.parseBinaryMessage(binaryMessage);
+        } catch (Exception e) {
+            LOGGER.error("Failed to parse incoming binary message", e);
             closeTransport(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage(e.getMessage()));
             return;
         }
@@ -79,8 +102,7 @@ public abstract class ClientTransport {
     /**
      * Send the specified message with the transport.
      *
-     * @param message
-     *            the message to send
+     * @param message the message to send
      */
     public abstract void sendMessage(MmsMessage message);
 }

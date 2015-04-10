@@ -23,6 +23,7 @@ import net.maritimecloud.util.Binary;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,14 @@ public class ProtobufValueWriter extends AbstractBinaryValueWriter {
      */
     ProtobufValueWriter(CodedOutputStream cos) {
         this.cos = requireNonNull(cos);
+    }
+
+    /**
+     * Constructor
+     * @param os the output stream
+     */
+    public ProtobufValueWriter(OutputStream os) {
+        this(CodedOutputStream.newInstance(os));
     }
 
     /** {@inheritDoc} */
