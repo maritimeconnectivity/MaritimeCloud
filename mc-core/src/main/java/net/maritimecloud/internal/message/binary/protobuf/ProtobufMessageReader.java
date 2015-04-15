@@ -124,7 +124,7 @@ public class ProtobufMessageReader extends AbstractMessageReader {
     public <K, V> Map<K, V> readMap(int tag, String name, ValueSerializer<K> keyParser, ValueSerializer<V> valueParser)
             throws IOException {
         ValueReader r = findOptional(tag, name);
-        return r == null ? (Map) Collections.emptyMap() : r.readMap(keyParser, valueParser);
+        return r == null ? Collections.emptyMap() : r.readMap(keyParser, valueParser);
     }
 
     /** {@inheritDoc} */

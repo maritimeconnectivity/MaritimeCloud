@@ -53,7 +53,6 @@ import org.junit.Test;
  *
  * @author Kasper Nielsen
  */
-@SuppressWarnings("unused")
 public class TestConnectionTransport {
 
     TestWebSocketServer ws;

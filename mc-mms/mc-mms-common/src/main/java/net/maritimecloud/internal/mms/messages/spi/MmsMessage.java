@@ -190,14 +190,15 @@ public class MmsMessage {
     public byte[] toBinary() throws IOException {
         MmsMessageType mt = MmsMessageType.getTypeOf(m.getClass());
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ProtobufMessageWriter bvw = new ProtobufMessageWriter(baos);
-        bvw.writeInt(1, null, mt.type);
-        if (mt.isConnectionMessage()) {
-            bvw.writeInt64(2, null, oldMessageId);
-            bvw.writeInt64(3, null, latestReceivedId);
+        try (ProtobufMessageWriter bvw = new ProtobufMessageWriter(baos)) {
+            bvw.writeInt(1, null, mt.type);
+            if (mt.isConnectionMessage()) {
+                bvw.writeInt64(2, null, oldMessageId);
+                bvw.writeInt64(3, null, latestReceivedId);
+            }
+            bvw.writeMessage(4, null, m, MessageHelper.getSerializer(m));
+            bvw.flush();
         }
-        bvw.writeMessage(4, null, m, MessageHelper.getSerializer(m));
-        bvw.flush();
         return baos.toByteArray();
     }
 
@@ -209,13 +210,14 @@ public class MmsMessage {
     public static MmsMessage parseBinaryMessage(byte[] msg) throws IOException {
         MmsMessage pm = new MmsMessage();
         ByteArrayInputStream bain = new ByteArrayInputStream(msg);
-        ProtobufMessageReader bmr = new ProtobufMessageReader(bain);
-        int type = bmr.readInt(1, null);
-        if (type > 7) {
-            pm.setMessageId(bmr.readInt64(2, null));
-            pm.setLatestReceivedId(bmr.readInt64(3, null));
+        try (ProtobufMessageReader bmr = new ProtobufMessageReader(bain)) {
+            int type = bmr.readInt(1, null);
+            if (type > 7) {
+                pm.setMessageId(bmr.readInt64(2, null));
+                pm.setLatestReceivedId(bmr.readInt64(3, null));
+            }
+            pm.m = bmr.readMessage(4, null, MmsMessageType.getParser(type));
         }
-        pm.m = bmr.readMessage(4, null, MmsMessageType.getParser(type));
         return pm;
     }
 
