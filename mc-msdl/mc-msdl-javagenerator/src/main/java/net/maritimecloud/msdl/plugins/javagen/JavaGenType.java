@@ -108,7 +108,7 @@ class JavaGenType {
             if (md.isAnnotationPresent(JavaImplementation.class)) {
                 return md.getAnnotation(JavaImplementation.class).value();
             } else if (!Objects.equals(md.getFile().getNamespace(), existing.getNamespace())) {
-                return md.getFile().getNamespace() + "." + md.getName();
+                return md.getFullName();
             }
             return md.getName();
         case ENUM:
@@ -116,7 +116,7 @@ class JavaGenType {
             if (d.isAnnotationPresent(JavaImplementation.class)) {
                 return d.getAnnotation(JavaImplementation.class).value();
             } else if (!Objects.equals(d.getFile().getNamespace(), existing.getNamespace())) {
-                return d.getFile().getNamespace() + "." + d.getName();
+                return d.getFullName();
             }
             return d.getName();
         default:

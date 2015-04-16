@@ -40,12 +40,22 @@ public interface EnumDeclaration extends Iterable<Constant>, Type, Annotatable {
     MsdlFile getFile();
 
     /**
+     * Returns the full name of the enum.
+     *
+     * @return the full name of the enum
+     */
+    default String getFullName() {
+        String namespace = getFile().getNamespace();
+        return namespace == null ? getName() : namespace + "." + getName();
+    }
+
+    /**
      * Returns the name of the enum.
      *
      * @return the name of the enum
      */
     String getName();
-
+    
     /**
      * The predefined constants that make of an enum.
      */

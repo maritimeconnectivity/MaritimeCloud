@@ -38,16 +38,19 @@ public interface BaseMessage extends Iterable<FieldOrParameter>, Annotatable {
     MsdlFile getFile();
 
     /**
-     * Returns the name of the message.
+     * Returns the full name of the message.
      *
-     * @return the name of the message
+     * @return the full name of the message
      */
-    String getName();
-
-
     default String getFullName() {
         String namespace = getFile().getNamespace();
         return namespace == null ? getName() : namespace + "." + getName();
     }
 
+    /**
+     * Returns the name of the message.
+     *
+     * @return the name of the message
+     */
+    String getName();
 }
