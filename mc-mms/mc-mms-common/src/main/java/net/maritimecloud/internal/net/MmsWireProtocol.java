@@ -22,5 +22,5 @@ package net.maritimecloud.internal.net;
  * over the wire.
  */
 public class MmsWireProtocol {
-    public static boolean USE_BINARY = false;
+    public static boolean USE_BINARY = Boolean.getBoolean("net.maritimecloud.mms.use_binary");
 }
