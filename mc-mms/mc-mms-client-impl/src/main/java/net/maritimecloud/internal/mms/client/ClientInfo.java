@@ -93,8 +93,10 @@ public class ClientInfo {
                 remote += ":43234";
             }
 
-            // use standard http (ws instead of wss)
-            remote = "ws://" + remote;
+            // Prefix the web socket protocol
+            if (!remote.toLowerCase().startsWith("ws://") && !remote.toLowerCase().startsWith("wss://")) {
+                remote = "ws://" + remote;
+            }
 
             // Tomcat does not automatically append a '/' to the host address
             if (!remote.endsWith("/")) {

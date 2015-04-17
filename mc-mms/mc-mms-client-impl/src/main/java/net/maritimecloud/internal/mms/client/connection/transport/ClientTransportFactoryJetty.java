@@ -27,6 +27,11 @@ import org.eclipse.jetty.websocket.jsr356.ClientContainer;
  */
 public class ClientTransportFactoryJetty extends ClientTransportFactory {
 
+    static {
+        // Allows us to test wss connections
+        System.setProperty("org.eclipse.jetty.websocket.jsr356.ssl-trust-all", "true");
+    }
+
     /** The single instance of a WebSocketContainer. */
     private final ClientContainer container = new ClientContainer();
 
