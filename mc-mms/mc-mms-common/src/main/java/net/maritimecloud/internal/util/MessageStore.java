@@ -42,6 +42,7 @@ public class MessageStore<T extends StoredMessage> {
 
     public void addMessage(T m) {
         messages.put(m.getMessageId(), m);
+        messagesByTime.put(new Key(m), m);
     }
 
     public T find(Binary key) {
