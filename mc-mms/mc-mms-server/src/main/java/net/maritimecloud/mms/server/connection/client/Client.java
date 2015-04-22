@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.mms.server.targets;
+package net.maritimecloud.mms.server.connection.client;
 
 import static java.util.Objects.requireNonNull;
 
@@ -28,7 +28,7 @@ import net.maritimecloud.util.geometry.PositionTime;
  *
  * @author Kasper Nielsen
  */
-public class Target {
+public class Client {
 
     private volatile ServerConnection activeConnection;
 
@@ -39,15 +39,15 @@ public class Target {
     /** The latest reported time and position. */
     private volatile PositionTime latestPosition;
 
-    private volatile TargetProperties properties = new TargetProperties(null, null, null);
+    private volatile ClientProperties properties = new ClientProperties(null, null, null);
 
     final ReentrantLock retrieveLock = new ReentrantLock();
 
     final ReentrantLock sendLock = new ReentrantLock();
 
-    final TargetManager tm;
+    final ClientManager tm;
 
-    public Target(TargetManager tm, MaritimeId id) {
+    public Client(ClientManager tm, MaritimeId id) {
         this.id = id;
         this.tm = tm;
         endpointManager = new TargetEndpointManager(this);
@@ -94,7 +94,7 @@ public class Target {
     /**
      * @return the properties
      */
-    public TargetProperties getProperties() {
+    public ClientProperties getProperties() {
         return properties;
     }
 
@@ -133,7 +133,7 @@ public class Target {
      * @param properties
      *            the properties to set
      */
-    public void setProperties(TargetProperties properties) {
+    public void setProperties(ClientProperties properties) {
         this.properties = requireNonNull(properties);
     }
 }

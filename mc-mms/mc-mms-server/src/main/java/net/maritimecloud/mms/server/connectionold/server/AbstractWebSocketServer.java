@@ -30,8 +30,8 @@ import javax.websocket.server.ServerEndpointConfig.Builder;
 
 import net.maritimecloud.mms.server.MmsServer;
 import net.maritimecloud.mms.server.MmsServerConfiguration;
-import net.maritimecloud.mms.server.connectionold.transport.DefaultServerEndpoint;
-import net.maritimecloud.mms.server.connectionold.transport.ServerTransport;
+import net.maritimecloud.mms.server.connection.transport.DefaultServerEndpoint;
+import net.maritimecloud.mms.server.connection.transport.ServerTransport;
 
 import org.cakeframework.container.lifecycle.RunOnStart;
 import org.cakeframework.container.lifecycle.RunOnStop;

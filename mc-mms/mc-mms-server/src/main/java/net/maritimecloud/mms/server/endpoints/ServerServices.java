@@ -24,10 +24,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
+
 import net.maritimecloud.internal.mms.messages.services.AbstractServices;
+import net.maritimecloud.mms.server.connection.client.Client;
+import net.maritimecloud.mms.server.connection.client.ClientManager;
 import net.maritimecloud.mms.server.connectionold.ServerConnection;
-import net.maritimecloud.mms.server.targets.Target;
-import net.maritimecloud.mms.server.targets.TargetManager;
 import net.maritimecloud.net.MessageHeader;
 import net.maritimecloud.util.geometry.Area;
 import net.maritimecloud.util.geometry.Position;
@@ -40,13 +41,13 @@ import net.maritimecloud.util.geometry.PositionTime;
  */
 public class ServerServices extends AbstractServices {
 
-    final TargetManager tracker;
+    final ClientManager tracker;
 
     // Metrics
     final Meter endpointRegistrationsMeter;
     final Meter serviceLocatesMeter;
 
-    public ServerServices(TargetManager tm, MetricRegistry metrics) {
+    public ServerServices(ClientManager tm, MetricRegistry metrics) {
         this.tracker = requireNonNull(tm);
 
         endpointRegistrationsMeter = metrics.meter("endpointRegistrations");
@@ -62,10 +63,10 @@ public class ServerServices extends AbstractServices {
      *            the find service request
      * @return a sorted list of the targets that was found sorted by distance to the target doing the search
      */
-    List<Entry<Target, PositionTime>> findServices(Target target, String endpointName, Position pos, double m, int max) {
+    List<Entry<Client, PositionTime>> findServices(Client target, String endpointName, Position pos, double m, int max) {
         double meters = m <= 0 ? Double.MAX_VALUE : m;
 
-        final ConcurrentHashMap<Target, PositionTime> map = new ConcurrentHashMap<>();
+        final ConcurrentHashMap<Client, PositionTime> map = new ConcurrentHashMap<>();
 
         if (pos == null) {
             tracker.forEachTarget((tt, r) -> {
@@ -87,7 +88,7 @@ public class ServerServices extends AbstractServices {
         map.remove(target);
 
         // Sort by distance
-        List<Entry<Target, PositionTime>> l = new ArrayList<>(map.entrySet());
+        List<Entry<Client, PositionTime>> l = new ArrayList<>(map.entrySet());
         if (pos != null) {
             Collections.sort(
                     l,
@@ -107,10 +108,10 @@ public class ServerServices extends AbstractServices {
     @Override
     protected List<String> locate(MessageHeader header, String endpointName, Integer meters, Integer max) {
         ServerConnection con = ServerEndpointManager.connection(header);
-        List<Entry<Target, PositionTime>> findService = findServices(con.getTarget(), endpointName,
+        List<Entry<Client, PositionTime>> findService = findServices(con.getTarget(), endpointName,
                 header.getSenderPosition(), meters, max);
         List<String> result = new ArrayList<>();
-        for (Entry<Target, PositionTime> e : findService) {
+        for (Entry<Client, PositionTime> e : findService) {
             result.add(e.getKey().getId().toString());
         }
 

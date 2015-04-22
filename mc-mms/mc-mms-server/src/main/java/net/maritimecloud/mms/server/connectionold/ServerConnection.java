@@ -18,8 +18,8 @@ import static java.util.Objects.requireNonNull;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.mms.server.MmsServer;
-import net.maritimecloud.mms.server.connectionold.transport.ServerTransport;
-import net.maritimecloud.mms.server.targets.Target;
+import net.maritimecloud.mms.server.connection.client.Client;
+import net.maritimecloud.mms.server.connection.transport.ServerTransport;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 import net.maritimecloud.util.Binary;
 
@@ -35,13 +35,13 @@ public class ServerConnection {
 
     final MmsServer is;
 
-    final Target target;
+    final Client target;
 
     volatile ServerTransport transport;
 
     final Worker worker = new Worker(this);
 
-    ServerConnection(Target target, MmsServer is) {
+    ServerConnection(Client target, MmsServer is) {
         this.target = requireNonNull(target);
         this.bus = requireNonNull(is.getService(MmsServerConnectionBus.class));
         this.is = is;
@@ -50,7 +50,7 @@ public class ServerConnection {
     /**
      * @return the target
      */
-    public Target getTarget() {
+    public Client getTarget() {
         return target;
     }
 

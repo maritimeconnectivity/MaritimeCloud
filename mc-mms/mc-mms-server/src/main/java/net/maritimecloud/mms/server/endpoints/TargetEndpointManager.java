@@ -18,7 +18,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.maritimecloud.mms.server.targets.Target;
+import net.maritimecloud.mms.server.connection.client.Client;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,9 +37,9 @@ public class TargetEndpointManager {
     final ConcurrentHashMap<String, String> endpoints = new ConcurrentHashMap<>();
 
     /** The client */
-    final Target target;
+    final Client target;
 
-    public TargetEndpointManager(Target target) {
+    public TargetEndpointManager(Client target) {
         this.target = requireNonNull(target);
     }
 

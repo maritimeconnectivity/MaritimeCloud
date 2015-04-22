@@ -27,12 +27,9 @@
   <groupId>net.maritimecloud.mms</groupId>
   <artifactId>mc-mms-parent</artifactId>
   <packaging>pom</packaging>
-  <name>MaritimeCloud MSDL Parent</name>
+  <name>MaritimeCloud MMS Parent</name>
   
-  
-  
-  
-    <modules>
+  <modules>
     <module>mc-mms-common</module>
     <module>mc-mms-client-api</module>
     <module>mc-mms-client-impl</module>
@@ -40,4 +37,5 @@
     <module>mc-mms-tck</module>
     <module>distribution</module>
   </modules>
+  
 </project>

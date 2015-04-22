@@ -19,7 +19,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.LinkedList;
 
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
-import net.maritimecloud.mms.server.connectionold.transport.ServerTransport;
+import net.maritimecloud.mms.server.connection.transport.ServerTransport;
 
 /**
  *

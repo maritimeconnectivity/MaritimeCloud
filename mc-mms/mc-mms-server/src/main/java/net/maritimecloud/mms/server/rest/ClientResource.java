@@ -18,7 +18,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
 import net.maritimecloud.message.Message;
-import net.maritimecloud.mms.server.targets.TargetManager;
+import net.maritimecloud.mms.server.connection.client.ClientManager;
 
 
 /**
@@ -28,9 +28,9 @@ import net.maritimecloud.mms.server.targets.TargetManager;
 
 @Path("/clients")
 public class ClientResource {
-    final TargetManager tm;
+    final ClientManager tm;
 
-    public ClientResource(TargetManager tm) {
+    public ClientResource(ClientManager tm) {
         this.tm = tm;
     }
 

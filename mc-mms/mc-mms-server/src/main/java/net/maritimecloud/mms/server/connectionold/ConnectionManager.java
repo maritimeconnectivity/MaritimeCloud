@@ -16,7 +16,7 @@ package net.maritimecloud.mms.server.connectionold;
 
 import static java.util.Objects.requireNonNull;
 import net.maritimecloud.mms.server.MmsServer;
-import net.maritimecloud.mms.server.targets.TargetManager;
+import net.maritimecloud.mms.server.connection.client.ClientManager;
 
 /**
  *
@@ -26,9 +26,9 @@ public class ConnectionManager {
 
     public final MmsServer server;
 
-    final TargetManager targetManager;
+    final ClientManager targetManager;
 
-    public ConnectionManager(MmsServer server, TargetManager targetManager) {
+    public ConnectionManager(MmsServer server, ClientManager targetManager) {
         this.server = requireNonNull(server);
         this.targetManager = requireNonNull(targetManager);
     }

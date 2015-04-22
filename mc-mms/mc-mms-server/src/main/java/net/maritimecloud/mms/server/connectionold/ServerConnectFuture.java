@@ -20,10 +20,10 @@ import net.maritimecloud.internal.mms.messages.Connected;
 import net.maritimecloud.internal.mms.messages.Hello;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.message.Message;
-import net.maritimecloud.mms.server.connectionold.transport.ServerTransport;
-import net.maritimecloud.mms.server.targets.Target;
-import net.maritimecloud.mms.server.targets.TargetManager;
-import net.maritimecloud.mms.server.targets.TargetProperties;
+import net.maritimecloud.mms.server.connection.client.Client;
+import net.maritimecloud.mms.server.connection.client.ClientManager;
+import net.maritimecloud.mms.server.connection.client.ClientProperties;
+import net.maritimecloud.mms.server.connection.transport.ServerTransport;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 
 import org.slf4j.Logger;
@@ -48,8 +48,8 @@ public class ServerConnectFuture {
     }
 
     public void onMessage(Hello hm) {
-        TargetManager tm = serverTransport.cm.targetManager;
-        Target target = tm.getTarget(MaritimeId.create(hm.getClientId()));
+        ClientManager tm = serverTransport.cm.targetManager;
+        Client target = tm.getTarget(MaritimeId.create(hm.getClientId()));
 
         // make sure we only have one connection attempt for a target at a time
         target.fullyLock();
@@ -69,7 +69,7 @@ public class ServerConnectFuture {
                 target.setLatestPosition(hm.getPositionTime());
                 target.setConnection(connection);
             }
-            target.setProperties(TargetProperties.createFrom(hm.getProperties()));
+            target.setProperties(ClientProperties.createFrom(hm.getProperties()));
 
 
             connection.transport = serverTransport;

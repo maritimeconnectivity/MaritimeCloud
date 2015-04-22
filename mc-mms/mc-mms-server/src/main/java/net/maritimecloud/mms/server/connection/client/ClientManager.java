@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.mms.server.targets;
+package net.maritimecloud.mms.server.connection.client;
 
 import static java.util.Objects.requireNonNull;
 
@@ -44,13 +44,13 @@ import org.cakeframework.container.lifecycle.RunOnStart;
  * @author Kasper Nielsen
  */
 
-public class TargetManager extends AbstractClients implements Iterable<Target> {
+public class ClientManager extends AbstractClients implements Iterable<Client> {
 
-    private final ConcurrentHashMap<String, Target> targets = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Client> targets = new ConcurrentHashMap<>();
 
-    final PositionTracker<Target> tracker = new PositionTracker<>();
+    final PositionTracker<Client> tracker = new PositionTracker<>();
 
-    public Target find(MaritimeId id) {
+    public Client find(MaritimeId id) {
         return targets.get(id.toString());
     }
 
@@ -64,16 +64,16 @@ public class TargetManager extends AbstractClients implements Iterable<Target> {
         });
     }
 
-    public void forEachTarget(BiConsumer<Target, PositionTime> consumer) {
+    public void forEachTarget(BiConsumer<Client, PositionTime> consumer) {
         tracker.forEach(consumer);
     }
 
-    public void forEachTarget(Consumer<Target> consumer) {
+    public void forEachTarget(Consumer<Client> consumer) {
         requireNonNull(consumer);
         targets.forEachValue(10, consumer);
     }
 
-    public void forEachWithinArea(Area shape, BiConsumer<Target, PositionTime> block) {
+    public void forEachWithinArea(Area shape, BiConsumer<Client, PositionTime> block) {
         tracker.forEachWithinArea(shape, block);
     }
 
@@ -85,7 +85,7 @@ public class TargetManager extends AbstractClients implements Iterable<Target> {
 
     public ClientList getAllClients() {
         ClientList cl = new ClientList();
-        for (Target t : this) {
+        for (Client t : this) {
             ClientInfo ci = new ClientInfo();
             ci.setId(t.getId().toString());
             PositionTime pt = t.getLatestPosition();
@@ -94,7 +94,7 @@ public class TargetManager extends AbstractClients implements Iterable<Target> {
                 ci.setLatestPosition(pt);
             }
 
-            TargetProperties p = t.getProperties();
+            ClientProperties p = t.getProperties();
             ci.setName(p.getName());
             ci.setDescription(p.getDescription());
             ci.setOrganization(p.getOrganization());
@@ -116,17 +116,17 @@ public class TargetManager extends AbstractClients implements Iterable<Target> {
         return i.intValue();
     }
 
-    public Target getTarget(MaritimeId id) {
-        return targets.computeIfAbsent(id.toString(), key -> new Target(this, id));
+    public Client getTarget(MaritimeId id) {
+        return targets.computeIfAbsent(id.toString(), key -> new Client(this, id));
     }
 
     /** {@inheritDoc} */
     @Override
-    public Iterator<Target> iterator() {
+    public Iterator<Client> iterator() {
         return Collections.unmodifiableCollection(targets.values()).iterator();
     }
 
-    public void reportPosition(Target target, PositionTime pt) {
+    public void reportPosition(Client target, PositionTime pt) {
         tracker.update(target, pt);
     }
 

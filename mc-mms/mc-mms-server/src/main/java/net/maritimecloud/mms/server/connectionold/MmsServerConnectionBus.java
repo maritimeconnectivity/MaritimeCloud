@@ -18,6 +18,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
+
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.mms.messages.PositionReport;
 import net.maritimecloud.internal.net.messages.Broadcast;
@@ -25,9 +26,9 @@ import net.maritimecloud.internal.net.messages.MethodInvoke;
 import net.maritimecloud.internal.net.messages.MethodInvokeResult;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.mms.server.broadcast.ServerBroadcastManager;
+import net.maritimecloud.mms.server.connection.client.Client;
+import net.maritimecloud.mms.server.connection.client.ClientManager;
 import net.maritimecloud.mms.server.endpoints.ServerEndpointManager;
-import net.maritimecloud.mms.server.targets.Target;
-import net.maritimecloud.mms.server.targets.TargetManager;
 
 /**
  *
@@ -37,7 +38,7 @@ public class MmsServerConnectionBus {
 
     ServerBroadcastManager sbm;
 
-    final TargetManager tm;
+    final ClientManager tm;
 
     final ServerEndpointManager sem;
 
@@ -47,7 +48,7 @@ public class MmsServerConnectionBus {
     final Meter positionReportsMeter;
 
 
-    public MmsServerConnectionBus(ServerEndpointManager sem, TargetManager tm, MetricRegistry metrics) {
+    public MmsServerConnectionBus(ServerEndpointManager sem, ClientManager tm, MetricRegistry metrics) {
         this.tm = requireNonNull(tm);
         this.sem = sem;
 
@@ -91,7 +92,7 @@ public class MmsServerConnectionBus {
             }
             return;
         }
-        Target t = tm.find(MaritimeId.create(receiverId));
+        Client t = tm.find(MaritimeId.create(receiverId));
         if (t == null) {
             System.err.println("Unknown destination " + receiverId);
             return;

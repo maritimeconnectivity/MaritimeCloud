@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.mms.server.targets;
+package net.maritimecloud.mms.server.connection.client;
 
 import java.util.Map;
 
@@ -21,7 +21,7 @@ import java.util.Map;
  *
  * @author Kasper Nielsen
  */
-public class TargetProperties {
+public class ClientProperties {
 
     private final String description;
 
@@ -30,7 +30,7 @@ public class TargetProperties {
     private final String organization;
 
 
-    public TargetProperties(String name, String description, String organization) {
+    public ClientProperties(String name, String description, String organization) {
         this.description = description;
         this.name = name;
         this.organization = organization;
@@ -64,13 +64,13 @@ public class TargetProperties {
                 + "]";
     }
 
-    public static TargetProperties createFrom(Map<String, String> map) {
-        return new TargetProperties(map.get("name"), map.get("description"), map.get("organization"));
+    public static ClientProperties createFrom(Map<String, String> map) {
+        return new ClientProperties(map.get("name"), map.get("description"), map.get("organization"));
 
     }
 
-    public static TargetProperties createFrom(String commaSeparated) {
-        return new TargetProperties(extractFrom("name", null, commaSeparated), extractFrom("description", null,
+    public static ClientProperties createFrom(String commaSeparated) {
+        return new ClientProperties(extractFrom("name", null, commaSeparated), extractFrom("description", null,
                 commaSeparated), extractFrom("organization", null, commaSeparated));
     }
 

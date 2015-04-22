@@ -19,7 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.message.Message;
-import net.maritimecloud.mms.server.connectionold.transport.ServerTransport;
+import net.maritimecloud.mms.server.connection.transport.ServerTransport;
 
 /**
  *

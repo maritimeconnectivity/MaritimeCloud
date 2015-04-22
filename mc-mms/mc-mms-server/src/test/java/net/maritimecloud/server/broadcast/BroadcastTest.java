@@ -52,7 +52,6 @@ public class BroadcastTest extends AbstractServerConnectionTest {
 
         System.out.println(bp.equals(bp2));
         System.out.println(bp.getArea().equals(bp2.getArea()));
-
     }
 
     @Test
