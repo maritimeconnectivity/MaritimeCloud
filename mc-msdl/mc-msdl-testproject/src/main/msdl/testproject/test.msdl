@@ -2,6 +2,8 @@ namespace testproject;
 
 import "core/geometry.msdl";
 
+import "role.msdl";
+
 enum Fffff {
     RHUMB_LINE = 1;
     GREAT_CIRCLE = 2;
@@ -13,6 +15,7 @@ message Geometry1 {
   3: Polygon p1;
   4: Area area;
 }
+
 /*
 message Unit1 {
   1: Distance d1;
