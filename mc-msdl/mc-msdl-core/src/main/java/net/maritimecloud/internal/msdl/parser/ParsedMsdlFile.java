@@ -61,11 +61,17 @@ class ParsedMsdlFile implements MsdlFile {
 
     }
 
-    void error(ParserRuleContext context, String msg) {
-        String st = antlrFile.getPath() + ":[" + context.getStart().getLine() + ":"
+    String prefix(ParserRuleContext context) {
+        return antlrFile.getPath() + ":[" + context.getStart().getLine() + ":"
                 + context.getStart().getCharPositionInLine() + "] ";
-        st += msg;
-        project.logger.error(st);
+    }
+
+    void error(ParserRuleContext context, String msg) {
+        project.logger.error(prefix(context) + msg);
+    }
+
+    void warn(ParserRuleContext context, String msg) {
+        project.logger.warn(prefix(context) + msg);
     }
 
     /**
@@ -139,6 +145,8 @@ class ParsedMsdlFile implements MsdlFile {
         if (namespaceContext != null) {
             namespace = namespaceContext.getChild(1).getText();
             // TODO validate name spaces
+        } else {
+         //   project.logger.error(antlrFile.getPath()  + ": A MSDL file must have a valid namespace");
         }
     }
 
