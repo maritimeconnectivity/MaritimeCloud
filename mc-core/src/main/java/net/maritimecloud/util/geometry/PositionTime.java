@@ -198,6 +198,10 @@ public class PositionTime extends Position {
     }
 
 
+    public static PositionTime create(double latitude, double longitude) {
+        return new PositionTime(latitude, longitude, System.currentTimeMillis());
+    }
+    
     /**
      * Creates a new position from the specified latitude and longitude.
      *
