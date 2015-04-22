@@ -1,0 +1,4 @@
+message Role {
+  1: text id;
+  2: text title;
+}
