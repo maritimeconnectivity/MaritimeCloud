@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.mms.server.connection.transport;
+package net.maritimecloud.mms.server.connectionold;
 
 import static java.util.Objects.requireNonNull;
 
@@ -23,8 +23,8 @@ import net.maritimecloud.internal.mms.messages.Welcome;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.mms.server.MmsServer;
 import net.maritimecloud.mms.server.connection.client.ClientManager;
-import net.maritimecloud.mms.server.connectionold.ServerConnectFuture;
-import net.maritimecloud.mms.server.connectionold.ServerConnection;
+import net.maritimecloud.mms.server.connection.transport.ServerTransport;
+import net.maritimecloud.mms.server.connection.transport.ServerTransportListener;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 
 import org.slf4j.Logger;

@@ -19,7 +19,6 @@ import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.mms.server.MmsServer;
 import net.maritimecloud.mms.server.connection.client.Client;
-import net.maritimecloud.mms.server.connection.transport.OldServerTransport;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 import net.maritimecloud.util.Binary;
 

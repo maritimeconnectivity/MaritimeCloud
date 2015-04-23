@@ -23,7 +23,6 @@ import net.maritimecloud.message.Message;
 import net.maritimecloud.mms.server.connection.client.Client;
 import net.maritimecloud.mms.server.connection.client.ClientManager;
 import net.maritimecloud.mms.server.connection.client.ClientProperties;
-import net.maritimecloud.mms.server.connection.transport.OldServerTransport;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 
 import org.slf4j.Logger;

@@ -89,7 +89,7 @@ public final class ServerTransport {
         }
         listener.onMessage(this, msg);
     }
-    
+
     void endpointOnBinaryMessage(byte[] binary) {
         MmsMessage msg;
         try {
@@ -102,7 +102,7 @@ public final class ServerTransport {
         }
         listener.onMessage(this, msg);
     }
-    
+
     /**
      * Send the specified message with the transport.
      *
@@ -119,7 +119,7 @@ public final class ServerTransport {
                 try {
                     wsSession.getAsyncRemote().sendBinary(ByteBuffer.wrap(message.toBinary()));
                 } catch (IOException e) {
-                    throw new RuntimeException("Failed sending binary message", e);
+                    LOG.error("Failed to send message", e);
                 }
             } else {
                 String textToSend = message.toText();

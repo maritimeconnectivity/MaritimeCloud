@@ -19,10 +19,13 @@ import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 
 /**
  * A listener for transport events.
- * 
+ *
  * @author Kasper Nielsen
  */
 public interface ServerTransportListener {
+
+    /** Invoked whenever the transport has been successfully opened. */
+    default void onOpen(ServerTransport t) {};
 
     /**
      * Invoked whenever a MMS message has been received.
@@ -39,7 +42,4 @@ public interface ServerTransportListener {
      *            the closing code
      */
     default void onClose(ServerTransport t, MmsConnectionClosingCode closingCode) {}
-
-    /** Invoked whenever the transport has been successfully opened. */
-    default void onOpen(ServerTransport t) {};
 }
