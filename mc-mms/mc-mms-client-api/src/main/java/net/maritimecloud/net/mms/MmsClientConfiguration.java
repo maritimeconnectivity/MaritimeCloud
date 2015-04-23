@@ -41,7 +41,7 @@ public class MmsClientConfiguration {
 
     long keepAliveNanos = TimeUnit.SECONDS.toNanos(2);
 
-    final List<MmsConnectionListener> connectionListeners = new ArrayList<>();
+    final List<MmsConnection.Listener> connectionListeners = new ArrayList<>();
 
     private String nodes = "localhost:43234";
 
@@ -57,7 +57,7 @@ public class MmsClientConfiguration {
         this.id = id;
         String p = System.getProperty("maritimecloud.printmessages");
         if ("true".equalsIgnoreCase(p)) {
-            addConnectionListener(new MmsConnectionListener() {
+            addConnectionListener(new MmsConnection.Listener() {
                 @Override
                 public void textMessageReceived(String message) {
                     System.out.println("Received:" + message);
@@ -80,7 +80,7 @@ public class MmsClientConfiguration {
      *             if the specified listener is null
      * @return this configuration
      */
-    public MmsClientConfiguration addConnectionListener(MmsConnectionListener listener) {
+    public MmsClientConfiguration addConnectionListener(MmsConnection.Listener listener) {
         connectionListeners.add(requireNonNull(listener, "listener is null"));
         return this;
     }
@@ -150,7 +150,7 @@ public class MmsClientConfiguration {
     /**
      * @return the connectionListeners
      */
-    public List<MmsConnectionListener> getConnectionListeners() {
+    public List<MmsConnection.Listener> getConnectionListeners() {
         return connectionListeners;
     }
 

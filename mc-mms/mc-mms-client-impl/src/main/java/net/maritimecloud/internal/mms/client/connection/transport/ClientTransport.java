@@ -22,8 +22,8 @@ import java.util.concurrent.TimeUnit;
 
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.internal.util.logging.Logger;
+import net.maritimecloud.net.mms.MmsConnection;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
-import net.maritimecloud.net.mms.MmsConnectionListener;
 
 /**
  * The client implementation of a transport. Every time the client connects to a server a new transport is created.
@@ -40,14 +40,14 @@ public abstract class ClientTransport {
     final ClientTransportListener transportListener;
 
     /** A listener for changes to the connection */
-    final MmsConnectionListener connectionListener;
+    final MmsConnection.Listener connectionListener;
 
     /**
      * Constructor
      * @param transportListener the transport listener
      * @param connectionListener the connection listener
      */
-    protected ClientTransport(ClientTransportListener transportListener, MmsConnectionListener connectionListener) {
+    protected ClientTransport(ClientTransportListener transportListener, MmsConnection.Listener connectionListener) {
         this.transportListener = requireNonNull(transportListener);
         this.connectionListener = requireNonNull(connectionListener);
     }

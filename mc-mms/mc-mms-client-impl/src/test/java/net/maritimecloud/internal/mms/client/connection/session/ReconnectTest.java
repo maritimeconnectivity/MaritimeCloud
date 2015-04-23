@@ -28,8 +28,8 @@ import net.maritimecloud.internal.mms.messages.Hello;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.internal.net.messages.Broadcast;
 import net.maritimecloud.internal.util.concurrent.CompletableFuture;
+import net.maritimecloud.net.mms.MmsConnection;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
-import net.maritimecloud.net.mms.MmsConnectionListener;
 import net.maritimecloud.util.Binary;
 
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class ReconnectTest extends AbstractSessionTest {
     @Test
     public void reconnect() throws Exception {
         CountDownLatch connectCount = new CountDownLatch(2);
-        Session s = connect(new SessionListener() {}, new MmsConnectionListener() {
+        Session s = connect(new SessionListener() {}, new MmsConnection.Listener() {
             @Override
             public void connected(URI host) {
                 connectCount.countDown();
@@ -77,7 +77,7 @@ public class ReconnectTest extends AbstractSessionTest {
     @Test
     public void reconnectMultipleTimes() throws Exception {
         CountDownLatch connectCount = new CountDownLatch(10);
-        Session s = connect(new SessionListener() {}, new MmsConnectionListener() {
+        Session s = connect(new SessionListener() {}, new MmsConnection.Listener() {
             @Override
             public void connected(URI host) {
                 connectCount.countDown();
@@ -109,7 +109,7 @@ public class ReconnectTest extends AbstractSessionTest {
     @Test
     public void reconnectWithMessage() throws Exception {
         CountDownLatch connectCount = new CountDownLatch(2);
-        Session s = connectNormally(e -> {}, new MmsConnectionListener() {
+        Session s = connectNormally(e -> {}, new MmsConnection.Listener() {
 
             /** {@inheritDoc} */
             @Override
@@ -149,7 +149,7 @@ public class ReconnectTest extends AbstractSessionTest {
     @Test
     public void reconnectResend() throws Exception {
         CountDownLatch connectCount = new CountDownLatch(2);
-        Session s = connectNormally(e -> {}, new MmsConnectionListener() {
+        Session s = connectNormally(e -> {}, new MmsConnection.Listener() {
 
             /** {@inheritDoc} */
             @Override
@@ -190,7 +190,7 @@ public class ReconnectTest extends AbstractSessionTest {
     @Test
     public void reconnectResendMany() throws Exception {
         CountDownLatch connectCount = new CountDownLatch(2);
-        Session s = connectNormally(e -> {}, new MmsConnectionListener() {
+        Session s = connectNormally(e -> {}, new MmsConnection.Listener() {
 
             /** {@inheritDoc} */
             @Override

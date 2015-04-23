@@ -25,8 +25,8 @@ import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.internal.util.concurrent.CompletableFuture;
 import net.maritimecloud.internal.util.logging.Logger;
 import net.maritimecloud.message.Message;
+import net.maritimecloud.net.mms.MmsConnection;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
-import net.maritimecloud.net.mms.MmsConnectionListener;
 import net.maritimecloud.util.Binary;
 
 /**
@@ -38,7 +38,7 @@ public class Session {
     /** The logger. */
     private static final Logger LOGGER = Logger.get(Session.class);
 
-    final MmsConnectionListener connectionListener;
+    final MmsConnection.Listener connectionListener;
 
     final ClientTransportFactory ctm;
 
@@ -64,7 +64,7 @@ public class Session {
     final ClientTransportListener tl;
 
     Session(ClientTransportFactory ctm, ClientInfo info, SessionListener listener,
-            MmsConnectionListener connectionListener) {
+            MmsConnection.Listener connectionListener) {
         this.ctm = requireNonNull(ctm);
         this.info = requireNonNull(info);
         this.sender = new SessionSender(this);
@@ -167,7 +167,7 @@ public class Session {
     }
 
     public static Session createNewSessionAndConnect(ClientTransportFactory ctm, ClientInfo info,
-            SessionListener listener, MmsConnectionListener connectionListener) {
+            SessionListener listener, MmsConnection.Listener connectionListener) {
         LOGGER.debug("Creating new session");
         Session session = new Session(ctm, info, listener, connectionListener);
         session.fullyLock();

@@ -17,7 +17,7 @@ package net.maritimecloud.internal.mms.client.connection.transport;
 import javax.websocket.ContainerProvider;
 import javax.websocket.WebSocketContainer;
 
-import net.maritimecloud.net.mms.MmsConnectionListener;
+import net.maritimecloud.net.mms.MmsConnection;
 
 /**
  *
@@ -33,7 +33,7 @@ public class ClientTransportFactoryJsr356 extends ClientTransportFactory {
 
     /** {@inheritDoc} */
     @Override
-    public ClientTransport create(ClientTransportListener transportListener, MmsConnectionListener connectionListener) {
+    public ClientTransport create(ClientTransportListener transportListener, MmsConnection.Listener connectionListener) {
         WebSocketContainer container = CACHED_CONTAINER;
         if (container == null) {
             synchronized (LOCK) {

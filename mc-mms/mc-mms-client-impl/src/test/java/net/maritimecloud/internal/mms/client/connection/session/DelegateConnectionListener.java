@@ -18,18 +18,18 @@ import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
 
+import net.maritimecloud.net.mms.MmsConnection;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
-import net.maritimecloud.net.mms.MmsConnectionListener;
 
 /**
  *
  * @author Kasper Nielsen
  */
-public class DelegateConnectionListener implements MmsConnectionListener {
+public class DelegateConnectionListener implements MmsConnection.Listener {
 
-    final MmsConnectionListener l;
+    final MmsConnection.Listener l;
 
-    DelegateConnectionListener(MmsConnectionListener l) {
+    DelegateConnectionListener(MmsConnection.Listener l) {
         this.l = requireNonNull(l);
     }
 

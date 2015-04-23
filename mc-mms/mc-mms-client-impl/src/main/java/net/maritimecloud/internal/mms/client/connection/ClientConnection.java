@@ -32,9 +32,9 @@ import net.maritimecloud.internal.util.concurrent.CompletableFuture;
 import net.maritimecloud.internal.util.logging.Logger;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.net.mms.MmsClientConfiguration;
+import net.maritimecloud.net.mms.MmsConnection;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 
-import net.maritimecloud.net.mms.MmsConnectionListener;
 import org.cakeframework.container.lifecycle.RunOnStop;
 
 /**
@@ -46,7 +46,7 @@ public class ClientConnection {
     /** The logger. */
     private static final Logger LOGGER = Logger.get(ClientConnection.class);
 
-    private final MmsConnectionListener connectionListener;
+    private final MmsConnection.Listener connectionListener;
 
     final ClientInfo clientInfo;
 

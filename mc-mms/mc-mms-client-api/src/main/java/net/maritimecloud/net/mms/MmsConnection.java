@@ -14,6 +14,7 @@
  */
 package net.maritimecloud.net.mms;
 
+import java.net.URI;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -82,4 +83,55 @@ public interface MmsConnection {
      */
     boolean isEnabled();
 
+    /**
+     * A listener interface that can used to listen for updates to the connection status to the maritime network.
+     */
+    interface Listener {
+
+        /**
+         * Invoked whenever the client is trying to connect/reconnect to a remote MMS server.
+         *
+         * @param host The MMS server we are connecting to
+         */
+        default void connecting(URI host) {}
+
+        /**
+         * Invoked when the client has successfully connected to a MMS server.
+         *
+         * @param host The MMS server we are connecting to
+         */
+        default void connected(URI host) {}
+
+        /**
+         * Invoked whenever the connection is lost to the MMS server. It will automatically connect again unless
+         * disabled or shutdown.
+         *
+         * @param closeReason the reason for the closing
+         */
+        default void disconnected(MmsConnectionClosingCode closeReason) {}
+
+        /**
+         * The binary message received over the connection
+         * @param message the message
+         */
+        default void binaryMessageReceived(byte[] message) {}
+
+        /**
+         * The binary message sent over the connection
+         * @param message the message
+         */
+        default void binaryMessageSend(byte[] message) {}
+
+        /**
+         * The text message received over the connection
+         * @param message the message
+         */
+        default void textMessageReceived(String message) {}
+
+        /**
+         * The text message sent over the connection
+         * @param message the message
+         */
+        default void textMessageSend(String message) {}
+    }
 }

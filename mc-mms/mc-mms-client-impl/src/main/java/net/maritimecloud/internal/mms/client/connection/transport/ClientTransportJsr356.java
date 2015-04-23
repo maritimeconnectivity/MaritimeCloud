@@ -18,8 +18,8 @@ import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.internal.mms.transport.MmsWireProtocol;
 import net.maritimecloud.internal.util.concurrent.CompletableFuture;
 import net.maritimecloud.internal.util.logging.Logger;
+import net.maritimecloud.net.mms.MmsConnection;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
-import net.maritimecloud.net.mms.MmsConnectionListener;
 
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
@@ -61,7 +61,7 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
      * @param connectionListener the connection listener
      * @param container the web-socket container
      */
-    ClientTransportJsr356(ClientTransportListener transportListener, MmsConnectionListener connectionListener,
+    ClientTransportJsr356(ClientTransportListener transportListener, MmsConnection.Listener connectionListener,
             WebSocketContainer container) {
         super(transportListener, connectionListener);
         this.container = requireNonNull(container);
