@@ -27,8 +27,8 @@ import net.maritimecloud.internal.mms.client.connection.transport.ClientTranspor
 import net.maritimecloud.internal.mms.messages.Connected;
 import net.maritimecloud.internal.mms.messages.Hello;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
-import net.maritimecloud.net.mms.MmsConnection;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
+import net.maritimecloud.net.mms.MmsConnectionListener;
 import net.maritimecloud.util.Binary;
 
 import org.junit.After;
@@ -45,10 +45,10 @@ public class AbstractSessionTest extends AbstractClientConnectionTest {
     ClientTransportFactoryJetty ctm = new ClientTransportFactoryJetty();
 
     Session connectNormally(Consumer<MmsMessage> c) throws InterruptedException {
-        return connectNormally(c, new MmsConnection.Listener() {});
+        return connectNormally(c, new MmsConnectionListener() {});
     }
 
-    Session connectNormally(Consumer<MmsMessage> c, MmsConnection.Listener listener) throws InterruptedException {
+    Session connectNormally(Consumer<MmsMessage> c, MmsConnectionListener listener) throws InterruptedException {
         ClientInfo ci = new ClientInfo(conf);
         CountDownLatch connected = new CountDownLatch(1);
         Session s = Session.createNewSessionAndConnect(ctm, ci, new SessionListener() {
@@ -85,7 +85,7 @@ public class AbstractSessionTest extends AbstractClientConnectionTest {
         return s;
     }
 
-    Session connect(SessionListener sessionListener, MmsConnection.Listener listener) throws Exception {
+    Session connect(SessionListener sessionListener, MmsConnectionListener listener) throws Exception {
         ClientInfo ci = new ClientInfo(conf);
         CountDownLatch connected = new CountDownLatch(1);
         Session s = Session.createNewSessionAndConnect(ctm, ci, sessionListener, new DelegateConnectionListener(

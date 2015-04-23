@@ -14,8 +14,7 @@
  */
 package net.maritimecloud.internal.mms.client.connection.transport;
 
-import net.maritimecloud.net.mms.MmsConnection;
-
+import net.maritimecloud.net.mms.MmsConnectionListener;
 import org.cakeframework.container.lifecycle.RunOnStart;
 import org.cakeframework.container.lifecycle.RunOnStop;
 import org.eclipse.jetty.websocket.jsr356.ClientContainer;
@@ -37,8 +36,8 @@ public class ClientTransportFactoryJetty extends ClientTransportFactory {
 
     /** {@inheritDoc} */
     @Override
-    public ClientTransport create(ClientTransportListener listener, MmsConnection.Listener connectionListener) {
-        return new ClientTransportJsr356(listener, connectionListener, container);
+    public ClientTransport create(ClientTransportListener transportListener, MmsConnectionListener connectionListener) {
+        return new ClientTransportJsr356(transportListener, connectionListener, container);
     }
 
     /**

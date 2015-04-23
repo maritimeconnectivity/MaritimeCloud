@@ -32,9 +32,9 @@ import net.maritimecloud.internal.util.concurrent.CompletableFuture;
 import net.maritimecloud.internal.util.logging.Logger;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.net.mms.MmsClientConfiguration;
-import net.maritimecloud.net.mms.MmsConnection;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 
+import net.maritimecloud.net.mms.MmsConnectionListener;
 import org.cakeframework.container.lifecycle.RunOnStop;
 
 /**
@@ -46,7 +46,7 @@ public class ClientConnection {
     /** The logger. */
     private static final Logger LOGGER = Logger.get(ClientConnection.class);
 
-    private final MmsConnection.Listener mmsListener;
+    private final MmsConnectionListener connectionListener;
 
     final ClientInfo clientInfo;
 
@@ -82,7 +82,7 @@ public class ClientConnection {
     public ClientConnection(ClientTransportFactory ctm, ClientInfo info, MmsClientConfiguration b) {
         this.ctm = requireNonNull(ctm);
         this.clientInfo = requireNonNull(info);
-        this.mmsListener = new MmsConnectionListenerInvoker(this, b);
+        this.connectionListener = new MmsConnectionListenerInvoker(this, b);
     }
 
     public boolean await(boolean connected, long timeout, TimeUnit unit) throws InterruptedException {
@@ -115,7 +115,7 @@ public class ClientConnection {
         lock.lock();
         try {
             if (isEnabled) { // Reconnect
-                session = Session.createNewSessionAndConnect(ctm, clientInfo, sessionListener, mmsListener);
+                session = Session.createNewSessionAndConnect(ctm, clientInfo, sessionListener, connectionListener);
             } else {
                 session = null;
             }
@@ -156,7 +156,7 @@ public class ClientConnection {
                 this.isEnabled = isEnabled;
                 if (isEnabled) {
                     if (session == null) {
-                        session = Session.createNewSessionAndConnect(ctm, clientInfo, sessionListener, mmsListener);
+                        session = Session.createNewSessionAndConnect(ctm, clientInfo, sessionListener, connectionListener);
                     }
                 } else { // Disable
                     if (session != null) { // only disconnect if we have an active session

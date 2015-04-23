@@ -28,8 +28,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import net.maritimecloud.internal.mms.client.ClientInfo;
 import net.maritimecloud.internal.mms.messages.Connected;
 import net.maritimecloud.internal.mms.messages.Hello;
-import net.maritimecloud.net.mms.MmsConnection;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
+import net.maritimecloud.net.mms.MmsConnectionListener;
 import net.maritimecloud.util.Binary;
 
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class ConnectTest extends AbstractSessionTest {
         ClientInfo ci = new ClientInfo(conf);
         CountDownLatch connected = new CountDownLatch(1);
 
-        Session s = Session.createNewSessionAndConnect(ctm, ci, new SessionListener() {}, new MmsConnection.Listener() {
+        Session s = Session.createNewSessionAndConnect(ctm, ci, new SessionListener() {}, new MmsConnectionListener() {
             @Override
             public void connected(URI host) {
                 connected.countDown();
@@ -89,7 +89,7 @@ public class ConnectTest extends AbstractSessionTest {
                 createdSession.set(closingCode);
                 closed.countDown();
             }
-        }, new MmsConnection.Listener() {});
+        }, new MmsConnectionListener() {});
         assertFalse(s.isConnected());
 
         SessionStateConnecting ssc = (SessionStateConnecting) s.state;

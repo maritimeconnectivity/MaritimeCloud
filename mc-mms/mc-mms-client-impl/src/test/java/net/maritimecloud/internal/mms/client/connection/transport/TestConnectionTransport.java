@@ -41,9 +41,9 @@ import net.maritimecloud.internal.mms.messages.Hello;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.internal.mms.transport.MmsWireProtocol;
 import net.maritimecloud.net.mms.MmsClient;
-import net.maritimecloud.net.mms.MmsConnection;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 
+import net.maritimecloud.net.mms.MmsConnectionListener;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -111,7 +111,7 @@ public class TestConnectionTransport {
                 assertEquals(MmsConnectionClosingCode.NORMAL.getId(), closingCode.getId());
                 close.countDown();
             }
-        }, new MmsConnection.Listener() {});
+        }, new MmsConnectionListener() {});
 
         tr.connectBlocking(new URI("ws://localhost:" + clientPort));
         assertTrue(st.opened.await(1, TimeUnit.SECONDS));
@@ -137,7 +137,7 @@ public class TestConnectionTransport {
                 assertEquals(MmsConnectionClosingCode.NORMAL.getId(), closingCode.getId());
                 close.countDown();
             }
-        }, new MmsConnection.Listener() {});
+        }, new MmsConnectionListener() {});
 
         tr.connectBlocking(new URI("ws://localhost:" + clientPort));
         assertTrue(st.opened.await(1, TimeUnit.SECONDS));
@@ -158,7 +158,7 @@ public class TestConnectionTransport {
             public void onOpen() {
                 onOpenInvoke.countDown();
             }
-        }, new MmsConnection.Listener() {});
+        }, new MmsConnectionListener() {});
 
         tr.connectBlocking(new URI("ws://localhost:" + clientPort));
         assertTrue(st.opened.await(1, TimeUnit.SECONDS));
@@ -168,7 +168,7 @@ public class TestConnectionTransport {
     @Test
     public void connectTimedOut() throws Exception {
         try (ServerSocket ss = new ServerSocket(55555)) {
-            ClientTransport tr = tm.create(new ClientTransportListener() {}, new MmsConnection.Listener() {});
+            ClientTransport tr = tm.create(new ClientTransportListener() {}, new MmsConnectionListener() {});
             try {
                 tr.connectBlocking(new URI("ws://localhost:55555"), 100, TimeUnit.MILLISECONDS);
                 fail("Should fail");
@@ -189,7 +189,7 @@ public class TestConnectionTransport {
                 assertEquals("aBcDe", ((Hello) message.getM()).getClientId());
                 onMessage.countDown();
             }
-        }, new MmsConnection.Listener() {
+        }, new MmsConnectionListener() {
             @Override
             public void textMessageReceived(String text) {
                 assertTrue(text.contains("aBcDe"));
@@ -217,7 +217,7 @@ public class TestConnectionTransport {
                 onOpenInvoke.countDown();
             }
 
-        }, new MmsConnection.Listener() {
+        }, new MmsConnectionListener() {
 
             /** {@inheritDoc} */
             @Override
@@ -245,7 +245,7 @@ public class TestConnectionTransport {
         CountDownLatch cdl = new CountDownLatch(1);
         ClientTransport tr = tm.create(new ClientTransportListener() {
 
-        }, new MmsConnection.Listener() {
+        }, new MmsConnectionListener() {
             /** {@inheritDoc} */
             @Override
             public void textMessageReceived(String text) {

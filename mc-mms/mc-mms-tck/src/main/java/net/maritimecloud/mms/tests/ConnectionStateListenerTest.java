@@ -21,9 +21,9 @@ import java.net.URI;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import net.maritimecloud.net.mms.MmsConnection;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 
+import net.maritimecloud.net.mms.MmsConnectionListener;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -36,7 +36,7 @@ public class ConnectionStateListenerTest extends AbstractNetworkTest {
     @Test
     public void connected() throws Exception {
         final CountDownLatch cdl = new CountDownLatch(1);
-        newClient(newBuilder(ID1).addListener(new MmsConnection.Listener() {
+        newClient(newBuilder(ID1).addConnectionListener(new MmsConnectionListener() {
             public void connected(URI host) {
                 assertEquals(1, cdl.getCount());
                 cdl.countDown();
@@ -48,11 +48,11 @@ public class ConnectionStateListenerTest extends AbstractNetworkTest {
     @Test
     public void connectedTwoListeners() throws Exception {
         final CountDownLatch cdl = new CountDownLatch(2);
-        newClient(newBuilder(ID1).addListener(new MmsConnection.Listener() {
+        newClient(newBuilder(ID1).addConnectionListener(new MmsConnectionListener() {
             public void connected(URI host) {
                 cdl.countDown();
             }
-        }).addListener(new MmsConnection.Listener() {
+        }).addConnectionListener(new MmsConnectionListener() {
             public void connected(URI host) {
                 cdl.countDown();
             }
@@ -64,7 +64,7 @@ public class ConnectionStateListenerTest extends AbstractNetworkTest {
     @Ignore
     public void closed() throws Exception {
         final CountDownLatch cdl = new CountDownLatch(1);
-        newClient(newBuilder(ID1).addListener(new MmsConnection.Listener() {
+        newClient(newBuilder(ID1).addConnectionListener(new MmsConnectionListener() {
             public void disconnected(MmsConnectionClosingCode reason) {
                 assertEquals(1000, reason.getId());
                 cdl.countDown();

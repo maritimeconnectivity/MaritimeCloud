@@ -25,8 +25,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import net.maritimecloud.internal.mms.client.ClientInfo;
 import net.maritimecloud.internal.mms.messages.Connected;
 import net.maritimecloud.internal.mms.messages.Hello;
-import net.maritimecloud.net.mms.MmsConnection;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
+import net.maritimecloud.net.mms.MmsConnectionListener;
 import net.maritimecloud.util.Binary;
 
 import org.junit.Ignore;
@@ -43,7 +43,7 @@ public class ListenerTest extends AbstractConnectionTest {
     public void connectDisconnect() throws Exception {
         AtomicReference<String> state = new AtomicReference<>();
         CountDownLatch connected = new CountDownLatch(1);
-        conf.addListener(new MmsConnection.Listener() {
+        conf.addConnectionListener(new MmsConnectionListener() {
 
             @Override
             public void connecting(URI host) {

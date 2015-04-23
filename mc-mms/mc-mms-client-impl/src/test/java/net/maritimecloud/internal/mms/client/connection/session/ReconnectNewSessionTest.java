@@ -22,8 +22,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import net.maritimecloud.internal.mms.messages.Hello;
-import net.maritimecloud.net.mms.MmsConnection;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
+import net.maritimecloud.net.mms.MmsConnectionListener;
 import net.maritimecloud.util.Binary;
 
 import org.junit.Test;
@@ -47,7 +47,7 @@ public class ReconnectNewSessionTest extends AbstractSessionTest {
                 assertEquals(MmsConnectionClosingCode.INVALID_SESSION, closingCode);
                 sessionClosed.countDown();
             }
-        }, new MmsConnection.Listener() {
+        }, new MmsConnectionListener() {
             @Override
             public void connected(URI host) {
                 connectCount.countDown();

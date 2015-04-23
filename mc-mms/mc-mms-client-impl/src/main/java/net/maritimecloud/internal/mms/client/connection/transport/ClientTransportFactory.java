@@ -14,7 +14,7 @@
  */
 package net.maritimecloud.internal.mms.client.connection.transport;
 
-import net.maritimecloud.net.mms.MmsConnection;
+import net.maritimecloud.net.mms.MmsConnectionListener;
 
 /**
  * A ConnectionTransportManager takes care of creating new ConnectionTransport. This class mainly exists because we are
@@ -48,12 +48,12 @@ public abstract class ClientTransportFactory {
     /**
      * Creates a new transport
      *
-     * @param listener
-     * @param connectionListener
+     * @param transportListener the transport listener
+     * @param connectionListener the connection listener
      * @return the transport
      */
-    public abstract ClientTransport create(ClientTransportListener listener,
-            MmsConnection.Listener connectionListener);
+    public abstract ClientTransport create(ClientTransportListener transportListener,
+            MmsConnectionListener connectionListener);
 
     static boolean classExists(String className) {
         try {
