@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.internal.net;
+package net.maritimecloud.internal.mms.transport;
 
 /**
  * A dummy implementation to be replaced at a later stage.

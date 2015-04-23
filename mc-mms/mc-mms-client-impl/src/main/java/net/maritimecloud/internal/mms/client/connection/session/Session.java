@@ -77,7 +77,7 @@ public class Session {
             }
 
             @Override
-            public void onMessage(MmsMessage message) {
+            public void onMessageReceived(MmsMessage message) {
                 listenerOnMessage(message);
             }
         };

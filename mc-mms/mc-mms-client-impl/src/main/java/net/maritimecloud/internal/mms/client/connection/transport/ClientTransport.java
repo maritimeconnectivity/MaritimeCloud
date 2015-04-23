@@ -37,13 +37,13 @@ public abstract class ClientTransport {
     private static final Logger LOGGER = Logger.get(ClientTransport.class);
 
     /** The listener of transport events. */
-    final ClientTransportListener listener;
+    final ClientTransportListener transportListener;
 
     /** A listener for changes to the connection */
     final MmsConnection.Listener connectionListener;
 
     protected ClientTransport(ClientTransportListener listener, MmsConnection.Listener connectionListener) {
-        this.listener = requireNonNull(listener);
+        this.transportListener = requireNonNull(listener);
         this.connectionListener = requireNonNull(connectionListener);
     }
 
@@ -73,12 +73,14 @@ public abstract class ClientTransport {
         connectionListener.textMessageReceived(textMessage);
         try {
             msg = MmsMessage.parseTextMessage(textMessage);
+            msg.setInbound(true);
+            msg.setBinary(false);
         } catch (Exception e) {
             LOGGER.error("Failed to parse incoming text message", e);
             closeTransport(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage(e.getMessage()));
             return;
         }
-        listener.onMessage(msg);
+        transportListener.onMessageReceived(msg);
     }
 
     /**
@@ -91,12 +93,14 @@ public abstract class ClientTransport {
         connectionListener.binaryMessageReceived(binaryMessage);
         try {
             msg = MmsMessage.parseBinaryMessage(binaryMessage);
+            msg.setInbound(true);
+            msg.setBinary(true);
         } catch (Exception e) {
             LOGGER.error("Failed to parse incoming binary message", e);
             closeTransport(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage(e.getMessage()));
             return;
         }
-        listener.onMessage(msg);
+        transportListener.onMessageReceived(msg);
     }
 
     /**

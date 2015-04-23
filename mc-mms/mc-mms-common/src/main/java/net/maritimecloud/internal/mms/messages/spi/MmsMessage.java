@@ -45,6 +45,12 @@ public class MmsMessage {
 
     boolean ignoreForNewSession;
 
+    /** Flags if the message has be sent or received */
+    boolean inbound;
+
+    /** Flags if the message was communicated in a binary (Protobuf) format rather than text (json) */
+    boolean binary;
+
     public MmsMessage() {
 
     }
@@ -236,5 +242,21 @@ public class MmsMessage {
         } catch (IOException e) {
             throw new RuntimeException("Failed to read message from JSON", e);
         }
+    }
+
+    public boolean isInbound() {
+        return inbound;
+    }
+
+    public void setInbound(boolean inbound) {
+        this.inbound = inbound;
+    }
+
+    public boolean isBinary() {
+        return binary;
+    }
+
+    public void setBinary(boolean binary) {
+        this.binary = binary;
     }
 }

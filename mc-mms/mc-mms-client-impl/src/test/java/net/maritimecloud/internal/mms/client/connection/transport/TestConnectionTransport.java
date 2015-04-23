@@ -39,7 +39,7 @@ import javax.websocket.server.ServerEndpoint;
 import net.maritimecloud.internal.mms.client.TestWebSocketServer;
 import net.maritimecloud.internal.mms.messages.Hello;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
-import net.maritimecloud.internal.net.MmsWireProtocol;
+import net.maritimecloud.internal.mms.transport.MmsWireProtocol;
 import net.maritimecloud.net.mms.MmsClient;
 import net.maritimecloud.net.mms.MmsConnection;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
@@ -183,7 +183,7 @@ public class TestConnectionTransport {
         ClientTransport tr = tm.create(new ClientTransportListener() {
             /** {@inheritDoc} */
             @Override
-            public void onMessage(MmsMessage message) {
+            public void onMessageReceived(MmsMessage message) {
                 assertTrue(textReceived.getCount() == 0);
                 assertTrue(message.getM() instanceof Hello);
                 assertEquals("aBcDe", ((Hello) message.getM()).getClientId());

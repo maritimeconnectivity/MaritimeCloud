@@ -16,7 +16,7 @@ package net.maritimecloud.server;
 
 import net.maritimecloud.internal.message.MessageHelper;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
-import net.maritimecloud.internal.net.MmsWireProtocol;
+import net.maritimecloud.internal.mms.transport.MmsWireProtocol;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageSerializer;
 

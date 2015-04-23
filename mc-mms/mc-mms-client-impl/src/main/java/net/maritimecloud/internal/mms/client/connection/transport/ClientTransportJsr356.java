@@ -15,7 +15,7 @@
 package net.maritimecloud.internal.mms.client.connection.transport;
 
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
-import net.maritimecloud.internal.net.MmsWireProtocol;
+import net.maritimecloud.internal.mms.transport.MmsWireProtocol;
 import net.maritimecloud.internal.util.concurrent.CompletableFuture;
 import net.maritimecloud.internal.util.logging.Logger;
 import net.maritimecloud.net.mms.MmsConnection;
@@ -113,7 +113,7 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
         wsSession = null;
         MmsConnectionClosingCode reason = MmsConnectionClosingCode.create(closeReason.getCloseCode().getCode(),
                 closeReason.getReasonPhrase());
-        listener.onClose(reason);
+        transportListener.onClose(reason);
         connectionListener.disconnected(reason);
     }
 
@@ -122,7 +122,7 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
     public void onOpen(Session session) {
         this.wsSession = session; // wait on the server to send a hello message
         session.setMaxTextMessageBufferSize(10 * 1024 * 1024);
-        listener.onOpen();
+        transportListener.onOpen();
     }
 
     /** {@inheritDoc} */
@@ -144,7 +144,10 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
     public void sendMessage(MmsMessage message) {
         Session session = this.wsSession;
         if (session != null) {
-            if (MmsWireProtocol.USE_BINARY) {
+            message.setInbound(false);
+            message.setBinary(MmsWireProtocol.USE_BINARY);
+
+            if (message.isBinary()) {
                 try {
                     byte[] data = message.toBinary();
                     connectionListener.binaryMessageSend(data);
@@ -158,6 +161,8 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
                 connectionListener.textMessageSend(textToSend);
                 session.getAsyncRemote().sendText(textToSend);
             }
+
+            transportListener.onMessageSent(message);
         }
     }
 }

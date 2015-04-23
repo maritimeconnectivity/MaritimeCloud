@@ -16,7 +16,7 @@ package net.maritimecloud.internal.mms.client;
 
 import net.maritimecloud.internal.mms.messages.Welcome;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
-import net.maritimecloud.internal.net.MmsWireProtocol;
+import net.maritimecloud.internal.mms.transport.MmsWireProtocol;
 import net.maritimecloud.message.Message;
 import org.eclipse.jetty.websocket.common.WebSocketSession;
 import org.eclipse.jetty.websocket.common.io.AbstractWebSocketConnection;

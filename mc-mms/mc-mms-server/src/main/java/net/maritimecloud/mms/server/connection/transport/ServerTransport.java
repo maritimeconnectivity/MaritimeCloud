@@ -15,9 +15,10 @@
 package net.maritimecloud.mms.server.connection.transport;
 
 import net.maritimecloud.core.id.ServerId;
+import net.maritimecloud.internal.mms.client.connection.transport.ClientTransportListener;
 import net.maritimecloud.internal.mms.messages.Welcome;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
-import net.maritimecloud.internal.net.MmsWireProtocol;
+import net.maritimecloud.internal.mms.transport.MmsWireProtocol;
 import net.maritimecloud.mms.server.MmsServer;
 import net.maritimecloud.mms.server.connectionold.ConnectionManager;
 import net.maritimecloud.mms.server.connectionold.ServerConnectFuture;
@@ -55,15 +56,18 @@ public class ServerTransport {
 
     public final MmsServer server;
 
+    final ClientTransportListener transportListener;
+
     /** The websocket session. */
     private volatile Session session;
 
     private final ReentrantLock writeLock = new ReentrantLock();
 
     /** Constructor */
-    public ServerTransport(MmsServer server) {
+    public ServerTransport(MmsServer server, ClientTransportListener transportListener) {
         this.cm = requireNonNull(server.getService(ConnectionManager.class));
         this.server = requireNonNull(server);
+        this.transportListener = requireNonNull(transportListener);
     }
 
     /** {@inheritDoc} */
@@ -111,6 +115,7 @@ public class ServerTransport {
             if (connection != null) {
                 connection.transportDisconnected(this, reason);
             }
+            transportListener.onClose(reason);
         } finally {
             fullyUnlock();
         }
@@ -125,6 +130,7 @@ public class ServerTransport {
             ServerId id = cm.server.getServerId();
             sendMessage(new MmsMessage(new Welcome().addProtocolVersion(1).setServerId(id.toString())
                     .putProperties("implementation", "mmsServer/0.2")));
+            transportListener.onOpen();
         } finally {
             fullyUnlock();
         }
@@ -138,9 +144,10 @@ public class ServerTransport {
         readLock.lock();
         try {
             MmsMessage msg;
-            System.out.println("Received text: " + textMessage);
             try {
                 msg = MmsMessage.parseTextMessage(textMessage);
+                msg.setInbound(true);
+                msg.setBinary(false);
             } catch (Exception e) {
                 LOG.error("Failed to parse incoming message", e);
                 doClose(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage(e.getMessage()));
@@ -155,6 +162,7 @@ public class ServerTransport {
                 LOG.error(err);
                 doClose(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage(err));
             }
+            transportListener.onMessageReceived(msg);
         } finally {
             readLock.unlock();
         }
@@ -168,9 +176,10 @@ public class ServerTransport {
         readLock.lock();
         try {
             MmsMessage msg;
-            System.out.println("Received binary: " + binaryMessage.length);
             try {
                 msg = MmsMessage.parseBinaryMessage(binaryMessage);
+                msg.setInbound(true);
+                msg.setBinary(true);
             } catch (Exception e) {
                 LOG.error("Failed to parse incoming message", e);
                 doClose(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage(e.getMessage()));
@@ -185,6 +194,7 @@ public class ServerTransport {
                 LOG.error(err);
                 doClose(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage(err));
             }
+            transportListener.onMessageReceived(msg);
         } finally {
             readLock.unlock();
         }
@@ -199,42 +209,22 @@ public class ServerTransport {
         try {
             Session session = this.session;
             if (session != null) {
-                if (MmsWireProtocol.USE_BINARY) {
-                    sendBinaryMessage(session, msg);
+                msg.setInbound(false);
+                msg.setBinary(MmsWireProtocol.USE_BINARY);
+
+                if (msg.isBinary()) {
+                    try {
+                        session.getAsyncRemote().sendBinary(ByteBuffer.wrap(msg.toBinary()));
+                    } catch (IOException e) {
+                        throw new RuntimeException("Failed sending binary message", e);
+                    }
                 } else {
-                    sendTextMessage(session, msg);
+                    session.getAsyncRemote().sendText(msg.toText());
                 }
+                transportListener.onMessageSent(msg);
             }
         } finally {
             writeLock.unlock();
-        }
-    }
-
-    /**
-     * Sends the message over the wire in text format
-     * @param session the web socket session
-     * @param msg the message to send
-     */
-    protected void sendTextMessage(Session session, MmsMessage msg) {
-        String text = msg.toText();
-        if (text.length() < 1000) {
-            System.out.println("Sending text " + text);
-        }
-        session.getAsyncRemote().sendText(text);
-    }
-
-    /**
-     * Sends the message over the wire in binary format
-     * @param session the web socket session
-     * @param msg the message to send
-     */
-    protected void sendBinaryMessage(Session session, MmsMessage msg) {
-        try {
-            byte[] data = msg.toBinary();
-            System.out.println("Sending binary " + data.length);
-            session.getAsyncRemote().sendBinary(ByteBuffer.wrap(data));
-        } catch (IOException e) {
-            throw new RuntimeException("Failed sending binary message", e);
         }
     }
 }
