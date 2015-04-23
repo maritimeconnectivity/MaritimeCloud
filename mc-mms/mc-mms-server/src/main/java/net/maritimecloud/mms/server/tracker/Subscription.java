@@ -130,10 +130,10 @@ public class Subscription<T> {
             if (current == null) {// not tracked
                 if (shapeEntering.contains(pt)) {
                     trackedObjects.put(t, pt);
-                    handler.entering(t, pt);
+                    handler.entering(t, pt, PositionUpdatedHandler.EnterReason.ENTERED_AREA);
                 }
             } else if (!shapeExiting.contains(pt)) {
-                handler.exiting(t);
+                handler.exiting(t, PositionUpdatedHandler.LeaveReason.LEFT_AREA);
                 trackedObjects.remove(t);
             } else {
                 if (positionChanged) {

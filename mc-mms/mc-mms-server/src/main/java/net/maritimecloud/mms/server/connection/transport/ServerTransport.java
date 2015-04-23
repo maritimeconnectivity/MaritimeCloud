@@ -39,7 +39,7 @@ public final class ServerTransport {
     /** The logger. */
     private static final Logger LOG = LoggerFactory.getLogger(ServerTransport.class);
 
-    /** non-null while connecting. */
+    /** The listener to invoke. */
     final ServerTransportListener listener;
 
     /** The current session. */

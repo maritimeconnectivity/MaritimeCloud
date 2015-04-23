@@ -37,6 +37,6 @@ public class ClientResource {
     @GET
     @Path("/list")
     public Message list2() {
-        return tm.getAllClients();
+        return tm.statistics().getAllClients();
     }
 }

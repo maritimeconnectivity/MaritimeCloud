@@ -22,9 +22,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricRegistry;
-
 import net.maritimecloud.internal.mms.messages.services.AbstractServices;
 import net.maritimecloud.mms.server.connection.client.Client;
 import net.maritimecloud.mms.server.connection.client.ClientManager;
@@ -33,6 +30,9 @@ import net.maritimecloud.net.MessageHeader;
 import net.maritimecloud.util.geometry.Area;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
+
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
 
 /**
  * Manages services for all connected targets.
@@ -45,6 +45,7 @@ public class ServerServices extends AbstractServices {
 
     // Metrics
     final Meter endpointRegistrationsMeter;
+
     final Meter serviceLocatesMeter;
 
     public ServerServices(ClientManager tm, MetricRegistry metrics) {
@@ -69,15 +70,16 @@ public class ServerServices extends AbstractServices {
         final ConcurrentHashMap<Client, PositionTime> map = new ConcurrentHashMap<>();
 
         if (pos == null) {
-            tracker.forEachTarget((tt, r) -> {
+            tracker.forEachTarget(tt -> {
                 if (tt.getEndpointManager().hasService(endpointName)) {
-                    map.put(tt, r);
+                    map.put(tt, tt.getLatestPosition());
                 }
             });
         } else {
             // Find all services with the area
-            tracker.forEachTarget((tt, pt) -> {
+            tracker.forEachTarget(tt -> {
                 if (tt.getEndpointManager().hasService(endpointName)) {
+                    PositionTime pt = tt.getLatestPosition();
                     if (pt.geodesicDistanceTo(pos) <= meters) {
                         map.put(tt, pt);
                     }

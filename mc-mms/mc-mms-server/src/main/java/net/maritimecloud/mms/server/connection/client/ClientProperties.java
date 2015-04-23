@@ -29,7 +29,6 @@ public class ClientProperties {
 
     private final String organization;
 
-
     public ClientProperties(String name, String description, String organization) {
         this.description = description;
         this.name = name;

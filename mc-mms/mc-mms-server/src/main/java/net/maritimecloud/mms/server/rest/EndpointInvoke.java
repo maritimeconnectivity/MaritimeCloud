@@ -50,7 +50,7 @@ public class EndpointInvoke {
     public Message invoke(@PathParam("mmsi") String mmsi, @PathParam("endpoint") String endpoint) {
         MaritimeId id = MaritimeId.create("mmsi:" + mmsi);
         String ep = EndpointMirror.stripEndpointMethod(endpoint);
-        Client t = tm.find(id);
+        Client t = tm.get(id);
         if (t != null) {
             if (t.getEndpointManager().hasService(ep)) {
                 // Vi skal lave en "Fake" sources

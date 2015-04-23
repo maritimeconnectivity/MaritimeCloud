@@ -78,7 +78,7 @@ public class PositionTracker<T> {
      * @param block
      *            the callback
      */
-    public void forEachWithinArea(final Area shape, final BiConsumer<T, PositionTime> block) {
+    public void forEachWithinArea(Area shape, BiConsumer<T, PositionTime> block) {
         requireNonNull(shape, "shape is null");
         requireNonNull(block, "block is null");
         targets.forEach(THRESHOLD, (a, b) -> {
@@ -131,7 +131,7 @@ public class PositionTracker<T> {
      *            the area of interest
      * @return a map of all tracked objects within the area as keys and their latest position as the value
      */
-    public Map<T, PositionTime> getTargetsWithin(final Area shape) {
+    public Map<T, PositionTime> getTargetsWithin(Area shape) {
         final ConcurrentHashMap<T, PositionTime> result = new ConcurrentHashMap<>();
         forEachWithinArea(shape, (a, b) -> {
             if (shape.contains(b)) {

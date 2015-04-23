@@ -26,7 +26,7 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
 /**
- * The endpoint taking care of creating server transports.
+ * The endpoint taking care of creating server transports using the JSR 356 Websocket API.
  *
  * @author Kasper Nielsen
  */
@@ -36,7 +36,7 @@ public class ServerTransportJsr356Endpoint {
     /** The connection is attached to, or null, if it is not attached to one. */
     private volatile ServerTransport transport;
 
-    /** A factory for creating server transports. */
+    /** A factory for creating server transport listeners. */
     private final Supplier<? extends ServerTransportListener> transportListenerFactory;
 
     public ServerTransportJsr356Endpoint(Supplier<? extends ServerTransportListener> transportListenerFactory) {
@@ -51,8 +51,10 @@ public class ServerTransportJsr356Endpoint {
 
     @OnOpen
     public void onOpen(Session session) {
+        //Set the maximum size of messages we want to receive from clients.
         session.setMaxBinaryMessageBufferSize(10 * 1024 * 1024);
         session.setMaxTextMessageBufferSize(10 * 1024 * 1024);
+        
         transport = new ServerTransport(session, transportListenerFactory.get());
         transport.endpointOnOpen();
     }

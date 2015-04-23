@@ -220,7 +220,7 @@ public abstract class AbstractNetworkTest {
 
     public List<ClientInfo> clients(MmsServer server) {
         ClientManager ac = server.getService(ClientManager.class);
-        return ac.getAllClients().getClients();
+        return ac.statistics().getAllClients().getClients();
     }
 
 

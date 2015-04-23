@@ -92,7 +92,7 @@ public class MmsServerConnectionBus {
             }
             return;
         }
-        Client t = tm.find(MaritimeId.create(receiverId));
+        Client t = tm.get(MaritimeId.create(receiverId));
         if (t == null) {
             System.err.println("Unknown destination " + receiverId);
             return;

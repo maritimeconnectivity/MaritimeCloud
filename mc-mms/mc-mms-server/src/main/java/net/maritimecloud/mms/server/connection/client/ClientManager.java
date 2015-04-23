@@ -18,112 +18,53 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.LongAdder;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
-import com.codahale.metrics.Gauge;
-import com.codahale.metrics.MetricRegistry;
 import net.maritimecloud.core.id.MaritimeId;
-import net.maritimecloud.internal.mms.messages.services.AbstractClients;
-import net.maritimecloud.internal.mms.messages.services.ClientInfo;
-import net.maritimecloud.internal.mms.messages.services.ClientList;
-import net.maritimecloud.mms.server.connectionold.ServerConnection;
 import net.maritimecloud.mms.server.tracker.PositionTracker;
-import net.maritimecloud.net.MessageHeader;
-import net.maritimecloud.util.geometry.Area;
 import net.maritimecloud.util.geometry.PositionTime;
 
 import org.cakeframework.container.concurrent.ThreadManager;
 import org.cakeframework.container.lifecycle.RunOnStart;
+
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
 
 /**
  *
  * @author Kasper Nielsen
  */
 
-public class ClientManager extends AbstractClients implements Iterable<Client> {
+public class ClientManager implements Iterable<Client> {
 
-    private final ConcurrentHashMap<String, Client> targets = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Client> clients = new ConcurrentHashMap<>();
+
+    final ClientManagerStatistics statistics = new ClientManagerStatistics(this);
 
     final PositionTracker<Client> tracker = new PositionTracker<>();
 
-    public Client find(MaritimeId id) {
-        return targets.get(id.toString());
-    }
-
-    public void forEachConnection(final Consumer<ServerConnection> consumer) {
-        requireNonNull(consumer);
-        targets.forEachValue(10, target -> {
-            ServerConnection c = target.getActiveConnection();
-            if (c != null) {
-                consumer.accept(c);
-            }
-        });
-    }
-
-    public void forEachTarget(BiConsumer<Client, PositionTime> consumer) {
-        tracker.forEach(consumer);
-    }
-
     public void forEachTarget(Consumer<Client> consumer) {
-        requireNonNull(consumer);
-        targets.forEachValue(10, consumer);
+        clients.forEachValue(10, requireNonNull(consumer));
     }
 
-    public void forEachWithinArea(Area shape, BiConsumer<Client, PositionTime> block) {
-        tracker.forEachWithinArea(shape, block);
+    public Client get(MaritimeId id) {
+        return clients.get(id.toString());
     }
 
-    /** {@inheritDoc} */
-    @Override
-    protected List<ClientInfo> getAllClient(MessageHeader header) {
-        return getAllClients().getClients();
-    }
-
-    public ClientList getAllClients() {
-        ClientList cl = new ClientList();
-        for (Client t : this) {
-            ClientInfo ci = new ClientInfo();
-            ci.setId(t.getId().toString());
-            PositionTime pt = t.getLatestPosition();
-            if (pt != null) {
-                ci.setLastSeen(pt.timestamp());
-                ci.setLatestPosition(pt);
-            }
-
-            ClientProperties p = t.getProperties();
-            ci.setName(p.getName());
-            ci.setDescription(p.getDescription());
-            ci.setOrganization(p.getOrganization());
-
-            cl.addClients(ci);
-        }
-        return cl;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected Integer getConnectionCount(MessageHeader header) {
-        final LongAdder i = new LongAdder();
-        forEachTarget(t -> {
-            if (t.isConnected()) {
-                i.increment();
-            }
-        });
-        return i.intValue();
-    }
-
-    public Client getTarget(MaritimeId id) {
-        return targets.computeIfAbsent(id.toString(), key -> new Client(this, id));
+    public Client getOrCreate(MaritimeId id) {
+        return clients.computeIfAbsent(id.toString(), key -> new Client(this, id));
     }
 
     /** {@inheritDoc} */
     @Override
     public Iterator<Client> iterator() {
-        return Collections.unmodifiableCollection(targets.values()).iterator();
+        return Collections.unmodifiableCollection(clients.values()).iterator();
+    }
+
+    public Stream<Client> parallelStream() {
+        return clients.values().parallelStream();
     }
 
     public void reportPosition(Client target, PositionTime pt) {
@@ -133,8 +74,29 @@ public class ClientManager extends AbstractClients implements Iterable<Client> {
     @RunOnStart
     public void start(ThreadManager tm, MetricRegistry metrics) {
         tracker.schedule(tm.getScheduledExecutor(), 1000);
-
         // Add metrics gauges
-        metrics.register(MetricRegistry.name("targets", "size"), (Gauge<Integer>) targets::size);
+        metrics.register(MetricRegistry.name("clients", "size"), (Gauge<Integer>) clients::size);
+    }
+
+    /**
+     * @return the statistics
+     */
+    public ClientManagerStatistics statistics() {
+        return statistics;
+    }
+
+    public Stream<Client> stream() {
+        return clients.values().stream();
     }
 }
+
+
+// public void forEachConnection(final Consumer<ServerConnection> consumer) {
+// requireNonNull(consumer);
+// targets.forEachValue(10, target -> {
+// ServerConnection c = target.getActiveConnection();
+// if (c != null) {
+// consumer.accept(c);
+// }
+// });
+// }

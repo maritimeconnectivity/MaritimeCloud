@@ -31,7 +31,7 @@ public abstract class PositionUpdatedHandler<T> {
      * @param positiontime
      *            the position and time when entering
      */
-    protected void entering(T t, PositionTime positiontime) {}
+    protected void entering(T t, PositionTime positiontime, EnterReason reasonForEntering) {}
 
     /**
      * Invoked whenever a tracked object position is updated.
@@ -51,5 +51,16 @@ public abstract class PositionUpdatedHandler<T> {
      * @param t
      *            the tracked object
      */
-    protected void exiting(T t) {}
+    protected void exiting(T t, LeaveReason reasonForEntering) {}
+    
+    public enum EnterReason {
+        ENTERED_AREA,
+        CONNECTED;
+    }
+    
+    public enum LeaveReason {
+        LEFT_AREA,
+        DISCONNECTED,
+        TIMEOUT;
+    }
 }
