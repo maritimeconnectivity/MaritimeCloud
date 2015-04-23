@@ -18,8 +18,6 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.concurrent.TimeUnit;
 
-import com.codahale.metrics.MetricRegistry;
-
 import net.maritimecloud.core.id.ServerId;
 import net.maritimecloud.mms.server.broadcast.ServerBroadcastManager;
 import net.maritimecloud.mms.server.connection.client.ClientManager;
@@ -29,10 +27,13 @@ import net.maritimecloud.mms.server.connectionold.server.UnsecureWebSocketServer
 import net.maritimecloud.mms.server.endpoints.ServerEndpointManager;
 import net.maritimecloud.mms.server.endpoints.ServerServices;
 import net.maritimecloud.mms.server.rest.WebServer;
+import net.maritimecloud.mms.server.tracker.PositionTracker;
 
 import org.cakeframework.container.Container;
 import org.cakeframework.container.Container.State;
 import org.cakeframework.container.ContainerConfiguration;
+
+import com.codahale.metrics.MetricRegistry;
 
 /**
  *
@@ -64,6 +65,7 @@ public class MmsServer {
         conf.addService(ServerServices.class);
         conf.addService(ClientManager.class);
         conf.addService(ConnectionManager.class);
+        conf.addService(PositionTracker.class);
         conf.addService(UnsecureWebSocketServer.class);
         conf.addService(MmsServerConnectionBus.class);
         conf.addService(ServerBroadcastManager.class);

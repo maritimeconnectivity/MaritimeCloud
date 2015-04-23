@@ -45,11 +45,11 @@ public class Client {
 
     final ReentrantLock sendLock = new ReentrantLock();
 
-    final ClientManager tm;
+    final ClientManager clientManager;
 
-    public Client(ClientManager tm, MaritimeId id) {
+    public Client(ClientManager clientManager, MaritimeId id) {
         this.id = id;
-        this.tm = tm;
+        this.clientManager = requireNonNull(clientManager);
         endpointManager = new TargetEndpointManager(this);
     }
 
@@ -126,7 +126,9 @@ public class Client {
      */
     public void setLatestPosition(PositionTime latestPosition) {
         this.latestPosition = latestPosition;
-        tm.reportPosition(this, latestPosition);
+        // previously we reported the updated position immediately.
+        // now we sample every second, can be removed at some point
+        // clientManager.reportPosition(this, latestPosition);
     }
 
     /**

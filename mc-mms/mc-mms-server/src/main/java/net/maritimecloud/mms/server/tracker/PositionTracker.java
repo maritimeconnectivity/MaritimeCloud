@@ -18,56 +18,77 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
+import net.maritimecloud.mms.server.connection.client.Client;
+import net.maritimecloud.mms.server.connection.client.ClientManager;
 import net.maritimecloud.util.geometry.Area;
 import net.maritimecloud.util.geometry.Circle;
 import net.maritimecloud.util.geometry.PositionTime;
+
+import org.cakeframework.container.Container;
+import org.cakeframework.container.concurrent.Daemon;
 
 /**
  * An object that tracks positions.
  *
  * @author Kasper Nielsen
  */
-public class PositionTracker<T> {
+public class PositionTracker {
     // Good description of why we use brute force
     // http://www.jandrewrogers.com/2015/03/02/geospatial-databases-are-hard/?h
     /** Magic constant. */
     static final int THRESHOLD = 1;
 
     /** All targets at last update. Must be read via synchronized */
-    private ConcurrentHashMap<T, PositionTime> latest = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Client, PositionTime> latest = new ConcurrentHashMap<>();
 
     /** All current subscriptions. */
-    final ConcurrentHashMap<PositionUpdatedHandler<? super T>, Subscription<T>> subscriptions = new ConcurrentHashMap<>();
+    final ConcurrentHashMap<PositionUpdatedHandler, Subscription> subscriptions = new ConcurrentHashMap<>();
 
-    /** All targets that we are currently monitoring. */
-    private final ConcurrentHashMap<T, PositionTime> targets = new ConcurrentHashMap<>();
+    private final ClientManager clientManager;
+
+    public PositionTracker(ClientManager clientManager) {
+        this.clientManager = requireNonNull(clientManager);
+    }
+
+    @Daemon
+    public void run(Container c) {
+        long start = System.currentTimeMillis();
+        while (!c.getState().isShutdown()) {
+            try {
+                doRun0();
+                long now = System.currentTimeMillis();
+                long sleep = 1000 - Math.min(1000, now - start);
+                if (sleep > 0) {
+                    Thread.sleep(sleep);
+                }
+                start = now;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     /** Should be scheduled to run every x second to update handlers. */
-    synchronized void doRun() {
-        ConcurrentHashMap<T, PositionTime> current = new ConcurrentHashMap<>(targets);
-        final Map<T, PositionTime> latest = this.latest;
+    private void doRun0() {
+        ConcurrentHashMap<Client, PositionTime> current = new ConcurrentHashMap<>();
+        final Map<Client, PositionTime> latest = this.latest;
 
         // We only want to process those that have been updated since last time
-        final ConcurrentHashMap<T, PositionTime> updates = new ConcurrentHashMap<>();
-        current.forEach(THRESHOLD, (t, pt) -> {
-            PositionTime p = latest.get(t);
-            if (p == null || !p.positionEquals(pt)) {
-                updates.put(t, pt);
+        final ConcurrentHashMap<Client, PositionTime> updates = new ConcurrentHashMap<>();
+        clientManager.forEach(pt -> {
+            PositionTime p = latest.get(pt);
+            PositionTime currentPt = pt.getLatestPosition();
+            if (p == null || !p.positionEquals(currentPt)) {
+                updates.put(pt, currentPt);
             }
+            current.put(pt, currentPt);
         });
         // update each subscription with new positions
         subscriptions.forEachValue(THRESHOLD, s -> s.updateWith(updates));
         // update latest with current latest
         this.latest = current;
-    }
-
-    public void forEach(BiConsumer<T, PositionTime> consumer) {
-        targets.forEach(THRESHOLD, requireNonNull(consumer, "block is null"));
     }
 
     /**
@@ -78,32 +99,15 @@ public class PositionTracker<T> {
      * @param block
      *            the callback
      */
-    public void forEachWithinArea(Area shape, BiConsumer<T, PositionTime> block) {
+    public void forEachWithinArea(Area shape, BiConsumer<Client, PositionTime> block) {
         requireNonNull(shape, "shape is null");
         requireNonNull(block, "block is null");
-        targets.forEach(THRESHOLD, (a, b) -> {
-            if (shape.contains(b)) {
-                block.accept(a, b);
+        clientManager.forEach(c -> {
+            PositionTime pt = c.getLatestPosition();
+            if (shape.contains(pt)) {
+                block.accept(c, pt);
             }
         });
-    }
-
-    /**
-     * Returns the latest position time updated for the specified target. Or <code>null</code> if no position has ever
-     * been recorded for the target.
-     *
-     *
-     * @param target
-     *            the target
-     * @return the latest position time updated
-     */
-    public PositionTime getLatest(T target) {
-        return latest.get(target);
-    }
-
-    public PositionTime getLatestIfLaterThan(T target, long time) {
-        PositionTime t = getLatest(target);
-        return t != null && time < t.getTime() ? t : null;
     }
 
     /**
@@ -116,23 +120,14 @@ public class PositionTracker<T> {
     }
 
     /**
-     * Returns the number of tracked objects.
-     *
-     * @return the number of tracked objects
-     */
-    public int getNumberOfTrackedObjects() {
-        return targets.size();
-    }
-
-    /**
      * Returns a map of all tracked objects and their latest position.
      *
      * @param shape
      *            the area of interest
      * @return a map of all tracked objects within the area as keys and their latest position as the value
      */
-    public Map<T, PositionTime> getTargetsWithin(Area shape) {
-        final ConcurrentHashMap<T, PositionTime> result = new ConcurrentHashMap<>();
+    public Map<Client, PositionTime> getTargetsWithin(Area shape) {
+        final ConcurrentHashMap<Client, PositionTime> result = new ConcurrentHashMap<>();
         forEachWithinArea(shape, (a, b) -> {
             if (shape.contains(b)) {
                 result.put(a, b);
@@ -141,12 +136,8 @@ public class PositionTracker<T> {
         return result;
     }
 
-    public boolean remove(T t) {
+    public boolean remove(Client t) {
         return latest.remove(t) != null;
-    }
-
-    public Future<?> schedule(ScheduledExecutorService ses, int updatePeriodMS) {
-        return ses.scheduleAtFixedRate(() -> doRun(), 0, updatePeriodMS, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -158,7 +149,7 @@ public class PositionTracker<T> {
      *            a subscription that can be used to cancel the subscription
      * @return a subscription object
      */
-    public Subscription<T> subscribe(Area area, PositionUpdatedHandler<? super T> handler) {
+    public Subscription subscribe(Area area, PositionUpdatedHandler handler) {
         return subscribe(area, handler, 100);
     }
 
@@ -174,7 +165,7 @@ public class PositionTracker<T> {
      *            situations where a boat sails on a boundary line and keeps changing from being inside to outside of it
      * @return a subscription object
      */
-    public Subscription<T> subscribe(Area area, PositionUpdatedHandler<? super T> handler, double slack) {
+    public Subscription subscribe(Area area, PositionUpdatedHandler handler, double slack) {
         Area exitShape = requireNonNull(area, "area is null");
         if (slack < 0) {
             throw new IllegalArgumentException("Slack must be non-negative, was " + slack);
@@ -187,22 +178,28 @@ public class PositionTracker<T> {
                 throw new UnsupportedOperationException("Only circles allowed for now");
             }
         }
-        Subscription<T> s = new Subscription<>(this, handler, area, exitShape);
+        Subscription s = new Subscription(this, handler, area, exitShape);
         if (subscriptions.putIfAbsent(handler, s) != null) {
             throw new IllegalArgumentException("The specified handler has already been registered");
         }
         return s;
     }
-
-    /**
-     * Updates the current position of the specified target.
-     *
-     * @param target
-     *            the target
-     * @param positionTime
-     *            the position and reported time
-     */
-    public void update(T target, PositionTime positionTime) {
-        targets.merge(target, positionTime, (a, b) -> a.getTime() >= b.getTime() ? a : b);
-    }
 }
+//
+// /**
+// * Returns the latest position time updated for the specified target. Or <code>null</code> if no position has ever
+// * been recorded for the target.
+// *
+// *
+// * @param target
+// * the target
+// * @return the latest position time updated
+// */
+// public PositionTime getLatest(Client target) {
+// return latest.get(target);
+// }
+//
+// public PositionTime getLatestIfLaterThan(Client target, long time) {
+// PositionTime t = getLatest(target);
+// return t != null && time < t.getTime() ? t : null;
+// }

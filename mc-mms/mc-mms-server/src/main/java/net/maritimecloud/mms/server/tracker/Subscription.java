@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import net.maritimecloud.mms.server.connection.client.Client;
 import net.maritimecloud.util.geometry.Area;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
@@ -31,10 +32,10 @@ import net.maritimecloud.util.geometry.PositionTime;
  *
  * @author Kasper Nielsen
  */
-public class Subscription<T> {
+public class Subscription {
 
     /** The handler that should be called whenever objects are entering/exiting. */
-    private final PositionUpdatedHandler<? super T> handler;
+    private final PositionUpdatedHandler handler;
 
     /** The shape we look at to see if we are entering the area of interest. */
     private final Area shapeEntering;
@@ -43,12 +44,12 @@ public class Subscription<T> {
     private final Area shapeExiting;
 
     /** A map of currently tracked objects for this subscription. */
-    private final ConcurrentHashMap<T, PositionTime> trackedObjects = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Client, PositionTime> trackedObjects = new ConcurrentHashMap<>();
 
     /** The tracker that this subscription is registered with. */
-    private final PositionTracker<T> tracker;
+    private final PositionTracker tracker;
 
-    Subscription(PositionTracker<T> tracker, PositionUpdatedHandler<? super T> handler, Area shape, Area exitShape) {
+    Subscription(PositionTracker tracker, PositionUpdatedHandler handler, Area shape, Area exitShape) {
         this.tracker = requireNonNull(tracker);
         this.shapeEntering = requireNonNull(shape);
         this.shapeExiting = requireNonNull(exitShape);
@@ -68,7 +69,7 @@ public class Subscription<T> {
      * @param consumer
      *            the consumer
      */
-    public void forEachTrackedObject(Consumer<T> consumer) {
+    public void forEachTrackedObject(Consumer<Client> consumer) {
         requireNonNull(consumer, "consumer is null");
         trackedObjects.forEachKey(PositionTracker.THRESHOLD, t -> consumer.accept(t));
     }
@@ -79,14 +80,14 @@ public class Subscription<T> {
      * @param consumer
      *            the consumer
      */
-    public void forEachTrackedObject(BiConsumer<T, Position> consumer) {
+    public void forEachTrackedObject(BiConsumer<Client, Position> consumer) {
         requireNonNull(consumer, "consumer is null");
         trackedObjects.forEach(PositionTracker.THRESHOLD, (t, pt) -> {
             // pt.time is from the first time we encountered the position.
             // We might have gotten messages with the position but different timestamps
             // To avoid confusion we do not export the timestamp out
-                consumer.accept(t, Position.create(pt.getLatitude(), pt.getLongitude()));
-            });
+            consumer.accept(t, Position.create(pt.getLatitude(), pt.getLongitude()));
+        });
     }
 
     /**
@@ -103,12 +104,12 @@ public class Subscription<T> {
      *
      * @return a map of tracked objects with their current position
      */
-    public Map<T, Position> getTrackedObjects() {
+    public Map<Client, Position> getTrackedObjects() {
         // We could return trackedObjects directly. But we do not want to return PositionTime objects
         // because the time is not the time from the latest report. But the first time with the current position.
         // Which would be easily to mistake for users.
-        HashMap<T, Position> result = new HashMap<>();
-        for (Map.Entry<T, PositionTime> e : trackedObjects.entrySet()) {
+        HashMap<Client, Position> result = new HashMap<>();
+        for (Map.Entry<Client, PositionTime> e : trackedObjects.entrySet()) {
             result.put(e.getKey(), Position.create(e.getValue().getLatitude(), e.getValue().getLongitude()));
         }
         return result;
@@ -121,9 +122,9 @@ public class Subscription<T> {
      * @param updates
      *            the position that have been updated since this method was last invoked
      */
-    synchronized void updateWith(ConcurrentHashMap<T, PositionTime> updates) {
-        for (Map.Entry<T, PositionTime> e : updates.entrySet()) {
-            T t = e.getKey();
+    synchronized void updateWith(ConcurrentHashMap<Client, PositionTime> updates) {
+        for (Map.Entry<Client, PositionTime> e : updates.entrySet()) {
+            Client t = e.getKey();
             PositionTime pt = e.getValue();
             PositionTime current = trackedObjects.get(t);
             boolean positionChanged = current == null || pt == null || !current.positionEquals(pt);

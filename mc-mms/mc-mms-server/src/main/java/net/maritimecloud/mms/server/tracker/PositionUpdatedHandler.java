@@ -14,28 +14,29 @@
  */
 package net.maritimecloud.mms.server.tracker;
 
+import net.maritimecloud.mms.server.connection.client.Client;
 import net.maritimecloud.util.geometry.PositionTime;
 
 /**
  * A position update handler is used for notifying the user about updated positions within the area of interest.
- * 
+ *
  * @author Kasper Nielsen
  */
-public abstract class PositionUpdatedHandler<T> {
+public abstract class PositionUpdatedHandler {
 
     /**
      * Invoked whenever an object enters the area of interest.
-     * 
+     *
      * @param t
      *            the tracked object
      * @param positiontime
      *            the position and time when entering
      */
-    protected void entering(T t, PositionTime positiontime, EnterReason reasonForEntering) {}
+    protected void entering(Client t, PositionTime positiontime, EnterReason reasonForEntering) {}
 
     /**
      * Invoked whenever a tracked object position is updated.
-     * 
+     *
      * @param t
      *            the tracked object
      * @param previous
@@ -43,24 +44,21 @@ public abstract class PositionUpdatedHandler<T> {
      * @param current
      *            the current position (is null if existing the area of interest)
      */
-    protected void updated(T t, PositionTime previous, PositionTime current) {}
+    protected void updated(Client t, PositionTime previous, PositionTime current) {}
 
     /**
      * Invoked whenever an object leaves the area of interest.
-     * 
+     *
      * @param t
      *            the tracked object
      */
-    protected void exiting(T t, LeaveReason reasonForEntering) {}
-    
+    protected void exiting(Client t, LeaveReason reasonForEntering) {}
+
     public enum EnterReason {
-        ENTERED_AREA,
-        CONNECTED;
+        ENTERED_AREA, CONNECTED;
     }
-    
+
     public enum LeaveReason {
-        LEFT_AREA,
-        DISCONNECTED,
-        TIMEOUT;
+        LEFT_AREA, DISCONNECTED, TIMEOUT;
     }
 }

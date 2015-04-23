@@ -23,10 +23,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import net.maritimecloud.core.id.MaritimeId;
-import net.maritimecloud.mms.server.tracker.PositionTracker;
-import net.maritimecloud.util.geometry.PositionTime;
 
-import org.cakeframework.container.concurrent.ThreadManager;
 import org.cakeframework.container.lifecycle.RunOnStart;
 
 import com.codahale.metrics.Gauge;
@@ -42,8 +39,6 @@ public class ClientManager implements Iterable<Client> {
     private final ConcurrentHashMap<String, Client> clients = new ConcurrentHashMap<>();
 
     final ClientManagerStatistics statistics = new ClientManagerStatistics(this);
-
-    final PositionTracker<Client> tracker = new PositionTracker<>();
 
     public void forEachTarget(Consumer<Client> consumer) {
         clients.forEachValue(10, requireNonNull(consumer));
@@ -67,14 +62,8 @@ public class ClientManager implements Iterable<Client> {
         return clients.values().parallelStream();
     }
 
-    public void reportPosition(Client target, PositionTime pt) {
-        tracker.update(target, pt);
-    }
-
     @RunOnStart
-    public void start(ThreadManager tm, MetricRegistry metrics) {
-        tracker.schedule(tm.getScheduledExecutor(), 1000);
-        // Add metrics gauges
+    public void start(MetricRegistry metrics) {
         metrics.register(MetricRegistry.name("clients", "size"), (Gauge<Integer>) clients::size);
     }
 
@@ -89,14 +78,3 @@ public class ClientManager implements Iterable<Client> {
         return clients.values().stream();
     }
 }
-
-
-// public void forEachConnection(final Consumer<ServerConnection> consumer) {
-// requireNonNull(consumer);
-// targets.forEachValue(10, target -> {
-// ServerConnection c = target.getActiveConnection();
-// if (c != null) {
-// consumer.accept(c);
-// }
-// });
-// }
