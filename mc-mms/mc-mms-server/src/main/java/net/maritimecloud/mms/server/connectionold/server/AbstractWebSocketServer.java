@@ -32,8 +32,8 @@ import net.maritimecloud.internal.mms.client.connection.transport.ClientTranspor
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.mms.server.MmsServer;
 import net.maritimecloud.mms.server.MmsServerConfiguration;
-import net.maritimecloud.mms.server.connection.transport.OldDefaultServerEndpoint;
 import net.maritimecloud.mms.server.connection.transport.OldServerTransport;
+import net.maritimecloud.mms.server.connection.transport.ServerTransportJsr356Endpoint;
 
 import org.cakeframework.container.lifecycle.RunOnStart;
 import org.cakeframework.container.lifecycle.RunOnStop;
@@ -135,11 +135,11 @@ public abstract class AbstractWebSocketServer {
         wsContainer.setDefaultMaxTextMessageBufferSize(10 * 1024 * 1024);
         // Add our default endpoint.
 
-        Builder b = ServerEndpointConfig.Builder.create(OldDefaultServerEndpoint.class, "/");
+        Builder b = ServerEndpointConfig.Builder.create(ServerTransportJsr356Endpoint.class, "/");
         b.configurator(new ServerEndpointConfig.Configurator() {
             @SuppressWarnings("unchecked")
             public <S> S getEndpointInstance(Class<S> endpointClass) throws InstantiationException {
-                return (S) new OldDefaultServerEndpoint(() -> new OldServerTransport(is, transportListener));
+                return (S) new ServerTransportJsr356Endpoint(() -> new OldServerTransport(is, transportListener));
             }
         });
 

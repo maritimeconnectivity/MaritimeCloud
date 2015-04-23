@@ -16,11 +16,15 @@ package net.maritimecloud.mms.server.connection.transport;
 
 import static java.util.Objects.requireNonNull;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCode;
 import javax.websocket.Session;
 
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
+import net.maritimecloud.internal.mms.transport.MmsWireProtocol;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 
 import org.slf4j.Logger;
@@ -30,7 +34,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Kasper Nielsen
  */
-public class ServerTransport {
+public final class ServerTransport {
 
     /** The logger. */
     private static final Logger LOG = LoggerFactory.getLogger(ServerTransport.class);
@@ -77,6 +81,7 @@ public class ServerTransport {
         MmsMessage msg;
         try {
             msg = MmsMessage.parseTextMessage(textMessage);
+            msg.setInbound(true);
         } catch (Exception e) {
             LOG.error("Failed to parse incoming message", e);
             close(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage(e.getMessage()));
@@ -84,7 +89,20 @@ public class ServerTransport {
         }
         listener.onMessage(this, msg);
     }
-
+    
+    void endpointOnBinaryMessage(byte[] binary) {
+        MmsMessage msg;
+        try {
+            msg = MmsMessage.parseBinaryMessage(binary);
+            msg.setInbound(true);
+        } catch (Exception e) {
+            LOG.error("Failed to parse incoming message", e);
+            close(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage(e.getMessage()));
+            return;
+        }
+        listener.onMessage(this, msg);
+    }
+    
     /**
      * Send the specified message with the transport.
      *
@@ -94,9 +112,19 @@ public class ServerTransport {
     public void sendMessage(MmsMessage message) {
         Session wsSession = this.wsSession;
         if (wsSession != null) {
-            String textToSend = message.toText();
-            // connectionListener.textMessageSend(textToSend);
-            wsSession.getAsyncRemote().sendText(textToSend);
+            message.setInbound(false);
+            message.setBinary(MmsWireProtocol.USE_BINARY);
+
+            if (message.isBinary()) {
+                try {
+                    wsSession.getAsyncRemote().sendBinary(ByteBuffer.wrap(message.toBinary()));
+                } catch (IOException e) {
+                    throw new RuntimeException("Failed sending binary message", e);
+                }
+            } else {
+                String textToSend = message.toText();
+                wsSession.getAsyncRemote().sendText(textToSend);
+            }
         }
     }
 }

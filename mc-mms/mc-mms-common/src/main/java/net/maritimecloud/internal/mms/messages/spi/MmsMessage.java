@@ -186,11 +186,13 @@ public class MmsMessage {
 
         Message tm = MessageSerializer.readFromJSON(p, msg);
         pm.m = tm;
+        pm.binary = false;
         return pm;
     }
 
     /**
      * Returns a binary representation of the MmsMessage
+     * 
      * @return a binary representation of the MmsMessage
      */
     public byte[] toBinary() throws IOException {
@@ -210,7 +212,9 @@ public class MmsMessage {
 
     /**
      * Parses the byte array as an MmsMessage
-     * @param msg the bytes of the message
+     * 
+     * @param msg
+     *            the bytes of the message
      * @return the parsed message
      */
     public static MmsMessage parseBinaryMessage(byte[] msg) throws IOException {
@@ -224,6 +228,7 @@ public class MmsMessage {
             }
             pm.m = bmr.readMessage(4, null, MmsMessageType.getParser(type));
         }
+        pm.binary = true;
         return pm;
     }
 

@@ -14,32 +14,28 @@
  */
 package net.maritimecloud.mms.server.connection.transport;
 
+import static java.util.Objects.requireNonNull;
+
+import java.util.concurrent.locks.ReentrantLock;
+
 import net.maritimecloud.core.id.ServerId;
 import net.maritimecloud.internal.mms.client.connection.transport.ClientTransportListener;
 import net.maritimecloud.internal.mms.messages.Welcome;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
-import net.maritimecloud.internal.mms.transport.MmsWireProtocol;
 import net.maritimecloud.mms.server.MmsServer;
 import net.maritimecloud.mms.server.connectionold.ConnectionManager;
 import net.maritimecloud.mms.server.connectionold.ServerConnectFuture;
 import net.maritimecloud.mms.server.connectionold.ServerConnection;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.websocket.CloseReason;
-import javax.websocket.Session;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.concurrent.locks.ReentrantLock;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  *
  * @author Kasper Nielsen
  */
-public class OldServerTransport {
+public class OldServerTransport implements ServerTransportListener {
 
     /** The logger. */
     static final Logger LOG = LoggerFactory.getLogger(OldServerTransport.class);
@@ -59,7 +55,7 @@ public class OldServerTransport {
     final ClientTransportListener transportListener;
 
     /** The websocket session. */
-    private volatile Session session;
+    private volatile ServerTransport transport;
 
     private final ReentrantLock writeLock = new ReentrantLock();
 
@@ -74,12 +70,10 @@ public class OldServerTransport {
     public void doClose(final MmsConnectionClosingCode reason) {
         fullyLock();
         try {
-            Session session = this.session;
-            if (session != null) {
-                CloseReason cr = new CloseReason(reason::getId, reason.getMessage());
-
+            ServerTransport transport = this.transport;
+            if (transport != null) {
                 try {
-                    session.close(cr);
+                    transport.close(reason);
                 } catch (Exception e) {
                     LOG.error("Failed to close connection", e);
                 }
@@ -106,12 +100,10 @@ public class OldServerTransport {
     }
 
     /** {@inheritDoc} */
-    public void onClose(CloseReason closeReason) {
+    public void onClose(ServerTransport t, MmsConnectionClosingCode reason) {
         fullyLock();
         try {
-            session = null;
-            MmsConnectionClosingCode reason = MmsConnectionClosingCode.create(closeReason.getCloseCode().getCode(),
-                    closeReason.getReasonPhrase());
+            transport = null;
             if (connection != null) {
                 connection.transportDisconnected(this, reason);
             }
@@ -122,10 +114,10 @@ public class OldServerTransport {
 
     }
 
-    public void onOpen(Session session) {
+    public void onOpen(ServerTransport t) {
         fullyLock();
         try {
-            this.session = session;
+            this.transport = t;
             // send a Welcome message to the client as the first thing
             ServerId id = cm.server.getServerId();
             sendMessage(new MmsMessage(new Welcome().addProtocolVersion(1).setServerId(id.toString())
@@ -136,55 +128,11 @@ public class OldServerTransport {
         }
     }
 
-    /**
-     * Called when a text message is received over the wire
-     * @param textMessage the text message
-     */
-    public void onTextMessage(String textMessage) {
+    /** {@inheritDoc} */
+    @Override
+    public void onMessage(ServerTransport t, MmsMessage msg) {
         readLock.lock();
         try {
-            MmsMessage msg;
-            try {
-                msg = MmsMessage.parseTextMessage(textMessage);
-                msg.setInbound(true);
-                msg.setBinary(false);
-            } catch (Exception e) {
-                LOG.error("Failed to parse incoming message", e);
-                doClose(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage(e.getMessage()));
-                return;
-            }
-            if (connectFuture != null) {
-                connectFuture.onMessage(msg.getM());
-            } else if (msg.isConnectionMessage()) {
-                connection.messageReceive(this, msg);
-            } else {
-                String err = "Unknown messageType " + msg.getClass().getSimpleName();
-                LOG.error(err);
-                doClose(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage(err));
-            }
-            transportListener.onMessageReceived(msg);
-        } finally {
-            readLock.unlock();
-        }
-    }
-
-    /**
-     * Called when a binary message is received over the wire
-     * @param binaryMessage the binary message
-     */
-    public void onBinaryMessage(byte[] binaryMessage) {
-        readLock.lock();
-        try {
-            MmsMessage msg;
-            try {
-                msg = MmsMessage.parseBinaryMessage(binaryMessage);
-                msg.setInbound(true);
-                msg.setBinary(true);
-            } catch (Exception e) {
-                LOG.error("Failed to parse incoming message", e);
-                doClose(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage(e.getMessage()));
-                return;
-            }
             if (connectFuture != null) {
                 connectFuture.onMessage(msg.getM());
             } else if (msg.isConnectionMessage()) {
@@ -202,25 +150,16 @@ public class OldServerTransport {
 
     /**
      * Sends the given message over the wire in text or binary format
-     * @param msg the message to sen
+     * 
+     * @param msg
+     *            the message to sen
      */
     public void sendMessage(MmsMessage msg) {
         writeLock.lock();
         try {
-            Session session = this.session;
-            if (session != null) {
-                msg.setInbound(false);
-                msg.setBinary(MmsWireProtocol.USE_BINARY);
-
-                if (msg.isBinary()) {
-                    try {
-                        session.getAsyncRemote().sendBinary(ByteBuffer.wrap(msg.toBinary()));
-                    } catch (IOException e) {
-                        throw new RuntimeException("Failed sending binary message", e);
-                    }
-                } else {
-                    session.getAsyncRemote().sendText(msg.toText());
-                }
+            ServerTransport transport = this.transport;
+            if (transport != null) {
+                transport.sendMessage(msg);
                 transportListener.onMessageSent(msg);
             }
         } finally {

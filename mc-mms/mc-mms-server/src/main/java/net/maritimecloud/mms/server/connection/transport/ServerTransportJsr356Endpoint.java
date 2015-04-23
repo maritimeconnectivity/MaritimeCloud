@@ -52,6 +52,7 @@ public class ServerTransportJsr356Endpoint {
     @OnOpen
     public void onOpen(Session session) {
         session.setMaxBinaryMessageBufferSize(10 * 1024 * 1024);
+        session.setMaxTextMessageBufferSize(10 * 1024 * 1024);
         transport = new ServerTransport(session, transportListenerFactory.get());
         transport.endpointOnOpen();
     }
@@ -59,5 +60,10 @@ public class ServerTransportJsr356Endpoint {
     @OnMessage
     public void onTextMessage(String textMessage) {
         transport.endpointOnTextMessage(textMessage);
+    }
+    
+    @OnMessage
+    public void onBinaryMessage(byte[] binaryMessage) {
+        transport.endpointOnBinaryMessage(binaryMessage);
     }
 }
