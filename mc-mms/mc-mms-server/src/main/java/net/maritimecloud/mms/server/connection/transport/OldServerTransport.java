@@ -19,7 +19,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.concurrent.locks.ReentrantLock;
 
 import net.maritimecloud.core.id.ServerId;
-import net.maritimecloud.internal.mms.client.connection.transport.ClientTransportListener;
 import net.maritimecloud.internal.mms.messages.Welcome;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.mms.server.MmsServer;
@@ -52,18 +51,16 @@ public class OldServerTransport implements ServerTransportListener {
 
     public final MmsServer server;
 
-    final ClientTransportListener transportListener;
-
     /** The websocket session. */
     private volatile ServerTransport transport;
 
     private final ReentrantLock writeLock = new ReentrantLock();
 
     /** Constructor */
-    public OldServerTransport(MmsServer server, ClientTransportListener transportListener) {
+    public OldServerTransport(MmsServer server) {
         this.clientManager = requireNonNull(server.getService(ClientManager.class));
         this.server = requireNonNull(server);
-        this.transportListener = requireNonNull(transportListener);
+        // this.transportListener = requireNonNull(transportListener);
     }
 
     /** {@inheritDoc} */
@@ -107,7 +104,7 @@ public class OldServerTransport implements ServerTransportListener {
             if (connection != null) {
                 connection.transportDisconnected(this, reason);
             }
-            transportListener.onClose(reason);
+            // transportListener.onClose(reason);
         } finally {
             fullyUnlock();
         }
@@ -122,7 +119,7 @@ public class OldServerTransport implements ServerTransportListener {
             ServerId id = server.getServerId();
             sendMessage(new MmsMessage(new Welcome().addProtocolVersion(1).setServerId(id.toString())
                     .putProperties("implementation", "mmsServer/0.2")));
-            transportListener.onOpen();
+            // transportListener.onOpen();
         } finally {
             fullyUnlock();
         }
@@ -142,7 +139,7 @@ public class OldServerTransport implements ServerTransportListener {
                 LOG.error(err);
                 doClose(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage(err));
             }
-            transportListener.onMessageReceived(msg);
+            // transportListener.onMessageReceived(msg);
         } finally {
             readLock.unlock();
         }
@@ -160,7 +157,7 @@ public class OldServerTransport implements ServerTransportListener {
             ServerTransport transport = this.transport;
             if (transport != null) {
                 transport.sendMessage(msg);
-                transportListener.onMessageSent(msg);
+                // transportListener.onMessageSent(msg);
             }
         } finally {
             writeLock.unlock();

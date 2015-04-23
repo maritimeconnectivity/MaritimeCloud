@@ -28,8 +28,6 @@ import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
 import javax.websocket.server.ServerEndpointConfig.Builder;
 
-import net.maritimecloud.internal.mms.client.connection.transport.ClientTransportListener;
-import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.mms.server.MmsServer;
 import net.maritimecloud.mms.server.MmsServerConfiguration;
 import net.maritimecloud.mms.server.connection.transport.OldServerTransport;
@@ -69,24 +67,10 @@ public abstract class AbstractWebSocketServer {
 
     final String accessLogPath;
 
-    final ClientTransportListener transportListener;
-
     public AbstractWebSocketServer(MmsServerConfiguration configuration, MmsServer is) {
         this.sa = new InetSocketAddress(configuration.getServerPort());
         this.is = requireNonNull(is);
         this.server = new Server(sa);
-
-        transportListener = new ClientTransportListener() {
-            @Override
-            public void onMessageReceived(MmsMessage message) {
-                System.out.println("Received: " + message.toText());
-            }
-
-            @Override
-            public void onMessageSent(MmsMessage message) {
-                System.out.println("Sent: " + message.toText());
-            }
-        };
 
         // Sets the sockets reuse address to true
         ServerConnector connector = (ServerConnector) server.getConnectors()[0];
@@ -139,7 +123,7 @@ public abstract class AbstractWebSocketServer {
         b.configurator(new ServerEndpointConfig.Configurator() {
             @SuppressWarnings("unchecked")
             public <S> S getEndpointInstance(Class<S> endpointClass) throws InstantiationException {
-                return (S) new ServerTransportJsr356Endpoint(() -> new OldServerTransport(is, transportListener));
+                return (S) new ServerTransportJsr356Endpoint(() -> new OldServerTransport(is));
             }
         });
 

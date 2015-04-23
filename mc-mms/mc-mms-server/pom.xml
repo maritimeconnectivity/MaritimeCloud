@@ -56,11 +56,22 @@
       <scope>test</scope>
     </dependency>
     
-    <dependency>
-      <groupId>net.maritimecloud.mms</groupId>
-      <artifactId>mc-mms-client-impl</artifactId>
+ <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mc-mms-client-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+<dependency>
+    <groupId>org.cakeframework</groupId>
+    <artifactId>cake-container</artifactId>
+    <version>0.8-SNAPSHOT</version>
+</dependency>
+   <dependency>
+       <groupId>${project.groupId}</groupId>
+       <artifactId>mc-mms-common</artifactId>
+       <version>${project.version}</version>
+    </dependency>
+  
     <dependency>
       <groupId>net.maritimecloud.mms</groupId>
       <artifactId>mc-mms-client-impl</artifactId>
