@@ -24,7 +24,8 @@ import net.maritimecloud.net.MessageHeader;
 import net.maritimecloud.util.geometry.PositionTime;
 
 /**
- *
+ * This class is just temporary until the server has been properly refactored
+ * 
  * @author Kasper Nielsen
  */
 public class ClientManagerStatistics extends AbstractClients {

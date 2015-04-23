@@ -48,7 +48,7 @@ public class ServerConnectFuture {
     }
 
     public void onMessage(Hello hm) {
-        ClientManager tm = serverTransport.cm.targetManager;
+        ClientManager tm = serverTransport.clientManager;
         Client target = tm.getOrCreate(MaritimeId.create(hm.getClientId()));
 
         // make sure we only have one connection attempt for a target at a time

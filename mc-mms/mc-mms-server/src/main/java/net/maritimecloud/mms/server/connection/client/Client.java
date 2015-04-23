@@ -21,7 +21,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.mms.server.connectionold.ServerConnection;
-import net.maritimecloud.mms.server.endpoints.TargetEndpointManager;
+import net.maritimecloud.mms.server.endpoints.ServerClientEndpointManager;
 import net.maritimecloud.util.geometry.PositionTime;
 
 /**
@@ -32,9 +32,14 @@ public class Client {
 
     private volatile ServerConnection activeConnection;
 
-    final TargetEndpointManager endpointManager;
+    volatile InnerClient client;
 
-    final MaritimeId id;
+    final ClientManager clientManager;
+
+    final ServerClientEndpointManager endpointManager;
+
+    /** The unique if of the client. */
+    private final MaritimeId id;
 
     /** The latest reported time and position. */
     private volatile PositionTime latestPosition;
@@ -45,12 +50,10 @@ public class Client {
 
     final ReentrantLock sendLock = new ReentrantLock();
 
-    final ClientManager clientManager;
-
     public Client(ClientManager clientManager, MaritimeId id) {
-        this.id = id;
+        this.id = requireNonNull(id);
         this.clientManager = requireNonNull(clientManager);
-        endpointManager = new TargetEndpointManager(this);
+        endpointManager = new ServerClientEndpointManager(this);
     }
 
     public void fullyLock() {
@@ -64,7 +67,7 @@ public class Client {
     }
 
     /**
-     * @return the connegction
+     * @return the connection
      */
     public ServerConnection getActiveConnection() {
         return activeConnection;
@@ -73,12 +76,14 @@ public class Client {
     /**
      * @return the endpointManager
      */
-    public TargetEndpointManager getEndpointManager() {
+    public ServerClientEndpointManager getEndpointManager() {
         return endpointManager;
     }
 
     /**
-     * @return the id
+     * Returns the unique id of the client.
+     *
+     * @return the unique id of the client
      */
     public MaritimeId getId() {
         return id;

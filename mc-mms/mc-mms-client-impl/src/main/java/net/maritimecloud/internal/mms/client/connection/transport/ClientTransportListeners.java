@@ -14,17 +14,16 @@
  */
 package net.maritimecloud.internal.mms.client.connection.transport;
 
-import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
-import net.maritimecloud.net.mms.MmsConnectionClosingCode;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
+import net.maritimecloud.net.mms.MmsConnectionClosingCode;
+
 /**
- * An implementation of {@linkplain ClientTransportListener} that
- * manages an internal list of the ClientTransportListener and delegates all events to
- * each listener
+ * An implementation of {@linkplain ClientTransportListener} that manages an internal list of the
+ * ClientTransportListener and delegates all events to each listener
  */
 public class ClientTransportListeners implements ClientTransportListener {
 
@@ -32,7 +31,9 @@ public class ClientTransportListeners implements ClientTransportListener {
 
     /**
      * Factory method that combines the list of listeners into a combined client transport listener
-     * @param listeners the listeners to add
+     * 
+     * @param listeners
+     *            the listeners to add
      * @return the combined client transport listeners
      */
     public static ClientTransportListeners of(List<ClientTransportListener> listeners) {
@@ -45,7 +46,9 @@ public class ClientTransportListeners implements ClientTransportListener {
 
     /**
      * Factory method that combines the list of listeners into a combined client transport listener
-     * @param listeners the listeners to add
+     * 
+     * @param listeners
+     *            the listeners to add
      * @return the combined client transport listeners
      */
     public static ClientTransportListeners of(ClientTransportListener... listeners) {
@@ -54,7 +57,9 @@ public class ClientTransportListeners implements ClientTransportListener {
 
     /**
      * Adds a listener to the internal list of listeners
-     * @param listener the listener to add
+     * 
+     * @param listener
+     *            the listener to add
      */
     public void addListener(ClientTransportListener listener) {
         listeners.add(listener);
@@ -62,7 +67,9 @@ public class ClientTransportListeners implements ClientTransportListener {
 
     /**
      * Removes a listener from the internal list of listeners
-     * @param listener the listener to remove
+     * 
+     * @param listener
+     *            the listener to remove
      */
     public void removeListener(ClientTransportListener listener) {
         listeners.add(listener);

@@ -110,7 +110,7 @@ public class ServerServices extends AbstractServices {
     @Override
     protected List<String> locate(MessageHeader header, String endpointName, Integer meters, Integer max) {
         ServerConnection con = ServerEndpointManager.connection(header);
-        List<Entry<Client, PositionTime>> findService = findServices(con.getTarget(), endpointName,
+        List<Entry<Client, PositionTime>> findService = findServices(con.getClient(), endpointName,
                 header.getSenderPosition(), meters, max);
         List<String> result = new ArrayList<>();
         for (Entry<Client, PositionTime> e : findService) {
@@ -127,7 +127,7 @@ public class ServerServices extends AbstractServices {
     @Override
     protected void registerEndpoint(MessageHeader header, String endpointName) {
         ServerConnection con = ServerEndpointManager.connection(header);
-        TargetEndpointManager services = con.getTarget().getEndpointManager();
+        ServerClientEndpointManager services = con.getClient().getEndpointManager();
         services.registerEndpoint(endpointName);
 
         // Update metrics

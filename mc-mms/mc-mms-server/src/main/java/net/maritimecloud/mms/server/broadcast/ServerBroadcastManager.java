@@ -46,7 +46,7 @@ public class ServerBroadcastManager {
     }
 
     public PositionReport broadcast(ServerConnection sourceConnection, Broadcast broadcast) {
-        final Client target = sourceConnection.getTarget();
+        final Client target = sourceConnection.getClient();
         // final PositionTime sourcePositionTime = send.getPositionTime();
 
         tm.forEachTarget(t -> {
@@ -95,7 +95,7 @@ public class ServerBroadcastManager {
                 BroadcastAck ba = new BroadcastAck();
                 ba.setAckForMessageId(bd.getMessageId());
                 // Ignore original sender id
-                Client org = destination.getTarget();
+                Client org = destination.getClient();
                 ba.setReceiverId(org.getId().toString());
 
                 PositionTime pt = org.getLatestPosition();

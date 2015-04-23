@@ -70,7 +70,7 @@ public class MmsServerConnectionBus {
 
     public void onMessage(ServerConnection connection, Message message) {
         if (message instanceof PositionReport) {
-            connection.getTarget().setLatestPosition(((PositionReport) message).getPositionTime());
+            connection.getClient().setLatestPosition(((PositionReport) message).getPositionTime());
             positionReportsMeter.mark();
         } else if (message instanceof Broadcast) {
             onBroadcast(connection, (Broadcast) message);

@@ -28,10 +28,10 @@ import org.slf4j.LoggerFactory;
  *
  * @author Kasper Nielsen
  */
-public class TargetEndpointManager {
+public class ServerClientEndpointManager {
 
     /** A logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(TargetEndpointManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ServerClientEndpointManager.class);
 
     /** A map of all registered services at the client. */
     final ConcurrentHashMap<String, String> endpoints = new ConcurrentHashMap<>();
@@ -39,7 +39,7 @@ public class TargetEndpointManager {
     /** The client */
     final Client target;
 
-    public TargetEndpointManager(Client target) {
+    public ServerClientEndpointManager(Client target) {
         this.target = requireNonNull(target);
     }
 

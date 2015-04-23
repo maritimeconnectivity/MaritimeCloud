@@ -64,6 +64,12 @@
     <artifactId>cake-container</artifactId>
     <version>0.8-SNAPSHOT</version>
 </dependency>
+   <dependency>
+       <groupId>${project.groupId}</groupId>
+       <artifactId>mc-mms-common</artifactId>
+       <version>${project.version}</version>
+    </dependency>
+  
   </dependencies>
   <build>
     <plugins>

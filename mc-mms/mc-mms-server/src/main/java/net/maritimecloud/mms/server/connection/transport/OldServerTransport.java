@@ -23,7 +23,7 @@ import net.maritimecloud.internal.mms.client.connection.transport.ClientTranspor
 import net.maritimecloud.internal.mms.messages.Welcome;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.mms.server.MmsServer;
-import net.maritimecloud.mms.server.connectionold.ConnectionManager;
+import net.maritimecloud.mms.server.connection.client.ClientManager;
 import net.maritimecloud.mms.server.connectionold.ServerConnectFuture;
 import net.maritimecloud.mms.server.connectionold.ServerConnection;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
@@ -40,7 +40,7 @@ public class OldServerTransport implements ServerTransportListener {
     /** The logger. */
     static final Logger LOG = LoggerFactory.getLogger(OldServerTransport.class);
 
-    public final ConnectionManager cm;
+    public final ClientManager clientManager;
 
     /** Whether or not we have received the first hello message from the client. */
     public ServerConnectFuture connectFuture = new ServerConnectFuture(this);
@@ -61,7 +61,7 @@ public class OldServerTransport implements ServerTransportListener {
 
     /** Constructor */
     public OldServerTransport(MmsServer server, ClientTransportListener transportListener) {
-        this.cm = requireNonNull(server.getService(ConnectionManager.class));
+        this.clientManager = requireNonNull(server.getService(ClientManager.class));
         this.server = requireNonNull(server);
         this.transportListener = requireNonNull(transportListener);
     }
@@ -119,7 +119,7 @@ public class OldServerTransport implements ServerTransportListener {
         try {
             this.transport = t;
             // send a Welcome message to the client as the first thing
-            ServerId id = cm.server.getServerId();
+            ServerId id = server.getServerId();
             sendMessage(new MmsMessage(new Welcome().addProtocolVersion(1).setServerId(id.toString())
                     .putProperties("implementation", "mmsServer/0.2")));
             transportListener.onOpen();
@@ -150,7 +150,7 @@ public class OldServerTransport implements ServerTransportListener {
 
     /**
      * Sends the given message over the wire in text or binary format
-     * 
+     *
      * @param msg
      *            the message to sen
      */

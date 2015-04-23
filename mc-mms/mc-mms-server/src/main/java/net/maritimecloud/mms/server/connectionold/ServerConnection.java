@@ -50,7 +50,7 @@ public class ServerConnection {
     /**
      * @return the target
      */
-    public Client getTarget() {
+    public Client getClient() {
         return target;
     }
 

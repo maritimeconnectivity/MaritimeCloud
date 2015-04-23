@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.mms.server.connectionold.server;
+package net.maritimecloud.mms.server.connection.server;
 
 import static java.util.Objects.requireNonNull;
 
@@ -158,7 +158,7 @@ public abstract class AbstractWebSocketServer {
 
         @Override
         protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-        IOException {
+                IOException {
             response.setContentType("text/html");
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().println("<h1>DumpServlet</h1><pre>");
