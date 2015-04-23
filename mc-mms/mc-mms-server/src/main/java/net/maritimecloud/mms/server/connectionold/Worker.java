@@ -19,7 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.message.Message;
-import net.maritimecloud.mms.server.connection.transport.ServerTransport;
+import net.maritimecloud.mms.server.connection.transport.OldServerTransport;
 
 /**
  *
@@ -63,7 +63,7 @@ public class Worker implements Runnable {
         return wi.getLatestReceivedMessageId();
     }
 
-    public long onConnect(ServerTransport transport, long id, boolean isReconnected) {
+    public long onConnect(OldServerTransport transport, long id, boolean isReconnected) {
         sendLock.lock();
         receiveLock.lock();
         workLock.lock();

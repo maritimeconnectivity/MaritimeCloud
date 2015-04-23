@@ -31,37 +31,33 @@ import javax.websocket.server.ServerEndpoint;
  * @author Kasper Nielsen
  */
 @ServerEndpoint(value = "/")
-public class DefaultServerEndpoint {
+public class ServerTransportJsr356Endpoint {
 
     /** The connection is attached to, or null, if it is not attached to one. */
     private volatile ServerTransport transport;
 
     /** A factory for creating server transports. */
-    private final Supplier<ServerTransport> transportFactory;
+    private final Supplier<? extends ServerTransportListener> transportListenerFactory;
 
-    public DefaultServerEndpoint(Supplier<ServerTransport> transportFactory) {
-        this.transportFactory = requireNonNull(transportFactory);
+    public ServerTransportJsr356Endpoint(Supplier<? extends ServerTransportListener> transportListenerFactory) {
+        this.transportListenerFactory = requireNonNull(transportListenerFactory);
     }
 
     @OnClose
     public void onClose(CloseReason closeReason) {
-        transport.onClose(closeReason);
+        transport.endpointOnClose(closeReason);
+        transport = null;
     }
 
     @OnOpen
     public void onOpen(Session session) {
         session.setMaxBinaryMessageBufferSize(10 * 1024 * 1024);
-        transport = transportFactory.get();
-        transport.onOpen(session);
+        transport = new ServerTransport(session, transportListenerFactory.get());
+        transport.endpointOnOpen();
     }
 
     @OnMessage
     public void onTextMessage(String textMessage) {
-        transport.onTextMessage(textMessage);
-    }
-
-    @OnMessage
-    public void onBinaryMessage(byte[] binaryMessage) {
-        transport.onBinaryMessage(binaryMessage);
+        transport.endpointOnTextMessage(textMessage);
     }
 }

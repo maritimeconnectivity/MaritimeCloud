@@ -19,7 +19,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.LinkedList;
 
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
-import net.maritimecloud.mms.server.connection.transport.ServerTransport;
+import net.maritimecloud.mms.server.connection.transport.OldServerTransport;
 
 /**
  *
@@ -54,9 +54,9 @@ public class WorkerInner {
         this.worker = requireNonNull(worker);
     }
 
-    ServerTransport transport;
+    OldServerTransport transport;
 
-    public long onConnect(ServerTransport transport, long id, boolean isReconnected) {
+    public long onConnect(OldServerTransport transport, long id, boolean isReconnected) {
         while (!written.isEmpty()) {
             OutstandingMessage om = written.pollLast();
             if (om.id > id) {
@@ -127,7 +127,7 @@ public class WorkerInner {
 
     private void processWritten() {
         // System.out.println("Prep to send");
-        ServerTransport transport = worker.connection.transport;
+        OldServerTransport transport = worker.connection.transport;
         if (transport != null && transport == this.transport) {
             OutstandingMessage om = unwritten.poll();
             MmsMessage cm = om.cm;

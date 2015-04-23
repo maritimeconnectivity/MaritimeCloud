@@ -19,7 +19,7 @@ import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.mms.server.MmsServer;
 import net.maritimecloud.mms.server.connection.client.Client;
-import net.maritimecloud.mms.server.connection.transport.ServerTransport;
+import net.maritimecloud.mms.server.connection.transport.OldServerTransport;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 import net.maritimecloud.util.Binary;
 
@@ -37,7 +37,7 @@ public class ServerConnection {
 
     final Client target;
 
-    volatile ServerTransport transport;
+    volatile OldServerTransport transport;
 
     final Worker worker = new Worker(this);
 
@@ -58,7 +58,7 @@ public class ServerConnection {
      * @param serverTransport
      * @param m
      */
-    public void messageReceive(ServerTransport serverTransport, MmsMessage m) {
+    public void messageReceive(OldServerTransport serverTransport, MmsMessage m) {
         if (serverTransport == this.transport) {
             worker.messageReceived(m);
         }
@@ -72,5 +72,5 @@ public class ServerConnection {
      * @param serverTransport
      * @param reason
      */
-    public void transportDisconnected(ServerTransport serverTransport, MmsConnectionClosingCode reason) {}
+    public void transportDisconnected(OldServerTransport serverTransport, MmsConnectionClosingCode reason) {}
 }

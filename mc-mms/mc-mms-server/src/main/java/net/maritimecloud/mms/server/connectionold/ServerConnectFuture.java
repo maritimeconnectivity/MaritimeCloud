@@ -23,7 +23,7 @@ import net.maritimecloud.message.Message;
 import net.maritimecloud.mms.server.connection.client.Client;
 import net.maritimecloud.mms.server.connection.client.ClientManager;
 import net.maritimecloud.mms.server.connection.client.ClientProperties;
-import net.maritimecloud.mms.server.connection.transport.ServerTransport;
+import net.maritimecloud.mms.server.connection.transport.OldServerTransport;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 
 import org.slf4j.Logger;
@@ -38,12 +38,12 @@ public class ServerConnectFuture {
     /** The logger. */
     private static final Logger LOG = LoggerFactory.getLogger(ServerConnectFuture.class);
 
-    final ServerTransport serverTransport;
+    final OldServerTransport serverTransport;
 
     /**
      * @param serverTransport
      */
-    public ServerConnectFuture(ServerTransport serverTransport) {
+    public ServerConnectFuture(OldServerTransport serverTransport) {
         this.serverTransport = requireNonNull(serverTransport);
     }
 
@@ -58,7 +58,7 @@ public class ServerConnectFuture {
             boolean isReconnect = connection != null;
 
             if (isReconnect) {
-                ServerTransport st = connection.transport;
+                OldServerTransport st = connection.transport;
                 if (st != null) {
                     connection.transport = null;
                     st.doClose(MmsConnectionClosingCode.DUPLICATE_CONNECT);
