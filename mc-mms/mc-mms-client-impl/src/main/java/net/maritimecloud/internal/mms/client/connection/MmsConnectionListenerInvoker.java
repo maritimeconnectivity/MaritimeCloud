@@ -40,7 +40,7 @@ class MmsConnectionListenerInvoker implements MmsConnection.Listener {
 
     MmsConnectionListenerInvoker(ClientConnection dcc, MmsClientConfiguration b) {
         this.clientConnection = requireNonNull(dcc);
-        for (MmsConnection.Listener listener : b.getConnectionListeners()) {
+        for (MmsConnection.Listener listener : b.getListeners()) {
             listeners.add(requireNonNull(listener));
         }
     }

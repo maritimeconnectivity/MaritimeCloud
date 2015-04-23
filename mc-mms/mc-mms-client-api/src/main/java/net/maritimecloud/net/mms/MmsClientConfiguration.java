@@ -57,7 +57,7 @@ public class MmsClientConfiguration {
         this.id = id;
         String p = System.getProperty("maritimecloud.printmessages");
         if ("true".equalsIgnoreCase(p)) {
-            addConnectionListener(new MmsConnection.Listener() {
+            addListener(new MmsConnection.Listener() {
                 @Override
                 public void textMessageReceived(String message) {
                     System.out.println("Received:" + message);
@@ -80,7 +80,7 @@ public class MmsClientConfiguration {
      *             if the specified listener is null
      * @return this configuration
      */
-    public MmsClientConfiguration addConnectionListener(MmsConnection.Listener listener) {
+    public MmsClientConfiguration addListener(MmsConnection.Listener listener) {
         connectionListeners.add(requireNonNull(listener, "listener is null"));
         return this;
     }
@@ -150,7 +150,7 @@ public class MmsClientConfiguration {
     /**
      * @return the connectionListeners
      */
-    public List<MmsConnection.Listener> getConnectionListeners() {
+    public List<MmsConnection.Listener> getListeners() {
         return connectionListeners;
     }
 

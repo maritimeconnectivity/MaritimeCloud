@@ -43,7 +43,7 @@ public class ListenerTest extends AbstractConnectionTest {
     public void connectDisconnect() throws Exception {
         AtomicReference<String> state = new AtomicReference<>();
         CountDownLatch connected = new CountDownLatch(1);
-        conf.addConnectionListener(new MmsConnection.Listener() {
+        conf.addListener(new MmsConnection.Listener() {
 
             @Override
             public void connecting(URI host) {
