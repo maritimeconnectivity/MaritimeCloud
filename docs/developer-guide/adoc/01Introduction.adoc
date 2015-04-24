@@ -1,0 +1,66 @@
+== Introduction
+ifdef::snapshot[]
+This development guide describes the current state of the Maritime Cloud reference implementation as of {releaseDate}. Detailing the upcoming {releaseVersion} release.
+This version is still under development. And the API described in this document might change before the release.
+endif::snapshot[]
+ifndef::snapshot[]
+This development guide describes the current state of the Maritime Cloud reference implementation as of {releaseDate}. Detailing the {version} release.
+endif::snapshot[]
+
+Please do not email us directly about usage questions. Instead use our Google Group at https://groups.google.com/forum/#!forum/maritimecloud for general usage questions. In this way future users can see answers to commonly asked questions. Google Groups is also where we post information about new releases and updated documentation.
+
+This developer guide is intended to make you familiar with developing applications and services for the Maritime Cloud. In addition to this developer guide the javadoc at http://dev.maritimecloud.net/apidocs/ might come in handy for those using the Java Client.
+
+Some experience with developing for the Java platform is required for using this development guide.
+Developers should as minimum be able to write short single file Java programs. Some sections requires usage of the Apache Maven build tool. 
+
+=== A Bit of History
+The Maritime Cloud project started out as an internal project at the Danish Maritime Authority in the autumn of 2012.
+As part of the e-Navigation process the Danish Maritime Authority had been working on an e-Navigation Prototype Display system called EPD. The EPD consist of two applications for demonstrating potential e-navigation solutions. An ECDIS like ship side application and a shore side application. 
+
+During the development it was clear that AIS was a severe limiting factor when communicating between the ship side and the shore side. Putting a lot of limitations of the different kind of maritime services that could be developed. Especially three issues was identified. 
+
+* *Lack of bandwidth.* Only limited amounts of data could be transfered. Often using complex encoding schemes such as application specific AIS messages. 
+* *Ease of development.* There was no easy way to simulate AIS communication without a very complex developer environment.
+* *Limited Signal Coverage.* There are certain types of services where the actors communicating might not all be within reach of radio signals. 
+
+The first prototype was built in the winter of 2012 and was implemented in the EPD in spring 2013. It just featured basic point to point communication. This is basically what is the Maritime Message Service now. During the summer of 2013 the vision for a general framework for maritime communication was created. Including registries for services and identities in addition to the message based framework. It also got its name the “Maritime Cloud” as a sort of umbralle name for the various underlying services. In 2014 the first release of the Maritime Cloud reference implementation was made available for the public.
+
+=== Overview
+Here is 10000 foot overview of the Maritime Cloud:
+
+image::{imagesdir}/maritimecloud.png[Overview]
+
+There are 3 different core services provided by the Maritime Cloud
+
+* *Maritime Identity Registry.* A centralized authority for identities of persons, organizations or ships that are using the Maritime Cloud. 
+* *Maritime Service Registry.* A centralized repository of service standards and provisioned services world wide.
+* *Maritime Messaging Service (MMS).* A communication protocol on top of TCP/IP. Supporting reliable delivery of messages and geocastingfootnote:[Geocasting refers to the delivery of information to a group of actors identified by their geographical locations.].
+
+Both the identity registry and service registry are still in the specification stage. 
+Only the Maritime Messaging Service (MMS) is functional. While functional, please note that the latest realease is still beta quality.
+
+For more information on the Maritime Cloud concept see: http://maritimecloud.net
+
+==== Java as a platform
+As you will notice when getting started with the Maritime Cloud all the software we provide requires a JVM (Java 8 or later) to run. While we do want to develop a C{plus}{plus}/C# client at some point. We currently do major refactorings at every release. In order to avoid too much duplicated work we need to finalize the specification of the Maritime Cloud before we can target other platforms. We understand this will be a major issue for companies and organizations that are C{plus}{plus}/C# only. However, we do not have the resources to develop along multiple tracks at this point.
+
+=== Organization of this guide 
+Chapter 2 shows how to connect to an MMS Server.
+
+Chapter 3 describes how to implement and invoke predefined remote services.
+
+Chapter 4 describes how messages can be broadcast to a subset of actors within a specific area.
+
+Chapter 5 specifies the Maritime Service Definition Language. Which is the language for defining services that can be registered with a MMS Server.
+
+Chapter 6 describes how you can develop your own services with MSDL.
+
+=== Feedback
+Readers may send feedback about errors, omissions, and ambiguities in this guide to kasperni@gmail.com or even better submit a pull request to the documentation available at https://github.com/MaritimeCloud/Documentation/tree/master/developer-guide/adoc.
+
+As previously mentioned questions about usage of the Maritime Cloud should be directed to our Google Group at https://groups.google.com/forum/#!forum/maritimecloud
+
+==== Open Source and Source code
+
+The source code of the Maritime Cloud reference implementation is available as open source at Github https://github.com/MaritimeCloud under the Apache 2.0 License.

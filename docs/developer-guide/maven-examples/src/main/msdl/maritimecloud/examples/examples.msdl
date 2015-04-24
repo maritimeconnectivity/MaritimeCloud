@@ -1,0 +1,13 @@
+namespace maritimecloud.examples;
+
+endpoint MathEndpoint {
+  int sum(1:int left, 2:int right);
+}
+
+broadcast Hello {
+  1: text msg;
+}
+
+endpoint ImageRender {
+  binary render(1:text str);
+}

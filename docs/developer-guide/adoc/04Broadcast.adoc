@@ -1,0 +1,69 @@
+== Geocasting 
+Geocasting is delivery of information to a group of destinations in a network identified by their geographical locations. Sometimes we refer to geocasting as broadcasting.
+
+For example, here is a party (red dot) that wishes to geocast a message to everyone located on the african continent.
+
+image::{imagesdir}/geocast.svg[geocast]
+
+Geocasts can be very useful, for example, if you want to send a message to every ship that is in your proximite.
+
+Instead of sending these messages directly to ships that are near. The actor send the message along to the MMS server with an indicating of the area in which this message should be delivered. This can be either a relative area, for example, send this message too all ships within a 20 km radius of the actor itself. Or an absolute area defined by a polygon. 
+
+The MMS server will then look at the position of every ship that is connected to the server. And relay the message only to those ships that are within the area that the actor specified.
+
+["plantuml", "broadcast", "png"]
+---------------------------------------------------------------------
+participant "Ship X" as A
+participant "MMS Server" as Server
+participant "Ship 1" as B
+participant "Ship 2" as C
+participant "Ship 3" as D
+
+A -> Server: send "hello" to every in 10 km radius
+Server --> B: Ship X sends you a "hello"
+Server --> C: Ship X sends you a "hello"
+Server --> D: Ship X sends you a "hello"
+
+---------------------------------------------------------------------
+
+Like endpoints, all messages that can be broadcast are defined in a MSDL file.
+Here is a very simple broadcast message that just sends a UTF-8 string.
+[source]
+----
+namespace maritimecloud.examples;
+
+broadcast Hello {
+  /* Just a text message. */
+  1: text msg;
+}
+----
+
+A class called _maritimecloud.examples.Hello_ corresponding to the above definition is available in the example jar.
+
+=== Sending and Listening for broadcasts
+Before you can receive a broadcast you need to listen for it actively. This is done by registering a broadcast listener.
+[source,java]
+----
+include::{sourcedir}/ch04geocast/Broadcasting.java[tag=listen]
+----
+
+In another client you can now send a broadcast to clients that are in the proximite:
+
+[source,java]
+----
+include::{sourcedir}/ch04geocast/Broadcasting.java[tag=send]
+----
+The default broadcast radius is 50 kilometers. That is every client which is closer than 50 kilometers to the client sending the broadcast will receive the broadcast.
+
+You can also use the _withBroadcast_ method to specify a custom radius. For example, the following code will only send the message in a 30 kilometer radius.
+
+[source,java]
+----
+include::{sourcedir}/ch04geocast/Broadcasting.java[tag=sendCustom]
+----
+
+Currently it is only possible to listen for geocasts covering own position. In later releases it will be possible to define a area to listen in. Messages sent to an area intersecting with this listening area will result in reception of the message. This is highly relevant for non-mobile actors like shore stations that will be able to listen in a defined area like VTS area.
+
+
+=== Unicast and multicast
+Unicast to a single recipient and multicast to a number of recipients is currently not supported but will be implemented in later versions.

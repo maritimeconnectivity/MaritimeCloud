@@ -1,0 +1,311 @@
+== MSDL
+MSDL is an interface description language footnote:[http://en.wikipedia.org/wiki/Interface_description_language] or specification language used for describing the interface of a particular set of services in the Maritime Cloud. MSDL is to the Maritime Cloud what IDL is to Corba and what WSDL is to XML based web services. 
+
+In order to develop new services that can be used with the Maritime Messaging Service you need to specify the interfaces of the services in a MSDL file. But, even if you are just a consumer of existing services it is a good idea to learn the syntax. In order to understand the contract of the service you are using.
+
+An MSDL file is just an ordinary text file with a standardized syntax. Just to give you an idea of what a MSDL file looks like. Here is an example used in the EPD developed at DMA for route exchange.
+[source]
+----
+namespace dma.route;
+
+/** The heading of each leg. */
+enum HeadingType {
+    RHUMB_LINE = 1;
+    GREAT_CIRCLE = 2;
+}
+
+/** A route leg. */
+message Leg {
+    /** The speed over ground in knots. */
+    1: float speed;
+
+    /** Cross track starboard distance in meters. */
+    2: float xtdStarboard;
+
+    /** Cross track port distance in meters. */
+    3: float xtdPort;
+    
+    /** The heading of the leg. */
+    4: HeadingType headingType;
+    
+    /** The length of the navigational window in meters. */
+    5: float navWindow;
+}
+
+/** A waypoint in a route. */
+message Waypoint {
+
+    /** The position. */
+    1: position waypointPosition;
+
+    /** The planned or estimated time of arrival at the waypoint position. */
+    2: timestamp eta;
+
+    /** The rate of turn of the waypoint. In degrees */
+    3: float rot;
+
+    /** The turn radius of the vessel. In nautical miles. */
+    4: float turnRadius;
+    
+    /** The waypoints outleg, will be null for the final waypoint. */
+    5: Leg outleg;
+}
+
+/** Route. */
+message Route {
+    /** A list of waypoints on the route . */
+    1: list<Waypoint> waypoints;
+    2: text routename;
+}
+
+
+/** Status of the Route Suggestion. */
+enum RouteSuggestionStatus {
+    PENDING = 1;
+    ACCEPTED = 2;
+    REJECTED = 3;
+}
+
+endpoint TacticalRouteEndpoint {
+
+  void RouteSuggestion(
+    /** The suggested route */
+    1: Route route;
+    
+    /** The transaction ID */
+    2: int64 id;
+
+    /** The status, used for replying*/
+    3: RouteSuggestionStatus status;
+  );
+}
+----
+
+The syntax of MSDL is inspired by Apache Thrift, a remote procedure call (RPC) framework developed at Facebook.
+While the main underlying binary serialization format is inspired by the binary wire format used by Protocol Buffers, developed at Google. If you have been using any of those 2 projects you should feel right at home when using MSDL.
+
+Here is a rough sketch of how MSDL fits into the bigger picture.
+
+[ditaa, "msdl", "png"]
+....
+       +-----------------+                         +-----------------+
+       |    Company A    |                         |    Company B    |
+       |   Source Code   |                         |   Source Code   |
+       +-----------------+                         +-----------------+
+            |      ^                                   |      ^    
+            v      |                                   v      |
+       +-----------------+      +-----------+      +-----------------+
+       | Stubs Generated | <--- |  Shared   | ---> | Stubs Generated |
+       | From MSDL files |      | MSDL file |      | From MSDL files |
+       +-----------------+      +----------=+      +-----------------+
+            |      ^                                   |      ^    
+            |      |<---Same Serialization Protocol--->|      |
+            v      |                                   v      |
+       +-----------------+   +-----------------+   +-----------------+
+       | 010101000010100 |<--|     Binary      |-->| 010101000010100 |
+       | 100000001111110 |   | Representation  |   | 100000001111110 |
+       +-----------------+   |   of Message    |   +-----------------+
+                |            +----------------=+             |
+                |                                            |
+                |           +-------------------+            |
+                +-----------|   Wire Protocol   |------------+
+                            | MMS/NAVDAT/AISASM |
+                            +-------------------+
+
+....
+
+The basic idea is that a single text based MSDL file is created for a service. This file is then distributed to all clients that wish to use this service. These clients then generates stubs that matches the definition from the MSDL file. These stubs then know how to serialize and deserialize to and from byte streams which can be transported over various protocols such as NAVDAT, VDES or MMS. Or even as an application specific message (AIS ASM).
+
+The serialization mechanism is pluggable. So far we have developed a mechanism for serialization messages as JSON. But the next version (0.3) will include a compact binary serialization mechanism as well.
+
+
+This following sections in this chapter describes the syntax of MSDL.
+
+=== Types
+The MSDL type system consists of pre-defined base types, user-defined structs and container types.
+Built-in data types are always all lowercase such as 'float'. Custom defined datatypes always starts with a capital letter such as a 'Waypoint' or a "TacticalRoute".
+
+[cols="3,7,7", options="header"]
+|===
+|Name
+|Description
+|Java type
+
+|boolean
+|True or False
+|java.lang.Boolean
+
+|binary
+|Arbitrary bytes (no validation)
+|net.maritimecloud.util.Binary
+
+|decimal
+|Arbitrary-precision decimal
+|java.math.BigDecimal
+
+|double
+|64-bit IEEE-754 floating point
+|java.lang.Double
+
+|float
+|32-bit IEEE-754 floating point
+|java.lang.Float
+
+|int
+|32-bit signed integer
+|java.lang.Integer
+
+|int64
+|64-bit signed integer
+|java.lang.Long
+
+|list
+|Ordered collection of one or more elements
+|java.util.List
+
+|position
+|Latitude+Longitude
+|net.maritimecloud.util.geometry.Position
+
+|positiontime
+|position + timestamp
+|net.maritimecloud.util.geometry.PositionTime
+
+|set
+|Collection of one or more unique elements
+|java.util.Set
+
+|text
+|UTF-8 encoded string
+|java.lang.String
+
+|timestamp
+|Date plus time since epoch (64-bit)
+|net.maritimecloud.util.Timestamp
+
+|varint
+|Arbitrary-precision integer
+|java.math.BigInteger
+
+|===
+
+There are no support for unsigned integers as they are not supported on all platforms (well we only have one so far).
+
+=== Enums
+When you’re defining a message type, you might want one of its fields to only have one of a pre-defined list of values. You can do this very simply by adding an enum to your message definition — An enum (also called enumeration or enumerated type) is a data type consisting of a set of named values called elements, members or enumerators of the type.
+
+In the following example we have added an enum called Planet with all the different planets circling the sun:
+
+[source]
+----
+enum Planet {
+    MERCURY = 1;
+    VENUS   = 2;
+    EARTH   = 3;
+    MARS    = 4;
+    JUPITER = 5;
+    SATURN  = 6;
+    URANUS  = 7;
+    NEPTUNE = 8;
+}
+----
+
+Enumerator constants MUST be in the range of _postive_ 32-bit integers.
+
+=== Message
+A message is the basic building block in a MSDL file. It is a collection of named fields with a specific type. Similar to how a table is defined in a database. Or a class in an object oriented language.
+
+As you can see, each field in the message definition has a unique numbered tag. These tags are used to identify your fields in the wire format, and should not be changed once your message type is in use.
+
+Messages do *not* support inheritance, that is, a message may not extend other message. 
+Instead composition should be used.
+
+Here is the waypoint message we showed in the initial example of this chapter.
+[source]
+----
+/** A waypoint in a route. */
+message Waypoint {
+
+    /** The position. */
+    1: position waypointPosition;
+
+    /** The planned or estimated time of arrival at the waypoint position. */
+    2: timestamp eta;
+
+    /** The rate of turn of the waypoint. In degrees */
+    3: float rot;
+
+    /** The turn radius of the vessel. In nautical miles. */
+    4: float turnRadius;
+    
+    /** The waypoints outleg, will be null for the final waypoint. */
+    5: Leg outleg;
+}
+----
+
+=== Containers
+MSDL containers are strongly typed containers that map to the most commonly used containers in popular programming languages. They are annotated using the Java Generics style. There are currently two containers types available:
+
+* *list<t1>:* An ordered list of elements of type t1. May contain duplicates.
+* *set<t1>:* An unordered set of unique elements of type t1.
+//map<t1,t2>: A map of strictly unique keys of type t1 to values of type t2.
+
+For example, here is the definition of a polygon using the built-in type _position_:
+[source]
+----
+message Polygon {
+   1: list<position> points;
+}
+----
+
+Types used in containers can be any valid type. For example, it is possible to defined containers of container such as _list<set<position>>_.
+
+A map type is planned for future versions of MSDL.
+
+=== Endpoints
+Think of endpoint definitions as Java interfaces. Endpoints contains multiple methods that each have a unique name and some kind og signature.
+
+Here is real simple example:
+[source]
+----
+endpoint ImageRender {
+  binary render(1:text str);
+  void sendResult(1:int64 id, 2:list<int> results);
+}
+----
+
+Arguments can be primitive types or messages. Likewise for return types. _void_ is a valid return type for functions.
+
+=== Comments
+MSDL supports C-style multi-line as well as single-line Java/C++ style comments.
+[source]
+----
+/*
+ * This is a multi-line comment.
+ * Just like in Java or C.
+ */
+
+// C++/Java style single-line comments work just as well.
+----
+
+=== Namespaces
+Namespaces in MSDL are akin to namespaces in C++ or packages in Java — they offer a convenient way of organizing (or isolating) your code. Namespaces may also be used to prevent name clashes between type definitions.
+
+While not enforced, MSDL files should be ordered in a namespace corresponding to the organization you are working with. For example, at the Danish Maritime Authorities we put all the MSDL files we develop into a "dma.***" namespace.
+
+At some point we envision a global repository of MSDL files (Service Repository) where everyone can upload their MSDL files. Every organization is then responsible for maintaining their own MSDL files under their own namespace. Making it very easy for people to use the work of other organizations.
+
+
+=== Imports
+It is often useful to split up MSDL definitions in separate files to ease maintenance, enable reuse and improve modularity/organization. MSDL allows files to include other MSDL files. Included files are looked up in the current directory and by searching relative to any paths specified when compiling.
+[source]
+----
+import "dma/foobar.msdl";
+----
+
+=== Serialization of messages
+Unlike, for example AIS. The serialization format of a message is not tightly coupled to the definition of the message. Instead general serialization protocols are implemented that anyone can use. These protocols take any kind of message and serializes it to a byte stream using predifined rules. In the other end an instance of the same serialization protocol takes the stream of bytes and transforms them into an equivalent message.
+
+The current version comes with a JSON based protocol. So all messages that are send over the Maritime Cloud are JSON messages. In the future are highly compact binary protocol will be added.
+
+We expect very few people to actually implement their own serialization protocol. And we will not cover how to do this in this developer guide. Instead look at how the existing JSON protocol is implemented.

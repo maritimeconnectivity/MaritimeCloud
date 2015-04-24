@@ -1,0 +1,166 @@
+== Connecting to a MMS server
+This chapter details how you install the MMS client and use it to connect to a MMS server.
+In the next chapter we go into details about how to communicate with other actors connected to the same MMS Server
+
+The MMS protocol is an internet based protocol layered on top of TCP/IP and WebSockets. It requires a persistent connection to a central server in order to be able to receive messages from remote actors.
+
+On of the main ideas behind the MMS protocol is that actors/clients never communicate directly. Instead all actors
+must connect to a MMS server to communicate. To send a message from a _Ship A_ to a _Ship B_. Ship A must send the message to the MMS server which will relay the message to Ship B.
+
+There are a number of reasons for this design
+
+* *Security,* if actors where to communicate directly. Every actors would have to have some kind of server running with an open public port. Making them an potential target for hackers. Instead by requiring them to connect to a central server. Only the server needs to be secured properly.
+
+* *Availability,* satellite connections are in general more unreliable than landbased connections. 
+It is not uncommon that connections comes and go. By having a central server that is always on. It can act as a sort of mailbox if a client looses its connection temporarily.
+
+* *Bandwidth,* while creating a new TCP/IP connection is a lightway process. It still takes both time and bandwidth. When a central approach only a single connection needs to maintained.
+
+* *Geocasting,* one of the main functionalities of the MMS protocol is the ability to send messages to all actors in a certain area. A central server(s) is needed to keep track of where everybody is for determining who should receive a particular geocasted message.
+
+=== Installing the client 
+First if you do not already have a Java 8 JDK on your machine you should install one. Either from OpenJDK or from Oracle.
+
+The MMS client is a single jar available at http://repo1.maven.org/maven2/net/maritimecloud/mms/mc-mms-client/0.3/mc-mms-client-0.3.jar. There are no other dependencies. Everything needed to connect to a MMS Server is embedded in the jar.
+
+If you are using Maven (or a similar build system) you can use the following dependency:
+[source,xml,subs="+attributes"]
+----
+<dependency>
+    <groupId>net.maritimecloud.mms</groupId>
+    <artifactId>mc-mms-client</artifactId>
+    <version>{version}</version>
+</dependency>
+----
+
+ifdef::snapshot[]
+Since you are using a develop version (snapshot) you also need to add this to your pom.
+[source,xml]
+----
+<pluginRepositories>
+  <pluginRepository>
+    <id>sonatype.snapshots</id>
+    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+    <snapshots><enabled>true</enabled></snapshots>
+    <releases><enabled>false</enabled></releases>
+  </pluginRepository>
+</pluginRepositories>
+----
+endif::snapshot[]
+
+If you are using the MMS client in a Java EE 7 (or greater) server we have a special client that uses functionality whereever possible of the Jave EE server. Just replace _mc-mms-client_ with _mc-mms-client-javaee_ in the above URL/dependency. 
+
+=== Identity
+The first thing you need to do before connecting to a MMS server is to create a MaritimeId which is your unique identity. Think of it as your user name. At some point the identity will be maintained in a registry for all stakeholders. But since the Maritime Identity Registry is still being specified we are using a temporary solution for now.
+
+Any client connecting must use an integer identifier as their username. If you are emulating a ship you should use its 9 digit MMSI number. Otherwise you are free to choose the id. You should probably stay away for using numbers with 1-4 digits. Because if an actor connects to a MMS server with an identical ID to one that is already connected. The actor that is already connected is automatically disconnected. We use 0123456789 in most examples but you will want to replace it. 
+
+For various historic reasons the number must be prefixed with "mmsi:".
+
+[source,java]
+----
+include::{sourcedir}/ch02connecting/ConfigurationMaritimeID.java[tag=code]
+----
+The above example shows how to create a MaritimeId. It also shows a MMSClientConfiguration object being created. This configuration is used to set various properties, for example, the host name of the MMS server before connecting.
+
+While not required, we would appreciate if you set some details about the client that is connecting.
+These are not required, but they are used by the Maritime Cloud development team to see who is connected to the cloud. 
+[source,java]
+----
+include::{sourcedir}/ch02connecting/ConfigurationMaritimeID.java[tag=properties]
+----
+
+=== PositionReader
+One of the main features of the Maritime Cloud is support for geographical services. To use these services you need to let the MMS server know your current position. This is done by specifying a position reader that the MMS client can query for the current position.
+
+Here is a simple reader that returns a fixed position at (latitude, longitude) (10,20).
+[source,java]
+----
+include::{sourcedir}/ch02connecting/ConfigurationMaritimeID.java[tag=staticReader]
+----
+Fixed locations are relevant for non-mobile actors like shore centers and servers providing services. For some actors the location is not relevant at all. 
+
+For mobile actors like ships, instead of just returning a fixed position you want to replace it with your own implementation that reads from whatever navigational equipment (for example, GPS) that is available. The timestamp of the position returned must be a timestamp from the time of measurement of the returned position.
+
+If you are in an environment where you do not have access to real time positions and want to test mobility. You can use a PositionSimulator to create a fictive dynamic position.
+[source,java]
+----
+include::{sourcedir}/ch02connecting/ConfigurationMaritimeID.java[tag=simulatedReader]
+----
+The simulated position reader created in the above example will just sail around in a fixed circle 
+with a speed between 10 and 30 knots until disconnected.
+
+=== Connecting and Disconnecting
+The last thing you need to do before connecting is to set the hostname of the MMS server.
+Unless you have set up your own server (which is easy, see later section). You can use our public instance at mms03.maritimecloud.net.
+
+If you repeatedly fail to connect make sure you are not behind any kind of firewall by telnetting to the MMS server "telnet mms03.maritimecloud.net 43234". If you keep having problems ask for help in our Google Group.
+
+Expect the port and url of the public instance to change for every release of the Maritime Cloud. The details of the underlying MMS protocol is still being fleshed out. And different releases are not compatible at the moment. 
+
+After having set the host the last thing is to create the MMSClient which you will use to send and receive remote messages. When you create the client it will automatically (in the background) connect to the MMS server.
+The full source of the example will also print out "success" when it
+has successfully connected. And finally close/shutdown the client as the last thing.
+
+[source,java]
+----
+include::{sourcedir}/ch02connecting/MMSConnect.java[tag=code]
+----
+If you are using the public instance of the MMS Server. Your client should appear in the list of connected clients at this site http://{server}:9099/clients/list/. The url basically lists all clients that are connected or have recently been connected. And is primarily used for debugging.
+
+You should always remember to shutdown the client properly. This is mainly done to make sure that all messages that you have send have been properly delivered to the MMS Server.
+
+Just as connecting was done asynchronously. Shutdown of the client is also done asynchronous.
+So after having performed the shutdown you need to await for the client to have fully shutdown the connection to the MMS server. 
+
+=== Connection status
+While the MMS client will automatically connect and reconnect whenever a connection is lost. It is sometimes
+useful to be able to query the actual state of the connection. This is easily done by querying the client
+
+[source,java]
+----
+include::{sourcedir}/ch02connecting/ConnectionStatus.java[tag=connectionStatus]
+----
+
+You can also manually disable and enable the connection to the MMS server.
+
+[source,java]
+----
+include::{sourcedir}/ch02connecting/ConnectionStatus.java[tag=manuallyConnect]
+----
+
+You can also block the current thread if you want to wait on a connection being connected or disconnected.
+
+[source,java]
+----
+include::{sourcedir}/ch02connecting/ConnectionStatus.java[tag=await]
+----
+
+Finally, before creating a MMSClient you can register a listener that will be invoked every time the status of the connection is changed.
+
+[source,java]
+----
+include::{sourcedir}/ch02connecting/ConnectionStatus.java[tag=listener]
+----
+
+ifdef::snapshotsdsdsdsd[]
+Problemet er vi ikke kan downloade sidste snapshot version
+[source,shell,subs="+attributes"]
+----
+curl -O https://oss.sonatype.org/content/repositories/snapshots/net//maritimecloud/mms/mc-mms-server-standalone/{version}/mc-mms-server-standalone-{version}.jar
+java -jar mc-mms-server-standalone-{version}.jar
+----
+endif::snapshotsdsdsdsd[]
+
+ifndef::snapshot[]
+=== Setting up your own MMS server
+If for some reason you want to set up your own MMS server it is very easy. Just follow these two simple steps.
+
+[source,shell,subs="+attributes"]
+----
+curl -O http://repo1.maven.org/maven2/net/maritimecloud/mms/mc-mms-server-standalone/{version}/mc-mms-server-standalone-{version}.jar
+java -jar mc-mms-server-standalone-{version}.jar
+----
+
+And then use the hostname where the MMS server is running when you configure the MMS client.
+endif::snapshot[]
