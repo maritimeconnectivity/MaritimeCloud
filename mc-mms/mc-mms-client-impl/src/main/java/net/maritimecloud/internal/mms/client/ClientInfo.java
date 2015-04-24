@@ -88,15 +88,18 @@ public class ClientInfo {
         try {
             String remote = configuration.getHost();
 
+            if (!remote.toLowerCase().startsWith("ws://") && !remote.toLowerCase().startsWith("wss://")) {
+                remote = "ws://" + remote;
+            }
+
+            URI tmp = new URI(remote);
+
             // Add default port, if no specific port has been specified
-            if (!remote.contains(":")) {
+            if (tmp.getPort() == -1) {
                 remote += ":43234";
             }
 
             // Prefix the web socket protocol
-            if (!remote.toLowerCase().startsWith("ws://") && !remote.toLowerCase().startsWith("wss://")) {
-                remote = "ws://" + remote;
-            }
 
             // Tomcat does not automatically append a '/' to the host address
             if (!remote.endsWith("/")) {

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import net.maritimecloud.core.id.MaritimeId;
+import net.maritimecloud.net.Environment;
 import net.maritimecloud.util.geometry.Circle;
 import net.maritimecloud.util.geometry.PositionReader;
 import net.maritimecloud.util.geometry.PositionReaderSimulator;
@@ -51,12 +52,15 @@ public class MmsClientConfiguration {
 
     /**
      * Constructor
-     * @param id the maritime id
+     *
+     * @param id
+     *            the maritime id
      */
     MmsClientConfiguration(MaritimeId id) {
         this.id = id;
         String p = System.getProperty("maritimecloud.printmessages");
         if ("true".equalsIgnoreCase(p)) {
+            System.err.println("This setting is deprecated for 0.3 and will be removed in the next release (0.4)");
             addListener(new MmsConnection.Listener() {
                 @Override
                 public void textMessageReceived(String message) {
@@ -69,6 +73,7 @@ public class MmsClientConfiguration {
                 }
             });
         }
+        // setHost(Environment.SANDBOX);
     }
 
     /**
@@ -184,6 +189,11 @@ public class MmsClientConfiguration {
 
     public MmsClientConfiguration setHost(String host) {
         this.nodes = requireNonNull(host);
+        return this;
+    }
+
+    public MmsClientConfiguration setHost(Environment environment) {
+        this.nodes = requireNonNull(environment.mmsServerURL());
         return this;
     }
 
