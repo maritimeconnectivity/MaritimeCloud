@@ -143,5 +143,4 @@ public class Client {
     public void setProperties(ClientProperties properties) {
         this.properties = requireNonNull(properties);
     }
-
 }
