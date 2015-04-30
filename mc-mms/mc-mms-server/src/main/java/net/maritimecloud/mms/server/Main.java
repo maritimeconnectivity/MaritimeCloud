@@ -48,9 +48,12 @@ public class Main {
         }));
 
         System.out.println("Wuhuu Maritime Messing Service started!");
-        if (configuration.getServerPort() >= 0) {
+        if (configuration.getServerPort() >= 0 && !configuration.requireTLS) {
             System.out.println("MMS  : Running on port " + configuration.getServerPort() + " (unsecure)");
+        } else {
+            System.out.println("MMS  : Unencrypted MMS disabled");
         }
+
         if (configuration.getSecureport() >= 0) {
             System.out.println("MMS  : Running on port " + configuration.getSecureport() + " (secure)");
         }

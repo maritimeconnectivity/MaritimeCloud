@@ -36,11 +36,20 @@ public class MmsServerConfiguration {
     /** The id of the server, hard coded for now */
     ServerId id = new ServerId(1);
 
+    @Parameter(names = "-keystore", description = "The path to the keystore")
+    String keystore = null;
+
+    @Parameter(names = "-keystorePassword", description = "The password of the keystore")
+    String keystorePassword = null;
+
     @Parameter(names = "-accessLogs", description = "The directory to write access logs into")
     String logRequestDirectory;
 
-    @Parameter(names = "-port", description = "The (unsecure) port to listen for MMS connections on")
+    @Parameter(names = "-port", description = "The port to listen for MMS connections on")
     int port = DEFAULT_PORT;
+
+    @Parameter(names = "-requireTLS", description = "if true clients will not be able to connect without TLS")
+    boolean requireTLS = false;
 
     @Parameter(names = "-secureport", description = "The secure port to listen for MMS connections on")
     int secureport = DEFAULT_SECURE_PORT;
@@ -53,6 +62,20 @@ public class MmsServerConfiguration {
      */
     public ServerId getId() {
         return id;
+    }
+
+    /**
+     * @return the keystore
+     */
+    public String getKeystore() {
+        return keystore;
+    }
+
+    /**
+     * @return the keystorePassword
+     */
+    public String getKeystorePassword() {
+        return keystorePassword;
     }
 
     /**
@@ -84,6 +107,13 @@ public class MmsServerConfiguration {
     }
 
     /**
+     * @return the requireTLS
+     */
+    public boolean isRequireTLS() {
+        return requireTLS;
+    }
+
+    /**
      * @param id
      *            the id to set
      * @return this configuration
@@ -94,11 +124,35 @@ public class MmsServerConfiguration {
     }
 
     /**
+     * @param keystore
+     *            the keystore to set
+     */
+    public void setKeystore(String keystore) {
+        this.keystore = keystore;
+    }
+
+    /**
+     * @param keystorePassword
+     *            the keystorePassword to set
+     */
+    public void setKeystorePassword(String keystorePassword) {
+        this.keystorePassword = keystorePassword;
+    }
+
+    /**
      * @param logRequestDirectory
      *            the logRequestDirectory to set
      */
     public void setLogRequestDirectory(String logRequestDirectory) {
         this.logRequestDirectory = logRequestDirectory;
+    }
+
+    /**
+     * @param requireTLS
+     *            the requireTLS to set
+     */
+    public void setRequireTLS(boolean requireTLS) {
+        this.requireTLS = requireTLS;
     }
 
     /**

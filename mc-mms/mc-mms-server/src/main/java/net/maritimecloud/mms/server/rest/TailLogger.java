@@ -12,25 +12,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.mms.server.connection.server;
+package net.maritimecloud.mms.server.rest;
 
-import net.maritimecloud.mms.server.MmsServer;
-import net.maritimecloud.mms.server.MmsServerConfiguration;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import javax.ws.rs.Path;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 /**
  *
  * @author Kasper Nielsen
  */
-public class UnsecureWebSocketServer extends AbstractWebSocketServer {
+@Path("/tail")
+public class TailLogger {
 
-    public UnsecureWebSocketServer(MmsServerConfiguration configuration, MmsServer is) {
-        super(configuration, is);
+    final Cache<String, List<?>> cache;
+
+    public TailLogger() {
+        CacheBuilder<Object, Object> b = CacheBuilder.newBuilder();
+        b.expireAfterAccess(1, TimeUnit.HOURS);
+        cache = b.build();
     }
 
-    /** {@inheritDoc} */
-    @Override
-    boolean isSecure() {
-        return false;
+    @Path("/incoming")
+    public void incoming() {
+
     }
 
+
+    @Path("/outgoing")
+    public void outcoming() {
+
+    }
 }

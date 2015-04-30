@@ -12,13 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.mms.server.connection.server;
+package net.maritimecloud.mms.server;
 
 import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.net.InetSocketAddress;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -28,22 +27,26 @@ import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
 import javax.websocket.server.ServerEndpointConfig.Builder;
 
-import net.maritimecloud.mms.server.MmsServer;
-import net.maritimecloud.mms.server.MmsServerConfiguration;
 import net.maritimecloud.mms.server.connection.transport.ServerTransportJsr356Endpoint;
 import net.maritimecloud.mms.server.connectionold.OldServerTransport;
 
 import org.cakeframework.container.lifecycle.RunOnStart;
 import org.cakeframework.container.lifecycle.RunOnStop;
+import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.NCSARequestLog;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,33 +56,57 @@ import org.slf4j.LoggerFactory;
  *
  * @author Kasper Nielsen
  */
-public abstract class AbstractWebSocketServer {
+public class WebSocketServer {
 
     /** The logger. */
-    static final Logger LOG = LoggerFactory.getLogger(AbstractWebSocketServer.class);
+    static final Logger LOG = LoggerFactory.getLogger(WebSocketServer.class);
 
     /** The actual WebSocket server */
     private final Server server;
-
-    final InetSocketAddress sa;
 
     final MmsServer is;
 
     final String accessLogPath;
 
-    public AbstractWebSocketServer(MmsServerConfiguration configuration, MmsServer is) {
-        this.sa = new InetSocketAddress(configuration.getServerPort());
+    public WebSocketServer(MmsServerConfiguration configuration, MmsServer is) {
         this.is = requireNonNull(is);
-        this.server = new Server(sa);
+        this.server = new Server();
+        if (!configuration.isRequireTLS()) {
+            ServerConnector connector = new ServerConnector(server);
+            connector.setPort(configuration.getServerPort());
+            connector.setReuseAddress(true);
+            server.addConnector(connector);
+        }
+        if (configuration.getSecureport() > 0) {
+
+            // ADD HTPS
+            // HTTP Configuration
+            HttpConfiguration http_config = new HttpConfiguration();
+            http_config.setSecureScheme("https");
+            http_config.setSecurePort(configuration.getSecureport());
+            http_config.setOutputBufferSize(32768);
+
+            // SSL Context Factory for HTTPS
+            SslContextFactory sslContextFactory = new SslContextFactory();
+            sslContextFactory.setKeyStorePath(configuration.getKeystore());
+            sslContextFactory.setKeyStorePassword(configuration.getKeystorePassword());
+            sslContextFactory.setKeyManagerPassword(configuration.getKeystorePassword());
+
+            // HTTPS Configuration
+            HttpConfiguration https_config = new HttpConfiguration(http_config);
+            https_config.addCustomizer(new SecureRequestCustomizer());
+
+            // HTTPS connector
+            ServerConnector https = new ServerConnector(server, new SslConnectionFactory(sslContextFactory,
+                    HttpVersion.HTTP_1_1.asString()), new HttpConnectionFactory(https_config));
+            https.setPort(configuration.getSecureport());
+            https.setIdleTimeout(500000);
+            server.addConnector(https);
+        }
 
         // Sets the sockets reuse address to true
-        ServerConnector connector = (ServerConnector) server.getConnectors()[0];
-        connector.setReuseAddress(true);
         accessLogPath = configuration.getLogRequestDirectory();
-
     }
-
-    abstract boolean isSecure();
 
     @RunOnStart
     public void start() throws Exception {
@@ -129,7 +156,7 @@ public abstract class AbstractWebSocketServer {
 
         wsContainer.addEndpoint(b.build());
         server.start();
-        LOG.info("System is ready accept client connections on " + sa);
+        LOG.info("System is ready accept client connections");
     }
 
     @RunOnStop

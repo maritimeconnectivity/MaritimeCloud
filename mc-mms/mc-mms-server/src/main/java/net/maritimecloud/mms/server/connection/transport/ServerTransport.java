@@ -74,6 +74,7 @@ public final class ServerTransport {
     }
 
     void endpointOnOpen() {
+        System.out.println("OPENED");
         listener.onOpen(this);
     }
 
