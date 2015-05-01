@@ -12,31 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.mms.server.rest;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-
-import net.maritimecloud.message.Message;
-import net.maritimecloud.mms.server.connection.client.OldClientManager;
+package net.maritimecloud.mms.server.connection.clientnew;
 
 
 /**
  *
  * @author Kasper Nielsen
  */
+// Man kan ikke have en server transport attached naar man er i Terminated State
+public class InternalStateTerminated extends InternalState {
 
-@Path("/clients")
-public class ClientResource {
-    final OldClientManager tm;
-
-    public ClientResource(OldClientManager tm) {
-        this.tm = tm;
+    public InternalStateTerminated() {
+        super(null);
     }
 
-    @GET
-    @Path("/list")
-    public Message list2() {
-        return tm.statistics().getAllClients();
-    }
 }

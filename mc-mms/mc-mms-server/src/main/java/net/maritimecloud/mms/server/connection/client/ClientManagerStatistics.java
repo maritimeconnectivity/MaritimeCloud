@@ -29,9 +29,9 @@ import net.maritimecloud.util.geometry.PositionTime;
  * @author Kasper Nielsen
  */
 public class ClientManagerStatistics extends AbstractClients {
-    private final ClientManager cm;
+    private final OldClientManager cm;
 
-    public ClientManagerStatistics(ClientManager cm) {
+    public ClientManagerStatistics(OldClientManager cm) {
         this.cm = cm;
     }
 
@@ -43,7 +43,7 @@ public class ClientManagerStatistics extends AbstractClients {
 
     public ClientList getAllClients() {
         ClientList cl = new ClientList();
-        for (Client t : cm) {
+        for (OldClient t : cm) {
             ClientInfo ci = new ClientInfo();
             ci.setId(t.getId().toString());
             PositionTime pt = t.getLatestPosition();

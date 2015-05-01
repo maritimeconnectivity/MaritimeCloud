@@ -22,8 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.maritimecloud.internal.mms.messages.PositionReport;
 import net.maritimecloud.internal.net.messages.Broadcast;
 import net.maritimecloud.internal.net.messages.BroadcastAck;
-import net.maritimecloud.mms.server.connection.client.Client;
-import net.maritimecloud.mms.server.connection.client.ClientManager;
+import net.maritimecloud.mms.server.connection.client.OldClient;
+import net.maritimecloud.mms.server.connection.client.OldClientManager;
 import net.maritimecloud.mms.server.connectionold.MmsServerConnectionBus;
 import net.maritimecloud.mms.server.connectionold.ServerConnection;
 import net.maritimecloud.util.geometry.Area;
@@ -38,15 +38,15 @@ public class ServerBroadcastManager {
 
     final ConcurrentHashMap<String, BroadcastSubscriptionSet> listeners = new ConcurrentHashMap<>();
 
-    private final ClientManager tm;
+    private final OldClientManager tm;
 
-    public ServerBroadcastManager(ClientManager tm, MmsServerConnectionBus bus) {
+    public ServerBroadcastManager(OldClientManager tm, MmsServerConnectionBus bus) {
         this.tm = requireNonNull(tm);
         bus.setBroadcastManager(this);
     }
 
     public PositionReport broadcast(ServerConnection sourceConnection, Broadcast broadcast) {
-        final Client target = sourceConnection.getClient();
+        final OldClient target = sourceConnection.getClient();
         // final PositionTime sourcePositionTime = send.getPositionTime();
 
         tm.forEachTarget(t -> {
@@ -57,7 +57,7 @@ public class ServerBroadcastManager {
         return new PositionReport();
     }
 
-    void broadcast(ServerConnection source, Broadcast broadcast, Client t) {
+    void broadcast(ServerConnection source, Broadcast broadcast, OldClient t) {
         PositionTime latest = t.getLatestPosition();
         if (latest != null) {
 
@@ -76,7 +76,7 @@ public class ServerBroadcastManager {
         }
     }
 
-    void broadcastSend(ServerConnection source, Broadcast broadcast, Client t) {
+    void broadcastSend(ServerConnection source, Broadcast broadcast, OldClient t) {
         Broadcast bd = new Broadcast();
         bd.setMessageId(broadcast.getMessageId());
         bd.setBroadcastType(broadcast.getBroadcastType());
@@ -95,7 +95,7 @@ public class ServerBroadcastManager {
                 BroadcastAck ba = new BroadcastAck();
                 ba.setAckForMessageId(bd.getMessageId());
                 // Ignore original sender id
-                Client org = destination.getClient();
+                OldClient org = destination.getClient();
                 ba.setReceiverId(org.getId().toString());
 
                 PositionTime pt = org.getLatestPosition();

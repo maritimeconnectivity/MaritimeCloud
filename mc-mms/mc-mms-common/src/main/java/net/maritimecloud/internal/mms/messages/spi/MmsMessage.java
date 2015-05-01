@@ -14,6 +14,13 @@
  */
 package net.maritimecloud.internal.mms.messages.spi;
 
+import static java.util.Objects.requireNonNull;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.lang.reflect.Field;
+
 import net.maritimecloud.internal.message.MessageHelper;
 import net.maritimecloud.internal.message.binary.protobuf.ProtobufMessageReader;
 import net.maritimecloud.internal.message.binary.protobuf.ProtobufMessageWriter;
@@ -22,13 +29,7 @@ import net.maritimecloud.internal.net.messages.Broadcast;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.net.BroadcastMessage;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.lang.reflect.Field;
-
-import static java.util.Objects.requireNonNull;
+import net.maritimecloud.util.geometry.PositionTime;
 
 /**
  *
@@ -53,6 +54,10 @@ public class MmsMessage {
 
     public MmsMessage() {
 
+    }
+
+    public PositionTime getPositionTime() {
+        throw new UnsupportedOperationException();
     }
 
     public MmsMessage(Message m) {
@@ -192,7 +197,7 @@ public class MmsMessage {
 
     /**
      * Returns a binary representation of the MmsMessage
-     * 
+     *
      * @return a binary representation of the MmsMessage
      */
     public byte[] toBinary() throws IOException {
@@ -212,7 +217,7 @@ public class MmsMessage {
 
     /**
      * Parses the byte array as an MmsMessage
-     * 
+     *
      * @param msg
      *            the bytes of the message
      * @return the parsed message

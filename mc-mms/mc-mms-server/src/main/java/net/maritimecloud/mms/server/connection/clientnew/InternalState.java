@@ -12,12 +12,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.mms.server.connection.client;
+package net.maritimecloud.mms.server.connection.clientnew;
+
+import net.maritimecloud.mms.server.connection.transport.ServerTransport;
 
 /**
  *
  * @author Kasper Nielsen
  */
-class InnerClient {
+public class InternalState {
+
+    final long creationTime = System.nanoTime();
+
+    final ServerTransport transport;
+
+    /**
+     * @param transport
+     */
+    public InternalState(ServerTransport transport) {
+        this.transport = transport;
+    }
 
 }

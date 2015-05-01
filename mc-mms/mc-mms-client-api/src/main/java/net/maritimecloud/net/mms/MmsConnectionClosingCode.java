@@ -57,6 +57,8 @@ public final class MmsConnectionClosingCode implements Serializable {
     public static final MmsConnectionClosingCode INVALID_SESSION = new MmsConnectionClosingCode(4107, "Session Invalid");
 
 
+    public static final MmsConnectionClosingCode CLIENT_TIMEOUT = new MmsConnectionClosingCode(4108, "Client Timeout");
+
     /** The status code. */
     private final int id;
 

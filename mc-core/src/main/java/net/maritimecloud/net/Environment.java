@@ -20,8 +20,18 @@ package net.maritimecloud.net;
  */
 public abstract class Environment {
     // Client Trust
+
     /** The default sandbox environment. */
     public static final Environment SANDBOX = new Environment() {
+        @Override
+        public String mmsServerURL() {
+            // TODO replace with ws://mms.sandbox03.maritimecloud.net"
+            return "ws://mms03.maritimecloud.net";
+        }
+    };
+
+    /** The default sandbox environment. */
+    public static final Environment SANDBOX_NO_ENCRYPTION = new Environment() {
         @Override
         public String mmsServerURL() {
             // TODO replace with ws://mms.sandbox03.maritimecloud.net"

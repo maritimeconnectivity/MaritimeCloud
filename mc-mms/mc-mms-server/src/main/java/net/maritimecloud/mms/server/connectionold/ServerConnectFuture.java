@@ -20,8 +20,8 @@ import net.maritimecloud.internal.mms.messages.Connected;
 import net.maritimecloud.internal.mms.messages.Hello;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.message.Message;
-import net.maritimecloud.mms.server.connection.client.Client;
-import net.maritimecloud.mms.server.connection.client.ClientManager;
+import net.maritimecloud.mms.server.connection.client.OldClient;
+import net.maritimecloud.mms.server.connection.client.OldClientManager;
 import net.maritimecloud.mms.server.connection.client.ClientProperties;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 
@@ -47,8 +47,8 @@ public class ServerConnectFuture {
     }
 
     public void onMessage(Hello hm) {
-        ClientManager tm = serverTransport.clientManager;
-        Client target = tm.getOrCreate(MaritimeId.create(hm.getClientId()));
+        OldClientManager tm = serverTransport.clientManager;
+        OldClient target = tm.getOrCreate(MaritimeId.create(hm.getClientId()));
 
         // make sure we only have one connection attempt for a target at a time
         target.fullyLock();

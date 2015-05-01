@@ -28,13 +28,11 @@ import net.maritimecloud.util.geometry.PositionTime;
  *
  * @author Kasper Nielsen
  */
-public class Client {
+public class OldClient {
 
     private volatile ServerConnection activeConnection;
 
-    volatile InnerClient client;
-
-    final ClientManager clientManager;
+    final OldClientManager clientManager;
 
     final ServerClientEndpointManager endpointManager;
 
@@ -50,7 +48,7 @@ public class Client {
 
     final ReentrantLock sendLock = new ReentrantLock();
 
-    public Client(ClientManager clientManager, MaritimeId id) {
+    public OldClient(OldClientManager clientManager, MaritimeId id) {
         this.id = requireNonNull(id);
         this.clientManager = requireNonNull(clientManager);
         endpointManager = new ServerClientEndpointManager(this);

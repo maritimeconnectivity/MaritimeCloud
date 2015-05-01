@@ -26,8 +26,8 @@ import net.maritimecloud.internal.net.messages.MethodInvoke;
 import net.maritimecloud.internal.net.messages.MethodInvokeResult;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.mms.server.broadcast.ServerBroadcastManager;
-import net.maritimecloud.mms.server.connection.client.Client;
-import net.maritimecloud.mms.server.connection.client.ClientManager;
+import net.maritimecloud.mms.server.connection.client.OldClient;
+import net.maritimecloud.mms.server.connection.client.OldClientManager;
 import net.maritimecloud.mms.server.endpoints.ServerEndpointManager;
 
 /**
@@ -38,7 +38,7 @@ public class MmsServerConnectionBus {
 
     ServerBroadcastManager sbm;
 
-    final ClientManager tm;
+    final OldClientManager tm;
 
     final ServerEndpointManager sem;
 
@@ -48,7 +48,7 @@ public class MmsServerConnectionBus {
     final Meter positionReportsMeter;
 
 
-    public MmsServerConnectionBus(ServerEndpointManager sem, ClientManager tm, MetricRegistry metrics) {
+    public MmsServerConnectionBus(ServerEndpointManager sem, OldClientManager tm, MetricRegistry metrics) {
         this.tm = requireNonNull(tm);
         this.sem = sem;
 
@@ -92,7 +92,7 @@ public class MmsServerConnectionBus {
             }
             return;
         }
-        Client t = tm.get(MaritimeId.create(receiverId));
+        OldClient t = tm.get(MaritimeId.create(receiverId));
         if (t == null) {
             System.err.println("Unknown destination " + receiverId);
             return;

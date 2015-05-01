@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import net.maritimecloud.mms.server.connection.client.Client;
+import net.maritimecloud.mms.server.connection.client.OldClient;
 import net.maritimecloud.util.geometry.Area;
 import net.maritimecloud.util.geometry.Position;
 import net.maritimecloud.util.geometry.PositionTime;
@@ -44,7 +44,7 @@ public class Subscription {
     private final Area shapeExiting;
 
     /** A map of currently tracked objects for this subscription. */
-    private final ConcurrentHashMap<Client, PositionTime> trackedObjects = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<OldClient, PositionTime> trackedObjects = new ConcurrentHashMap<>();
 
     /** The tracker that this subscription is registered with. */
     private final PositionTracker tracker;
@@ -69,7 +69,7 @@ public class Subscription {
      * @param consumer
      *            the consumer
      */
-    public void forEachTrackedObject(Consumer<Client> consumer) {
+    public void forEachTrackedObject(Consumer<OldClient> consumer) {
         requireNonNull(consumer, "consumer is null");
         trackedObjects.forEachKey(PositionTracker.THRESHOLD, t -> consumer.accept(t));
     }
@@ -80,7 +80,7 @@ public class Subscription {
      * @param consumer
      *            the consumer
      */
-    public void forEachTrackedObject(BiConsumer<Client, Position> consumer) {
+    public void forEachTrackedObject(BiConsumer<OldClient, Position> consumer) {
         requireNonNull(consumer, "consumer is null");
         trackedObjects.forEach(PositionTracker.THRESHOLD, (t, pt) -> {
             // pt.time is from the first time we encountered the position.
@@ -104,12 +104,12 @@ public class Subscription {
      *
      * @return a map of tracked objects with their current position
      */
-    public Map<Client, Position> getTrackedObjects() {
+    public Map<OldClient, Position> getTrackedObjects() {
         // We could return trackedObjects directly. But we do not want to return PositionTime objects
         // because the time is not the time from the latest report. But the first time with the current position.
         // Which would be easily to mistake for users.
-        HashMap<Client, Position> result = new HashMap<>();
-        for (Map.Entry<Client, PositionTime> e : trackedObjects.entrySet()) {
+        HashMap<OldClient, Position> result = new HashMap<>();
+        for (Map.Entry<OldClient, PositionTime> e : trackedObjects.entrySet()) {
             result.put(e.getKey(), Position.create(e.getValue().getLatitude(), e.getValue().getLongitude()));
         }
         return result;
@@ -122,9 +122,9 @@ public class Subscription {
      * @param updates
      *            the position that have been updated since this method was last invoked
      */
-    synchronized void updateWith(ConcurrentHashMap<Client, PositionTime> updates) {
-        for (Map.Entry<Client, PositionTime> e : updates.entrySet()) {
-            Client t = e.getKey();
+    synchronized void updateWith(ConcurrentHashMap<OldClient, PositionTime> updates) {
+        for (Map.Entry<OldClient, PositionTime> e : updates.entrySet()) {
+            OldClient t = e.getKey();
             PositionTime pt = e.getValue();
             PositionTime current = trackedObjects.get(t);
             boolean positionChanged = current == null || pt == null || !current.positionEquals(pt);

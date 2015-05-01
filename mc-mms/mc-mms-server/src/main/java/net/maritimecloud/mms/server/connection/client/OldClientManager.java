@@ -34,31 +34,31 @@ import com.codahale.metrics.MetricRegistry;
  * @author Kasper Nielsen
  */
 
-public class ClientManager implements Iterable<Client> {
+public class OldClientManager implements Iterable<OldClient> {
 
-    private final ConcurrentHashMap<String, Client> clients = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, OldClient> clients = new ConcurrentHashMap<>();
 
     final ClientManagerStatistics statistics = new ClientManagerStatistics(this);
 
-    public void forEachTarget(Consumer<Client> consumer) {
+    public void forEachTarget(Consumer<OldClient> consumer) {
         clients.forEachValue(10, requireNonNull(consumer));
     }
 
-    public Client get(MaritimeId id) {
+    public OldClient get(MaritimeId id) {
         return clients.get(id.toString());
     }
 
-    public Client getOrCreate(MaritimeId id) {
-        return clients.computeIfAbsent(id.toString(), key -> new Client(this, id));
+    public OldClient getOrCreate(MaritimeId id) {
+        return clients.computeIfAbsent(id.toString(), key -> new OldClient(this, id));
     }
 
     /** {@inheritDoc} */
     @Override
-    public Iterator<Client> iterator() {
+    public Iterator<OldClient> iterator() {
         return Collections.unmodifiableCollection(clients.values()).iterator();
     }
 
-    public Stream<Client> parallelStream() {
+    public Stream<OldClient> parallelStream() {
         return clients.values().parallelStream();
     }
 
@@ -74,7 +74,8 @@ public class ClientManager implements Iterable<Client> {
         return statistics;
     }
 
-    public Stream<Client> stream() {
+    public Stream<OldClient> stream() {
         return clients.values().stream();
     }
+
 }

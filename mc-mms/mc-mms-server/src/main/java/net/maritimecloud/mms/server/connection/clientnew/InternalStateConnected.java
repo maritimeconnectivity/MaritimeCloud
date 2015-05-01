@@ -12,31 +12,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.mms.server.rest;
+package net.maritimecloud.mms.server.connection.clientnew;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-
-import net.maritimecloud.message.Message;
-import net.maritimecloud.mms.server.connection.client.OldClientManager;
-
+import static java.util.Objects.requireNonNull;
+import net.maritimecloud.mms.server.connection.transport.ServerTransport;
 
 /**
  *
  * @author Kasper Nielsen
  */
+public class InternalStateConnected extends InternalState {
 
-@Path("/clients")
-public class ClientResource {
-    final OldClientManager tm;
+    final Session session;
 
-    public ClientResource(OldClientManager tm) {
-        this.tm = tm;
+    InternalStateConnected(ServerTransport transport, Session session) {
+        super(transport);
+        this.session = requireNonNull(session);
     }
 
-    @GET
-    @Path("/list")
-    public Message list2() {
-        return tm.statistics().getAllClients();
-    }
+
 }

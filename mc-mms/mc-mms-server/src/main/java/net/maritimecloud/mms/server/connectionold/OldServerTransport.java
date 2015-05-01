@@ -22,7 +22,7 @@ import net.maritimecloud.core.id.ServerId;
 import net.maritimecloud.internal.mms.messages.Welcome;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.mms.server.MmsServer;
-import net.maritimecloud.mms.server.connection.client.ClientManager;
+import net.maritimecloud.mms.server.connection.client.OldClientManager;
 import net.maritimecloud.mms.server.connection.transport.ServerTransport;
 import net.maritimecloud.mms.server.connection.transport.ServerTransportListener;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
@@ -39,7 +39,7 @@ public class OldServerTransport implements ServerTransportListener {
     /** The logger. */
     static final Logger LOG = LoggerFactory.getLogger(OldServerTransport.class);
 
-    public final ClientManager clientManager;
+    public final OldClientManager clientManager;
 
     /** Whether or not we have received the first hello message from the client. */
     public ServerConnectFuture connectFuture = new ServerConnectFuture(this);
@@ -58,13 +58,13 @@ public class OldServerTransport implements ServerTransportListener {
 
     /** Constructor */
     public OldServerTransport(MmsServer server) {
-        this.clientManager = requireNonNull(server.getService(ClientManager.class));
+        this.clientManager = requireNonNull(server.getService(OldClientManager.class));
         this.server = requireNonNull(server);
         // this.transportListener = requireNonNull(transportListener);
     }
 
     /** {@inheritDoc} */
-    public void doClose(final MmsConnectionClosingCode reason) {
+    public void doClose(MmsConnectionClosingCode reason) {
         fullyLock();
         try {
             ServerTransport transport = this.transport;

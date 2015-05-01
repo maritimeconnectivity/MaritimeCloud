@@ -12,31 +12,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.mms.server.rest;
+package net.maritimecloud.mms.server.connection.clientnew;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-
-import net.maritimecloud.message.Message;
-import net.maritimecloud.mms.server.connection.client.OldClientManager;
-
+import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 
 /**
  *
  * @author Kasper Nielsen
  */
+public interface SessionListener {
 
-@Path("/clients")
-public class ClientResource {
-    final OldClientManager tm;
-
-    public ClientResource(OldClientManager tm) {
-        this.tm = tm;
-    }
-
-    @GET
-    @Path("/list")
-    public Message list2() {
-        return tm.statistics().getAllClients();
-    }
+    /**
+     *
+     * <p>
+     * The reason it is marked acked and we do not supply some kind og completion token is that messages cannot be acked
+     * in a random order. Before message x can be acked, message x-1 must already have been acked.
+     *
+     * @param session
+     * @param message
+     */
+    // is under readlock, is invoked in order one at a time
+    void onMessage(Session session, MmsMessage message);
 }

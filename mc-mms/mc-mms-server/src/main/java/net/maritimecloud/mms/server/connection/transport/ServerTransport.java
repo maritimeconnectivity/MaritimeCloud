@@ -39,6 +39,12 @@ public final class ServerTransport {
     /** The logger. */
     private static final Logger LOG = LoggerFactory.getLogger(ServerTransport.class);
 
+    Object attachment;
+
+    private final long creationTime = System.nanoTime();
+
+    volatile long latestReceivedMessage;
+
     /** The listener to invoke. */
     final ServerTransportListener listener;
 
@@ -67,6 +73,20 @@ public final class ServerTransport {
         }
     }
 
+    void endpointOnBinaryMessage(byte[] binary) {
+        latestReceivedMessage = System.nanoTime();
+        MmsMessage msg;
+        try {
+            msg = MmsMessage.parseBinaryMessage(binary);
+            msg.setInbound(true);
+        } catch (Exception e) {
+            LOG.error("Failed to parse incoming message", e);
+            close(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage(e.getMessage()));
+            return;
+        }
+        listener.onMessage(this, msg);
+    }
+
     void endpointOnClose(CloseReason closeReason) {
         wsSession = null;
         listener.onClose(this,
@@ -74,11 +94,12 @@ public final class ServerTransport {
     }
 
     void endpointOnOpen() {
-        System.out.println("OPENED");
+        latestReceivedMessage = System.nanoTime();
         listener.onOpen(this);
     }
 
     void endpointOnTextMessage(String textMessage) {
+        latestReceivedMessage = System.nanoTime();
         MmsMessage msg;
         try {
             msg = MmsMessage.parseTextMessage(textMessage);
@@ -91,17 +112,25 @@ public final class ServerTransport {
         listener.onMessage(this, msg);
     }
 
-    void endpointOnBinaryMessage(byte[] binary) {
-        MmsMessage msg;
-        try {
-            msg = MmsMessage.parseBinaryMessage(binary);
-            msg.setInbound(true);
-        } catch (Exception e) {
-            LOG.error("Failed to parse incoming message", e);
-            close(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage(e.getMessage()));
-            return;
-        }
-        listener.onMessage(this, msg);
+    /**
+     * @return the attachment
+     */
+    public Object getAttachment() {
+        return attachment;
+    }
+
+    /**
+     * @return the creationTime
+     */
+    public long getCreationTime() {
+        return creationTime;
+    }
+
+    /**
+     * @return the latestReceivedMessage
+     */
+    public long getLatestReceivedMessage() {
+        return latestReceivedMessage;
     }
 
     /**
@@ -127,5 +156,13 @@ public final class ServerTransport {
                 wsSession.getAsyncRemote().sendText(textToSend);
             }
         }
+    }
+
+    /**
+     * @param attachment
+     *            the attachment to set
+     */
+    public void setAttachment(Object attachment) {
+        this.attachment = attachment;
     }
 }

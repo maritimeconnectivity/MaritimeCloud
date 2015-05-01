@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import net.maritimecloud.core.id.ServerId;
 import net.maritimecloud.mms.server.broadcast.ServerBroadcastManager;
-import net.maritimecloud.mms.server.connection.client.ClientManager;
+import net.maritimecloud.mms.server.connection.client.OldClientManager;
 import net.maritimecloud.mms.server.connectionold.MmsServerConnectionBus;
 import net.maritimecloud.mms.server.endpoints.ServerEndpointManager;
 import net.maritimecloud.mms.server.endpoints.ServerServices;
@@ -61,7 +61,7 @@ public class MmsServer {
         conf.addService(this);
 
         conf.addService(ServerServices.class);
-        conf.addService(ClientManager.class);
+        conf.addService(OldClientManager.class);
         conf.addService(PositionTracker.class);
         conf.addService(WebSocketServer.class);
         conf.addService(MmsServerConnectionBus.class);

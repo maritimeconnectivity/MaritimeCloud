@@ -21,8 +21,8 @@ import javax.ws.rs.PathParam;
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.net.endpoint.EndpointMirror;
 import net.maritimecloud.message.Message;
-import net.maritimecloud.mms.server.connection.client.Client;
-import net.maritimecloud.mms.server.connection.client.ClientManager;
+import net.maritimecloud.mms.server.connection.client.OldClient;
+import net.maritimecloud.mms.server.connection.client.OldClientManager;
 
 /**
  *
@@ -30,9 +30,9 @@ import net.maritimecloud.mms.server.connection.client.ClientManager;
  */
 @Path("/endpoint")
 public class EndpointInvoke {
-    final ClientManager tm;
+    final OldClientManager tm;
 
-    public EndpointInvoke(ClientManager tm) {
+    public EndpointInvoke(OldClientManager tm) {
         this.tm = tm;
     }
 
@@ -50,7 +50,7 @@ public class EndpointInvoke {
     public Message invoke(@PathParam("mmsi") String mmsi, @PathParam("endpoint") String endpoint) {
         MaritimeId id = MaritimeId.create("mmsi:" + mmsi);
         String ep = EndpointMirror.stripEndpointMethod(endpoint);
-        Client t = tm.get(id);
+        OldClient t = tm.get(id);
         if (t != null) {
             if (t.getEndpointManager().hasService(ep)) {
                 // Vi skal lave en "Fake" sources

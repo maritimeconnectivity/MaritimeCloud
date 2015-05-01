@@ -14,25 +14,28 @@
  */
 package net.maritimecloud.server;
 
+import static java.util.Objects.requireNonNull;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.TimeUnit;
+
+import javax.websocket.ClientEndpoint;
+import javax.websocket.CloseReason;
+import javax.websocket.OnClose;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.RemoteEndpoint.Basic;
+import javax.websocket.Session;
+
 import net.maritimecloud.internal.message.MessageHelper;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.internal.mms.transport.MmsWireProtocol;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageSerializer;
-
-import javax.websocket.ClientEndpoint;
-import javax.websocket.CloseReason;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.RemoteEndpoint.Basic;
-import javax.websocket.Session;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.TimeUnit;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  *
@@ -48,8 +51,25 @@ public class TesstEndpoint {
 
     Session session;
 
+    final CountDownLatch closed = new CountDownLatch(1);
+
+    volatile CloseReason closeReason;
+
     public void close() throws IOException {
         session.close(new CloseReason(CloseReason.CloseCodes.UNEXPECTED_CONDITION, "suckit"));
+    }
+    public CloseReason awaitClosed() {
+        try {
+            closed.await(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            throw new AssertionError(e);
+        }
+        return closeReason;
+    }
+    @OnClose
+    public final void onClose(CloseReason reason) {
+        closeReason = reason;
+        closed.countDown();
     }
 
     @OnMessage

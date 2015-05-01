@@ -58,7 +58,7 @@ public abstract class AbstractServerConnectionTest {
 
     int clientPort;
 
-    MmsServer server;
+    protected MmsServer server;
 
     TestWebSocketServer ws;
 

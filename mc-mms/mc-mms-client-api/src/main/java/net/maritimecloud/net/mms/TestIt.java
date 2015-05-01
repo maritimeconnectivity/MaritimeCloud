@@ -12,31 +12,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.mms.server.rest;
+package net.maritimecloud.net.mms;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-
-import net.maritimecloud.message.Message;
-import net.maritimecloud.mms.server.connection.client.OldClientManager;
+import java.util.concurrent.TimeUnit;
 
 
 /**
  *
  * @author Kasper Nielsen
  */
+public class TestIt {
 
-@Path("/clients")
-public class ClientResource {
-    final OldClientManager tm;
+    public static void main(String[] args) throws Exception {
+        MmsClientConfiguration conf = MmsClientConfiguration.create("mmsi:123123123");
+        conf.setHost("ws://mms03.maritimecloud.net:43234");
 
-    public ClientResource(OldClientManager tm) {
-        this.tm = tm;
-    }
+        MmsClient cli = conf.build();
 
-    @GET
-    @Path("/list")
-    public Message list2() {
-        return tm.statistics().getAllClients();
+        cli.connection().awaitConnected(10, TimeUnit.SECONDS);
+        System.out.println(cli.connection().isConnected());
+
+        cli.shutdown();
+        cli.awaitTermination(10, TimeUnit.SECONDS);
     }
 }
