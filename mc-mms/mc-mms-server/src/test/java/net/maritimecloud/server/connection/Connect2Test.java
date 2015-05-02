@@ -20,12 +20,12 @@ import static org.junit.Assert.assertNotNull;
 import net.maritimecloud.internal.mms.messages.Connected;
 import net.maritimecloud.internal.mms.messages.Hello;
 import net.maritimecloud.internal.mms.messages.Welcome;
-import net.maritimecloud.mms.server.connection.client.OldClientManager;
+import net.maritimecloud.mms.server.connection.client.ClientManager;
+import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 import net.maritimecloud.server.AbstractServerConnectionTest;
 import net.maritimecloud.server.TesstEndpoint;
 import net.maritimecloud.util.geometry.PositionTime;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -50,7 +50,7 @@ public class Connect2Test extends AbstractServerConnectionTest {
         assertNotNull(cm.getSessionId());
         assertEquals(0, cm.getLastReceivedMessageId().longValue());
 
-        assertNotNull(server.getService(OldClientManager.class).get(ID2));
+        assertNotNull(server.getService(ClientManager.class).get(ID2));
     }
 
     /**
@@ -58,7 +58,6 @@ public class Connect2Test extends AbstractServerConnectionTest {
      * result in an immediate disconnect.
      */
     @Test
-    @Ignore
     public void connectWrongMessage() throws Exception {
         TesstEndpoint t = newClient();
         Welcome wm = t.take(Welcome.class);
@@ -66,12 +65,11 @@ public class Connect2Test extends AbstractServerConnectionTest {
 
         t.send(wm);
         // exit with status code 4100 for now.
-        assertEquals(4100, t.awaitClosed().getCloseCode().getCode());
+        assertEquals(MmsConnectionClosingCode.WRONG_MESSAGE.getId(), t.awaitClosed().getCloseCode().getCode());
     }
 
     /** Tests that we get a new session when reconnecting clean */
     @Test
-    @Ignore
     public void reconnectClean() throws Exception {
         TesstEndpoint t = newClient();
         assertNotNull(t.take(Welcome.class));
@@ -93,4 +91,38 @@ public class Connect2Test extends AbstractServerConnectionTest {
         assertNotEquals(cm.getSessionId(), cm2.getSessionId());
         assertEquals(0, cm2.getLastReceivedMessageId().longValue());
     }
+
+    @Test
+    public void connect2() throws Exception {
+        TesstEndpoint t = newClient();
+        Welcome wm = t.take(Welcome.class);
+        assertNotNull(wm.getServerId());
+
+        Hello h = new Hello().setClientId(ID2.toString()).setLastReceivedMessageId(0L)
+                .setPositionTime(PositionTime.create(1, 1, System.currentTimeMillis()));
+
+        t.send(h);
+
+        Connected cm = t.take(Connected.class);
+        assertNotNull(cm.getSessionId());
+        assertEquals(0, cm.getLastReceivedMessageId().longValue());
+
+        assertNotNull(server.getService(ClientManager.class).get(ID2));
+        // Second
+        t = newClient();
+        wm = t.take(Welcome.class);
+        assertNotNull(wm.getServerId());
+
+        h = new Hello().setClientId(ID3.toString()).setLastReceivedMessageId(0L)
+                .setPositionTime(PositionTime.create(1, 1, System.currentTimeMillis()));
+
+        t.send(h);
+
+        cm = t.take(Connected.class);
+        assertNotNull(cm.getSessionId());
+        assertEquals(0, cm.getLastReceivedMessageId().longValue());
+
+        assertNotNull(server.getService(ClientManager.class).get(ID3));
+    }
+
 }

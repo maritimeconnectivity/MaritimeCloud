@@ -33,6 +33,7 @@ import net.maritimecloud.util.geometry.Area;
 import net.maritimecloud.util.geometry.Circle;
 import net.maritimecloud.util.geometry.PositionTime;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -42,10 +43,10 @@ import org.junit.Test;
 public class BroadcastTest extends AbstractServerConnectionTest {
 
     @Test
+    @Ignore
     public void foo() {
         BroadcastTestMessage hw = new BroadcastTestMessage().setMsg("foo1");
         Broadcast bp = createBroadcast(ID1, PositionTime.create(1, 1, 1), hw, null, 10, null);
-        System.out.println(bp.toJSON());
 
         Broadcast bp2 = MessageSerializer.readFromJSON(Broadcast.SERIALIZER, bp.toJSON());
         System.out.println(bp2.toJSON());
@@ -57,12 +58,12 @@ public class BroadcastTest extends AbstractServerConnectionTest {
     @Test
     public void oneClient() throws Exception {
         TesstEndpoint c1 = newClient(ID1);
-        TesstEndpoint c2 = newClient(ID6);
+        TesstEndpoint c6 = newClient(ID6);
 
         BroadcastTestMessage hw = new BroadcastTestMessage().setMsg("foo1");
         c1.send(createBroadcast(ID1, PositionTime.create(1, 1, 1), hw, null, 10, null));
 
-        Broadcast bd = c2.take(Broadcast.class);
+        Broadcast bd = c6.take(Broadcast.class);
         BroadcastTestMessage tryRead = (BroadcastTestMessage) MmsMessage.tryRead(bd);
         assertEquals("foo1", tryRead.getMsg());
 

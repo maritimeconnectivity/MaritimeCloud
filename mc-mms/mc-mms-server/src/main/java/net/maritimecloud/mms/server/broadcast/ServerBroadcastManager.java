@@ -22,12 +22,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.maritimecloud.internal.mms.messages.PositionReport;
 import net.maritimecloud.internal.net.messages.Broadcast;
 import net.maritimecloud.internal.net.messages.BroadcastAck;
-import net.maritimecloud.mms.server.connection.client.OldClient;
-import net.maritimecloud.mms.server.connection.client.OldClientManager;
-import net.maritimecloud.mms.server.connectionold.MmsServerConnectionBus;
-import net.maritimecloud.mms.server.connectionold.ServerConnection;
+import net.maritimecloud.mms.server.MmsServerConnectionBus;
+import net.maritimecloud.mms.server.connection.client.Client;
+import net.maritimecloud.mms.server.connection.client.ClientManager;
 import net.maritimecloud.util.geometry.Area;
 import net.maritimecloud.util.geometry.PositionTime;
+
+import org.cakeframework.container.concurrent.ThreadManager;
 
 /**
  * The server side broadcast manager.
@@ -38,27 +39,30 @@ public class ServerBroadcastManager {
 
     final ConcurrentHashMap<String, BroadcastSubscriptionSet> listeners = new ConcurrentHashMap<>();
 
-    private final OldClientManager tm;
+    private final ClientManager tm;
 
-    public ServerBroadcastManager(OldClientManager tm, MmsServerConnectionBus bus) {
+    private final ThreadManager threadManager;
+
+    public ServerBroadcastManager(ThreadManager threadManager, ClientManager tm, MmsServerConnectionBus bus) {
         this.tm = requireNonNull(tm);
+        this.threadManager = threadManager;
         bus.setBroadcastManager(this);
     }
 
-    public PositionReport broadcast(ServerConnection sourceConnection, Broadcast broadcast) {
-        final OldClient target = sourceConnection.getClient();
+    public PositionReport broadcast(Client sender, Broadcast broadcast) {
         // final PositionTime sourcePositionTime = send.getPositionTime();
 
         tm.forEachTarget(t -> {
-            if (t != target && t.isConnected()) { // do not broadcast to self
-                broadcast(sourceConnection, broadcast, t);
+            // We could do some checks with regards to not send to terminated
+            if (t != sender/* && t.isConnected() */) { // do not broadcast to self
+                threadManager.getExecutor("mms.broadcast").execute(() -> broadcast(sender, broadcast, t));
             }
         });
         return new PositionReport();
     }
 
-    void broadcast(ServerConnection source, Broadcast broadcast, OldClient t) {
-        PositionTime latest = t.getLatestPosition();
+    void broadcast(Client source, Broadcast broadcast, Client destination) {
+        PositionTime latest = destination.getLatestPositionAndTime();
         if (latest != null) {
 
             boolean doSend = false;
@@ -71,12 +75,12 @@ public class ServerBroadcastManager {
             doSend = area.contains(latest);
             // }
             if (doSend) {
-                broadcastSend(source, broadcast, t);
+                broadcastSend(source, broadcast, destination);
             }
         }
     }
 
-    void broadcastSend(ServerConnection source, Broadcast broadcast, OldClient t) {
+    void broadcastSend(Client source, Broadcast broadcast, Client destination) {
         Broadcast bd = new Broadcast();
         bd.setMessageId(broadcast.getMessageId());
         bd.setBroadcastType(broadcast.getBroadcastType());
@@ -87,22 +91,20 @@ public class ServerBroadcastManager {
         bd.setPayload(broadcast.getPayload());
         bd.setSignature(broadcast.getSignature());
 
-        ServerConnection destination = t.getActiveConnection();
-        CompletableFuture<Void> f = destination.messageSend(bd).protocolAcked();
+        CompletableFuture<Void> acked = destination.send(bd).protocolAcked();
 
         if (broadcast.hasAckBroadcast()) {
-            f.thenAccept(e -> {
+            acked.thenAccept(e -> {
                 BroadcastAck ba = new BroadcastAck();
                 ba.setAckForMessageId(bd.getMessageId());
                 // Ignore original sender id
-                OldClient org = destination.getClient();
-                ba.setReceiverId(org.getId().toString());
+                ba.setReceiverId(destination.getId());
 
-                PositionTime pt = org.getLatestPosition();
+                PositionTime pt = destination.getLatestPositionAndTime();
                 ba.setReceiverTimestamp(pt.timestamp());
                 ba.setReceiverPosition(pt);
 
-                source.messageSend(ba);
+                source.send(ba);
             });
         }
     }

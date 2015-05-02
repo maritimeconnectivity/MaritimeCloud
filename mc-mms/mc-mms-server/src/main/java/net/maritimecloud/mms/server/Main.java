@@ -17,6 +17,9 @@ package net.maritimecloud.mms.server;
 
 import java.util.concurrent.TimeUnit;
 
+import org.cakeframework.container.Container.State;
+import org.cakeframework.util.DurationFormatter;
+
 import com.beust.jcommander.JCommander;
 
 /**
@@ -30,14 +33,13 @@ public class Main {
         MmsServerConfiguration configuration = new MmsServerConfiguration();
         new JCommander(configuration, args);
 
-        MmsServer server = new MmsServer(configuration);
-        server.startBlocking();
+        MmsServer server = configuration.build();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             server.shutdown();
             try {
                 for (int i = 0; i < 30; i++) {
-                    if (!server.awaitTerminated(1, TimeUnit.SECONDS)) {
+                    if (!server.awaitState(State.TERMINATED, 1, TimeUnit.SECONDS)) {
                         System.out.println("Awaiting shutdown " + i + " / 30 seconds");
                     } else {
                         return;
@@ -47,7 +49,10 @@ public class Main {
             } catch (InterruptedException ignore) {}
         }));
 
-        System.out.println("Wuhuu Maritime Messing Service started!");
+        server.start().join();
+
+        System.out.println("Wuhuu Maritime Messing Service started succesfully started in "
+                + DurationFormatter.DEFAULT.format(server.start().getStartupTime()));
         if (configuration.getServerPort() >= 0 && !configuration.requireTLS) {
             System.out.println("MMS  : Running on port " + configuration.getServerPort() + " (unsecure)");
         } else {

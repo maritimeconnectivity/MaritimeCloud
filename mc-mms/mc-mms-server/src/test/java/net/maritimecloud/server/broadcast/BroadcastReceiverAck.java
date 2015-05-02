@@ -14,7 +14,13 @@
  */
 package net.maritimecloud.server.broadcast;
 
+import net.maritimecloud.internal.net.messages.Broadcast;
+import net.maritimecloud.mms.stubs.BroadcastTestMessage;
 import net.maritimecloud.server.AbstractServerConnectionTest;
+import net.maritimecloud.server.TesstEndpoint;
+import net.maritimecloud.util.geometry.PositionTime;
+
+import org.junit.Test;
 
 /**
  * Test acknowledgments from receivers of broadcasts.
@@ -23,31 +29,30 @@ import net.maritimecloud.server.AbstractServerConnectionTest;
  */
 public class BroadcastReceiverAck extends AbstractServerConnectionTest {
 
-    // @Test
-    // public void receiverAck() throws Exception {
-    // TesstEndpoint c1 = newClient(ID1);
-    // TesstEndpoint c6 = newClient(ID6);
-    //
-    // BroadcastTestMessage hw = new BroadcastTestMessage().setMsg("foo1");
-    // Broadcast bp = MessageHelpers.createBroadcast(ID1, PositionTime.create(1, 1, 1), hw, null, 10, e -> {})
-    // .setReplyTo(1234L);
-    // c1.send(bp);
-    //
-    // Broadcast bd = c6.take(Broadcast.class);
-    // BroadcastTestMessage tryRead = (BroadcastTestMessage) MessageHelpers.tryRead(bd);
-    // assertEquals("foo1", tryRead.getMsg());
-    //
-    // long time = System.currentTimeMillis();
-    // System.out.println(time);
-    // c6.send(new PositionReport().setPositionTime(PositionTime.create(4, 4, time))
-    // .setLatestReceivedId(bd.getOldMessageId()).setOldMessageId(1L));
-    // c1.take(BroadcastPublishAck.class);
-    // Thread.sleep(100);
-    //
-    // BroadcastAck ba = c1.take(BroadcastAck.class);
-    // assertEquals(ba.getAckToBroadcastId(), bp.getBroadcastId());
-    // assertEquals(Position.create(4, 4), ba.getReceiverPosition());
-    // assertEquals(time, ba.getReceiverTimestamp().getTime());
-    // assertEquals(ID6.toString(), ba.getReceiverId());
-    // }
+    @Test
+    public void receiverAck() throws Exception {
+        TesstEndpoint c1 = newClient(ID1);
+        TesstEndpoint c6 = newClient(ID6);
+
+        BroadcastTestMessage hw = new BroadcastTestMessage().setMsg("foo1");
+        Broadcast bp = BroadcastTest.createBroadcast(ID1, PositionTime.create(1, 1, 1), hw, null, 10, e -> {});
+        c1.send(bp);
+
+        Broadcast bd = c6.take(Broadcast.class);
+        // BroadcastTestMessage tryRead = (BroadcastTestMessage) MessageHelpers.tryRead(bd);
+        // assertEquals("foo1", tryRead.getMsg());
+        //
+        // long time = System.currentTimeMillis();
+        // System.out.println(time);
+        // c6.send(new PositionReport().setPositionTime(PositionTime.create(4, 4, time))
+        // .setLatestReceivedId(bd.getOldMessageId()).setOldMessageId(1L));
+        // c1.take(BroadcastPublishAck.class);
+        // Thread.sleep(100);
+        //
+        // BroadcastAck ba = c1.take(BroadcastAck.class);
+        // assertEquals(ba.getAckToBroadcastId(), bp.getBroadcastId());
+        // assertEquals(Position.create(4, 4), ba.getReceiverPosition());
+        // assertEquals(time, ba.getReceiverTimestamp().getTime());
+        // assertEquals(ID6.toString(), ba.getReceiverId());
+    }
 }

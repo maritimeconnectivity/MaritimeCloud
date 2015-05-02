@@ -17,6 +17,7 @@ package net.maritimecloud.internal.mms.client.connection.transport;
 import javax.websocket.ContainerProvider;
 import javax.websocket.WebSocketContainer;
 
+import net.maritimecloud.message.MessageFormatType;
 import net.maritimecloud.net.mms.MmsConnection;
 
 /**
@@ -25,28 +26,24 @@ import net.maritimecloud.net.mms.MmsConnection;
  */
 public class ClientTransportFactoryJsr356 extends ClientTransportFactory {
 
-    /** The single instance of a WebSocketContainer. */
-    static volatile WebSocketContainer CACHED_CONTAINER;
-
-    /** A lock protecting the creation of the cached websocket container. */
-    private static final Object LOCK = new Object();
-
     /** {@inheritDoc} */
     @Override
-    public ClientTransport create(ClientTransportListener transportListener, MmsConnection.Listener connectionListener) {
-        WebSocketContainer container = CACHED_CONTAINER;
-        if (container == null) {
-            synchronized (LOCK) {
-                container = ContainerProvider.getWebSocketContainer();
+    public ClientTransport create(MessageFormatType mft, ClientTransportListener transportListener,
+            MmsConnection.Listener connectionListener) {
+        return new ClientTransportJsr356(mft, transportListener, connectionListener, Singleton.INSTANCE);
+    }
 
-                // Default settings, TODO check we also set it after having created as session in
-                // ConnectionTransportJsr356
-                container.setDefaultMaxTextMessageBufferSize(10 * 1024 * 1024);
+    /** Singleton. Uses the standard initialization-on-demand holder idiom. */
+    static class Singleton {
+        static final WebSocketContainer INSTANCE;
 
-                // Let others use this container as well. (most like none)
-                CACHED_CONTAINER = container;
-            }
+        static {
+            INSTANCE = ContainerProvider.getWebSocketContainer();
+
+            // Default settings,\
+            INSTANCE.setDefaultMaxTextMessageBufferSize(5 * 1024 * 1024);
+            INSTANCE.setDefaultMaxBinaryMessageBufferSize(5 * 1024 * 1024);
+
         }
-        return new ClientTransportJsr356(transportListener, connectionListener, container);
     }
 }

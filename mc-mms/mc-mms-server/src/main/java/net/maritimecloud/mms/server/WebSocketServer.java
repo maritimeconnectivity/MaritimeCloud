@@ -27,9 +27,10 @@ import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
 import javax.websocket.server.ServerEndpointConfig.Builder;
 
+import net.maritimecloud.mms.server.connection.client.DefaultTransportListener;
 import net.maritimecloud.mms.server.connection.transport.ServerTransportJsr356Endpoint;
-import net.maritimecloud.mms.server.connectionold.OldServerTransport;
 
+import org.cakeframework.container.ServiceManager;
 import org.cakeframework.container.lifecycle.RunOnStart;
 import org.cakeframework.container.lifecycle.RunOnStop;
 import org.eclipse.jetty.http.HttpVersion;
@@ -51,6 +52,7 @@ import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainer
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 /**
  * A factory used to create transports from connections by remote clients.
  *
@@ -68,7 +70,14 @@ public class WebSocketServer {
 
     final String accessLogPath;
 
-    public WebSocketServer(MmsServerConfiguration configuration, MmsServer is) {
+    final DefaultTransportListener defaultTransport;
+
+    final ServerEventListener eventListener;
+
+    public WebSocketServer(ServerEventListener listener, DefaultTransportListener defaultTransport,
+            MmsServerConfiguration configuration, MmsServer is) {
+        this.eventListener = requireNonNull(listener);
+        this.defaultTransport = requireNonNull(defaultTransport);
         this.is = requireNonNull(is);
         this.server = new Server();
         if (!configuration.isRequireTLS()) {
@@ -150,7 +159,7 @@ public class WebSocketServer {
         b.configurator(new ServerEndpointConfig.Configurator() {
             @SuppressWarnings("unchecked")
             public <S> S getEndpointInstance(Class<S> endpointClass) throws InstantiationException {
-                return (S) new ServerTransportJsr356Endpoint(() -> new OldServerTransport(is));
+                return (S) is.getService(ServiceManager.class).inject(ServerTransportJsr356Endpoint.class);
             }
         });
 
@@ -169,7 +178,7 @@ public class WebSocketServer {
 
         @Override
         protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-                IOException {
+        IOException {
             response.setContentType("text/html");
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().println("<h1>DumpServlet</h1><pre>");

@@ -16,15 +16,17 @@ package net.maritimecloud.mms.server.connection.transport;
 
 import static java.util.Objects.requireNonNull;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCode;
 import javax.websocket.Session;
 
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
-import net.maritimecloud.internal.mms.transport.MmsWireProtocol;
+import net.maritimecloud.message.MessageFormatType;
+import net.maritimecloud.mms.server.ServerEventListener;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 
 import org.slf4j.Logger;
@@ -37,23 +39,33 @@ import org.slf4j.LoggerFactory;
 public final class ServerTransport {
 
     /** The logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(ServerTransport.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServerTransport.class);
 
-    Object attachment;
+    /** An attachment that can be attached to the transport. */
+    private final ConcurrentHashMap<String, Object> attachments = new ConcurrentHashMap<>();
 
-    private final long creationTime = System.nanoTime();
+    /** A listener of important server side events. */
+    private final ServerEventListener eventListener;
 
-    volatile long latestReceivedMessage;
+    /** The listener to invoke on incoming messages. */
+    private final ServerTransportListener listener;
 
-    /** The listener to invoke. */
-    final ServerTransportListener listener;
+    /** The system time of the last received message. */
+    volatile long timeOfLatestIncomingMessage;
+
+    /** The creation time of this transport. */
+    private final long timeOfreationTime = System.nanoTime();
 
     /** The current session. */
     volatile Session wsSession;
 
-    ServerTransport(Session session, ServerTransportListener listener) {
+    /** Sets the output format of messages. */
+    volatile MessageFormatType channalFormatType;
+
+    ServerTransport(Session wsSession, ServerTransportListener listener, ServerEventListener eventListener) {
         this.listener = requireNonNull(listener);
-        this.wsSession = requireNonNull(session);
+        this.wsSession = requireNonNull(wsSession);
+        this.eventListener = requireNonNull(eventListener);
     }
 
     public void close(MmsConnectionClosingCode reason) {
@@ -68,69 +80,91 @@ public final class ServerTransport {
             try {
                 wsSession.close(cr);
             } catch (Exception e) {
-                LOG.error("Failed to close connection", e);
+                LOGGER.error("Failed to close connection", e);
             }
         }
     }
 
     void endpointOnBinaryMessage(byte[] binary) {
-        latestReceivedMessage = System.nanoTime();
-        MmsMessage msg;
-        try {
-            msg = MmsMessage.parseBinaryMessage(binary);
-            msg.setInbound(true);
-        } catch (Exception e) {
-            LOG.error("Failed to parse incoming message", e);
-            close(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage(e.getMessage()));
-            return;
+        timeOfLatestIncomingMessage = System.nanoTime();
+        if (channalFormatType == null) {
+            channalFormatType = MessageFormatType.MACHINE_READABLE;
         }
-        listener.onMessage(this, msg);
+        eventListener.transportBinaryMessageReceived(this, binary);
+        endpointOnMessage(() -> MmsMessage.parseBinaryMessage(binary));
     }
 
     void endpointOnClose(CloseReason closeReason) {
         wsSession = null;
-        listener.onClose(this,
-                MmsConnectionClosingCode.create(closeReason.getCloseCode().getCode(), closeReason.getReasonPhrase()));
+        try {
+            listener.onClose(this, MmsConnectionClosingCode.create(closeReason.getCloseCode().getCode(),
+                    closeReason.getReasonPhrase()));
+        } catch (RuntimeException e) {
+            LOGGER.error("Failed to process close request", e);
+            close(MmsConnectionClosingCode.INTERNAL_ERROR.withMessage(e.getMessage()));
+        }
+    }
+
+    private void endpointOnMessage(Callable<MmsMessage> c) {
+        // Start by parsing the received message
+        MmsMessage msg;
+        try {
+            msg = c.call();
+        } catch (Exception e) {
+            LOGGER.error("Failed to parse incoming message", e); // TODO not technically an error, we don't care
+            close(MmsConnectionClosingCode.BAD_DATA.withMessage(e.getMessage()));
+            return;
+        }
+
+        eventListener.transportMessageReceived(this, msg);
+
+        // process message
+        try {
+            listener.onMessage(this, msg);
+        } catch (RuntimeException e) {
+            LOGGER.error("Failed to process message", e);
+            close(MmsConnectionClosingCode.INTERNAL_ERROR.withMessage(e.getMessage()));
+        }
     }
 
     void endpointOnOpen() {
-        latestReceivedMessage = System.nanoTime();
-        listener.onOpen(this);
+        timeOfLatestIncomingMessage = System.nanoTime();
+        try {
+            listener.onOpen(this);
+        } catch (RuntimeException e) {
+            LOGGER.error("Failed to process open request", e);
+            close(MmsConnectionClosingCode.INTERNAL_ERROR.withMessage(e.getMessage()));
+        }
     }
 
     void endpointOnTextMessage(String textMessage) {
-        latestReceivedMessage = System.nanoTime();
-        MmsMessage msg;
-        try {
-            msg = MmsMessage.parseTextMessage(textMessage);
-            msg.setInbound(true);
-        } catch (Exception e) {
-            LOG.error("Failed to parse incoming message", e);
-            close(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage(e.getMessage()));
-            return;
+        timeOfLatestIncomingMessage = System.nanoTime();
+        if (channalFormatType == null) {
+            channalFormatType = MessageFormatType.HUMAN_READABLE;
         }
-        listener.onMessage(this, msg);
+        eventListener.transportTextMessageReceived(this, textMessage);
+        endpointOnMessage(() -> MmsMessage.parseTextMessage(textMessage));
     }
 
     /**
      * @return the attachment
      */
-    public Object getAttachment() {
-        return attachment;
+    public <T> T getAttachment(String key, Class<T> type) {
+        return type.cast(attachments.get(key));
     }
 
     /**
      * @return the creationTime
      */
-    public long getCreationTime() {
-        return creationTime;
+    public long getTimeOfCreation() {
+        return timeOfreationTime;
     }
 
     /**
      * @return the latestReceivedMessage
      */
-    public long getLatestReceivedMessage() {
-        return latestReceivedMessage;
+    public long getTimeOfLatestIncomingMessage() {
+        return timeOfLatestIncomingMessage;
     }
 
     /**
@@ -140,29 +174,46 @@ public final class ServerTransport {
      *            the message to send
      */
     public void sendMessage(MmsMessage message) {
+        try {
+            eventListener.transportMessageSend(this, message);
+        } catch (RuntimeException e) {
+            LOGGER.error("Event listener failed", e);
+        }
         Session wsSession = this.wsSession;
         if (wsSession != null) {
-            message.setInbound(false);
-            message.setBinary(MmsWireProtocol.USE_BINARY);
-
-            if (message.isBinary()) {
-                try {
-                    wsSession.getAsyncRemote().sendBinary(ByteBuffer.wrap(message.toBinary()));
-                } catch (IOException e) {
-                    LOG.error("Failed to send message", e);
+            try {
+                if (channalFormatType == MessageFormatType.MACHINE_READABLE) {
+                    byte[] data = message.toBinary();
+                    eventListener.transportBinaryMessageSend(this, data);
+                    wsSession.getAsyncRemote().sendBinary(ByteBuffer.wrap(data));
+                } else {
+                    String textToSend = message.toText();
+                    eventListener.transportTextMessageSend(this, textToSend);
+                    wsSession.getAsyncRemote().sendText(textToSend);
                 }
-            } else {
-                String textToSend = message.toText();
-                wsSession.getAsyncRemote().sendText(textToSend);
+            } catch (Exception e) {
+                LOGGER.error("Failed to serialize data", e);
+                close(MmsConnectionClosingCode.INTERNAL_ERROR.withMessage(e.getMessage()));
+                return;
             }
         }
     }
 
     /**
+     * Sets a named attachment for this transport. If the attachment is null, the attachment is cleared.
+     *
+     * @param key
+     *            the string of the attachment
      * @param attachment
-     *            the attachment to set
+     *            the attachment
+     * @throws NullPointerException
+     *             if the specified key is null
      */
-    public void setAttachment(Object attachment) {
-        this.attachment = attachment;
+    public void setAttachment(String key, Object attachment) {
+        if (attachment == null) {
+            attachments.remove(key);
+        } else {
+            attachments.put(key, attachment);
+        }
     }
 }

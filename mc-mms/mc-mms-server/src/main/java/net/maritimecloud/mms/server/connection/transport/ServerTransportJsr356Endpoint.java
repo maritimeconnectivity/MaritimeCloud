@@ -16,14 +16,14 @@ package net.maritimecloud.mms.server.connection.transport;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.function.Supplier;
-
 import javax.websocket.CloseReason;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
+
+import net.maritimecloud.mms.server.ServerEventListener;
 
 /**
  * The endpoint taking care of creating server transports using the JSR 356 Websocket API.
@@ -37,10 +37,14 @@ public class ServerTransportJsr356Endpoint {
     private volatile ServerTransport transport;
 
     /** A factory for creating server transport listeners. */
-    private final Supplier<? extends ServerTransportListener> transportListenerFactory;
+    private final ServerTransportListener transportListener;
 
-    public ServerTransportJsr356Endpoint(Supplier<? extends ServerTransportListener> transportListenerFactory) {
-        this.transportListenerFactory = requireNonNull(transportListenerFactory);
+    /** A listener of events */
+    private final ServerEventListener eventListener;
+
+    public ServerTransportJsr356Endpoint(ServerEventListener eventListener, ServerTransportListener transport) {
+        this.eventListener = requireNonNull(eventListener);
+        this.transportListener = requireNonNull(transport);
     }
 
     @OnClose
@@ -51,11 +55,11 @@ public class ServerTransportJsr356Endpoint {
 
     @OnOpen
     public void onOpen(Session session) {
-        //Set the maximum size of messages we want to receive from clients.
-        session.setMaxBinaryMessageBufferSize(10 * 1024 * 1024);
-        session.setMaxTextMessageBufferSize(10 * 1024 * 1024);
-        
-        transport = new ServerTransport(session, transportListenerFactory.get());
+        // Set the maximum size of messages we want to receive from clients.
+        session.setMaxBinaryMessageBufferSize(5 * 1024 * 1024);
+        session.setMaxTextMessageBufferSize(5 * 1024 * 1024);
+
+        transport = new ServerTransport(session, transportListener, eventListener);
         transport.endpointOnOpen();
     }
 
@@ -63,7 +67,7 @@ public class ServerTransportJsr356Endpoint {
     public void onTextMessage(String textMessage) {
         transport.endpointOnTextMessage(textMessage);
     }
-    
+
     @OnMessage
     public void onBinaryMessage(byte[] binaryMessage) {
         transport.endpointOnBinaryMessage(binaryMessage);

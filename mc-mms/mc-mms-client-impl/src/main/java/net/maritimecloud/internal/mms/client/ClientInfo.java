@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.util.logging.Logger;
+import net.maritimecloud.message.MessageFormatType;
 import net.maritimecloud.net.mms.MmsClientConfiguration;
 import net.maritimecloud.util.Timestamp;
 import net.maritimecloud.util.geometry.PositionReader;
@@ -36,14 +37,18 @@ import net.maritimecloud.util.geometry.PositionTime;
  */
 public class ClientInfo {
 
-    public static int RECONNECT_TIME_DELAY = 2000;
-
     private static final Logger LOGGER = Logger.get(ClientInfo.class);
+
+    public static int RECONNECT_TIME_DELAY = 2000;
 
     final Map<String, String> clientConnectString;
 
     /** The id of this client */
     final MaritimeId clientId;
+
+    private volatile long latestConnectionAttempt = -1;
+
+    private final MessageFormatType messageFormatType;
 
     /** Responsible for creating a current position and time. */
     final PositionReader positionReader;
@@ -51,27 +56,11 @@ public class ClientInfo {
     /** The URI to connect to. Is constant. */
     final URI serverUri;
 
-    private volatile long latestConnectionAttempt = -1;
-
-    /**
-     * @return the latestConnectionAttempt
-     */
-    public long getLatestConnectionAttempt() {
-        return latestConnectionAttempt;
-    }
-
-    /**
-     * @param latestConnectionAttempt
-     *            the latestConnectionAttempt to set
-     */
-    public void setLatestConnectionAttempt(long latestConnectionAttempt) {
-        this.latestConnectionAttempt = latestConnectionAttempt;
-    }
-
     public ClientInfo(MmsClientConfiguration configuration) {
         this.clientId = requireNonNull(configuration.getId());
         this.positionReader = configuration.getPositionReader();
-
+        this.messageFormatType = configuration.useBinary() ? MessageFormatType.MACHINE_READABLE
+                : MessageFormatType.HUMAN_READABLE;
         clientConnectString = new HashMap<>();
         clientConnectString.put("version", "0.3");
         if (configuration.properties().getName() != null) {
@@ -111,6 +100,10 @@ public class ClientInfo {
         }
     }
 
+    public Timestamp currentTime() {
+        return Timestamp.now();
+    }
+
     /**
      * @return the clientConnectString
      */
@@ -118,20 +111,8 @@ public class ClientInfo {
         return clientConnectString;
     }
 
-    public Timestamp currentTime() {
-        return Timestamp.now();
-    }
-
     public MaritimeId getClientId() {
         return clientId;
-    }
-
-    public URI getServerURI() {
-        return serverUri;
-    }
-
-    public boolean hasPosition() {
-        return positionReader != null;
     }
 
     public Optional<PositionTime> getCurrentPosition() {
@@ -144,5 +125,35 @@ public class ClientInfo {
             LOGGER.error("Failed to get position, reporting no position", e);
             return Optional.empty();
         }
+    }
+
+    /**
+     * @return the latestConnectionAttempt
+     */
+    public long getLatestConnectionAttempt() {
+        return latestConnectionAttempt;
+    }
+
+    /**
+     * @return the messageFormatType
+     */
+    public MessageFormatType getMessageFormatType() {
+        return messageFormatType;
+    }
+
+    public URI getServerURI() {
+        return serverUri;
+    }
+
+    public boolean hasPosition() {
+        return positionReader != null;
+    }
+
+    /**
+     * @param latestConnectionAttempt
+     *            the latestConnectionAttempt to set
+     */
+    public void setLatestConnectionAttempt(long latestConnectionAttempt) {
+        this.latestConnectionAttempt = latestConnectionAttempt;
     }
 }

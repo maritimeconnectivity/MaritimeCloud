@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import net.maritimecloud.core.id.MaritimeId;
+import net.maritimecloud.internal.mms.transport.MmsWireProtocol;
 import net.maritimecloud.net.Environment;
 import net.maritimecloud.util.geometry.Circle;
 import net.maritimecloud.util.geometry.PositionReader;
@@ -34,9 +35,11 @@ import net.maritimecloud.util.geometry.PositionReaderSimulator;
  */
 public class MmsClientConfiguration {
 
-    static final String FACTORY = "net.maritimecloud.internal.mms.client.DefaultMmsClient";
+    /** The default implementation of the MmsClient. */
+    private static final String IMPLEMENTATION = "net.maritimecloud.internal.mms.client.DefaultMmsClient";
 
-    boolean autoConnect = true;
+    /** Whether or not we will automatically connect to the MMS server when the client has been created. */
+    private boolean autoConnect = true;
 
     private MaritimeId id;
 
@@ -44,7 +47,7 @@ public class MmsClientConfiguration {
 
     final List<MmsConnection.Listener> connectionListeners = new ArrayList<>();
 
-    private String nodes = "localhost:43234";
+    private String host;
 
     private PositionReader positionReader = new PositionReaderSimulator().forArea(Circle.create(0, 0, 50000));
 
@@ -73,7 +76,7 @@ public class MmsClientConfiguration {
                 }
             });
         }
-        // setHost(Environment.SANDBOX);
+        setHost(Environment.SANDBOX);
     }
 
     /**
@@ -90,14 +93,21 @@ public class MmsClientConfiguration {
         return this;
     }
 
+    /**
+     * Creates the
+     *
+     * @return
+     */
     @SuppressWarnings("unchecked")
     public MmsClient build() {
         Class<?> c;
         try {
-            c = Class.forName(FACTORY);
+            c = Class.forName(IMPLEMENTATION);
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Could not find factory class " + FACTORY + " make sure it is on the classpath");
+            throw new RuntimeException("Could not find factory class " + IMPLEMENTATION
+                    + " make sure it is on the classpath");
         }
+
         Constructor<MmsClient> con;
         try {
             con = (Constructor<MmsClient>) c.getConstructor(MmsClientConfiguration.class);
@@ -116,9 +126,9 @@ public class MmsClientConfiguration {
                 } else if (ite.getCause() instanceof Error) {
                     throw (Error) ite.getCause();
                 }
-                throw new RuntimeException("Could not create a valid connection", ite.getCause());
+                throw new RuntimeException("Could not create a client", ite.getCause());
             }
-            throw new RuntimeException("Could not create a valid connection", e);
+            throw new RuntimeException("Could not create a client", e);
         }
         if (autoConnect) {
             client.connection().enable();
@@ -132,7 +142,7 @@ public class MmsClientConfiguration {
     }
 
     public String getHost() {
-        return nodes;
+        return host;
     }
 
     /**
@@ -142,6 +152,9 @@ public class MmsClientConfiguration {
         return id;
     }
 
+    public boolean useBinary() {
+        return MmsWireProtocol.USE_BINARY;
+    }
 
     /**
      * @param unit
@@ -188,12 +201,12 @@ public class MmsClientConfiguration {
     }
 
     public MmsClientConfiguration setHost(String host) {
-        this.nodes = requireNonNull(host);
+        this.host = requireNonNull(host);
         return this;
     }
 
     public MmsClientConfiguration setHost(Environment environment) {
-        this.nodes = requireNonNull(environment.mmsServerURL());
+        this.host = requireNonNull(environment.mmsServerURL());
         return this;
     }
 

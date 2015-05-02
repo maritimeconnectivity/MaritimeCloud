@@ -14,9 +14,27 @@
  */
 package net.maritimecloud.mms.server;
 
+import static java.util.Objects.requireNonNull;
+
+import java.util.concurrent.Executors;
+
 import net.maritimecloud.core.id.ServerId;
+import net.maritimecloud.mms.server.broadcast.ServerBroadcastManager;
+import net.maritimecloud.mms.server.connection.client.ClientManager;
+import net.maritimecloud.mms.server.connection.client.ClientReaper;
+import net.maritimecloud.mms.server.connection.client.DefaultTransportListener;
+import net.maritimecloud.mms.server.endpoints.ServerEndpointManager;
+import net.maritimecloud.mms.server.endpoints.ServerServices;
+import net.maritimecloud.mms.server.rest.WebServer;
+import net.maritimecloud.mms.server.tracker.PositionTracker;
+
+import org.cakeframework.container.spi.AbstractContainerConfiguration;
+import org.cakeframework.container.spi.ContainerComposer;
+import org.cakeframework.container.spi.ContainerFactory;
+import org.cakeframework.util.properties.Property;
 
 import com.beust.jcommander.Parameter;
+import com.codahale.metrics.MetricRegistry;
 
 /**
  *
@@ -181,5 +199,57 @@ public class MmsServerConfiguration {
     public MmsServerConfiguration setWebserverPort(int webserverport) {
         this.webserverport = webserverport;
         return this;
+    }
+
+    /**
+     * Creates a new instance of this class.
+     *
+     * @param configuration
+     *            the configuration
+     */
+    public MmsServer build() {
+        MyConfiguration conf = new MyConfiguration();
+
+        conf.withThreads().addPool(Executors.newFixedThreadPool(5));
+        conf.addService(this);
+        conf.addService(requireNonNull(getId()));
+
+        conf.addService(ClientManager.class);
+        conf.addService(ClientReaper.class);
+        conf.addService(DefaultTransportListener.class);
+
+        conf.addService(new ServerEventListener() {});
+
+        conf.addService(PositionTracker.class);
+        conf.addService(WebSocketServer.class);
+
+        conf.addService(ServerServices.class);
+        conf.addService(MmsServerConnectionBus.class);
+        conf.addService(ServerBroadcastManager.class);
+        conf.addService(ServerEndpointManager.class);
+        if (getWebserverPort() > 0) {
+            conf.addService(WebServer.class);
+        }
+        conf.addService(MetricRegistry.class);
+        return conf.create();
+    }
+
+
+    public static class MyConfiguration extends AbstractContainerConfiguration<MmsServer> {
+        static final Property<?> FACTORY = Property.create("cake.container.factory",
+                MmsServerConfiguration.class.getCanonicalName() + "$Factory", Class.class, "Container");
+
+        MyConfiguration() {
+            super(FACTORY);
+        }
+    }
+
+    public static class Factory extends ContainerFactory<MmsServer, MyConfiguration> {
+
+        /** {@inheritDoc} */
+        @Override
+        public MmsServer create(MyConfiguration configuration, ContainerComposer composer) {
+            return new MmsServer(configuration, composer);
+        }
     }
 }

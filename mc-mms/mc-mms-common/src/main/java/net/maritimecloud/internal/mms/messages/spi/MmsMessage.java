@@ -29,10 +29,10 @@ import net.maritimecloud.internal.net.messages.Broadcast;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageSerializer;
 import net.maritimecloud.net.BroadcastMessage;
-import net.maritimecloud.util.geometry.PositionTime;
 
 /**
- *
+ * This class is a bit of mess, will be cleaned up a later point.
+ * 
  * @author Kasper Nielsen
  */
 public class MmsMessage {
@@ -49,15 +49,8 @@ public class MmsMessage {
     /** Flags if the message has be sent or received */
     boolean inbound;
 
-    /** Flags if the message was communicated in a binary (Protobuf) format rather than text (json) */
-    boolean binary;
-
     public MmsMessage() {
 
-    }
-
-    public PositionTime getPositionTime() {
-        throw new UnsupportedOperationException();
     }
 
     public MmsMessage(Message m) {
@@ -191,7 +184,6 @@ public class MmsMessage {
 
         Message tm = MessageSerializer.readFromJSON(p, msg);
         pm.m = tm;
-        pm.binary = false;
         return pm;
     }
 
@@ -233,7 +225,6 @@ public class MmsMessage {
             }
             pm.m = bmr.readMessage(4, null, MmsMessageType.getParser(type));
         }
-        pm.binary = true;
         return pm;
     }
 
@@ -260,13 +251,5 @@ public class MmsMessage {
 
     public void setInbound(boolean inbound) {
         this.inbound = inbound;
-    }
-
-    public boolean isBinary() {
-        return binary;
-    }
-
-    public void setBinary(boolean binary) {
-        this.binary = binary;
     }
 }

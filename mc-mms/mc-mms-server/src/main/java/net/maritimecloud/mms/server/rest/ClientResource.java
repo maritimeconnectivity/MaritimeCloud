@@ -18,7 +18,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
 import net.maritimecloud.message.Message;
-import net.maritimecloud.mms.server.connection.client.OldClientManager;
+import net.maritimecloud.mms.server.connection.client.ClientManager;
 
 
 /**
@@ -28,15 +28,15 @@ import net.maritimecloud.mms.server.connection.client.OldClientManager;
 
 @Path("/clients")
 public class ClientResource {
-    final OldClientManager tm;
+    final ClientManagerStatistics cms;
 
-    public ClientResource(OldClientManager tm) {
-        this.tm = tm;
+    public ClientResource(ClientManager tm) {
+        cms = new ClientManagerStatistics(tm);
     }
 
     @GET
     @Path("/list")
     public Message list2() {
-        return tm.statistics().getAllClients();
+        return cms.getAllClients();
     }
 }

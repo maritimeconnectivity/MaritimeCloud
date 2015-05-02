@@ -12,9 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.net.mms;
+package net.maritimecloud.internal.mms.client.connection.session;
 
 import java.util.concurrent.TimeUnit;
+
+import net.maritimecloud.net.mms.MmsClient;
+import net.maritimecloud.net.mms.MmsClientConfiguration;
 
 
 /**

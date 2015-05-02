@@ -45,7 +45,7 @@ import net.maritimecloud.message.MessageSerializer;
 public class TesstEndpoint {
     int connectIdCount;
 
-    public BlockingQueue<MmsMessage> m = new SynchronousQueue<>();
+    private BlockingQueue<MmsMessage> m = new SynchronousQueue<>();
 
     boolean queueEnabled = true;
 
@@ -58,6 +58,7 @@ public class TesstEndpoint {
     public void close() throws IOException {
         session.close(new CloseReason(CloseReason.CloseCodes.UNEXPECTED_CONDITION, "suckit"));
     }
+
     public CloseReason awaitClosed() {
         try {
             closed.await(5, TimeUnit.SECONDS);
@@ -66,6 +67,7 @@ public class TesstEndpoint {
         }
         return closeReason;
     }
+
     @OnClose
     public final void onClose(CloseReason reason) {
         closeReason = reason;
@@ -74,7 +76,7 @@ public class TesstEndpoint {
 
     @OnMessage
     public final void onTextMessageReceived(String msg) throws InterruptedException {
-        System.out.println("TEST: Received text: " + msg);
+        System.out.println("TEST Client [" + "]: Received text: " + msg);
         MmsMessage tm = MmsMessage.parseTextMessage(msg);
         // System.out.println("GOT " + tm);
         m.put(tm);
@@ -149,5 +151,9 @@ public class TesstEndpoint {
 
     public <T extends Message> T take(Class<T> c) throws InterruptedException {
         return requireNonNull(c.cast(m.poll(5, TimeUnit.SECONDS).getM()));
+    }
+
+    public MmsMessage take() throws InterruptedException {
+        return requireNonNull(m.poll(5, TimeUnit.SECONDS));
     }
 }

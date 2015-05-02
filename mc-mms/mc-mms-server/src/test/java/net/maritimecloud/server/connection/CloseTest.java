@@ -14,10 +14,6 @@
  */
 package net.maritimecloud.server.connection;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import net.maritimecloud.internal.mms.messages.Connected;
-import net.maritimecloud.mms.server.connection.client.OldClientManager;
 import net.maritimecloud.server.AbstractServerConnectionTest;
 import net.maritimecloud.server.TesstEndpoint;
 
@@ -36,11 +32,6 @@ public class CloseTest extends AbstractServerConnectionTest {
         TesstEndpoint t = newClient(ID4);
 
         t.close();
-        Connected cm = t.take(Connected.class);
-        assertNotNull(cm.getSessionId());
-        assertEquals(0, cm.getLastReceivedMessageId().longValue());
-
-        assertNotNull(server.getService(OldClientManager.class).get(ID2));
     }
 
 }

@@ -15,57 +15,63 @@
 package net.maritimecloud.net;
 
 /**
+ * The default environments that are hosted by the Maritime Cloud Foundation.
  *
  * @author Kasper Nielsen
  */
 public abstract class Environment {
-    // Client Trust
 
-    /** The default sandbox environment. */
+    /** The default domain. */
+    private static final String DOMAIN = ".maritimecloud.net";
+
+    /** The default sandbox environment (unencrypted). */
     public static final Environment SANDBOX = new Environment() {
+
+        /** {@inheritDoc} */
         @Override
         public String mmsServerURL() {
             // TODO replace with ws://mms.sandbox03.maritimecloud.net"
-            return "ws://mms03.maritimecloud.net";
+            return "ws://mms03" + DOMAIN;
         }
     };
 
-    /** The default sandbox environment. */
-    public static final Environment SANDBOX_NO_ENCRYPTION = new Environment() {
+    /** The default sandbox environment (encrypted). */
+    public static final Environment SANDBOX_ENCRYPTED = new Environment() {
+
+        /** {@inheritDoc} */
         @Override
         public String mmsServerURL() {
-            // TODO replace with ws://mms.sandbox03.maritimecloud.net"
-            return "ws://mms03.maritimecloud.net";
+            return "wss://mms.sandbox03" + DOMAIN;
         }
     };
 
-    /** The default test environment. */
+    /** The default test environment (encrypted). */
     public static final Environment TEST = new Environment() {
-        public boolean isEncrypted() {
-            return true;
-        }
 
+        /** {@inheritDoc} */
         @Override
         public String mmsServerURL() {
-            return "wss://mms.test03.maritimecloud.net";
+            return "wss://mms.test03" + DOMAIN;
         }
     };
 
-    // package private for now
+    // package private for now, we might allow others to construct an environment at some point.
+    // Otherwise we should convert this class to an enum.
     Environment() {}
 
     /**
-     * Returns whether or not the communication with the MMS server is encrypted
+     * Returns whether or not the communication with the MMS server is encrypted.
      *
      * @return whether or not the communication with the MMS server is encrypted
      */
-    public boolean isEncrypted() {
-        return false;
+    public final boolean isEncrypted() {
+        return mmsServerURL().startsWith("wss");
     }
 
+    /**
+     * Returns the url at which the Maritime Messaging Service is located.
+     *
+     * @return the url at which the Maritime Messaging Service is located
+     */
     public abstract String mmsServerURL();
-
-    public boolean useBinaryAsDefault() {
-        return false;
-    }
 }

@@ -35,7 +35,8 @@ import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.mms.messages.services.ClientInfo;
 import net.maritimecloud.mms.server.MmsServer;
 import net.maritimecloud.mms.server.MmsServerConfiguration;
-import net.maritimecloud.mms.server.connection.client.OldClientManager;
+import net.maritimecloud.mms.server.connection.client.ClientManager;
+import net.maritimecloud.mms.server.rest.ClientManagerStatistics;
 import net.maritimecloud.net.mms.MmsClient;
 import net.maritimecloud.net.mms.MmsClientConfiguration;
 import net.maritimecloud.util.geometry.PositionReader;
@@ -180,14 +181,14 @@ public abstract class AbstractNetworkTest {
         MmsServerConfiguration sc = new MmsServerConfiguration();
         if (useProxy) {
             sc.setServerPort(12222);
-            si = new MmsServer(sc);
+            si = sc.build();
             pt = new ProxyTester(new InetSocketAddress(clientPort), new InetSocketAddress(12222));
             pt.start();
         } else {
             sc.setServerPort(clientPort);
-            si = new MmsServer(sc);
+            si = sc.build();
         }
-        si.startBlocking();
+        si.start().join();
     }
 
     @After
@@ -219,8 +220,8 @@ public abstract class AbstractNetworkTest {
     }
 
     public List<ClientInfo> clients(MmsServer server) {
-        OldClientManager ac = server.getService(OldClientManager.class);
-        return ac.statistics().getAllClients().getClients();
+        ClientManager ac = server.getService(ClientManager.class);
+        return new ClientManagerStatistics(ac).getAllClients().getClients();
     }
 
 

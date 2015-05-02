@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.mms.server.connection.clientnew;
+package net.maritimecloud.mms.server.connection.client;
 
 import static java.util.Objects.requireNonNull;
 
@@ -20,13 +20,12 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.maritimecloud.core.id.MaritimeId;
+import net.maritimecloud.core.id.ServerId;
 import net.maritimecloud.internal.mms.messages.Connected;
 import net.maritimecloud.internal.mms.messages.Hello;
 import net.maritimecloud.internal.mms.messages.Welcome;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.message.Message;
-import net.maritimecloud.mms.server.MmsServer;
 import net.maritimecloud.mms.server.connection.transport.ServerTransport;
 import net.maritimecloud.mms.server.connection.transport.ServerTransportListener;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
@@ -35,7 +34,9 @@ import net.maritimecloud.net.mms.MmsConnectionClosingCode;
  *
  * @author Kasper Nielsen
  */
-public class DefaultTransport implements ServerTransportListener {
+public class DefaultTransportListener implements ServerTransportListener {
+
+    static final String ATTACHMENT_CLIENT = "client";
 
     /** The client manager responsible for creating a new client when a hello message is received. */
     private final ClientManager clientManager;
@@ -47,11 +48,11 @@ public class DefaultTransport implements ServerTransportListener {
      * We keep track of clients that have not yet send a hello. This is done in order to be able to close those
      * connections at some point. Otherwise they will be lying around forever, unless the client closes the socket.
      */
-    private final Set<ServerTransport> missingHellos = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    final Set<ServerTransport> missingHellos = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
-    public DefaultTransport(ClientManager clientManager, MmsServer server) {
+    public DefaultTransportListener(ClientManager clientManager, ServerId id) {
         this.clientManager = requireNonNull(clientManager);
-        this.serverId = server.getServerId().toString();
+        this.serverId = id.toString();
     }
 
     /** {@inheritDoc} */
@@ -61,10 +62,10 @@ public class DefaultTransport implements ServerTransportListener {
         // still there so we are just going to remove it to be sure.
         missingHellos.remove(t);
 
-        Object o = t.getAttachment();
-        if (o != null) {
-            ((InternalClient) o).onClose(t, closingCode);
-            t.setAttachment(null); // clear attachment
+        Client client = t.getAttachment(ATTACHMENT_CLIENT, Client.class);
+        if (client != null) {
+            client.onClose(t, closingCode);
+            t.setAttachment(ATTACHMENT_CLIENT, null); // clear attachment
         }
     }
 
@@ -77,16 +78,14 @@ public class DefaultTransport implements ServerTransportListener {
         } else if (m instanceof Connected) {
             t.close(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage("A client must not send a Connected message"));
         } else {
-            Object client = t.getAttachment();
+            Client client = t.getAttachment(ATTACHMENT_CLIENT, Client.class);
             if (client == null) {
                 if (m instanceof Hello) {
-                    Hello h = (Hello) m;
+                    Hello hello = (Hello) m;
                     missingHellos.remove(t);
-                    MaritimeId mid = MaritimeId.create(h.getClientId());
-                    String clientId = mid.toString();
-                    InternalClient newClient = clientManager.onHello(clientId, h, t);
+                    Client newClient = clientManager.onHello(hello, t);
                     if (newClient != null) {
-                        t.setAttachment(newClient);
+                        t.setAttachment(ATTACHMENT_CLIENT, newClient);
                     }
                 } else {
                     t.close(MmsConnectionClosingCode.WRONG_MESSAGE
@@ -97,7 +96,7 @@ public class DefaultTransport implements ServerTransportListener {
                 t.close(MmsConnectionClosingCode.WRONG_MESSAGE
                         .withMessage("A client must not send a Hello message more than once"));
             } else {
-                ((InternalClient) client).onMessage(t, message);
+                client.onMessage(t, message);
             }
         }
     }
@@ -105,15 +104,11 @@ public class DefaultTransport implements ServerTransportListener {
     /** {@inheritDoc} */
     @Override
     public void onOpen(ServerTransport t) {
-        // Will only be invoked once
-        ServerTransportListener.super.onOpen(t);
         // send a Welcome message to the client as the first thing
-        MmsMessage hello = new MmsMessage(new Welcome().addProtocolVersion(1).setServerId(serverId)
+        MmsMessage welcome = new MmsMessage(new Welcome().addProtocolVersion(1).setServerId(serverId)
                 .putProperties("implementation", "mmsServer/0.2"));
+        t.sendMessage(welcome);
 
-        // Send hello
-        t.sendMessage(hello);
-
-        missingHellos.add(t);
+        missingHellos.add(t); // add this transport to set of transports waiting for a Hello
     }
 }

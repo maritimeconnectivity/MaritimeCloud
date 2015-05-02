@@ -20,8 +20,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
-import net.maritimecloud.mms.server.connection.client.OldClient;
-import net.maritimecloud.mms.server.connection.client.OldClientManager;
+import net.maritimecloud.mms.server.connection.client.Client;
+import net.maritimecloud.mms.server.connection.client.ClientManager;
 import net.maritimecloud.util.geometry.Area;
 import net.maritimecloud.util.geometry.Circle;
 import net.maritimecloud.util.geometry.PositionTime;
@@ -41,14 +41,14 @@ public class PositionTracker {
     static final int THRESHOLD = 1;
 
     /** All targets at last update. Must be read via synchronized */
-    private ConcurrentHashMap<OldClient, PositionTime> latest = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Client, PositionTime> latest = new ConcurrentHashMap<>();
 
     /** All current subscriptions. */
     final ConcurrentHashMap<PositionUpdatedHandler, Subscription> subscriptions = new ConcurrentHashMap<>();
 
-    private final OldClientManager clientManager;
+    private final ClientManager clientManager;
 
-    public PositionTracker(OldClientManager clientManager) {
+    public PositionTracker(ClientManager clientManager) {
         this.clientManager = requireNonNull(clientManager);
     }
 
@@ -72,14 +72,14 @@ public class PositionTracker {
 
     /** Should be scheduled to run every x second to update handlers. */
     private void doRun0() {
-        ConcurrentHashMap<OldClient, PositionTime> current = new ConcurrentHashMap<>();
-        final Map<OldClient, PositionTime> latest = this.latest;
+        ConcurrentHashMap<Client, PositionTime> current = new ConcurrentHashMap<>();
+        final Map<Client, PositionTime> latest = this.latest;
 
         // We only want to process those that have been updated since last time
-        final ConcurrentHashMap<OldClient, PositionTime> updates = new ConcurrentHashMap<>();
+        final ConcurrentHashMap<Client, PositionTime> updates = new ConcurrentHashMap<>();
         clientManager.forEach(pt -> {
             PositionTime p = latest.get(pt);
-            PositionTime currentPt = pt.getLatestPosition();
+            PositionTime currentPt = pt.getLatestPositionAndTime();
             if (p == null || !p.positionEquals(currentPt)) {
                 updates.put(pt, currentPt);
             }
@@ -99,11 +99,11 @@ public class PositionTracker {
      * @param block
      *            the callback
      */
-    public void forEachWithinArea(Area shape, BiConsumer<OldClient, PositionTime> block) {
+    public void forEachWithinArea(Area shape, BiConsumer<Client, PositionTime> block) {
         requireNonNull(shape, "shape is null");
         requireNonNull(block, "block is null");
         clientManager.forEach(c -> {
-            PositionTime pt = c.getLatestPosition();
+            PositionTime pt = c.getLatestPositionAndTime();
             if (shape.contains(pt)) {
                 block.accept(c, pt);
             }
@@ -126,8 +126,8 @@ public class PositionTracker {
      *            the area of interest
      * @return a map of all tracked objects within the area as keys and their latest position as the value
      */
-    public Map<OldClient, PositionTime> getTargetsWithin(Area shape) {
-        final ConcurrentHashMap<OldClient, PositionTime> result = new ConcurrentHashMap<>();
+    public Map<Client, PositionTime> getTargetsWithin(Area shape) {
+        final ConcurrentHashMap<Client, PositionTime> result = new ConcurrentHashMap<>();
         forEachWithinArea(shape, (a, b) -> {
             if (shape.contains(b)) {
                 result.put(a, b);
@@ -136,7 +136,7 @@ public class PositionTracker {
         return result;
     }
 
-    public boolean remove(OldClient t) {
+    public boolean remove(Client t) {
         return latest.remove(t) != null;
     }
 

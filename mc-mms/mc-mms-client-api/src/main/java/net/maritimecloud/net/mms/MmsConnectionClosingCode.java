@@ -37,6 +37,9 @@ public final class MmsConnectionClosingCode implements Serializable {
      */
     public static final MmsConnectionClosingCode BAD_DATA = new MmsConnectionClosingCode(1003, "Bad data");
 
+
+    public static final MmsConnectionClosingCode INTERNAL_ERROR = new MmsConnectionClosingCode(4109, "Internal Error");
+
     /**
      * Another client connected with the same identify. Only one client can be connected with the same id. Whenever a
      * new client connects with the same identify as a client that is already connected. The connection to the existing

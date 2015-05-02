@@ -14,24 +14,19 @@
    See the License for the specific language governing permissions and 
    limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  
+
   <parent>
     <groupId>net.maritimecloud.mms</groupId>
     <artifactId>mc-mms-parent</artifactId>
     <version>0.3-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  
+
   <artifactId>mc-mms-server</artifactId>
   <name>MaritimeCloud MMS Server</name>
-
-    <properties>
-        <dependencies.metrics.version>3.1.1</dependencies.metrics.version>
-    </properties>
 
   <dependencies>
     <dependency>
@@ -55,23 +50,23 @@
       <version>${dependencies.slf4j.version}</version>
       <scope>test</scope>
     </dependency>
-    
- <dependency>
+
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>mc-mms-client-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-<dependency>
-    <groupId>org.cakeframework</groupId>
-    <artifactId>cake-container</artifactId>
-    <version>0.8-SNAPSHOT</version>
-</dependency>
-   <dependency>
-       <groupId>${project.groupId}</groupId>
-       <artifactId>mc-mms-common</artifactId>
-       <version>${project.version}</version>
+    <dependency>
+      <groupId>org.cakeframework</groupId>
+      <artifactId>cake-container</artifactId>
+      <version>0.8-SNAPSHOT</version>
     </dependency>
-  
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mc-mms-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>net.maritimecloud.mms</groupId>
       <artifactId>mc-mms-client-impl</artifactId>
@@ -79,23 +74,23 @@
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-servlet</artifactId>
       <version>${dependencies.jetty.version}</version>
     </dependency>
     <dependency>
-    <groupId>org.eclipse.jetty</groupId>
-    <artifactId>jetty-jmx</artifactId>
-    <version>${dependencies.jetty.version}</version>
-</dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-jmx</artifactId>
+      <version>${dependencies.jetty.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.eclipse.jetty.websocket</groupId>
       <artifactId>javax-websocket-server-impl</artifactId>
       <version>${dependencies.jetty.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.glassfish.jersey.containers</groupId>
       <artifactId>jersey-container-servlet</artifactId>
@@ -127,17 +122,12 @@
         </exclusion>
       </exclusions>
     </dependency>
-    
+
     <dependency>
       <groupId>javax.ws.rs</groupId>
       <artifactId>javax.ws.rs-api</artifactId>
       <version>2.0</version>
     </dependency>
-<dependency>
-    <groupId>org.cakeframework</groupId>
-    <artifactId>cake-container</artifactId>
-    <version>0.8-SNAPSHOT</version>
-</dependency>
     <dependency>
       <groupId>javax.inject</groupId>
       <artifactId>javax.inject</artifactId>
@@ -149,15 +139,15 @@
       <version>1.1.0.Final</version>
     </dependency>
 
-      <!-- Metrics -->
-      <dependency>
-          <groupId>io.dropwizard.metrics</groupId>
-          <artifactId>metrics-core</artifactId>
-          <version>${dependencies.metrics.version}</version>
-      </dependency>
+    <!-- Metrics -->
+    <dependency>
+      <groupId>io.dropwizard.metrics</groupId>
+      <artifactId>metrics-core</artifactId>
+      <version>${dependencies.metrics.version}</version>
+    </dependency>
 
   </dependencies>
-  
+
   <build>
     <plugins>
       <plugin>

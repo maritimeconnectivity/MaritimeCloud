@@ -14,6 +14,9 @@
  */
 package net.maritimecloud.internal.mms.client.connection.transport;
 
+import static net.maritimecloud.internal.util.ClassUtil.classExists;
+import net.maritimecloud.internal.mms.transport.MmsWireProtocol;
+import net.maritimecloud.message.MessageFormatType;
 import net.maritimecloud.net.mms.MmsConnection;
 
 /**
@@ -25,19 +28,21 @@ import net.maritimecloud.net.mms.MmsConnection;
 @SuppressWarnings("unchecked")
 public abstract class ClientTransportFactory {
 
+    /** The client transport factory we will use for creating new client transports. */
     static final Class<? extends ClientTransportFactory> FACTORY;
 
-    static final String PREFIX = ClientTransportFactory.class.getCanonicalName();
-
     static {
+        String PACKAGE_PREFIX = ClientTransportFactory.class.getCanonicalName();
+
         final String name;
-        if (classExists(PREFIX + "AndroidNotImplementedYet")) {
-            name = PREFIX + "AndroidNotImplementedYet";
+        if (classExists(PACKAGE_PREFIX + "AndroidNotImplementedYet")) {
+            name = PACKAGE_PREFIX + "AndroidNotImplementedYet";
         } else if (classExists("org.eclipse.jetty.websocket.jsr356.ClientContainer")) {
-            name = PREFIX + "Jetty";
+            name = PACKAGE_PREFIX + "Jetty";
         } else {
-            name = PREFIX + "Jsr356";
+            name = PACKAGE_PREFIX + "Jsr356";
         }
+
         try {
             FACTORY = (Class<? extends ClientTransportFactory>) Class.forName(name);
         } catch (ClassNotFoundException e) {
@@ -48,21 +53,29 @@ public abstract class ClientTransportFactory {
     /**
      * Creates a new transport
      *
-     * @param transportListener the transport listener
-     * @param connectionListener the connection listener
+     * @param transportListener
+     *            the transport listener
+     * @param connectionListener
+     *            the connection listener
      * @return the transport
      */
-    public abstract ClientTransport create(ClientTransportListener transportListener,
-            MmsConnection.Listener connectionListener);
-
-    static boolean classExists(String className) {
-        try {
-            Class.forName(className);
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
+    public final ClientTransport create(ClientTransportListener transportListener,
+            MmsConnection.Listener connectionListener) {
+        return create(MmsWireProtocol.USE_BINARY ? MessageFormatType.MACHINE_READABLE
+                : MessageFormatType.HUMAN_READABLE, transportListener, connectionListener);
     }
+
+    /**
+     * Creates a new transport
+     *
+     * @param transportListener
+     *            the transport listener
+     * @param connectionListener
+     *            the connection listener
+     * @return the transport
+     */
+    public abstract ClientTransport create(MessageFormatType messageFormatType,
+            ClientTransportListener transportListener, MmsConnection.Listener connectionListener);
 
     /**
      * Creates a new connection transport factory.

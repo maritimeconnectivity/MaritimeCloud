@@ -32,7 +32,7 @@
   <dependencies>
   <!-- Available from https://github.com/MaritimeCloud/Contributors/tree/master/bootstrap  -->
   <!-- We keep dependencies in the core to a minimum. So please don't add anything unless necessary. -->
-  <!-- Test dependencies are of course okay -->
+  <!-- Test dependencies are okay -->
     <dependency>
       <groupId>net.maritimecloud.3rdparty</groupId>
       <artifactId>org.glassfish.javax.json</artifactId>

@@ -12,22 +12,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.mms.server.connection.clientnew;
+package net.maritimecloud.mms.server.connection.client;
 
 import static java.util.Objects.requireNonNull;
+import net.maritimecloud.mms.server.connection.client.Client.State;
 import net.maritimecloud.mms.server.connection.transport.ServerTransport;
 
 /**
- * For example, because of a failure, of if the client is switching from 3g to XX.
  *
  * @author Kasper Nielsen
  */
-public class InternalStateDisconnected extends InternalState {
+class ClientInternalState {
+
+    static final ClientInternalState TERMINATED = new ClientInternalState(State.TERMINATED, null, null);
+
+    final ServerTransport transport;
+
     final Session session;
 
-    InternalStateDisconnected(ServerTransport transport, Session session) {
-        super(transport);
-        this.session = requireNonNull(session);
-    }
+    final Client.State state;
 
+    /**
+     * @param transport
+     */
+    ClientInternalState(Client.State state, ServerTransport transport, Session session) {
+        this.state = requireNonNull(state);
+        this.transport = transport;
+        this.session = session;
+    }
 }

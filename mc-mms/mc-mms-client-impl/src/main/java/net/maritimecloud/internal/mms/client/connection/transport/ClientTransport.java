@@ -36,16 +36,19 @@ public abstract class ClientTransport {
     /** The logger. */
     private static final Logger LOGGER = Logger.get(ClientTransport.class);
 
-    /** The listener of transport events. */
-    final ClientTransportListener transportListener;
-
     /** A listener for changes to the connection */
     final MmsConnection.Listener connectionListener;
 
+    /** The listener of transport events. */
+    final ClientTransportListener transportListener;
+
     /**
-     * Constructor
-     * @param transportListener the transport listener
-     * @param connectionListener the connection listener
+     * Creates a new ClientTransport
+     *
+     * @param transportListener
+     *            the transport listener
+     * @param connectionListener
+     *            the connection listener
      */
     protected ClientTransport(ClientTransportListener transportListener, MmsConnection.Listener connectionListener) {
         this.transportListener = requireNonNull(transportListener);
@@ -53,7 +56,15 @@ public abstract class ClientTransport {
     }
 
     /**
-     * Tries to connect to the specified URI with a timeout of 20 seconds.
+     * Closes the transport with the specified closing code
+     *
+     * @param closingCode
+     *            the closing code
+     */
+    public abstract void closeTransport(MmsConnectionClosingCode closingCode);
+
+    /**
+     * Tries to connect (blockingly) to the specified URI with a timeout of 20 seconds.
      *
      * @param uri
      *            the URI to connect to
@@ -66,40 +77,19 @@ public abstract class ClientTransport {
 
     public abstract void connectBlocking(URI uri, long time, TimeUnit unit) throws IOException;
 
-    public abstract void closeTransport(MmsConnectionClosingCode reason);
-
-    /**
-     * Called when a text message is received over the wire
-     *
-     * @param textMessage the text message
-     */
-    void onTextMessage(String textMessage) {
-        MmsMessage msg;
-        connectionListener.textMessageReceived(textMessage);
-        try {
-            msg = MmsMessage.parseTextMessage(textMessage);
-            msg.setInbound(true);
-            msg.setBinary(false);
-        } catch (Exception e) {
-            LOGGER.error("Failed to parse incoming text message", e);
-            closeTransport(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage(e.getMessage()));
-            return;
-        }
-        transportListener.onMessageReceived(msg);
-    }
-
     /**
      * Called when a binary message is received over the wire
      *
-     * @param binaryMessage the text message
+     * @param binaryMessage
+     *            the text message
      */
     void onBinaryMessage(byte[] binaryMessage) {
-        MmsMessage msg;
         connectionListener.binaryMessageReceived(binaryMessage);
+
+        MmsMessage msg;
         try {
             msg = MmsMessage.parseBinaryMessage(binaryMessage);
             msg.setInbound(true);
-            msg.setBinary(true);
         } catch (Exception e) {
             LOGGER.error("Failed to parse incoming binary message", e);
             closeTransport(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage(e.getMessage()));
@@ -109,9 +99,31 @@ public abstract class ClientTransport {
     }
 
     /**
-     * Send the specified message with the transport.
+     * Called when a text message is received over the wire
      *
-     * @param message the message to send
+     * @param textMessage
+     *            the text message
+     */
+    void onTextMessage(String textMessage) {
+        connectionListener.textMessageReceived(textMessage);
+
+        MmsMessage msg;
+        try {
+            msg = MmsMessage.parseTextMessage(textMessage);
+            msg.setInbound(true);
+        } catch (Exception e) {
+            LOGGER.error("Failed to parse incoming text message", e);
+            closeTransport(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage(e.getMessage()));
+            return;
+        }
+        transportListener.onMessageReceived(msg);
+    }
+
+    /**
+     * Sends the specified message.
+     *
+     * @param message
+     *            the message to send
      */
     public abstract void sendMessage(MmsMessage message);
 }

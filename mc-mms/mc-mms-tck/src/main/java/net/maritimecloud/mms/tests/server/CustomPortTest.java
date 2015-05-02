@@ -35,8 +35,8 @@ public class CustomPortTest {
     public void testNonDefaultPort() throws Exception {
         MmsServerConfiguration sc = new MmsServerConfiguration();
         sc.setServerPort(12445);
-        MmsServer server = new MmsServer(sc);
-        server.startBlocking();
+        MmsServer server = sc.build();
+        server.start().join();
         MmsClientConfiguration b = MmsClientConfiguration.create("mmsi:1234");
         b.setHost("localhost:12445");
         System.out.println("a");

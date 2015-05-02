@@ -14,7 +14,9 @@
  */
 package net.maritimecloud.internal.mms.client.connection.transport;
 
+import net.maritimecloud.message.MessageFormatType;
 import net.maritimecloud.net.mms.MmsConnection;
+
 import org.cakeframework.container.lifecycle.RunOnStart;
 import org.cakeframework.container.lifecycle.RunOnStop;
 import org.eclipse.jetty.websocket.jsr356.ClientContainer;
@@ -26,18 +28,14 @@ import org.eclipse.jetty.websocket.jsr356.ClientContainer;
  */
 public class ClientTransportFactoryJetty extends ClientTransportFactory {
 
-    static {
-        // Allows us to test wss connections
-        System.setProperty("org.eclipse.jetty.websocket.jsr356.ssl-trust-all", "true");
-    }
-
     /** The single instance of a WebSocketContainer. */
     private final ClientContainer container = new ClientContainer();
 
     /** {@inheritDoc} */
     @Override
-    public ClientTransport create(ClientTransportListener transportListener, MmsConnection.Listener connectionListener) {
-        return new ClientTransportJsr356(transportListener, connectionListener, container);
+    public ClientTransport create(MessageFormatType mft, ClientTransportListener transportListener,
+            MmsConnection.Listener connectionListener) {
+        return new ClientTransportJsr356(mft, transportListener, connectionListener, container);
     }
 
     /**

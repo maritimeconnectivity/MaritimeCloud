@@ -14,7 +14,7 @@
  */
 package net.maritimecloud.mms.server.tracker;
 
-import net.maritimecloud.mms.server.connection.client.OldClient;
+import net.maritimecloud.mms.server.connection.client.Client;
 import net.maritimecloud.util.geometry.PositionTime;
 
 /**
@@ -32,7 +32,7 @@ public abstract class PositionUpdatedHandler {
      * @param positiontime
      *            the position and time when entering
      */
-    protected void entering(OldClient t, PositionTime positiontime, EnterReason reasonForEntering) {}
+    protected void entering(Client t, PositionTime positiontime, EnterReason reasonForEntering) {}
 
     /**
      * Invoked whenever a tracked object position is updated.
@@ -44,7 +44,7 @@ public abstract class PositionUpdatedHandler {
      * @param current
      *            the current position (is null if existing the area of interest)
      */
-    protected void updated(OldClient t, PositionTime previous, PositionTime current) {}
+    protected void updated(Client t, PositionTime previous, PositionTime current) {}
 
     /**
      * Invoked whenever an object leaves the area of interest.
@@ -52,7 +52,7 @@ public abstract class PositionUpdatedHandler {
      * @param t
      *            the tracked object
      */
-    protected void exiting(OldClient t, LeaveReason reasonForEntering) {}
+    protected void exiting(Client t, LeaveReason reasonForEntering) {}
 
     public enum EnterReason {
         ENTERED_AREA, CONNECTED;

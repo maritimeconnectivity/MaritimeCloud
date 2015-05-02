@@ -18,7 +18,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.maritimecloud.mms.server.connection.client.OldClient;
+import net.maritimecloud.mms.server.connection.client.Client;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,10 +37,10 @@ public class ServerClientEndpointManager {
     final ConcurrentHashMap<String, String> endpoints = new ConcurrentHashMap<>();
 
     /** The client */
-    final OldClient target;
+    final Client client;
 
-    public ServerClientEndpointManager(OldClient target) {
-        this.target = requireNonNull(target);
+    public ServerClientEndpointManager(Client client) {
+        this.client = requireNonNull(client);
     }
 
     public boolean hasService(String name) {
@@ -53,7 +53,7 @@ public class ServerClientEndpointManager {
     }
 
     public void registerEndpoint(String endpointName) {
-        LOG.debug("Registered remote service " + endpointName + "@" + target.getId());
+        LOG.debug("Registered remote service " + endpointName + "@" + client.getId());
         endpoints.put(endpointName, endpointName);
     }
 }

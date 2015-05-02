@@ -12,25 +12,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.mms.server.connection.clientnew;
-
-import net.maritimecloud.mms.server.connection.transport.ServerTransport;
+package net.maritimecloud.internal.util;
 
 /**
  *
  * @author Kasper Nielsen
  */
-public class InternalState {
+public class ClassUtil {
 
-    final long creationTime = System.nanoTime();
-
-    final ServerTransport transport;
-
-    /**
-     * @param transport
-     */
-    public InternalState(ServerTransport transport) {
-        this.transport = transport;
+    public static boolean classExists(String className) {
+        try {
+            Class.forName(className);
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 
 }

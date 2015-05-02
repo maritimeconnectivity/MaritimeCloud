@@ -22,7 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.maritimecloud.internal.util.concurrent.CustomConcurrentHashMap;
 import net.maritimecloud.internal.util.concurrent.CustomConcurrentHashMap.Strength;
-import net.maritimecloud.mms.server.connectionold.ServerConnection;
+import net.maritimecloud.mms.server.connection.client.Session;
 import net.maritimecloud.util.geometry.Area;
 import net.maritimecloud.util.geometry.Position;
 
@@ -31,12 +31,12 @@ import net.maritimecloud.util.geometry.Position;
  * @author Kasper Nielsen
  */
 class BroadcastSubscriptionSet {
-    final CustomConcurrentHashMap<ServerConnection, CopyOnWriteArrayList<Area>> c = new CustomConcurrentHashMap<>(
-            Strength.weak, Strength.strong);
+    final CustomConcurrentHashMap<Session, CopyOnWriteArrayList<Area>> c = new CustomConcurrentHashMap<>(Strength.weak,
+            Strength.strong);
 
-    Set<ServerConnection> find(Position position) {
-        for (Entry<ServerConnection, CopyOnWriteArrayList<Area>> e : c.entrySet()) {
-            ServerConnection c = e.getKey();
+    Set<Session> find(Position position) {
+        for (Entry<Session, CopyOnWriteArrayList<Area>> e : c.entrySet()) {
+            Session c = e.getKey();
             if (c != null) {
                 // for (Area area : e.getValue()) {}
             }
@@ -44,7 +44,7 @@ class BroadcastSubscriptionSet {
         return null;
     }
 
-    void add(ServerConnection connection, Area a) {
+    void add(Session connection, Area a) {
         requireNonNull(a);
         CopyOnWriteArrayList<Area> l = c.get(connection);
         if (l == null) {

@@ -12,26 +12,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.mms.server.connection.client;
+package net.maritimecloud.mms.server.rest;
 
 import java.util.List;
-import java.util.concurrent.atomic.LongAdder;
 
 import net.maritimecloud.internal.mms.messages.services.AbstractClients;
 import net.maritimecloud.internal.mms.messages.services.ClientInfo;
 import net.maritimecloud.internal.mms.messages.services.ClientList;
+import net.maritimecloud.mms.server.connection.client.Client;
+import net.maritimecloud.mms.server.connection.client.ClientManager;
+import net.maritimecloud.mms.server.connection.client.ClientProperties;
 import net.maritimecloud.net.MessageHeader;
 import net.maritimecloud.util.geometry.PositionTime;
 
 /**
  * This class is just temporary until the server has been properly refactored
- * 
+ *
  * @author Kasper Nielsen
  */
 public class ClientManagerStatistics extends AbstractClients {
-    private final OldClientManager cm;
+    private final ClientManager cm;
 
-    public ClientManagerStatistics(OldClientManager cm) {
+    public ClientManagerStatistics(ClientManager cm) {
         this.cm = cm;
     }
 
@@ -43,16 +45,16 @@ public class ClientManagerStatistics extends AbstractClients {
 
     public ClientList getAllClients() {
         ClientList cl = new ClientList();
-        for (OldClient t : cm) {
+        for (Client t : cm) {
             ClientInfo ci = new ClientInfo();
             ci.setId(t.getId().toString());
-            PositionTime pt = t.getLatestPosition();
+            PositionTime pt = t.getLatestPositionAndTime();
             if (pt != null) {
                 ci.setLastSeen(pt.timestamp());
                 ci.setLatestPosition(pt);
             }
 
-            ClientProperties p = t.getProperties();
+            ClientProperties p = t.getClientProperties();
             ci.setName(p.getName());
             ci.setDescription(p.getDescription());
             ci.setOrganization(p.getOrganization());
@@ -65,12 +67,7 @@ public class ClientManagerStatistics extends AbstractClients {
     /** {@inheritDoc} */
     @Override
     protected Integer getConnectionCount(MessageHeader header) {
-        final LongAdder i = new LongAdder();
-        cm.forEachTarget(t -> {
-            if (t.isConnected()) {
-                i.increment();
-            }
-        });
-        return i.intValue();
+        // maybe filter some stuff
+        return (int) cm.stream().count();
     }
 }

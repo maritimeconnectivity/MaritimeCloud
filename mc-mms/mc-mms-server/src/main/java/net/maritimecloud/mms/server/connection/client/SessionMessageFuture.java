@@ -12,12 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.mms.server.connection.clientnew;
+package net.maritimecloud.mms.server.connection.client;
 
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
+import net.maritimecloud.message.Message;
 
 /**
  *
@@ -31,24 +31,18 @@ public class SessionMessageFuture {
 
     private final CompletableFuture<Void> acked = new CompletableFuture<>();
 
-    final MmsMessage cm;
-
-    volatile boolean isSent;
-
-    long sessionId;
-
-    final UUID uuid = UUID.randomUUID();
-
-
     /** When the future was, and the initial was first attempted to be sent. */
-    final long created = System.nanoTime();
+    final long creationTime = System.nanoTime();
 
-    SessionMessageFuture(MmsMessage cm) {
-        this.cm = cm;
-    }
+    /** The message that should be send, might be null for certain error conditions. */
+    final MmsMessage message;
 
-    public boolean isSent() {
-        return isSent;
+    /** The message id. */
+    final long messageId;
+
+    SessionMessageFuture(MmsMessage cm, long messageId) {
+        this.message = cm;
+        this.messageId = messageId;
     }
 
     /**
@@ -61,19 +55,19 @@ public class SessionMessageFuture {
         return acked;
     }
 
-    public static SessionMessageFuture wrongSession(MmsMessage message) {
+    static SessionMessageFuture notConnected(Message message) {
         return null;
     }
 
-    public static SessionMessageFuture notConnected(MmsMessage message) {
+    static SessionMessageFuture wrongSession(Message message) {
         return null;
-    }
-
-    public enum State {
-        SEND, ACKED, OTHER_SESSION, CLIENT_GONE;
     }
 
     public enum FailToSendReason {
-        OK, SESSION_EXPIRED, NOT_CONNECTED;
+        NOT_CONNECTED, OK, SESSION_EXPIRED;
+    }
+
+    public enum State {
+        ACKED, CLIENT_GONE, OTHER_SESSION, SEND;
     }
 }

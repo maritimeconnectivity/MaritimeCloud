@@ -14,21 +14,20 @@
    See the License for the specific language governing permissions and 
    limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  
+
   <parent>
     <groupId>net.maritimecloud.mms</groupId>
     <artifactId>mc-mms-parent</artifactId>
     <version>0.3-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  
+
   <artifactId>mc-mms-client-impl</artifactId>
   <name>MaritimeCloud MMS Client Implementation</name>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.eclipse.jetty.websocket</groupId>
@@ -59,18 +58,18 @@
       <artifactId>mc-mms-client-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-<dependency>
-    <groupId>org.cakeframework</groupId>
-    <artifactId>cake-container</artifactId>
-    <version>0.8-SNAPSHOT</version>
-</dependency>
-   <dependency>
-       <groupId>${project.groupId}</groupId>
-       <artifactId>mc-mms-common</artifactId>
-       <version>${project.version}</version>
+    <dependency>
+      <groupId>org.cakeframework</groupId>
+      <artifactId>cake-container</artifactId>
+      <version>0.8-SNAPSHOT</version>
     </dependency>
-  
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mc-mms-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
+  
   <build>
     <plugins>
       <plugin>

@@ -16,6 +16,9 @@ package net.maritimecloud.server;
 
 import static org.junit.Assert.assertTrue;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
 import java.net.URI;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ThreadLocalRandom;
@@ -65,10 +68,33 @@ public abstract class AbstractServerConnectionTest {
     @After
     public void after() throws Exception {
         server.shutdown();
+        // Thread.sleep(5000);
+        // System.out.println(crunchifyGenerateThreadDump());
         assertTrue(server.awaitTerminated(5, TimeUnit.SECONDS));
         for (TesstEndpoint te : allClient) {
             te.close();
         }
+    }
+
+    public static String crunchifyGenerateThreadDump() {
+        final StringBuilder dump = new StringBuilder();
+        final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
+        final ThreadInfo[] threadInfos = threadMXBean.getThreadInfo(threadMXBean.getAllThreadIds(), 100);
+        for (ThreadInfo threadInfo : threadInfos) {
+            dump.append('"');
+            dump.append(threadInfo.getThreadName());
+            dump.append("\" ");
+            final Thread.State state = threadInfo.getThreadState();
+            dump.append("\n   java.lang.Thread.State: ");
+            dump.append(state);
+            final StackTraceElement[] stackTraceElements = threadInfo.getStackTrace();
+            for (final StackTraceElement stackTraceElement : stackTraceElements) {
+                dump.append("\n        at ");
+                dump.append(stackTraceElement);
+            }
+            dump.append("\n\n");
+        }
+        return dump.toString();
     }
 
     @Before
@@ -76,16 +102,25 @@ public abstract class AbstractServerConnectionTest {
         clientPort = ThreadLocalRandom.current().nextInt(40000, 50000);
         MmsServerConfiguration sc = new MmsServerConfiguration();
         sc.setServerPort(clientPort);
-        server = new MmsServer(sc);
-        server.startBlocking();
+        server = sc.build();
+        server.start().join();
     }
 
     protected TesstEndpoint newClient() throws Exception {
-        WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+
         TesstEndpoint t = new TesstEndpoint();
-        container.connectToServer(t, new URI("ws://localhost:" + clientPort));
+        container().connectToServer(t, new URI("ws://localhost:" + clientPort));
         allClient.add(t);
         return t;
+    }
+
+    WebSocketContainer container;
+
+    synchronized WebSocketContainer container() {
+        if (container == null) {
+            container = ContainerProvider.getWebSocketContainer();
+        }
+        return container;
     }
 
     protected TesstEndpoint newClient(MaritimeId id) throws Exception {
@@ -102,5 +137,6 @@ public abstract class AbstractServerConnectionTest {
         t.take(Connected.class);
         return t;
     }
+
 
 }

@@ -23,14 +23,14 @@ import net.maritimecloud.mms.server.MmsServer;
 import org.junit.Test;
 
 /**
- * 
+ *
  * @author Kasper Nielsen
  */
 public class StartStopServerTest {
 
     @Test
     public void noStart() throws InterruptedException {
-        MmsServer s = new MmsServer(12345);
+        MmsServer s = MmsServer.create(12345);
 
         s.shutdown();
         assertTrue(s.awaitTerminated(10, TimeUnit.SECONDS));
@@ -38,9 +38,9 @@ public class StartStopServerTest {
 
     @Test
     public void start() throws Exception {
-        MmsServer s = new MmsServer(12346);
+        MmsServer s = MmsServer.create(12346);
 
-        s.startBlocking();
+        s.start().join();
 
         s.shutdown();
         assertTrue(s.awaitTerminated(10, TimeUnit.SECONDS));
@@ -48,9 +48,9 @@ public class StartStopServerTest {
 
     @Test
     public void start2() throws Exception {
-        MmsServer s = new MmsServer(12347);
+        MmsServer s = MmsServer.create(12347);
 
-        s.startBlocking();
+        s.start().join();
 
         s.shutdown();
         assertTrue(s.awaitTerminated(10, TimeUnit.SECONDS));

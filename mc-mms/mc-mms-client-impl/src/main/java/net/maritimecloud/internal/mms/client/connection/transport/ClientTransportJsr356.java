@@ -14,12 +14,14 @@
  */
 package net.maritimecloud.internal.mms.client.connection.transport;
 
-import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
-import net.maritimecloud.internal.mms.transport.MmsWireProtocol;
-import net.maritimecloud.internal.util.concurrent.CompletableFuture;
-import net.maritimecloud.internal.util.logging.Logger;
-import net.maritimecloud.net.mms.MmsConnection;
-import net.maritimecloud.net.mms.MmsConnectionClosingCode;
+import static java.util.Objects.requireNonNull;
+
+import java.io.IOException;
+import java.io.InterruptedIOException;
+import java.net.URI;
+import java.nio.ByteBuffer;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
@@ -29,14 +31,13 @@ import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
-import java.io.IOException;
-import java.io.InterruptedIOException;
-import java.net.URI;
-import java.nio.ByteBuffer;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
-import static java.util.Objects.requireNonNull;
+import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
+import net.maritimecloud.internal.util.concurrent.CompletableFuture;
+import net.maritimecloud.internal.util.logging.Logger;
+import net.maritimecloud.message.MessageFormatType;
+import net.maritimecloud.net.mms.MmsConnection;
+import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 
 /**
  * The default implementation of a connection transport.
@@ -47,23 +48,30 @@ import static java.util.Objects.requireNonNull;
 public final class ClientTransportJsr356 extends ClientTransport { // Class must be public to be detected
 
     /** The logger. */
-    static final Logger LOG = Logger.get(ClientTransportJsr356.class);
+    static final Logger LOGGER = Logger.get(ClientTransportJsr356.class);
 
     /** The WebSocket container. */
     private final WebSocketContainer container;
+
+    private final MessageFormatType mft;
 
     /** The WebSocket session object set after having successfully connected. */
     private volatile Session wsSession;
 
     /**
-     * Constructor
-     * @param transportListener the transport listener
-     * @param connectionListener the connection listener
-     * @param container the web-socket container
+     * Creates a new ClientTransportJsr356.
+     *
+     * @param transportListener
+     *            the transport listener
+     * @param connectionListener
+     *            the connection listener
+     * @param container
+     *            the web-socket container
      */
-    ClientTransportJsr356(ClientTransportListener transportListener, MmsConnection.Listener connectionListener,
-            WebSocketContainer container) {
+    ClientTransportJsr356(MessageFormatType mft, ClientTransportListener transportListener,
+            MmsConnection.Listener connectionListener, WebSocketContainer container) {
         super(transportListener, connectionListener);
+        this.mft = requireNonNull(mft);
         this.container = requireNonNull(container);
     }
 
@@ -75,7 +83,7 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
         Thread t = Thread.currentThread();
         cf.orTimeout(time, unit).handle((v, tt) -> {
             if (tt instanceof TimeoutException) {
-                LOG.error("Connect timed out after " + time + " " + unit);
+                LOGGER.error("Connect timed out after " + time + " " + unit);
                 t.interrupt();
             }
             return v;
@@ -105,14 +113,16 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
             try {
                 session.close(cr);
             } catch (Exception e) {
-                LOG.error("Failed to close connection", e);
+                LOGGER.error("Failed to close connection", e);
             }
         }
     }
 
     /**
      * Called when a web socket connection is closed
-     * @param closeReason the close reason
+     *
+     * @param closeReason
+     *            the close reason
      */
     @OnClose
     public void onClose(CloseReason closeReason) {
@@ -151,9 +161,7 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
         Session session = this.wsSession;
         if (session != null) {
             message.setInbound(false);
-            message.setBinary(MmsWireProtocol.USE_BINARY);
-
-            if (message.isBinary()) {
+            if (mft == MessageFormatType.MACHINE_READABLE) {
                 try {
                     byte[] data = message.toBinary();
                     connectionListener.binaryMessageSend(data);

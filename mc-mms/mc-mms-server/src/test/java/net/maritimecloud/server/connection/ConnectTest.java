@@ -104,4 +104,6 @@ public class ConnectTest extends AbstractServerConnectionTest {
         assertEquals(2, mm.getMessageId());
         assertEquals(2, mm.getLatestReceivedId());
     }
+
+
 }

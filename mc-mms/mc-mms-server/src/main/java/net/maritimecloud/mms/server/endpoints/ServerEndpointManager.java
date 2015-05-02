@@ -18,7 +18,7 @@ import java.util.Collections;
 
 import net.maritimecloud.internal.net.endpoint.EndpointManager;
 import net.maritimecloud.internal.net.messages.MethodInvoke;
-import net.maritimecloud.mms.server.connectionold.ServerConnection;
+import net.maritimecloud.mms.server.connection.client.Session;
 import net.maritimecloud.net.EndpointImplementation;
 import net.maritimecloud.net.MessageHeader;
 
@@ -41,11 +41,11 @@ public class ServerEndpointManager extends InstanceofHandler<Container, Endpoint
         em.endpointRegister(context.getInstance());
     }
 
-    public void invokeLocally(ServerConnection con, MethodInvoke i) {
-        em.execute(i, Collections.singletonMap(CONNECTION, con), e -> con.messageSend(e));
+    public void invokeLocally(Session session, MethodInvoke i) {
+        em.execute(i, Collections.singletonMap(CONNECTION, session), e -> session.send(e));
     }
 
-    public static ServerConnection connection(MessageHeader header) {
-        return (ServerConnection) header.context().get(CONNECTION);
+    public static Session connection(MessageHeader header) {
+        return (Session) header.context().get(CONNECTION);
     }
 }

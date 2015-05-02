@@ -12,13 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.maritimecloud.mms.server.connectionold;
+package net.maritimecloud.mms.server;
 
 import static java.util.Objects.requireNonNull;
-
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricRegistry;
-
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.mms.messages.PositionReport;
 import net.maritimecloud.internal.net.messages.Broadcast;
@@ -26,29 +22,36 @@ import net.maritimecloud.internal.net.messages.MethodInvoke;
 import net.maritimecloud.internal.net.messages.MethodInvokeResult;
 import net.maritimecloud.message.Message;
 import net.maritimecloud.mms.server.broadcast.ServerBroadcastManager;
-import net.maritimecloud.mms.server.connection.client.OldClient;
-import net.maritimecloud.mms.server.connection.client.OldClientManager;
+import net.maritimecloud.mms.server.connection.client.Client;
+import net.maritimecloud.mms.server.connection.client.ClientManager;
+import net.maritimecloud.mms.server.connection.client.Session;
+import net.maritimecloud.mms.server.connection.client.SessionMessageFuture;
 import net.maritimecloud.mms.server.endpoints.ServerEndpointManager;
+
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
 
 /**
  *
  * @author Kasper Nielsen
  */
-public class MmsServerConnectionBus {
+public class MmsServerConnectionBus implements Session.Listener {
 
     ServerBroadcastManager sbm;
 
-    final OldClientManager tm;
+    final ClientManager tm;
 
     final ServerEndpointManager sem;
 
     // Metrics
     final Meter broadcastsMeter;
+
     final Meter methodInvokesMeter;
+
     final Meter positionReportsMeter;
 
 
-    public MmsServerConnectionBus(ServerEndpointManager sem, OldClientManager tm, MetricRegistry metrics) {
+    public MmsServerConnectionBus(ServerEndpointManager sem, ClientManager tm, MetricRegistry metrics) {
         this.tm = requireNonNull(tm);
         this.sem = sem;
 
@@ -58,21 +61,18 @@ public class MmsServerConnectionBus {
         positionReportsMeter = metrics.meter("positionReports");
     }
 
-    public void onBroadcast(ServerConnection connection, Broadcast message) {
+    public void onBroadcast(Session connection, Broadcast message) {
         try {
-            PositionReport srm = sbm.broadcast(connection, message);
-            connection.messageSend(srm);
+            PositionReport srm = sbm.broadcast(connection.getClient(), message);
+            connection.send(srm);
             return;
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void onMessage(ServerConnection connection, Message message) {
-        if (message instanceof PositionReport) {
-            connection.getClient().setLatestPosition(((PositionReport) message).getPositionTime());
-            positionReportsMeter.mark();
-        } else if (message instanceof Broadcast) {
+    public void onMessage(Session connection, Message message) {
+        if (message instanceof Broadcast) {
             onBroadcast(connection, (Broadcast) message);
             broadcastsMeter.mark();
         } else if (message instanceof MethodInvoke) {
@@ -85,24 +85,25 @@ public class MmsServerConnectionBus {
         }
     }
 
-    public void onMethodInvoke(ServerConnection connection, Message m, String receiverId, String senderId) {
+    public void onMethodInvoke(Session connection, Message m, String receiverId, String senderId) {
         if (receiverId == null) {
             if (m instanceof MethodInvoke) {
                 sem.invokeLocally(connection, (MethodInvoke) m);
             }
             return;
         }
-        OldClient t = tm.get(MaritimeId.create(receiverId));
+        Client t = tm.get(MaritimeId.create(receiverId));
         if (t == null) {
             System.err.println("Unknown destination " + receiverId);
             return;
         }
-        ServerConnection sc = t.getActiveConnection();
-        if (sc == null) {
-            System.err.println("Unknown destination " + receiverId);
-            return;
-        }
-        sc.messageSend(m);
+
+        SessionMessageFuture smf = t.send(m);
+        // TODO if client not available.
+        // if (sc == null) {
+        // System.err.println("Unknown destination " + receiverId);
+        // return;
+        // }
     }
 
     public void setBroadcastManager(ServerBroadcastManager sbm) {
