@@ -22,7 +22,8 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
-import java.util.LinkedList;
+import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,7 +37,7 @@ import java.util.concurrent.TimeUnit;
  * @author Kasper Nielsen
  */
 public class ProxyTester {
-    final LinkedList<Connection> connections = new LinkedList<>();
+    final CopyOnWriteArrayList<Connection> connections = new CopyOnWriteArrayList<>();
 
     final SocketAddress proxyAddress;
 
@@ -73,16 +74,23 @@ public class ProxyTester {
             public void run() {
                 for (;;) {
                     try {
-                        pause.await();
+                        // System.out.println("XX");
+                        // pause.await();
+                        // System.out.println("ZZ");
                         final Socket in = ss.accept();
-                        pause.await();
+                        // System.out.println("PP");
+                        // pause.await();
+                        // System.out.println("TT");
                         Socket out = new Socket();
                         out.connect(remoteAddress);
                         Connection con = new Connection(in, out);
                         con.inToOut.start();
                         con.outToIn.start();
+
                         connections.add(con);
+                        // System.out.println("Adding proxy connection " + con);
                     } catch (Throwable t) {
+                        t.printStackTrace();
                         return;
                     }
                 }
@@ -90,16 +98,17 @@ public class ProxyTester {
         });
     }
 
-    public void killLastConnection() {
-        close(connections.pollLast());
-    }
-
-    public void killFirstConnection() {
-        close(connections.pollFirst());
-    }
-
     public void killRandom() {
-        close(connections.remove(ThreadLocalRandom.current().nextInt(connections.size())));
+        while (!connections.isEmpty()) {
+            Connection[] a = connections.toArray(new Connection[connections.size()]);
+            if (a.length > 0) {
+                Connection con = a[ThreadLocalRandom.current().nextInt(a.length)];
+                if (connections.remove(con)) {
+                    close(con);
+                    return;
+                }
+            }
+        }
     }
 
     public Future<?> killRandom(long time, TimeUnit unit) {
@@ -112,10 +121,9 @@ public class ProxyTester {
     }
 
     public void killAll() {
-        for (Connection c : connections) {
-            close(c);
+        while (!connections.isEmpty()) {
+            killRandom();
         }
-        connections.clear();
     }
 
     public void shutdown() throws InterruptedException {
@@ -143,6 +151,7 @@ public class ProxyTester {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            // System.out.println("CLOSING Proxy " + c);
         }
     }
 
@@ -155,20 +164,13 @@ public class ProxyTester {
 
         final Thread outToIn;
 
+        final String id = UUID.randomUUID().toString();
+
         Connection(Socket incoming, Socket outgoing) {
             this.incoming = requireNonNull(incoming);
             this.outgoing = requireNonNull(outgoing);
-            inToOut = new Thread(new Runnable() {
-                public void run() {
-                    inToOut();
-                }
-            });
-            outToIn = new Thread(new Runnable() {
-                public void run() {
-                    outToIn();
-                }
-            });
-
+            this.inToOut = new Thread(() -> inToOut());
+            this.outToIn = new Thread(() -> outToIn());
         }
 
         void inToOut() {
@@ -183,8 +185,20 @@ public class ProxyTester {
                     }
                 } catch (Throwable t) {
                     return;
+                } finally {
+                    try {
+                        // System.out.println("Proxy " + id + " Incoming closed");
+                        incoming.close();
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
                 }
             }
+        }
+
+        public String toString() {
+            return id + " [" + incoming.getLocalPort() + " -> " + outgoing.getPort() + "]";
         }
 
         void outToIn() {
@@ -199,6 +213,14 @@ public class ProxyTester {
                     }
                 } catch (Throwable t) {
                     return;
+                } finally {
+                    try {
+                        // System.out.println("Proxy " + id + " Outgoing closed");
+                        outgoing.close();
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
                 }
             }
         }

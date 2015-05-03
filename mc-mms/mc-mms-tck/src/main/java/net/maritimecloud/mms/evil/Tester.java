@@ -46,6 +46,7 @@ public class Tester {
         for (int i = 0; i < clients.length; i++) {
             MmsClientConfiguration conf = MmsClientConfiguration.create("mmsi:" + i);
             conf.setPositionReader(PositionReader.fixedPosition(PositionTime.create(1, 1, 1)));
+            conf.setHost("localhost");
             clients[i] = conf.build();
             clients[i].endpointRegister(new AbstractTestEndpoint() {
 

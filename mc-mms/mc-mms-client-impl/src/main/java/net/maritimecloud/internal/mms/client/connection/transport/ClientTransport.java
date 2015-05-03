@@ -72,7 +72,7 @@ public abstract class ClientTransport {
      *             if we failed to connect
      */
     public final void connectBlocking(URI uri) throws IOException {
-        connectBlocking(uri, 20, TimeUnit.SECONDS);
+        connectBlocking(uri, 2, TimeUnit.SECONDS);
     }
 
     public abstract void connectBlocking(URI uri, long time, TimeUnit unit) throws IOException;
@@ -96,6 +96,7 @@ public abstract class ClientTransport {
             return;
         }
         transportListener.onMessageReceived(msg);
+
     }
 
     /**
@@ -116,7 +117,11 @@ public abstract class ClientTransport {
             closeTransport(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage(e.getMessage()));
             return;
         }
-        transportListener.onMessageReceived(msg);
+        try {
+            transportListener.onMessageReceived(msg);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**

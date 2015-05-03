@@ -126,7 +126,6 @@ public class Session {
     void listenerOnClose(MmsConnectionClosingCode closingCode) {
         fullyLock();
         try {
-
             if (state instanceof SessionStateConnecting && closingCode.equals(MmsConnectionClosingCode.INVALID_SESSION)) {
                 state = new SessionStateDisconnected(this);
                 listener.onSessionClose(closingCode);

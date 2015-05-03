@@ -126,6 +126,7 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
      */
     @OnClose
     public void onClose(CloseReason closeReason) {
+        LOGGER.info("Socket closed");
         wsSession = null;
         MmsConnectionClosingCode reason = MmsConnectionClosingCode.create(closeReason.getCloseCode().getCode(),
                 closeReason.getReasonPhrase());

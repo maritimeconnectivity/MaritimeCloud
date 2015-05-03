@@ -16,12 +16,20 @@ package net.maritimecloud.internal.mms.client.connection.session;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.AbstractMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+import net.maritimecloud.internal.mms.client.connection.transport.ClientTransport;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.internal.util.concurrent.CompletableFuture;
 import net.maritimecloud.message.Message;
@@ -45,10 +53,27 @@ class SessionSender extends Thread {
     /** Signaled when the state of the connection manager changes. */
     final Condition stateChange = lock.newCondition();
 
+    final Writer writer = new Writer();
+
+    static final Executor e;
+
+    static {
+        e = Executors.newSingleThreadExecutor(new ThreadFactory() {
+
+            @Override
+            public Thread newThread(Runnable r) {
+                Thread t = Executors.defaultThreadFactory().newThread(r);
+                t.setDaemon(true);
+                return t;
+            }
+        });
+    }
+
     SessionSender(Session session) {
         this.session = requireNonNull(session);
         setDaemon(true);
         setName("MMSClient-SessionSender");
+
     }
 
     void completeAll() {
@@ -102,7 +127,7 @@ class SessionSender extends Thread {
                         futures.put(id, new UnAcked(poll, mms));
                         nextMsgId++;
                         mms.setLatestReceivedId(session.latestReceivedId);
-                        ssc.transport.sendMessage(mms);
+                        writer.send(ssc.transport, mms, e);
                     }
                 }
 
@@ -168,6 +193,47 @@ class SessionSender extends Thread {
         Msg(Message message, CompletableFuture<Void> onAck) {
             this.message = requireNonNull(message);
             this.onAck = requireNonNull(onAck);
+        }
+    }
+
+    static class Writer implements Runnable {
+        private final ReentrantLock executorLock = new ReentrantLock();
+
+        private final BlockingQueue<Map.Entry<ClientTransport, MmsMessage>> q = new LinkedBlockingQueue<>();
+
+        /** {@inheritDoc} */
+        public void run() {
+            // We need retry check for extra elements one more time, if we have successfully polled elements
+            // This is because of a rare race condition where
+            // T1[Executor Thread] : q.poll() returns null
+            // T2 : submits an message to be send and queues this runnable, T3 picks it up.
+            // T3[Executor Thread] can not obtain the lock because T1 has not yet released it and returns emptyhanded
+
+            boolean sholdRetry;
+            do {
+                sholdRetry = false;
+                if (executorLock.tryLock()) {
+                    try {
+                        Entry<ClientTransport, MmsMessage> s = q.poll();
+                        while (s != null) {
+                            sholdRetry = true;
+                            try {
+                                s.getKey().sendMessage(s.getValue());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            s = q.poll();
+                        }
+                    } finally {
+                        executorLock.unlock();
+                    }
+                }
+            } while (sholdRetry);
+        }
+
+        void send(ClientTransport transport, MmsMessage message, Executor e) {
+            q.add(new AbstractMap.SimpleImmutableEntry<>(transport, message));
+            e.execute(this);
         }
     }
 }

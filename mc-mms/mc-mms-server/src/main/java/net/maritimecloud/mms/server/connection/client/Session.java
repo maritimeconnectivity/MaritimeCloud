@@ -244,6 +244,5 @@ public class Session {
             q.add(f);
             e.execute(this);
         }
-
     }
 }

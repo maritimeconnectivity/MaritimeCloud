@@ -59,7 +59,10 @@ public abstract class MaritimeId implements Serializable {
             int mmsi = Integer.parseInt(uri.getSchemeSpecificPart());
             return new MmsiId(mmsi);
         }
-        throw new IllegalArgumentException("Unknown schenme " + uri.getScheme());
+        if (uri.getScheme().equals("test")) {
+            return new TestId(uri.getSchemeSpecificPart());
+        }
+        throw new IllegalArgumentException("Unknown scheme " + uri.getScheme());
     }
 
     public abstract String getId();

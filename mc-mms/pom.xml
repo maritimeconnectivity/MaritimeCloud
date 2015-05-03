@@ -34,6 +34,7 @@
     <module>mc-mms-client-api</module>
     <module>mc-mms-client-impl</module>
     <module>mc-mms-server</module>
+    <module>mc-mms-server-monitor</module>
     <module>mc-mms-tck</module>
     <module>distribution</module>
   </modules>

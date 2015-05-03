@@ -32,21 +32,24 @@ public interface ClientTransportListener {
     /**
      * Invoked whenever the transport has been closed. Either remote or locally.
      *
-     * @param closingCode the closing code
+     * @param closingCode
+     *            the closing code
      */
     default void onClose(MmsConnectionClosingCode closingCode) {}
 
     /**
      * Invoked whenever a MMS message has been received.
      *
-     * @param message the message that was received
+     * @param message
+     *            the message that was received
      */
     default void onMessageReceived(MmsMessage message) {}
 
     /**
      * Invoked whenever a MMS message has been sent.
      *
-     * @param message the message that was sent
+     * @param message
+     *            the message that was sent
      */
     default void onMessageSent(MmsMessage message) {}
 }

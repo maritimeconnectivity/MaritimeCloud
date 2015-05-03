@@ -24,7 +24,7 @@ public abstract class Environment {
     /** The default domain. */
     private static final String DOMAIN = ".maritimecloud.net";
 
-    /** The default sandbox environment (unencrypted). */
+    /** The default sandbox environment (unencrypted connection). */
     public static final Environment SANDBOX = new Environment() {
 
         /** {@inheritDoc} */
@@ -35,7 +35,11 @@ public abstract class Environment {
         }
     };
 
-    /** The default sandbox environment (encrypted). */
+    /**
+     * The default sandbox environment (encrypted connection). Even though the connection is encrypted other clients
+     * connected to sandbox environment might not use encryption. So do not transmit any kind of confidential data in
+     * the sandbox environment.
+     */
     public static final Environment SANDBOX_ENCRYPTED = new Environment() {
 
         /** {@inheritDoc} */
@@ -45,7 +49,7 @@ public abstract class Environment {
         }
     };
 
-    /** The default test environment (encrypted). */
+    /** The default test environment (encrypted connection). */
     public static final Environment TEST = new Environment() {
 
         /** {@inheritDoc} */
