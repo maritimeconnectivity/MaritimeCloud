@@ -8,6 +8,7 @@ target
 .idea
 *.iml
 /_old
+mc-mms-server-monitor
 mc-msdl/*.msdl
 mc-msdl/generated
 mc-almanac
