@@ -20,7 +20,7 @@
   <parent>
     <groupId>net.maritimecloud.msdl</groupId>
     <artifactId>mc-msdl-parent</artifactId>
-    <version>0.3-SNAPSHOT</version>
+    <version>0.3-RC1-SNAPSHOT</version>
   </parent>
   
   <artifactId>mc-msdl-core</artifactId>
