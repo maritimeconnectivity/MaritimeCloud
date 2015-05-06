@@ -24,28 +24,27 @@ public abstract class Environment {
     /** The default domain. */
     private static final String DOMAIN = ".maritimecloud.net";
 
-    /** The default sandbox environment (unencrypted connection). */
-    public static final Environment SANDBOX = new Environment() {
-
-        /** {@inheritDoc} */
-        @Override
-        public String mmsServerURL() {
-            // TODO replace with ws://mms.sandbox03.maritimecloud.net"
-            return "ws://mms03" + DOMAIN;
-        }
-    };
-
     /**
      * The default sandbox environment (encrypted connection). Even though the connection is encrypted other clients
      * connected to sandbox environment might not use encryption. So do not transmit any kind of confidential data in
      * the sandbox environment.
      */
-    public static final Environment SANDBOX_ENCRYPTED = new Environment() {
+    public static final Environment SANDBOX = new Environment() {
 
         /** {@inheritDoc} */
         @Override
         public String mmsServerURL() {
-            return "wss://mms.sandbox03" + DOMAIN;
+            return "wss://mms.sandbox03" + DOMAIN + ":443";
+        }
+    };
+
+    /** The default sandbox environment (unencrypted connection). */
+    public static final Environment SANDBOX_UNENCRYPTED = new Environment() {
+
+        /** {@inheritDoc} */
+        @Override
+        public String mmsServerURL() {
+            return "ws://mms03.sandbox03" + DOMAIN + ":80";
         }
     };
 
@@ -55,7 +54,7 @@ public abstract class Environment {
         /** {@inheritDoc} */
         @Override
         public String mmsServerURL() {
-            return "wss://mms.test03" + DOMAIN;
+            return "wss://mms.test03" + DOMAIN + ":443";
         }
     };
 
