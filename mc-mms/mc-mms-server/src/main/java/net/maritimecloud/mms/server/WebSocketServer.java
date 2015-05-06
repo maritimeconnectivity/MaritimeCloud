@@ -99,7 +99,6 @@ public class WebSocketServer {
             SslContextFactory sslContextFactory = new SslContextFactory();
             sslContextFactory.setKeyStorePath(configuration.getKeystore());
             sslContextFactory.setKeyStorePassword(configuration.getKeystorePassword());
-            sslContextFactory.setKeyManagerPassword(configuration.getKeystorePassword());
 
             // HTTPS Configuration
             HttpConfiguration https_config = new HttpConfiguration(http_config);
