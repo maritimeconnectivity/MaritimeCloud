@@ -25,7 +25,9 @@ import net.maritimecloud.internal.mms.messages.Connected;
 import net.maritimecloud.internal.mms.messages.Hello;
 import net.maritimecloud.internal.mms.messages.Welcome;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
+import net.maritimecloud.internal.mms.transport.AccessLogManager;
 import net.maritimecloud.message.Message;
+import net.maritimecloud.message.MessageFormatType;
 import net.maritimecloud.mms.server.connection.transport.ServerTransport;
 import net.maritimecloud.mms.server.connection.transport.ServerTransportListener;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
@@ -44,15 +46,19 @@ public class DefaultTransportListener implements ServerTransportListener {
     /** The id of the server. */
     private final String serverId;
 
+    /** The access log manager */
+    private AccessLogManager accessLogManager;
+
     /**
      * We keep track of clients that have not yet send a hello. This is done in order to be able to close those
      * connections at some point. Otherwise they will be lying around forever, unless the client closes the socket.
      */
     final Set<ServerTransport> missingHellos = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
-    public DefaultTransportListener(ClientManager clientManager, ServerId id) {
+    public DefaultTransportListener(ClientManager clientManager, ServerId id, AccessLogManager accessLogManager) {
         this.clientManager = requireNonNull(clientManager);
         this.serverId = id.toString();
+        this.accessLogManager = requireNonNull(accessLogManager);
     }
 
     /** {@inheritDoc} */
@@ -71,7 +77,9 @@ public class DefaultTransportListener implements ServerTransportListener {
 
     /** {@inheritDoc} */
     @Override
-    public void onMessage(ServerTransport t, MmsMessage message) {
+    public void onMessageReceived(ServerTransport t, MmsMessage message) {
+        updateAccessLog(t, message, true, t.getChannelFormatType());
+
         Message m = message.getM();
         if (m instanceof Welcome) {
             t.close(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage("A client must not send a Welcome message"));
@@ -99,6 +107,29 @@ public class DefaultTransportListener implements ServerTransportListener {
                 client.onMessage(t, message);
             }
         }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void onMessageSent(ServerTransport t, MmsMessage message) {
+        updateAccessLog(t, message, false, t.getChannelFormatType());
+    }
+
+    /**
+     * Updates the access log with the given message
+     * @param t the server transport
+     * @param msg the message
+     * @param inbound inbound or outbound
+     * @param type the message type
+     */
+    private void updateAccessLog(ServerTransport t, MmsMessage msg, boolean inbound, MessageFormatType type) {
+        Client client = t.getAttachment(ATTACHMENT_CLIENT, Client.class);
+        accessLogManager.logMessage(
+                msg,
+                client == null ? null : client.getId(),
+                inbound,
+                type
+        );
     }
 
     /** {@inheritDoc} */

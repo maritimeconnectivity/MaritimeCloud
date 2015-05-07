@@ -25,7 +25,7 @@ import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 public interface ServerTransportListener {
 
     /** Invoked whenever the transport has been successfully opened. */
-    default void onOpen(ServerTransport t) {};
+    default void onOpen(ServerTransport t) {}
 
     /**
      * Invoked whenever a MMS message has been received.
@@ -33,7 +33,15 @@ public interface ServerTransportListener {
      * @param message
      *            the message that as received
      */
-    default void onMessage(ServerTransport t, MmsMessage message) {}
+    default void onMessageReceived(ServerTransport t, MmsMessage message) {}
+
+    /**
+     * Invoked whenever a MMS message has been sent.
+     *
+     * @param message
+     *            the message that was sent
+     */
+    default void onMessageSent(ServerTransport t, MmsMessage message) {}
 
     /**
      * Invoked whenever the transport has been closed. Either remote or locally.

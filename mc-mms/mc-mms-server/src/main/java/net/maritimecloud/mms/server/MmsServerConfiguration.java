@@ -19,6 +19,8 @@ import static java.util.Objects.requireNonNull;
 import java.util.concurrent.Executors;
 
 import net.maritimecloud.core.id.ServerId;
+import net.maritimecloud.internal.mms.transport.AccessLogManager;
+import net.maritimecloud.internal.mms.transport.AccessLogManager.AccessLogConfiguration;
 import net.maritimecloud.mms.server.broadcast.ServerBroadcastManager;
 import net.maritimecloud.mms.server.connection.client.ClientManager;
 import net.maritimecloud.mms.server.connection.client.ClientReaper;
@@ -40,7 +42,7 @@ import com.codahale.metrics.MetricRegistry;
  *
  * @author Kasper Nielsen
  */
-public class MmsServerConfiguration {
+public class MmsServerConfiguration implements AccessLogConfiguration {
 
     /** The default port this server is running on. */
     public static final int DEFAULT_PORT = 43234;
@@ -60,8 +62,8 @@ public class MmsServerConfiguration {
     @Parameter(names = "-keystorePassword", description = "The password of the keystore")
     String keystorePassword = null;
 
-    @Parameter(names = "-accessLogs", description = "The directory to write access logs into")
-    String logRequestDirectory;
+    @Parameter(names = "-accessLog", description = "The file to write access logs to. Use 'stdout' for standard out")
+    String accessLog;
 
     @Parameter(names = "-port", description = "The port to listen for MMS connections on")
     int port = DEFAULT_PORT;
@@ -69,11 +71,11 @@ public class MmsServerConfiguration {
     @Parameter(names = "-requireTLS", description = "if true clients will not be able to connect without TLS")
     boolean requireTLS = false;
 
-    @Parameter(names = "-secureport", description = "The secure port to listen for MMS connections on")
-    int secureport = DEFAULT_SECURE_PORT;
+    @Parameter(names = "-securePort", description = "The secure port to listen for MMS connections on")
+    int securePort = DEFAULT_SECURE_PORT;
 
     @Parameter(names = "-rest", description = "The webserver port for the administrative interface")
-    int webserverport = -1;
+    int webserverPort = -1;
 
     /**
      * @return the id
@@ -96,18 +98,17 @@ public class MmsServerConfiguration {
         return keystorePassword;
     }
 
-    /**
-     * @return the logRequestDirectory
-     */
-    public String getLogRequestDirectory() {
-        return logRequestDirectory;
+    /** {@inheritDoc} */
+    @Override
+    public String getAccessLog() {
+        return accessLog;
     }
 
     /**
-     * @return the secureport
+     * @return the securePort
      */
-    public int getSecureport() {
-        return secureport;
+    public int getSecurePort() {
+        return securePort;
     }
 
     /**
@@ -121,7 +122,7 @@ public class MmsServerConfiguration {
      * @return the webserverPort
      */
     public int getWebserverPort() {
-        return webserverport;
+        return webserverPort;
     }
 
     /**
@@ -158,11 +159,11 @@ public class MmsServerConfiguration {
     }
 
     /**
-     * @param logRequestDirectory
-     *            the logRequestDirectory to set
+     * @param accessLog
+     *            the accessLog to set
      */
-    public void setLogRequestDirectory(String logRequestDirectory) {
-        this.logRequestDirectory = logRequestDirectory;
+    public void setAccessLog(String accessLog) {
+        this.accessLog = accessLog;
     }
 
     /**
@@ -174,11 +175,11 @@ public class MmsServerConfiguration {
     }
 
     /**
-     * @param secureport
-     *            the secureport to set
+     * @param securePort
+     *            the securePort to set
      */
-    public void setSecureport(int secureport) {
-        this.secureport = secureport;
+    public void setSecurePort(int securePort) {
+        this.securePort = securePort;
     }
 
     /**
@@ -197,15 +198,12 @@ public class MmsServerConfiguration {
      * @return this configuration
      */
     public MmsServerConfiguration setWebserverPort(int webserverport) {
-        this.webserverport = webserverport;
+        this.webserverPort = webserverport;
         return this;
     }
 
     /**
      * Creates a new instance of this class.
-     *
-     * @param configuration
-     *            the configuration
      */
     public MmsServer build() {
         MyConfiguration conf = new MyConfiguration();
@@ -230,6 +228,7 @@ public class MmsServerConfiguration {
         if (getWebserverPort() > 0) {
             conf.addService(WebServer.class);
         }
+        conf.addService(AccessLogManager.class);
         conf.addService(MetricRegistry.class);
         return conf.create();
     }

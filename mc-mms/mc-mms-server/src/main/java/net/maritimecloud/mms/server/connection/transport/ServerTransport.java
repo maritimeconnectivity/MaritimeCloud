@@ -60,7 +60,7 @@ public final class ServerTransport {
     volatile Session wsSession;
 
     /** Sets the output format of messages. */
-    volatile MessageFormatType channalFormatType;
+    volatile MessageFormatType channelFormatType;
 
     ServerTransport(Session wsSession, ServerTransportListener listener, ServerEventListener eventListener) {
         this.listener = requireNonNull(listener);
@@ -71,11 +71,7 @@ public final class ServerTransport {
     public void close(MmsConnectionClosingCode reason) {
         Session wsSession = this.wsSession;
         if (wsSession != null) {
-            CloseReason cr = new CloseReason(new CloseCode() {
-                public int getCode() {
-                    return reason.getId();
-                }
-            }, reason.getMessage());
+            CloseReason cr = new CloseReason(reason::getId, reason.getMessage());
 
             try {
                 wsSession.close(cr);
@@ -87,8 +83,8 @@ public final class ServerTransport {
 
     void endpointOnBinaryMessage(byte[] binary) {
         timeOfLatestIncomingMessage = System.nanoTime();
-        if (channalFormatType == null) {
-            channalFormatType = MessageFormatType.MACHINE_READABLE;
+        if (channelFormatType == null) {
+            channelFormatType = MessageFormatType.MACHINE_READABLE;
         }
         eventListener.transportBinaryMessageReceived(this, binary);
         endpointOnMessage(() -> MmsMessage.parseBinaryMessage(binary));
@@ -120,7 +116,7 @@ public final class ServerTransport {
 
         // process message
         try {
-            listener.onMessage(this, msg);
+            listener.onMessageReceived(this, msg);
         } catch (RuntimeException e) {
             LOGGER.error("Failed to process message", e);
             close(MmsConnectionClosingCode.INTERNAL_ERROR.withMessage(e.getMessage()));
@@ -139,8 +135,8 @@ public final class ServerTransport {
 
     void endpointOnTextMessage(String textMessage) {
         timeOfLatestIncomingMessage = System.nanoTime();
-        if (channalFormatType == null) {
-            channalFormatType = MessageFormatType.HUMAN_READABLE;
+        if (channelFormatType == null) {
+            channelFormatType = MessageFormatType.HUMAN_READABLE;
         }
         eventListener.transportTextMessageReceived(this, textMessage);
         endpointOnMessage(() -> MmsMessage.parseTextMessage(textMessage));
@@ -182,7 +178,7 @@ public final class ServerTransport {
         Session wsSession = this.wsSession;
         if (wsSession != null) {
             try {
-                if (channalFormatType == MessageFormatType.MACHINE_READABLE) {
+                if (channelFormatType == MessageFormatType.MACHINE_READABLE) {
                     byte[] data = message.toBinary();
                     eventListener.transportBinaryMessageSend(this, data);
                     wsSession.getAsyncRemote().sendBinary(ByteBuffer.wrap(data));
@@ -191,10 +187,10 @@ public final class ServerTransport {
                     eventListener.transportTextMessageSend(this, textToSend);
                     wsSession.getAsyncRemote().sendText(textToSend);
                 }
+                listener.onMessageSent(this, message);
             } catch (Exception e) {
                 LOGGER.error("Failed to serialize data", e);
                 close(MmsConnectionClosingCode.INTERNAL_ERROR.withMessage(e.getMessage()));
-                return;
             }
         }
     }
@@ -215,5 +211,9 @@ public final class ServerTransport {
         } else {
             attachments.put(key, attachment);
         }
+    }
+
+    public MessageFormatType getChannelFormatType() {
+        return channelFormatType;
     }
 }

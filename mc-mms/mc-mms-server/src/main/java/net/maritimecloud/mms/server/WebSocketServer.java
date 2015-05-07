@@ -14,10 +14,25 @@
  */
 package net.maritimecloud.mms.server;
 
-import static java.util.Objects.requireNonNull;
-
-import java.io.IOException;
-import java.lang.management.ManagementFactory;
+import net.maritimecloud.mms.server.connection.client.DefaultTransportListener;
+import net.maritimecloud.mms.server.connection.transport.ServerTransportJsr356Endpoint;
+import org.cakeframework.container.ServiceManager;
+import org.cakeframework.container.lifecycle.RunOnStart;
+import org.cakeframework.container.lifecycle.RunOnStop;
+import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.jmx.MBeanContainer;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -26,31 +41,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
 import javax.websocket.server.ServerEndpointConfig.Builder;
+import java.io.IOException;
+import java.lang.management.ManagementFactory;
 
-import net.maritimecloud.mms.server.connection.client.DefaultTransportListener;
-import net.maritimecloud.mms.server.connection.transport.ServerTransportJsr356Endpoint;
-
-import org.cakeframework.container.ServiceManager;
-import org.cakeframework.container.lifecycle.RunOnStart;
-import org.cakeframework.container.lifecycle.RunOnStop;
-import org.eclipse.jetty.http.HttpVersion;
-import org.eclipse.jetty.jmx.MBeanContainer;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.HttpConfiguration;
-import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.NCSARequestLog;
-import org.eclipse.jetty.server.SecureRequestCustomizer;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.SslConnectionFactory;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.server.handler.RequestLogHandler;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
-import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -68,8 +62,6 @@ public class WebSocketServer {
 
     final MmsServer is;
 
-    final String accessLogPath;
-
     final DefaultTransportListener defaultTransport;
 
     final ServerEventListener eventListener;
@@ -86,13 +78,13 @@ public class WebSocketServer {
             connector.setReuseAddress(true);
             server.addConnector(connector);
         }
-        if (configuration.getSecureport() > 0) {
+        if (configuration.getSecurePort() > 0) {
 
             // ADD HTPS
             // HTTP Configuration
             HttpConfiguration http_config = new HttpConfiguration();
             http_config.setSecureScheme("https");
-            http_config.setSecurePort(configuration.getSecureport());
+            http_config.setSecurePort(configuration.getSecurePort());
             http_config.setOutputBufferSize(32768);
 
             // SSL Context Factory for HTTPS
@@ -107,13 +99,10 @@ public class WebSocketServer {
             // HTTPS connector
             ServerConnector https = new ServerConnector(server, new SslConnectionFactory(sslContextFactory,
                     HttpVersion.HTTP_1_1.asString()), new HttpConnectionFactory(https_config));
-            https.setPort(configuration.getSecureport());
+            https.setPort(configuration.getSecurePort());
             https.setIdleTimeout(500000);
             server.addConnector(https);
         }
-
-        // Sets the sockets reuse address to true
-        accessLogPath = configuration.getLogRequestDirectory();
     }
 
     @RunOnStart
@@ -127,23 +116,7 @@ public class WebSocketServer {
         context.setContextPath("/");
 
 
-        // ContextHandlerCollection contexts = new ContextHandlerCollection();
-        if (accessLogPath != null) {
-            HandlerCollection handlers = new HandlerCollection();
-            RequestLogHandler requestLogHandler = new RequestLogHandler();
-            handlers.setHandlers(new Handler[] { context, requestLogHandler });
-            server.setHandler(handlers);
-
-            NCSARequestLog requestLog = new NCSARequestLog("./logs/jetty-yyyy_mm_dd.request.log");
-            requestLog.setRetainDays(90);
-            requestLog.setAppend(true);
-            requestLog.setExtended(false);
-            requestLog.setLogTimeZone("GMT");
-            requestLogHandler.setRequestLog(requestLog);
-        } else {
-            server.setHandler(context);
-        }
-
+        server.setHandler(context);
 
         // Jetty needs to have at least 1 servlet, so we add this dummy servlet
         context.addServlet(new ServletHolder(new DumpServlet()), "/*");

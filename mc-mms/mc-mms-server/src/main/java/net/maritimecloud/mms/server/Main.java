@@ -59,8 +59,8 @@ public class Main {
             System.out.println("MMS  : Unencrypted MMS disabled");
         }
 
-        if (configuration.getSecureport() >= 0) {
-            System.out.println("MMS  : Running on port " + configuration.getSecureport() + " (secure)");
+        if (configuration.getSecurePort() >= 0) {
+            System.out.println("MMS  : Running on port " + configuration.getSecurePort() + " (secure)");
         }
         if (configuration.getWebserverPort() >= 0) {
             System.out.println("REST : Running on port " + configuration.getWebserverPort() + " (unsecure)");
