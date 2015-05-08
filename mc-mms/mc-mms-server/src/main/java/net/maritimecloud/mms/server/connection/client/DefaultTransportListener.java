@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.maritimecloud.core.id.ServerId;
+import net.maritimecloud.internal.mms.messages.Close;
 import net.maritimecloud.internal.mms.messages.Connected;
 import net.maritimecloud.internal.mms.messages.Hello;
 import net.maritimecloud.internal.mms.messages.Welcome;
@@ -81,6 +82,11 @@ public class DefaultTransportListener implements ServerTransportListener {
         updateAccessLog(t, message, true, t.getChannelFormatType());
 
         Message m = message.getM();
+        // temporary fix
+        if (m instanceof Close) {
+            t.close(MmsConnectionClosingCode.NORMAL.withMessage("Closed normally"));
+            return;
+        }
         if (m instanceof Welcome) {
             t.close(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage("A client must not send a Welcome message"));
         } else if (m instanceof Connected) {
@@ -117,19 +123,19 @@ public class DefaultTransportListener implements ServerTransportListener {
 
     /**
      * Updates the access log with the given message
-     * @param t the server transport
-     * @param msg the message
-     * @param inbound inbound or outbound
-     * @param type the message type
+     *
+     * @param t
+     *            the server transport
+     * @param msg
+     *            the message
+     * @param inbound
+     *            inbound or outbound
+     * @param type
+     *            the message type
      */
     private void updateAccessLog(ServerTransport t, MmsMessage msg, boolean inbound, MessageFormatType type) {
         Client client = t.getAttachment(ATTACHMENT_CLIENT, Client.class);
-        accessLogManager.logMessage(
-                msg,
-                client == null ? null : client.getId(),
-                inbound,
-                type
-        );
+        accessLogManager.logMessage(msg, client == null ? null : client.getId(), inbound, type);
     }
 
     /** {@inheritDoc} */

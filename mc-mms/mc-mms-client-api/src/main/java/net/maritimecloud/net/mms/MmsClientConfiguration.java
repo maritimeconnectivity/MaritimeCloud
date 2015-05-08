@@ -76,7 +76,7 @@ public class MmsClientConfiguration {
                 }
             });
         }
-        setHost(Environment.SANDBOX);
+        setHost(Environment.SANDBOX_UNENCRYPTED);
     }
 
     /**
