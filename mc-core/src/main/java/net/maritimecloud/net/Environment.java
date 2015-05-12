@@ -44,7 +44,7 @@ public abstract class Environment {
         /** {@inheritDoc} */
         @Override
         public String mmsServerURL() {
-            return "ws://mms03.sandbox03" + DOMAIN + ":80";
+            return "ws://mms.sandbox03" + DOMAIN + ":80";
         }
     };
 
