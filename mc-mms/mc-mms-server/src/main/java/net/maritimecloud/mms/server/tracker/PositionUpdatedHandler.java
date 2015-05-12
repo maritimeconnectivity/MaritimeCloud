@@ -31,6 +31,8 @@ public abstract class PositionUpdatedHandler {
      *            the tracked object
      * @param positiontime
      *            the position and time when entering
+     * @param reasonForEntering
+     *            the reason for entering
      */
     protected void entering(Client t, PositionTime positiontime, EnterReason reasonForEntering) {}
 
@@ -51,6 +53,8 @@ public abstract class PositionUpdatedHandler {
      *
      * @param t
      *            the tracked object
+     * @param reasonForEntering
+     *            the reason for leaving
      */
     protected void exiting(Client t, LeaveReason reasonForEntering) {}
 
