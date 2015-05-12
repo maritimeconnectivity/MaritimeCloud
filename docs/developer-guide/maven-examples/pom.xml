@@ -27,7 +27,7 @@
   
   <groupId>net.maritimecloud.examples</groupId>
   <artifactId>developer-guide</artifactId>
-  <version>0.3-RC1-SNAPSHOT</version>
+  <version>0.3-RC1</version>
   
   <pluginRepositories>
     <pluginRepository>

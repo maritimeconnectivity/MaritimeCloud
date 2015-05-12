@@ -4,22 +4,22 @@ In the next chapter we go into details about how to communicate with other actor
 
 The MMS protocol is an internet based protocol layered on top of TCP/IP and WebSockets. It requires a persistent connection to a central server in order to be able to receive messages from remote actors.
 
-On of the main ideas behind the MMS protocol is that actors/clients never communicate directly. Instead all actors
+On of the main ideas behind the MMS protocol is that actors/clients never communicate directly. Instead all clients
 must connect to a MMS server to communicate. To send a message from a _Ship A_ to a _Ship B_. Ship A must send the message to the MMS server which will relay the message to Ship B.
 
 There are a number of reasons for this design
 
-* *Security,* if actors where to communicate directly. Every actors would have to have some kind of server running with an open public port. Making them an potential target for hackers. Instead by requiring them to connect to a central server. Only the server needs to be secured properly.
+* *Security,* if clients where to communicate directly. Every client would have to have some kind of server running with an open public port. Making them an potential target for hackers. Instead by requiring them to connect to a central server. Only the server needs to be secured properly.
 
 * *Availability,* satellite connections are in general more unreliable than landbased connections. 
 It is not uncommon that connections comes and go. By having a central server that is always on. It can act as a sort of mailbox if a client looses its connection temporarily.
 
-* *Bandwidth,* while creating a new TCP/IP connection is a lightway process. It still takes both time and bandwidth. When a central approach only a single connection needs to maintained.
+* *Bandwidth,* while creating a new TCP/IP connection is a lightway process. It still takes both time and bandwidth. With a central approach only a single connection needs to maintained. Furthermore, when laying a secure protocol such as TLS on top of it the connection bandwidth cost is even higher especially if all you need is sending a single message. 
 
-* *Geocasting,* one of the main functionalities of the MMS protocol is the ability to send messages to all actors in a certain area. A central server(s) is needed to keep track of where everybody is for determining who should receive a particular geocasted message.
+* *Geocasting,* one of the main functionalities of the MMS protocol is the ability to send messages to all actors in a certain area. A central server is needed to keep track of where everybody is to order for the system to determine who should receive a particular geocasted message. Making sure that no bandwidth is wasted by broadcasting information that clients have no need for. 
 
 === Installing the client 
-First if you do not already have a Java 8 JDK on your machine you should install one. Either from OpenJDK or from Oracle.
+First if you do not already have a Java 8 JDK on your machine you need to install one. Either from OpenJDK or from Oracle.
 
 The MMS client is a single jar available at http://repo1.maven.org/maven2/net/maritimecloud/mms/mc-mms-client/0.3/mc-mms-client-0.3.jar. There are no other dependencies. Everything needed to connect to a MMS Server is embedded in the jar.
 
@@ -53,7 +53,7 @@ If you are using the MMS client in a Java EE 7 (or greater) server we have a spe
 === Identity
 The first thing you need to do before connecting to a MMS server is to create a MaritimeId which is your unique identity. Think of it as your user name. At some point the identity will be maintained in a registry for all stakeholders. But since the Maritime Identity Registry is still being specified we are using a temporary solution for now.
 
-Any client connecting must use an integer identifier as their username. If you are emulating a ship you should use its 9 digit MMSI number. Otherwise you are free to choose the id. You should probably stay away for using numbers with 1-4 digits. Because if an actor connects to a MMS server with an identical ID to one that is already connected. The actor that is already connected is automatically disconnected. We use 0123456789 in most examples but you will want to replace it. 
+Any client connecting must use an integer identifier as their username. If you are emulating a ship you should use its 9 digit MMSI number. Otherwise you are free to choose the id. You should probably stay away for using numbers with 1-4 digits. Because if an client connects to a MMS server with an identical ID to one that is already connected. The client that is already connected is automatically disconnected. We use 0123456789 in most examples but you will want to replace it with your own id. 
 
 For various historic reasons the number must be prefixed with "mmsi:".
 
@@ -91,14 +91,27 @@ The simulated position reader created in the above example will just sail around
 with a speed between 10 and 30 knots until disconnected.
 
 === Connecting and Disconnecting
-The last thing you need to do before connecting is to set the hostname of the MMS server.
-Unless you have set up your own server (which is easy, see later section). You can use our public instance at mms03.maritimecloud.net.
+Every MMS clients needs to connect to a central MMS server. If you do not explicit specify a server when creating the client.
+The client will automatically use the shared sandbox environment.
 
-If you repeatedly fail to connect make sure you are not behind any kind of firewall by telnetting to the MMS server "telnet mms03.maritimecloud.net 43234". If you keep having problems ask for help in our Google Group.
+We provide 2 public environments that can be used by any client. 
 
-Expect the port and url of the public instance to change for every release of the Maritime Cloud. The details of the underlying MMS protocol is still being fleshed out. And different releases are not compatible at the moment. 
+* *Sandbox,* The _Sandbox_ environment is meant for any kind of testing. For example, running tests with other organizations.
+* *Test,* The _Test_ environment is the closest environment that comes close to something that can be considered operational ready. The environment is called test even though people will be using for semi-operational usage. Simple because we do not have the resources to have a human monitor it 24/7. We we do have software that monitors it 24/7 and raises an alarm in case the environment is unresponsive.
 
-After having set the host the last thing is to create the MMSClient which you will use to send and receive remote messages. When you create the client it will automatically (in the background) connect to the MMS server.
+Per default we always encrypt the data that is being sent back and forth. However, we provide a non-encrypted alternative with the sandbox environment in case you are having problems that needs an unencrypted connection.
+
+So too specify which of the diffent environments you want to use. You can use one of these methods. Again, if you just want to use the sandbox environment you do not need to specify anything. As it is the default environment.
+[source,java]
+----
+include::{sourcedir}/ch02connecting/MMSSelectEnvironment.java[tag=setEnvironment]
+----
+
+Instead up using the public instances we provide. You can also setup your own internal environment (which is easy, see later section).
+
+If you repeatedly fail to connect make sure you are not behind any kind of firewall by telnetting to the MMS server "telnet mms.sandbox03.maritimecloud.net 80". If you keep having problems ask for help in our Google Group.
+
+The last thing you need to do is to create the MMSClient which you will use to send and receive remote messages. When you create the client it will automatically (in the background) connect to the MMS server.
 The full source of the example will also print out "success" when it
 has successfully connected. And finally close/shutdown the client as the last thing.
 
@@ -106,7 +119,7 @@ has successfully connected. And finally close/shutdown the client as the last th
 ----
 include::{sourcedir}/ch02connecting/MMSConnect.java[tag=code]
 ----
-If you are using the public instance of the MMS Server. Your client should appear in the list of connected clients at this site http://{server}:9099/clients/list/. The url basically lists all clients that are connected or have recently been connected. And is primarily used for debugging.
+If you are using the public sandbox instance of the MMS Server. Your client should appear in the list of connected clients at this site http://{server}:9099/clients/list/. The url basically lists all clients that are connected or have recently been connected. And is primarily used for debugging.
 
 You should always remember to shutdown the client properly. This is mainly done to make sure that all messages that you have send have been properly delivered to the MMS Server.
 
@@ -115,14 +128,15 @@ So after having performed the shutdown you need to await for the client to have 
 
 === Connection status
 While the MMS client will automatically connect and reconnect whenever a connection is lost. It is sometimes
-useful to be able to query the actual state of the connection. This is easily done by querying the client
+useful to be able to query the actual state of the connection. This is easily done
 
 [source,java]
 ----
 include::{sourcedir}/ch02connecting/ConnectionStatus.java[tag=connectionStatus]
 ----
 
-You can also manually disable and enable the connection to the MMS server.
+You can also manually disable and enable the connection to the MMS server. When you disable the connection it will automatically close the connection.
+You can then at later point reenable it again.
 
 [source,java]
 ----
@@ -162,5 +176,9 @@ curl -O http://repo1.maven.org/maven2/net/maritimecloud/mms/mc-mms-server-standa
 java -jar mc-mms-server-standalone-{version}.jar
 ----
 
-And then use the hostname where the MMS server is running when you configure the MMS client.
+And then use the hostname of where the MMS server is running when you configure the MMS client.
+
+
+
+
 endif::snapshot[]

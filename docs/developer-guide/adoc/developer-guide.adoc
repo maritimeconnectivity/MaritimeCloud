@@ -32,9 +32,9 @@
 :icons: font
 
 :releaseVersion: 0.3
-:version: 0.3-SNAPSHOT
-:snapshot: true
-:releaseDate: March 2015
+:version: 0.3-RC1
+:snapshot: false
+:releaseDate: May 2015
 :server: mms03.maritimecloud.net
 
 
