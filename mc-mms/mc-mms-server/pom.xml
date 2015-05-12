@@ -41,7 +41,7 @@
     <dependency>
       <groupId>com.beust</groupId>
       <artifactId>jcommander</artifactId>
-      <version>1.30</version>
+      <version>1.48</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -56,9 +56,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.cakeframework</groupId>
-      <artifactId>cake-container</artifactId>
-      <version>0.8-SNAPSHOT</version>
+      <groupId>net.maritimecloud.3rdparty</groupId>
+      <artifactId>org.cakeframework.container</artifactId>
+      <version>0.8.2</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
