@@ -17,7 +17,6 @@ public class ReceiveBroadcast {
         conf.setId(MaritimeId.create("mmsi:" + ThreadLocalRandom.current().nextLong(10000, 100000)));
         conf.setPositionReader(PositionReader.fixedPosition(Position.create(1, 1)));
         conf.properties().setName("MaritimeExampleGuide");
-        conf.setHost("localhost");
         MmsClient client = conf.build();
 
         System.out.println("Starting receive client " + conf.getId());
@@ -28,7 +27,7 @@ public class ReceiveBroadcast {
 
         System.out.println("Waiting for Hello broadcasts");
         Thread.sleep(100000);
-        client.close();
+        client.shutdown();
         client.awaitTermination(1, TimeUnit.SECONDS);
     }
 }

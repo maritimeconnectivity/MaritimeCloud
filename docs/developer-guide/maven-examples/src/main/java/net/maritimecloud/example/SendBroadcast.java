@@ -17,7 +17,6 @@ public class SendBroadcast {
         conf.setId(MaritimeId.create("mmsi:" + ThreadLocalRandom.current().nextLong(10000, 100000)));
         conf.setPositionReader(PositionReader.fixedPosition(Position.create(1, 1)));
         conf.properties().setName("MaritimeExampleGuide");
-        conf.setHost("localhost");
         MmsClient client = conf.build();
         System.out.println("Starting send client " + conf.getId());
         for(;;) {

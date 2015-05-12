@@ -22,7 +22,7 @@ import net.maritimecloud.net.mms.MmsClientConfiguration;
 
 public class ServiceProvider {
   public static void main(String[] args) throws Exception {
-    MmsClient c = MmsClientConfiguration.create("mmsi:1112222").setHost("localhost").build();
+    MmsClient c = MmsClientConfiguration.create("mmsi:1112222").build();
 
     c.endpointRegister(new AbstractMathEndpoint() {
       protected Integer sum(MessageHeader h, Integer left, Integer right) {

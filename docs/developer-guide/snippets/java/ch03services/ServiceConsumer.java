@@ -24,14 +24,14 @@ import net.maritimecloud.net.mms.MmsClientConfiguration;
 
 public class ServiceConsumer {
   public static void main(String[] args) throws Exception {
-    MmsClient c = MmsClientConfiguration.create("mmsi:2223333").setHost("localhost").build();
+    MmsClient c = MmsClientConfiguration.create("mmsi:2223333").build();
 
     MathEndpoint e = c.endpointCreate(MaritimeId.create("mmsi:1112222"), MathEndpoint.class);
         
     EndpointInvocationFuture<Integer> sum = e.sum(123, 456);
     System.out.println(" 123 + 456 = " + sum.join());
 
-    c.close();
+    c.shutdown();
     c.awaitTermination(1, TimeUnit.SECONDS);
   }
 }

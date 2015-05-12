@@ -40,8 +40,6 @@ public class MMSConnect {
       }
     });
 
-    conf.setHost("mms02.maritimecloud.net");
-
     MmsClient client = conf.build();
 
     // Wait for a connection for 10 seconds
@@ -52,7 +50,7 @@ public class MMSConnect {
     }
 
     //Disconnect
-    client.close();
+    client.shutdown();
     client.awaitTermination(10, TimeUnit.SECONDS);
     }
 }
