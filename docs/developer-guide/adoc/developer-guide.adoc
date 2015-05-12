@@ -35,7 +35,7 @@
 :version: 0.3-RC1
 :snapshot: false
 :releaseDate: May 2015
-:server: mms03.maritimecloud.net
+:server: mms.sandbox03.maritimecloud.net
 
 
 = Maritime Cloud Developer Guide {version}

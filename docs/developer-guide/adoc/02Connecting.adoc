@@ -119,7 +119,7 @@ has successfully connected. And finally close/shutdown the client as the last th
 ----
 include::{sourcedir}/ch02connecting/MMSConnect.java[tag=code]
 ----
-If you are using the public sandbox instance of the MMS Server. Your client should appear in the list of connected clients at this site http://{server}:9099/clients/list/. The url basically lists all clients that are connected or have recently been connected. And is primarily used for debugging.
+If you are using the public sandbox instance of the MMS Server. Your client should appear in the list of connected clients at this site http://{server}:9990/clients/list/. The url basically lists all clients that are connected or have recently been connected. And is primarily used for debugging.
 
 You should always remember to shutdown the client properly. This is mainly done to make sure that all messages that you have send have been properly delivered to the MMS Server.
 
