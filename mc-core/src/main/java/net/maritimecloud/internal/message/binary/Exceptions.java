@@ -20,16 +20,10 @@ package net.maritimecloud.internal.message.binary;
  */
 public class Exceptions {
 
-    /**
-     * @return
-     */
     public static RuntimeException malformedVarint() {
         return null;
     }
 
-    /**
-     * @return
-     */
     public static RuntimeException truncatedMessage() {
         return null;
     }

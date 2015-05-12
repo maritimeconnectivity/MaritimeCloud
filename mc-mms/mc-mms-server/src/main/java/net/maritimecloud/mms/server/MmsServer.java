@@ -51,12 +51,6 @@ public class MmsServer extends AbstractContainer {
         return serverId;
     }
 
-    /**
-     * @param i
-     * @param seconds
-     * @return
-     * @throws InterruptedException
-     */
     public boolean awaitTerminated(long timeout, TimeUnit seconds) throws InterruptedException {
         return awaitState(State.TERMINATED, timeout, seconds);
     }

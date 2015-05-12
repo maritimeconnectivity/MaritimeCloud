@@ -51,7 +51,7 @@ import org.junit.internal.ArrayComparisonFailure;
 
 /**
  * And extension to {@link Assert} with useful asserts.
- * 
+ *
  * @author Kasper Nielsen
  */
 public class MoreAsserts extends Assert {
@@ -195,13 +195,6 @@ public class MoreAsserts extends Assert {
         }
     }
 
-    /**
-     * Asserts that all elements in the specified subSet is contained in the superSet
-     * 
-     * @param superSet
-     * @param subSet
-     * @return
-     */
     static Map<Object, Integer> assertArrayIsArraySubset0(Object[] superSet, Object[] subSet) {
         Map<Object, Integer> map = new HashMap<>();
         for (Object o : superSet) {
@@ -346,7 +339,7 @@ public class MoreAsserts extends Assert {
 
     /**
      * A best effort tet
-     * 
+     *
      * @param text
      *            the error text in case the reference was not garbage collected.
      * @param ref
@@ -421,7 +414,7 @@ public class MoreAsserts extends Assert {
 
     /**
      * A helper method that serializes and deserializes an object.
-     * 
+     *
      * @param o
      *            the object to serialize and deserialize
      * @return a serialized and deserialized instance of the specified object

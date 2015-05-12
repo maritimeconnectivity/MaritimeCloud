@@ -43,9 +43,6 @@ public class ParsedEndpoint extends AbstractContainer implements EndpointDefinit
         return (List) Collections.unmodifiableList(new ArrayList<>(endpointFunction.values()));
     }
 
-    /**
-     * @param child
-     */
     ParsedEndpoint parse(EndpointDeclarationContext c) {
         setName(c.Identifier().getText());
         for (FunctionContext ec : c.function()) {

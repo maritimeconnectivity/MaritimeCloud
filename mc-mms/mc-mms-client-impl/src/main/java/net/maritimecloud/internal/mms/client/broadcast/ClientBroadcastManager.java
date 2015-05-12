@@ -254,11 +254,6 @@ public class ClientBroadcastManager {
         // resend unacked broadcasts
     }
 
-    /**
-     * @param message
-     * @param options
-     * @return
-     */
     public DispatchedMessage broadcast(BroadcastMessage message, MmsBroadcastOptions options) {
         MmsBroadcastOptions op = options.immutable();
         return brodcast(message, op.getArea(), op.getRadius(), op.getRemoteReceive());

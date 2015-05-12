@@ -93,11 +93,6 @@ public class MmsClientConfiguration {
         return this;
     }
 
-    /**
-     * Creates the
-     *
-     * @return
-     */
     @SuppressWarnings("unchecked")
     public MmsClient build() {
         Class<?> c;

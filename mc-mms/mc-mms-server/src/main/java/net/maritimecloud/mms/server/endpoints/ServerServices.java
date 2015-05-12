@@ -60,8 +60,6 @@ public class ServerServices extends AbstractServices {
      *
      * @param target
      *            the target that is trying to find the service
-     * @param request
-     *            the find service request
      * @return a sorted list of the targets that was found sorted by distance to the target doing the search
      */
     List<Entry<Client, PositionTime>> findServices(Client target, String endpointName, Position pos, double m, int max) {

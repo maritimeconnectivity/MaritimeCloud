@@ -142,11 +142,6 @@ class SessionSender extends Thread {
         }
     }
 
-    /**
-     * @param message
-     * @param onAck
-     * @return
-     */
     void send(Message message, CompletableFuture<Void> onAck) {
         lock.lock();
         try {

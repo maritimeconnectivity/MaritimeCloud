@@ -54,10 +54,6 @@ public class Client {
 
     volatile long timeOfLatestReceivedMessage = System.nanoTime();
 
-    /**
-     * @param appLayerManager
-     * @param id
-     */
     public Client(ClientManager manager, ServerTransport initialTransport, String id) {
         this.clientManager = requireNonNull(manager);
         this.id = id;

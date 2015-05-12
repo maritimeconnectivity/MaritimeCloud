@@ -32,7 +32,7 @@ import net.maritimecloud.net.BroadcastMessage;
 
 /**
  * This class is a bit of mess, will be cleaned up a later point.
- * 
+ *
  * @author Kasper Nielsen
  */
 public class MmsMessage {
@@ -111,11 +111,6 @@ public class MmsMessage {
         return this;
     }
 
-    /**
-     * @param latestReceivedId
-     *            the latestReceivedId to set
-     * @return
-     */
     public MmsMessage setLatestReceivedId(long latestReceivedId) {
         this.latestReceivedId = latestReceivedId;
         return this;
@@ -125,11 +120,6 @@ public class MmsMessage {
         return getType().type <= MmsMessageType.POSITION_REPORT.type;
     }
 
-    /**
-     * @param m
-     *            the m to set
-     * @return
-     */
     public MmsMessage setM(Message m) {
         this.m = m;
         return this;

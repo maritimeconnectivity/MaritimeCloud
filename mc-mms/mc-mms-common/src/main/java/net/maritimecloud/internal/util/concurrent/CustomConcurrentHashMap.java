@@ -62,7 +62,7 @@ import sun.misc.Unsafe;
  * expression of configuration parameters):
  *
  * <pre>
- * {@code
+ * {@code}
  * identityMap = new CustomConcurrentHashMap<Person,Salary>
  *     (STRONG, IDENTITY, STRONG, EQUALS, 0);
  * weakKeyMap = new CustomConcurrentHashMap<Person,Salary>
@@ -134,10 +134,10 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V> implements 
      * use more segments, but lazily initialize them; and (2) Links connecting nodes are not immutable, enabling
      * unsplicing. These two adjustments help improve concurrency in the face of heavier per-element mechanics and the
      * increased load due to reference removal, while still keeping footprint etc reasonable.
-     *
+     * 
      * Additionally, because Reference keys/values may become null asynchronously, we cannot ensure snapshot integrity
      * in methods such as containsValue, so do not try to obtain them (so, no modCounts etc).
-     *
+     * 
      * Also, the volatility of Segment count vs table fields are swapped, enabled by ensuring fences on new node
      * assignments.
      */

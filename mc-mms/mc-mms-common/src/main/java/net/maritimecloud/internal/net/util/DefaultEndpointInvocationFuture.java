@@ -65,7 +65,6 @@ public class DefaultEndpointInvocationFuture<T> implements EndpointInvocationFut
         return delegate.complete(m);
     }
 
-    /** {@inheritDoc} */
     public boolean completeExceptionally(Throwable ex) {
         return delegate.completeExceptionally(ex);
     }
@@ -145,7 +144,6 @@ public class DefaultEndpointInvocationFuture<T> implements EndpointInvocationFut
         return new DefaultAcknowledgement(recivedByCloud);
     }
 
-    /** {@inheritDoc} */
     public CompletableFuture<Void> thenAcceptAsync(Consumer<? super T> block) {
         return delegate.thenAcceptAsync(e -> block.accept(e));
     }

@@ -117,7 +117,8 @@ public abstract class AbstractLogger implements Logger {
     }
 
     /**
-     * Converts from a {@link Level} to a {@link java.util.logging.Level}.
+     * Converts from a {@link net.maritimecloud.internal.util.logging.Logger.Level} to a {@link java.util.logging.Level}
+     * .
      *
      * @param level
      *            the level to convert

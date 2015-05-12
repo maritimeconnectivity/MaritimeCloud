@@ -77,9 +77,6 @@ public class ParsedEndpointFunction implements EndpointMethod {
         return publicReturnType;
     }
 
-    /**
-     * @param ec
-     */
     void parse(FunctionContext c) {
         name = c.Identifier().getText();
 

@@ -38,20 +38,10 @@ public class DefaultAcknowledgement implements Acknowledgement {
         this.delegate = requireNonNull(delegate);
     }
 
-    /**
-     * @param value
-     * @return
-     * @see java.util.concurrent.CompletableFuture#complete(java.lang.Object)
-     */
     public boolean complete() {
         return delegate.complete(null);
     }
 
-    /**
-     * @param ex
-     * @return
-     * @see java.util.concurrent.CompletableFuture#completeExceptionally(java.lang.Throwable)
-     */
     public boolean completeExceptionally(Throwable ex) {
         return delegate.completeExceptionally(ex);
     }

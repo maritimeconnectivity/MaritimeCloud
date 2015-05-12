@@ -67,7 +67,6 @@ public class JavaGenEndpointGenerator {
     }
 
 
-    /** {@inheritDoc} */
     JavaGenEndpointGenerator generate() {
         generateClient();
         generateServer();

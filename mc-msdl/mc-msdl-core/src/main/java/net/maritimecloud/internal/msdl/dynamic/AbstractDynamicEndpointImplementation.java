@@ -38,9 +38,6 @@ public abstract class AbstractDynamicEndpointImplementation implements EndpointI
 
     final Map<String, EndpointMethod> methods = new HashMap<>();
 
-    /**
-     * @param endpointName
-     */
     public AbstractDynamicEndpointImplementation(EndpointDefinition endpoint) {
         this.endpoint = requireNonNull(endpoint);
         for (EndpointMethod m : endpoint.getFunctions()) {
