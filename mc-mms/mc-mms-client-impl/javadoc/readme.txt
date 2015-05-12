@@ -1,0 +1,1 @@
+Unfortunately there is no easy way to shade existing javadoc 
