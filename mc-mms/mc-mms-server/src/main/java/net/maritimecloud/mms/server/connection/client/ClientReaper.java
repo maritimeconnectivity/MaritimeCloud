@@ -25,6 +25,8 @@ import net.maritimecloud.mms.server.connection.transport.ServerTransport;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 
 import org.cakeframework.container.concurrent.ScheduleAtFixedRate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A client reaper takes care of removing stale clients
@@ -32,6 +34,9 @@ import org.cakeframework.container.concurrent.ScheduleAtFixedRate;
  * @author Kasper Nielsen
  */
 public class ClientReaper {
+
+    /** The logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServerTransport.class);
 
     /** The number of nanoseconds before a stale connection is detected. */
     private final long timeoutNanos = TimeUnit.MINUTES.toNanos(5);
@@ -52,22 +57,31 @@ public class ClientReaper {
 
     /** Cleans up and remove stale clients. */
     @ScheduleAtFixedRate(value = 30, unit = TimeUnit.SECONDS)
+    public void cleanudp() {
+        try {
+            cleanup();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
+    
     public void cleanup() {
         long now = System.nanoTime();
 
         // We start by reaping missing Helloes from clients. That is clients that have received the welcome message.
         // But who for some reason do not ever reply to it but keeps the connection open.
         Iterator<ServerTransport> transports = transportListener.missingHellos.iterator();
-        for (ServerTransport t = transports.next(); transports.hasNext(); t = transports.next()) {
-            if (t.getTimeOfCreation() + timeoutNanos < now) {
+        while (transports.hasNext()) {
+            ServerTransport t = transports.next();
+            if (t.getTimeOfCreation()+ timeoutNanos < now) {
                 t.close(MmsConnectionClosingCode.CLIENT_TIMEOUT);
                 transports.remove();
             }
         }
 
-
         Iterator<Client> clients = clientManager.clients.values().iterator(); // clients.iterator() is immutable
-        for (Client ic = clients.next(); clients.hasNext(); ic = clients.next()) {
+        while (clients.hasNext()) {
+            Client ic = clients.next();
             ReentrantReadWriteLock.WriteLock lock = ic.lock.writeLock();
 
             // We use tryLock() in the following instead of lock() because we do not perform any critical operations.
@@ -78,11 +92,14 @@ public class ClientReaper {
             ClientInternalState state = ic.state;
 
             // state.session != null -> connected or disconnected
+
             if (state.session != null && ic.getTimeOfLatestReceivedMessage() + timeoutNanos < now && lock.tryLock()) {
                 try {
                     state = ic.state; // refresh after we have locked
                     if (state.session != null && ic.getTimeOfLatestReceivedMessage() + timeoutNanos < now) {
+                        LOGGER.info("Killing client " + ic.getId());
                         ic.close(MmsConnectionClosingCode.CLIENT_TIMEOUT);
+                        ic.state = ClientInternalState.TERMINATED;
                         state = ic.state;// refresh state
                     }
                 } finally {
