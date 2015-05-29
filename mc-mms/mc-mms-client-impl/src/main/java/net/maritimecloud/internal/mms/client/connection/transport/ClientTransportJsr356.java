@@ -55,6 +55,9 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
 
     private final MessageFormatType mft;
 
+    /** See https://github.com/MaritimeCloud/MaritimeCloud/issues/29, basically we need a lock for async writes in Tomcat.  */
+    private final Object writeLock = new Object();
+
     /** The WebSocket session object set after having successfully connected. */
     private volatile Session wsSession;
 
@@ -73,6 +76,21 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
         super(transportListener, connectionListener);
         this.mft = requireNonNull(mft);
         this.container = requireNonNull(container);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void closeTransport(MmsConnectionClosingCode reason) {
+        Session session = this.wsSession;
+        if (session != null) {
+            CloseReason cr = new CloseReason(reason::getId, reason.getMessage());
+
+            try {
+                session.close(cr);
+            } catch (Exception e) {
+                LOGGER.error("Failed to close connection", e);
+            }
+        }
     }
 
     /** {@inheritDoc} */
@@ -104,18 +122,10 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
     }
 
     /** {@inheritDoc} */
+    @OnMessage
     @Override
-    public void closeTransport(MmsConnectionClosingCode reason) {
-        Session session = this.wsSession;
-        if (session != null) {
-            CloseReason cr = new CloseReason(reason::getId, reason.getMessage());
-
-            try {
-                session.close(cr);
-            } catch (Exception e) {
-                LOGGER.error("Failed to close connection", e);
-            }
-        }
+    public void onBinaryMessage(byte[] binaryMessage) {
+        super.onBinaryMessage(binaryMessage); // overridden for the @OnMessage annotation
     }
 
     /**
@@ -150,13 +160,6 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
     }
 
     /** {@inheritDoc} */
-    @OnMessage
-    @Override
-    public void onBinaryMessage(byte[] binaryMessage) {
-        super.onBinaryMessage(binaryMessage); // overridden for the @OnMessage annotation
-    }
-
-    /** {@inheritDoc} */
     @Override
     public void sendMessage(MmsMessage message) {
         Session session = this.wsSession;
@@ -166,7 +169,9 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
                 try {
                     byte[] data = message.toBinary();
                     connectionListener.binaryMessageSend(data);
-                    session.getAsyncRemote().sendBinary(ByteBuffer.wrap(data));
+                    synchronized (writeLock) {
+                        session.getAsyncRemote().sendBinary(ByteBuffer.wrap(data));
+                    }
                 } catch (IOException e) {
                     // TODO: Proper error handling
                     throw new RuntimeException("Error sending binary message", e);
@@ -174,7 +179,9 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
             } else {
                 String textToSend = message.toText();
                 connectionListener.textMessageSend(textToSend);
-                session.getAsyncRemote().sendText(textToSend);
+                synchronized (writeLock) {
+                    session.getAsyncRemote().sendText(textToSend);
+                }
             }
 
             transportListener.onMessageSent(message);
