@@ -32,8 +32,10 @@
 :icons: font
 
 :releaseVersion: 0.3
-:version: 0.3-RC1
-:snapshot: false
+:version: 0.3
+////
+:snapshot: true
+////
 :releaseDate: May 2015
 :server: mms.sandbox03.maritimecloud.net
 
