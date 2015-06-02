@@ -55,7 +55,10 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
 
     private final MessageFormatType mft;
 
-    /** See https://github.com/MaritimeCloud/MaritimeCloud/issues/29, basically we need a lock for async writes in Tomcat.  */
+    /**
+     * See https://github.com/MaritimeCloud/MaritimeCloud/issues/29, basically we need a lock for async writes in
+     * Tomcat.
+     */
     private final Object writeLock = new Object();
 
     /** The WebSocket session object set after having successfully connected. */
@@ -170,17 +173,26 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
                     byte[] data = message.toBinary();
                     connectionListener.binaryMessageSend(data);
                     synchronized (writeLock) {
-                        session.getAsyncRemote().sendBinary(ByteBuffer.wrap(data));
+                        session.getBasicRemote().sendBinary(ByteBuffer.wrap(data));
                     }
                 } catch (IOException e) {
-                    // TODO: Proper error handling
-                    throw new RuntimeException("Error sending binary message", e);
+                    if (wsSession.isOpen()) {
+                        // TODO: Proper error handling
+                        throw new RuntimeException("Error sending binary message", e);
+                    }
                 }
             } else {
-                String textToSend = message.toText();
-                connectionListener.textMessageSend(textToSend);
-                synchronized (writeLock) {
-                    session.getAsyncRemote().sendText(textToSend);
+                try {
+                    String textToSend = message.toText();
+                    connectionListener.textMessageSend(textToSend);
+                    synchronized (writeLock) {
+                        session.getBasicRemote().sendText(textToSend);
+                    }
+                } catch (IOException e) {
+                    if (wsSession.isOpen()) {
+                        // TODO: Proper error handling
+                        throw new RuntimeException("Error sending text message", e);
+                    }
                 }
             }
 
