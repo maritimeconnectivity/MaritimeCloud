@@ -143,8 +143,13 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
         wsSession = null;
         MmsConnectionClosingCode reason = MmsConnectionClosingCode.create(closeReason.getCloseCode().getCode(),
                 closeReason.getReasonPhrase());
-        transportListener.onClose(reason);
-        connectionListener.disconnected(reason);
+        //Start a new thread to close it. Websocket async is a total mess
+        //Basically there is a deadlock if writing at the same time.
+        Thread t = new Thread(() -> {
+            transportListener.onClose(reason);
+            connectionListener.disconnected(reason);
+        });
+        t.start();
     }
 
     /** Called when a new web socket connection is opened */

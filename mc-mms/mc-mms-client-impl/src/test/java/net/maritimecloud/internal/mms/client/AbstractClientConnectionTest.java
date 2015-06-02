@@ -16,6 +16,9 @@ package net.maritimecloud.internal.mms.client;
 
 import static org.junit.Assert.assertTrue;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
@@ -103,8 +106,40 @@ public class AbstractClientConnectionTest {
     public void after() throws Exception {
         if (client != null) {
             client.shutdown();
+//            if (!client.awaitTermination(5, TimeUnit.SECONDS)) {
+//               System.out.println(crunchifyGenerateThreadDump());
+//                
+//            }
+//            System.out.println(client.isTerminated());
             assertTrue(client.awaitTermination(5, TimeUnit.SECONDS));
         }
         ws.stop();
+    }
+    
+    public static String crunchifyGenerateThreadDump() {
+        final StringBuilder dump = new StringBuilder();
+        final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
+//        
+
+        
+        
+        
+        
+        final ThreadInfo[] threadInfos = threadMXBean.getThreadInfo(threadMXBean.getAllThreadIds(), 100);
+        for (ThreadInfo threadInfo : threadInfos) {
+            dump.append('"');
+            dump.append(threadInfo.getThreadName());
+            dump.append("\" ");
+            final Thread.State state = threadInfo.getThreadState();
+            dump.append("\n   java.lang.Thread.State: ");
+            dump.append(state);
+            final StackTraceElement[] stackTraceElements = threadInfo.getStackTrace();
+            for (final StackTraceElement stackTraceElement : stackTraceElements) {
+                dump.append("\n        at ");
+                dump.append(stackTraceElement);
+            }
+            dump.append("\n\n");
+        }
+        return dump.toString();
     }
 }
