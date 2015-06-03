@@ -14,12 +14,21 @@
  */
 package net.maritimecloud.internal.mms.transport;
 
+import net.maritimecloud.internal.mms.messages.Close;
+import net.maritimecloud.internal.mms.messages.Connected;
+import net.maritimecloud.internal.mms.messages.Hello;
+import net.maritimecloud.internal.mms.messages.PositionReport;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
+import net.maritimecloud.internal.net.messages.Broadcast;
+import net.maritimecloud.internal.net.messages.BroadcastAck;
+import net.maritimecloud.internal.net.messages.MethodInvoke;
+import net.maritimecloud.internal.net.messages.MethodInvokeResult;
+import net.maritimecloud.message.Message;
 import net.maritimecloud.message.MessageFormatType;
 
+import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.Date;
@@ -32,6 +41,8 @@ import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Will handle logging of {@code MmsMessage} entities at the transport layer level.
@@ -41,10 +52,16 @@ import java.util.logging.Logger;
  * <a href="http://docs.oracle.com/javase/7/docs/api/java/util/logging/FileHandler.html">FileHandler</a> class.<br/>
  * If the file is undefined, the messages will be logged to {@code System.out}.
  * <p>
- * The optional <i>filter</i> parameter is currently <i>EXPERIMENTAL</i>.<br>
- * If the filter is defined, only the messages matching the filter are logged.
+ * The access log format determines the format of the logged messages:
+ * <ul>
+ *     <li>text: Logs all messages in a multi-line json format.</li>
+ *     <li>text: Logs all messages as base64-encoded single-line format.</li>
+ *     <li>compact: Skips certain messages, such as position reports, and formats the messages
+ *                  in a simplified compact format.</li>
+ * </ul>
  * <p>
- * Example: <code>inbound && clientId == 'mmsi:565009926'</code>
+ * If the <i>filter</i> is defined, only the messages matching the filter are logged.<br>
+ * Example: <code>inbound && clientId == 'mmsi:565009926' && msg.m.positionTime !== undefined</code>
  */
 @SuppressWarnings("unused")
 public class AccessLogManager {
@@ -61,17 +78,8 @@ public class AccessLogManager {
 
         if (conf.getAccessLog() != null && conf.getAccessLog().trim().length() > 0) {
             String logFile = conf.getAccessLog().equalsIgnoreCase(LOG_TO_STDOUT) ? null : conf.getAccessLog();
-            addMessageLog(logFile);
+            addMessageLog(logFile, conf.getAccessLogFormat());
         }
-    }
-
-    /**
-     * Adds a logger that logs to System.out.
-     *
-     * @return the message log or null if undefined
-     */
-    public MessageLog addMessageLog() {
-        return addMessageLog(null, null);
     }
 
     /**
@@ -79,10 +87,11 @@ public class AccessLogManager {
      * If no file is specified, System.out is used instead.
      *
      * @param file the log file. If null, System.out is used instead.
+     * @param format the message format
      * @return the message log or null if undefined
      */
-    public MessageLog addMessageLog(String file) {
-        return addMessageLog(file, null);
+    public MessageLog addMessageLog(String file, AccessLogFormat format) {
+        return addMessageLog(file, format, null);
     }
 
     /**
@@ -90,12 +99,13 @@ public class AccessLogManager {
      * If no file is specified, System.out is used instead.
      *
      * @param file the log file. If null, System.out is used instead.
+     * @param format the message format
      * @param filter the log filter
      * @return the message log or null if undefined
      */
-    public MessageLog addMessageLog(String file, String filter) {
+    public MessageLog addMessageLog(String file, AccessLogFormat format, String filter) {
         try {
-            MessageLog log = new MessageLog(file, filter);
+            MessageLog log = new MessageLog(file, format, filter);
             messageLogs.add(log);
             return log;
         } catch (IOException e) {
@@ -142,6 +152,15 @@ public class AccessLogManager {
     }
 
     /**
+     * The access log message format
+     */
+    public enum AccessLogFormat {
+        TEXT,       // Log in JSON format
+        BINARY,     // Log in binary format (Base64 encoded)
+        COMPACT     // Log a non-complete compact representation of the messages
+    }
+
+    /**
      * Interface that should be implemented by the main configuration class
      */
     public interface AccessLogConfiguration {
@@ -151,6 +170,12 @@ public class AccessLogManager {
          * @return the accessLog
          */
         String getAccessLog();
+
+        /**
+         * Returns the access log format
+         * @return the access log format
+         */
+        AccessLogFormat getAccessLogFormat();
     }
 
     /**
@@ -160,18 +185,34 @@ public class AccessLogManager {
     public static class MessageLog extends Formatter {
         private final Logger log = Logger.getLogger(MessageLog.class.getSimpleName());
         private final String file;
-        private final String filter;
-        private final String format = "%1$tb %1$td, %1$tY %1$tH:%1$tM:%1$tS:%1$tL %1$Tz - %2$s - %3$s - %4$s - %5$s%n";
-        private boolean compact = Boolean.getBoolean("net.maritimecloud.mms.accessLog.compact");
+        private final String lineFormat = "%1$tb %1$td, %1$tY %1$tH:%1$tM:%1$tS:%1$tL %1$Tz - %2$s - %3$s - %4$s - %5$s%n";
+        private final AccessLogFormat accessLogFormat;
+        private Invocable filterFunction = null;
 
         /**
          * Constructor
          * @param file the log file
+         * @param accessLogFormat the message format
          * @param filter the log filter
          */
-        public MessageLog(String file, String filter) throws IOException {
+        public MessageLog(String file, AccessLogFormat accessLogFormat, String filter) throws IOException {
             this.file = file;
-            this.filter = filter;
+            this.accessLogFormat = accessLogFormat;
+
+            // Instantiate the filter Javascript engine
+            if (filter != null && filter.trim().length() > 0) {
+                try {
+                    // Considerations: Various documentation suggests that the ScriptEngine is indeed threadsafe.
+                    // However, shared state is not isolated, so, setting the parameters (msg, clientId, etc.) as
+                    // script engine state and evaluating the filter directly would not work correctly.
+                    // Instead, we wrap the filter in a function and call that function.
+                    ScriptEngine jsEngine = new ScriptEngineManager().getEngineByName("JavaScript");
+                    jsEngine.eval("function doLog(msg, clientId, inbound, msgType) { return " + filter + "; }");
+                    filterFunction = (Invocable)jsEngine;
+                } catch (Exception e) {
+                    throw new IOException("Invalid access log filter: " + filter);
+                }
+            }
 
             log.setUseParentHandlers(false);
             if (file != null) {
@@ -196,20 +237,13 @@ public class AccessLogManager {
          */
         public void logMessage(MmsMessage msg, String clientId, boolean inbound, MessageFormatType type) {
             String msgType = type == MessageFormatType.MACHINE_READABLE ? "bin" : "txt";
-            boolean doLog = true;
+            boolean doLog = checkLogMessage(msg, inbound);
 
             // Check if a message filter has been defined
-            if (filter != null && filter.trim().length() > 0) {
-                // TODO: Do not create a new script engine for each call to log a message.
-                // However, multi-threading must be considered carefully.
-                ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
-                engine.put("msg", msg);
-                engine.put("clientId", clientId);
-                engine.put("inbound", inbound);
-                engine.put("msgType", msgType);
+            if (filterFunction != null) {
                 try {
-                    doLog = (Boolean)engine.eval(filter);
-                } catch (ScriptException e) {
+                    doLog = (Boolean)filterFunction.invokeFunction("doLog", msg, clientId, inbound, msgType);
+                } catch (Exception e) {
                     doLog = false;
                 }
             }
@@ -218,10 +252,10 @@ public class AccessLogManager {
             if (doLog) {
                 try {
                     String record = String.format(
-                            format,
+                            lineFormat,
                             new Date(),
                             msgType,
-                            inbound ? "inbound" : "outbound",
+                            inbound ? "in " : "out",
                             clientId == null ? "N/A" : clientId,
                             encodeMessage(msg)
                     );
@@ -233,16 +267,91 @@ public class AccessLogManager {
         }
 
         /**
+         * Check if the message should be logged. When the 'compact' access log format is selected
+         * certain types of messages are omitted.
+         * @param msg the message to check
+         * @param inbound inbound or outbound
+         * @return if the message should be logged
+         */
+        private boolean checkLogMessage(MmsMessage msg, boolean inbound) {
+            if (accessLogFormat == AccessLogFormat.COMPACT) {
+                Message m = msg.getMessage();
+
+                // The different condition where we want to skip a log record in the 'compact' access log format
+                if (m instanceof Broadcast && !inbound) {
+                    return false;
+                } else if (m instanceof BroadcastAck ||
+                        m instanceof Connected ||
+                        m instanceof PositionReport ||
+                        m instanceof MethodInvokeResult) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /**
          * Encodes the given message
          * @param msg the message
          * @return the encoded message
          */
         private String encodeMessage(MmsMessage msg) throws IOException {
-            if (compact) {
+            if (accessLogFormat == AccessLogFormat.BINARY) {
                 return Base64.getEncoder().encodeToString(msg.toBinary());
+
+            } else if (accessLogFormat == AccessLogFormat.COMPACT) {
+                return formatMessageCompact(msg);
+
             } else {
                 // Indent each line in the JSON blob
                 return String.format("%n%s", msg.toText().replaceAll("(?m)^", "  "));
+            }
+        }
+
+        /** Simple utility method that extracts the parameter value */
+        public static String extractParam(String txt, String param, String defaultValue) {
+            try {
+                Matcher m = Pattern.compile(".*\"" + param + "\":\\s*\"(.*)\".*", Pattern.MULTILINE).matcher(txt);
+                return m.find() ? m.group(1) : defaultValue;
+            } catch (Exception e) {
+                return defaultValue;
+            }
+        }
+
+        /**
+         * Formats the message in a compact fashion
+         * @param msg the message to format
+         * @return the result
+         */
+        private String formatMessageCompact(MmsMessage msg) {
+            if (msg.getMessage() instanceof Close) {
+                return String.format("Close[%s]", ((Close)msg.getMessage()).getCloseCode());
+
+            } else if (msg.getMessage().getClass().getPackage().equals(Hello.class.getPackage())) {
+                return msg.getMessage().getClass().getSimpleName();
+
+            } else if (msg.getMessage() instanceof Broadcast) {
+                return String.format("Broadcast[%s]", ((Broadcast) msg.getMessage()).getBroadcastType());
+
+            } else if (msg.getMessage() instanceof MethodInvoke) {
+                MethodInvoke invoke = (MethodInvoke)msg.getMessage();
+
+                if ("Services.registerEndpoint".equals(invoke.getEndpointMethod())) {
+                    return String.format("Services.registerEndpoint[%s]", extractParam(invoke.getParameters(), "endpointName", ""));
+                } else if ("Services.unregisterEndpoint".equals(invoke.getEndpointMethod())) {
+                    return String.format("Services.unregisterEndpoint[%s]", extractParam(invoke.getParameters(), "endpointName", ""));
+                } else if ("Services.locate".equals(invoke.getEndpointMethod())) {
+                    return String.format("Services.locate[%s]", extractParam(invoke.getParameters(), "endpointName", ""));
+                } else if ("Services.subscribe".equals(invoke.getEndpointMethod())) {
+                    return String.format("Services.subscribe[%s]", extractParam(invoke.getParameters(), "name", ""));
+                }
+                return String.format("MethodInvoke[%s]", invoke.getEndpointMethod());
+
+            } else if (msg.getMessage().getClass().getPackage().equals(MethodInvoke.class.getPackage())) {
+                return msg.getMessage().getClass().getSimpleName();
+
+            } else {
+                return msg.getMessage().getClass().getName();
             }
         }
 
@@ -250,14 +359,6 @@ public class AccessLogManager {
         @Override
         public String format(LogRecord record) {
             return record.getMessage();
-        }
-
-        public boolean isCompact() {
-            return compact;
-        }
-
-        public void setCompact(boolean compact) {
-            this.compact = compact;
         }
     }
 }

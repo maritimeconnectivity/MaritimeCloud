@@ -15,9 +15,14 @@
 package net.maritimecloud.mms.server;
 
 import static java.util.Objects.requireNonNull;
+import static net.maritimecloud.internal.mms.transport.AccessLogManager.*;
 
+import java.util.Arrays;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
+import com.beust.jcommander.IStringConverter;
+import com.beust.jcommander.ParameterException;
 import net.maritimecloud.core.id.ServerId;
 import net.maritimecloud.internal.mms.transport.AccessLogManager;
 import net.maritimecloud.internal.mms.transport.AccessLogManager.AccessLogConfiguration;
@@ -65,6 +70,10 @@ public class MmsServerConfiguration implements AccessLogConfiguration {
     @Parameter(names = "-accessLog", description = "The file to write access logs to. Use 'stdout' for standard out")
     String accessLog;
 
+    @Parameter(names = "-accessLogFormat", description = "The access log message format. One of 'text', 'binary' or 'compact'",
+                converter = AccessLogFormatConverter.class)
+    AccessLogFormat accessLogFormat = AccessLogFormat.TEXT;
+
     @Parameter(names = "-port", description = "The port to listen for MMS connections on")
     int port = DEFAULT_PORT;
 
@@ -102,6 +111,12 @@ public class MmsServerConfiguration implements AccessLogConfiguration {
     @Override
     public String getAccessLog() {
         return accessLog;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public AccessLogFormat getAccessLogFormat() {
+        return accessLogFormat;
     }
 
     /**
@@ -249,6 +264,23 @@ public class MmsServerConfiguration implements AccessLogConfiguration {
         @Override
         public MmsServer create(MyConfiguration configuration, ContainerComposer composer) {
             return new MmsServer(configuration, composer);
+        }
+    }
+
+    /** Parses the accessLogFormat parameter into an AccessLogFormat enum value */
+    public static class AccessLogFormatConverter implements IStringConverter<AccessLogFormat> {
+
+        /** {@inheritDoc} */
+        @Override
+        public AccessLogFormat convert(String value) {
+            try {
+                return AccessLogFormat.valueOf(value.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new ParameterException("'" + value + "' is not a valid access log format value. Valid options: "
+                    + Arrays.stream(AccessLogFormat.values())
+                        .map(v -> v.toString().toLowerCase())
+                        .collect(Collectors.joining(", ")));
+            }
         }
     }
 }

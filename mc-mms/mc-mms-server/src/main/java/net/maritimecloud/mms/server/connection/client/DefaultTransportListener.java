@@ -135,7 +135,13 @@ public class DefaultTransportListener implements ServerTransportListener {
      */
     private void updateAccessLog(ServerTransport t, MmsMessage msg, boolean inbound, MessageFormatType type) {
         Client client = t.getAttachment(ATTACHMENT_CLIENT, Client.class);
-        accessLogManager.logMessage(msg, client == null ? null : client.getId(), inbound, type);
+        String id = client == null ? null : client.getId();
+        if (id == null && msg.getMessage() instanceof Hello) {
+            // The ATTACHMENT_CLIENT has not been updated yet when 'Hello' is logged
+            // Pending: Find solution for 'Connected' which has the same problem
+            id = ((Hello)msg.getMessage()).getClientId();
+        }
+        accessLogManager.logMessage(msg, id, inbound, type);
     }
 
     /** {@inheritDoc} */

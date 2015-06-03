@@ -7,6 +7,12 @@ else
 	ACCESS_LOGP="-accessLog ${ACCESS_LOG}"
 fi
 
+if [ -z "${ACCESS_LOG_FORMAT}" ]; then
+	ACCESS_LOG_FORMATP=""
+else
+	ACCESS_LOG_FORMATP="-accessLogFormat ${ACCESS_LOG_FORMAT}"
+fi
+
 if [ -z "${SECURE_PORT}" ]; then
 	SECURE_PORTP=""
 else
@@ -26,5 +32,6 @@ else
 fi
 
 
-java -classpath $LATEST  net.maritimecloud.mms.server.Main -port 43234 -rest 9090 $ACCESS_LOGP $SECURE_PORTP $KEYSTOREP $KEYSTORE_PASSWORDP
+java -classpath $LATEST  net.maritimecloud.mms.server.Main -port 43234 -rest 9090 \
+     $ACCESS_LOGP $ACCESS_LOG_FORMATP $SECURE_PORTP $KEYSTOREP $KEYSTORE_PASSWORDP
 
