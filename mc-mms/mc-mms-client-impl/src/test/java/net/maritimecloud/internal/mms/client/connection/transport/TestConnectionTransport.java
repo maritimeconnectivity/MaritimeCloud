@@ -14,10 +14,23 @@
  */
 package net.maritimecloud.internal.mms.client.connection.transport;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import net.maritimecloud.internal.mms.client.TestWebSocketServer;
+import net.maritimecloud.internal.mms.messages.Hello;
+import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
+import net.maritimecloud.net.mms.MmsClient;
+import net.maritimecloud.net.mms.MmsConnection;
+import net.maritimecloud.net.mms.MmsConnectionClosingCode;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
+import javax.websocket.CloseReason;
+import javax.websocket.OnClose;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
+import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.ServerSocket;
@@ -29,25 +42,9 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.websocket.CloseReason;
-import javax.websocket.OnClose;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.server.ServerEndpoint;
-
-import net.maritimecloud.internal.mms.client.TestWebSocketServer;
-import net.maritimecloud.internal.mms.messages.Hello;
-import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
-import net.maritimecloud.internal.mms.transport.MmsWireProtocol;
-import net.maritimecloud.net.mms.MmsClient;
-import net.maritimecloud.net.mms.MmsConnection;
-import net.maritimecloud.net.mms.MmsConnectionClosingCode;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  *
@@ -65,13 +62,8 @@ public class TestConnectionTransport {
 
     ClientTransportFactoryJetty tm;
 
-    boolean wasSendBinary = MmsWireProtocol.USE_BINARY;
-
     @Before
     public void before() throws Exception {
-
-        // Force text over the wire protocol
-        MmsWireProtocol.USE_BINARY = false;
 
         tm = new ClientTransportFactoryJetty();
         tm.start();
@@ -92,9 +84,6 @@ public class TestConnectionTransport {
             }
             assertTrue(st.receivedTests.isEmpty());
         }
-
-        // Restore the wire protocol
-        MmsWireProtocol.USE_BINARY = wasSendBinary;
     }
 
     @Test

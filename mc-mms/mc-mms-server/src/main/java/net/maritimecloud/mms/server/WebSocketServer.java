@@ -89,8 +89,15 @@ public class WebSocketServer {
 
             // SSL Context Factory for HTTPS
             SslContextFactory sslContextFactory = new SslContextFactory();
-            sslContextFactory.setKeyStorePath(configuration.getKeystore());
-            sslContextFactory.setKeyStorePassword(configuration.getKeystorePassword());
+            if (configuration.useKeystore()) {
+                sslContextFactory.setKeyStorePath(configuration.getKeystore());
+                sslContextFactory.setKeyStorePassword(configuration.getKeystorePassword());
+            }
+            if (configuration.useTruststore()) {
+                sslContextFactory.setNeedClientAuth(true);
+                sslContextFactory.setTrustStorePath(configuration.getTruststore());
+                sslContextFactory.setTrustStorePassword(configuration.getTruststorePassword());
+            }
 
             // HTTPS Configuration
             HttpConfiguration https_config = new HttpConfiguration(http_config);

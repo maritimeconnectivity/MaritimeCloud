@@ -14,11 +14,11 @@
  */
 package net.maritimecloud.internal.mms.client.connection.transport;
 
+import net.maritimecloud.net.mms.MmsClientConfiguration;
+import net.maritimecloud.net.mms.MmsConnection;
+
 import javax.websocket.ContainerProvider;
 import javax.websocket.WebSocketContainer;
-
-import net.maritimecloud.message.MessageFormatType;
-import net.maritimecloud.net.mms.MmsConnection;
 
 /**
  *
@@ -26,11 +26,15 @@ import net.maritimecloud.net.mms.MmsConnection;
  */
 public class ClientTransportFactoryJsr356 extends ClientTransportFactory {
 
+    public ClientTransportFactoryJsr356(MmsClientConfiguration conf) {
+        super(conf);
+    }
+
     /** {@inheritDoc} */
     @Override
-    public ClientTransport create(MessageFormatType mft, ClientTransportListener transportListener,
+    public ClientTransport create(ClientTransportListener transportListener,
             MmsConnection.Listener connectionListener) {
-        return new ClientTransportJsr356(mft, transportListener, connectionListener, Singleton.INSTANCE);
+        return new ClientTransportJsr356(conf, transportListener, connectionListener, Singleton.INSTANCE);
     }
 
     /** Singleton. Uses the standard initialization-on-demand holder idiom. */
@@ -40,7 +44,7 @@ public class ClientTransportFactoryJsr356 extends ClientTransportFactory {
         static {
             INSTANCE = ContainerProvider.getWebSocketContainer();
 
-            // Default settings,\
+            // Default settings
             INSTANCE.setDefaultMaxTextMessageBufferSize(5 * 1024 * 1024);
             INSTANCE.setDefaultMaxBinaryMessageBufferSize(5 * 1024 * 1024);
 

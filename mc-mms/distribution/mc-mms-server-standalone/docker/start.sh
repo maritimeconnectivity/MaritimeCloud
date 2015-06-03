@@ -31,7 +31,21 @@ else
 	KEYSTORE_PASSWORDP="-keystorePassword ${KEYSTORE_PASSWORD}"
 fi
 
+if [ -z "${TRUSTSTORE}" ]; then
+	TRUSTSTOREP=""
+else
+	TRUSTSTOREP="-truststore ${TRUSTSTORE}"
+fi
 
-java -classpath $LATEST  net.maritimecloud.mms.server.Main -port 43234 -rest 9090 \
-     $ACCESS_LOGP $ACCESS_LOG_FORMATP $SECURE_PORTP $KEYSTOREP $KEYSTORE_PASSWORDP
+if [ -z "${TRUSTSTORE_PASSWORD}" ]; then
+	TRUSTSTORE_PASSWORDP=""
+else
+	TRUSTSTORE_PASSWORDP="-truststorePassword ${TRUSTSTORE_PASSWORD}"
+fi
+
+java -classpath $LATEST  net.maritimecloud.mms.server.Main \
+   -port 43234 -rest 9090 \
+   $ACCESS_LOGP $ACCESS_LOG_FORMATP $SECURE_PORTP \
+   $KEYSTOREP $KEYSTORE_PASSWORDP \
+   $TRUSTSTOREP $TRUSTSTORE_PASSWORDP
 

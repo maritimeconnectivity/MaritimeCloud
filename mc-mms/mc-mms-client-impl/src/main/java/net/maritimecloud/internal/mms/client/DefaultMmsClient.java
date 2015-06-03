@@ -189,7 +189,7 @@ public class DefaultMmsClient implements MmsClient {
         cc.addService(DefaultMmsConnection.class);
         cc.addService(MmsThreadManager.class);
         cc.addService(ClientConnection.class);
-        cc.addService(ClientTransportFactory.create());
+        cc.addService(ClientTransportFactory.create(configuration));
         LOGGER.debug("Creating client for " + clientId);
         return cc.create();
     }

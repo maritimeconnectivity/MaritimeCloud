@@ -14,11 +14,11 @@
  */
 package net.maritimecloud.internal.mms.client.connection.transport;
 
-import net.maritimecloud.message.MessageFormatType;
+import net.maritimecloud.net.mms.MmsClientConfiguration;
 import net.maritimecloud.net.mms.MmsConnection;
-
 import org.cakeframework.container.lifecycle.RunOnStart;
 import org.cakeframework.container.lifecycle.RunOnStop;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.jsr356.ClientContainer;
 
 /**
@@ -29,13 +29,49 @@ import org.eclipse.jetty.websocket.jsr356.ClientContainer;
 public class ClientTransportFactoryJetty extends ClientTransportFactory {
 
     /** The single instance of a WebSocketContainer. */
-    private final ClientContainer container = new ClientContainer();
+    private final ClientContainer container;
+
+    /**
+     * Test Constructor
+     */
+    public ClientTransportFactoryJetty() {
+        this(null);
+    }
+
+    /**
+     * Constructor
+     * @param conf the MMS client configuration
+     */
+    public ClientTransportFactoryJetty(MmsClientConfiguration conf) {
+        super(conf);
+
+        // Initialize the container
+        container = new ClientContainer();
+
+        // Default settings
+        container.setDefaultMaxTextMessageBufferSize(5 * 1024 * 1024);
+        container.setDefaultMaxBinaryMessageBufferSize(5 * 1024 * 1024);
+
+        if (conf != null && conf.getKeystore() != null && conf.getKeystorePassword() != null) {
+            SslContextFactory sslContextFactory = container.getClient().getSslContextFactory();
+
+            sslContextFactory.setKeyStorePath(conf.getKeystore());
+            sslContextFactory.setKeyStorePassword(conf.getKeystorePassword());
+        }
+
+        if (conf != null && conf.getTruststore() != null && conf.getTruststorePassword() != null) {
+            SslContextFactory sslContextFactory = container.getClient().getSslContextFactory();
+
+            sslContextFactory.setTrustStorePath(conf.getTruststore());
+            sslContextFactory.setTrustStorePassword(conf.getTruststorePassword());
+        }
+    }
 
     /** {@inheritDoc} */
     @Override
-    public ClientTransport create(MessageFormatType mft, ClientTransportListener transportListener,
+    public ClientTransport create(ClientTransportListener transportListener,
             MmsConnection.Listener connectionListener) {
-        return new ClientTransportJsr356(mft, transportListener, connectionListener, container);
+        return new ClientTransportJsr356(conf, transportListener, connectionListener, container);
     }
 
     /**

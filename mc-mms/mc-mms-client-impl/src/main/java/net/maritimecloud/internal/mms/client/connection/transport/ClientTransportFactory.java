@@ -14,10 +14,10 @@
  */
 package net.maritimecloud.internal.mms.client.connection.transport;
 
-import static net.maritimecloud.internal.util.ClassUtil.classExists;
-import net.maritimecloud.internal.mms.transport.MmsWireProtocol;
-import net.maritimecloud.message.MessageFormatType;
+import net.maritimecloud.net.mms.MmsClientConfiguration;
 import net.maritimecloud.net.mms.MmsConnection;
+
+import static net.maritimecloud.internal.util.ClassUtil.classExists;
 
 /**
  * A ConnectionTransportManager takes care of creating new ConnectionTransport. This class mainly exists because we are
@@ -39,6 +39,8 @@ public abstract class ClientTransportFactory {
             name = PACKAGE_PREFIX + "AndroidNotImplementedYet";
         } else if (classExists("org.eclipse.jetty.websocket.jsr356.ClientContainer")) {
             name = PACKAGE_PREFIX + "Jetty";
+        } else if (classExists("org.apache.tomcat.websocket.WsWebSocketContainer")) {
+            name = PACKAGE_PREFIX + "Tomcat";
         } else {
             name = PACKAGE_PREFIX + "Jsr356";
         }
@@ -50,19 +52,14 @@ public abstract class ClientTransportFactory {
         }
     }
 
+    final MmsClientConfiguration conf;
+
     /**
-     * Creates a new transport
-     *
-     * @param transportListener
-     *            the transport listener
-     * @param connectionListener
-     *            the connection listener
-     * @return the transport
+     * Constructor
+     * @param conf the MMS client configuration
      */
-    public final ClientTransport create(ClientTransportListener transportListener,
-            MmsConnection.Listener connectionListener) {
-        return create(MmsWireProtocol.USE_BINARY ? MessageFormatType.MACHINE_READABLE
-                : MessageFormatType.HUMAN_READABLE, transportListener, connectionListener);
+    public ClientTransportFactory(MmsClientConfiguration conf) {
+        this.conf = conf;
     }
 
     /**
@@ -74,17 +71,17 @@ public abstract class ClientTransportFactory {
      *            the connection listener
      * @return the transport
      */
-    public abstract ClientTransport create(MessageFormatType messageFormatType,
-            ClientTransportListener transportListener, MmsConnection.Listener connectionListener);
+    public abstract ClientTransport create(ClientTransportListener transportListener, MmsConnection.Listener connectionListener);
 
     /**
      * Creates a new connection transport factory.
      *
+     * @param conf the MMS client configuration
      * @return a new connection transport factory
      */
-    public static ClientTransportFactory create() {
+    public static ClientTransportFactory create(MmsClientConfiguration conf) {
         try {
-            return FACTORY.newInstance();
+            return FACTORY.getConstructor(MmsClientConfiguration.class).newInstance(conf);
         } catch (ReflectiveOperationException e) {
             throw new Error(e);
         }

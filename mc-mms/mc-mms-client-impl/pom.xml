@@ -47,6 +47,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-websocket</artifactId>
+      <version>8.0.21</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>net.maritimecloud.msdl</groupId>
       <artifactId>mc-msdl-javagenerator</artifactId>
       <version>${project.version}</version>

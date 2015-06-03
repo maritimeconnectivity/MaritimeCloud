@@ -14,23 +14,24 @@
  */
 package net.maritimecloud.net.mms;
 
-import static java.util.Objects.requireNonNull;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import net.maritimecloud.core.id.MaritimeId;
-import net.maritimecloud.internal.mms.transport.MmsWireProtocol;
 import net.maritimecloud.net.Environment;
 import net.maritimecloud.util.geometry.Circle;
 import net.maritimecloud.util.geometry.PositionReader;
 import net.maritimecloud.util.geometry.PositionReaderSimulator;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import static java.util.Objects.requireNonNull;
+
 /**
- *
+ * MMS Client configuration class.
  * @author Kasper Nielsen
  */
 public class MmsClientConfiguration {
@@ -52,6 +53,18 @@ public class MmsClientConfiguration {
     private PositionReader positionReader = new PositionReaderSimulator().forArea(Circle.create(0, 0, 50000));
 
     final Properties properties = new Properties();
+
+    private boolean useBinary;
+
+    private String keystore;
+
+    private String keystorePassword;
+
+    private String truststore;
+
+    private String truststorePassword;
+
+    private Map<String, String> headers = new HashMap<>();
 
     /**
      * Constructor
@@ -80,6 +93,32 @@ public class MmsClientConfiguration {
     }
 
     /**
+     * Factory method for creating a new MMS client configuration
+     * @return a new MMS client configuration
+     */
+    public static MmsClientConfiguration create() {
+        return new MmsClientConfiguration(null);
+    }
+
+    /**
+     * Factory method for creating a new MMS client configuration
+     * @param id the maritime id of the client
+     * @return a new MMS client configuration
+     */
+    public static MmsClientConfiguration create(MaritimeId id) {
+        return new MmsClientConfiguration(id);
+    }
+
+    /**
+     * Factory method for creating a new MMS client configuration
+     * @param id the maritime id of the client
+     * @return a new MMS client configuration
+     */
+    public static MmsClientConfiguration create(String id) {
+        return new MmsClientConfiguration(MaritimeId.create(id));
+    }
+
+    /**
      * Adds a state listener that will be invoked whenever the state of the connection changes.
      *
      * @param listener
@@ -93,6 +132,11 @@ public class MmsClientConfiguration {
         return this;
     }
 
+    /**
+     * Build an MmsClient from the configuration
+     *
+     * @return the MmsClient defined by the configuration
+     */
     @SuppressWarnings("unchecked")
     public MmsClient build() {
         Class<?> c;
@@ -131,68 +175,22 @@ public class MmsClientConfiguration {
         return client;
     }
 
+    /**
+     * Builds an MmsClient for the given maritime id
+     * @param id the maritime id
+     * @return an MmsClient for the maritime id
+     */
     public MmsClient build(MaritimeId id) {
         this.id = id;
         return build();
     }
 
+    // ****************************************
+    // ********** Getters and Setters *********
+    // ****************************************
+
     public String getHost() {
         return host;
-    }
-
-    /**
-     * @return the id
-     */
-    public MaritimeId getId() {
-        return id;
-    }
-
-    public boolean useBinary() {
-        return MmsWireProtocol.USE_BINARY;
-    }
-
-    /**
-     * @param unit
-     *            the timeunit
-     * @return the keepAliveNanos
-     */
-    public long getKeepAlive(TimeUnit unit) {
-        return unit.convert(keepAliveNanos, TimeUnit.NANOSECONDS);
-    }
-
-    /**
-     * @return the connectionListeners
-     */
-    public List<MmsConnection.Listener> getListeners() {
-        return connectionListeners;
-    }
-
-    /**
-     * @return the positionSupplier
-     */
-    public PositionReader getPositionReader() {
-        return positionReader;
-    }
-
-    /**
-     * @return the autoConnect
-     */
-    public boolean isAutoConnect() {
-        return autoConnect;
-    }
-
-
-    public Properties properties() {
-        return properties;
-    }
-
-    /**
-     * @param autoConnect
-     *            the autoConnect to set
-     */
-    // setDisabledOnStart?
-    public void setEnabledOnStartup(boolean autoConnect) {
-        this.autoConnect = autoConnect;
     }
 
     public MmsClientConfiguration setHost(String host) {
@@ -205,9 +203,26 @@ public class MmsClientConfiguration {
         return this;
     }
 
+    public MaritimeId getId() {
+        return id;
+    }
+
     public MmsClientConfiguration setId(MaritimeId id) {
         this.id = id;
         return this;
+    }
+
+    public boolean useBinary() {
+        return useBinary;
+    }
+
+    public MmsClientConfiguration setUseBinary(boolean useBinary) {
+        this.useBinary = useBinary;
+        return this;
+    }
+
+    public long getKeepAlive(TimeUnit unit) {
+        return unit.convert(keepAliveNanos, TimeUnit.NANOSECONDS);
     }
 
     public MmsClientConfiguration setKeepAlive(long time, TimeUnit unit) {
@@ -215,23 +230,83 @@ public class MmsClientConfiguration {
         return this;
     }
 
+    public List<MmsConnection.Listener> getListeners() {
+        return connectionListeners;
+    }
+
+    public PositionReader getPositionReader() {
+        return positionReader;
+    }
+
     public MmsClientConfiguration setPositionReader(PositionReader positionReader) {
         this.positionReader = requireNonNull(positionReader);
         return this;
     }
 
-    public static MmsClientConfiguration create() {
-        return new MmsClientConfiguration(null);
+    public boolean isAutoConnect() {
+        return autoConnect;
     }
 
-    public static MmsClientConfiguration create(MaritimeId id) {
-        return new MmsClientConfiguration(id);
+    public void setEnabledOnStartup(boolean autoConnect) {
+        this.autoConnect = autoConnect;
     }
 
-    public static MmsClientConfiguration create(String id) {
-        return new MmsClientConfiguration(MaritimeId.create(id));
+    public Properties properties() {
+        return properties;
     }
 
+    public String getKeystore() {
+        return keystore;
+    }
+
+    public MmsClientConfiguration setKeystore(String keystore) {
+        this.keystore = keystore;
+        return this;
+    }
+
+    public String getKeystorePassword() {
+        return keystorePassword;
+    }
+
+    public MmsClientConfiguration setKeystorePassword(String keystorePassword) {
+        this.keystorePassword = keystorePassword;
+        return this;
+    }
+
+    public String getTruststore() {
+        return truststore;
+    }
+
+    public MmsClientConfiguration setTruststore(String truststore) {
+        this.truststore = truststore;
+        return this;
+    }
+
+    public String getTruststorePassword() {
+        return truststorePassword;
+    }
+
+    public MmsClientConfiguration setTruststorePassword(String truststorePassword) {
+        this.truststorePassword = truststorePassword;
+        return this;
+    }
+
+    public Map<String, String> getHeaders() {
+        return headers;
+    }
+
+    public MmsClientConfiguration setHeaders(Map<String, String> headers) {
+        this.headers = headers;
+        return this;
+    }
+
+    // ****************************************
+    // ********** Helper Classes **************
+    // ****************************************
+
+    /**
+     * Class that defines the client properties such as name and organization
+     */
     public static class Properties {
         private String description;
 

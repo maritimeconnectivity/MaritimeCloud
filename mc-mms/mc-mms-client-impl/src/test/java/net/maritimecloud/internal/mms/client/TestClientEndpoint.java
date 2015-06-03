@@ -16,7 +16,6 @@ package net.maritimecloud.internal.mms.client;
 
 import net.maritimecloud.internal.mms.messages.Welcome;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
-import net.maritimecloud.internal.mms.transport.MmsWireProtocol;
 import net.maritimecloud.message.Message;
 import org.eclipse.jetty.websocket.common.WebSocketSession;
 import org.eclipse.jetty.websocket.common.io.AbstractWebSocketConnection;
@@ -29,7 +28,6 @@ import javax.websocket.RemoteEndpoint.Basic;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
@@ -135,11 +133,7 @@ public class TestClientEndpoint {
         }
         Basic r = session.getBasicRemote();
         try {
-            if (MmsWireProtocol.USE_BINARY) {
-                r.sendBinary(ByteBuffer.wrap(mms.toBinary()));
-            } else {
-                r.sendText(mms.toText());
-            }
+            r.sendText(mms.toText());
         } catch (IOException e) {
             throw new AssertionError(e);
         }

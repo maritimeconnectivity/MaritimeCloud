@@ -14,7 +14,7 @@
  */
 package net.maritimecloud.mms.server.connection.transport;
 
-import static java.util.Objects.requireNonNull;
+import net.maritimecloud.mms.server.ServerEventListener;
 
 import javax.websocket.CloseReason;
 import javax.websocket.OnClose;
@@ -23,7 +23,7 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
-import net.maritimecloud.mms.server.ServerEventListener;
+import static java.util.Objects.requireNonNull;
 
 /**
  * The endpoint taking care of creating server transports using the JSR 356 Websocket API.

@@ -25,7 +25,7 @@ import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.ParameterException;
 import net.maritimecloud.core.id.ServerId;
 import net.maritimecloud.internal.mms.transport.AccessLogManager;
-import net.maritimecloud.internal.mms.transport.AccessLogManager.AccessLogConfiguration;
+import net.maritimecloud.internal.mms.transport.SecurityConfiguration;
 import net.maritimecloud.mms.server.broadcast.ServerBroadcastManager;
 import net.maritimecloud.mms.server.connection.client.ClientManager;
 import net.maritimecloud.mms.server.connection.client.ClientReaper;
@@ -47,7 +47,7 @@ import com.codahale.metrics.MetricRegistry;
  *
  * @author Kasper Nielsen
  */
-public class MmsServerConfiguration implements AccessLogConfiguration {
+public class MmsServerConfiguration implements AccessLogConfiguration, SecurityConfiguration {
 
     /** The default port this server is running on. */
     public static final int DEFAULT_PORT = 43234;
@@ -61,11 +61,17 @@ public class MmsServerConfiguration implements AccessLogConfiguration {
     /** The id of the server, hard coded for now */
     ServerId id = new ServerId(1);
 
-    @Parameter(names = "-keystore", description = "The path to the keystore")
+    @Parameter(names = "-keystore", description = "The path to the key-store")
     String keystore = null;
 
-    @Parameter(names = "-keystorePassword", description = "The password of the keystore")
+    @Parameter(names = "-keystorePassword", description = "The password of the key-store")
     String keystorePassword = null;
+
+    @Parameter(names = "-truststore", description = "The path to the trust-store")
+    String truststore = null;
+
+    @Parameter(names = "-truststorePassword", description = "The password of the trust-store")
+    String truststorePassword = null;
 
     @Parameter(names = "-accessLog", description = "The file to write access logs to. Use 'stdout' for standard out")
     String accessLog;
@@ -93,18 +99,28 @@ public class MmsServerConfiguration implements AccessLogConfiguration {
         return id;
     }
 
-    /**
-     * @return the keystore
-     */
+    /** {@inheritDoc} */
+    @Override
     public String getKeystore() {
         return keystore;
     }
 
-    /**
-     * @return the keystorePassword
-     */
+    /** {@inheritDoc} */
+    @Override
     public String getKeystorePassword() {
         return keystorePassword;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getTruststore() {
+        return truststore;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getTruststorePassword() {
+        return truststorePassword;
     }
 
     /** {@inheritDoc} */

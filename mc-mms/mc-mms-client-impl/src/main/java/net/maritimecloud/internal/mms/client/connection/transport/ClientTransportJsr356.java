@@ -14,37 +14,39 @@
  */
 package net.maritimecloud.internal.mms.client.connection.transport;
 
-import static java.util.Objects.requireNonNull;
-
-import java.io.IOException;
-import java.io.InterruptedIOException;
-import java.net.URI;
-import java.nio.ByteBuffer;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import javax.websocket.ClientEndpoint;
-import javax.websocket.CloseReason;
-import javax.websocket.DeploymentException;
-import javax.websocket.OnClose;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
-
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.internal.util.concurrent.CompletableFuture;
 import net.maritimecloud.internal.util.logging.Logger;
 import net.maritimecloud.message.MessageFormatType;
+import net.maritimecloud.net.mms.MmsClientConfiguration;
 import net.maritimecloud.net.mms.MmsConnection;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
+
+import javax.websocket.ClientEndpointConfig;
+import javax.websocket.CloseReason;
+import javax.websocket.DeploymentException;
+import javax.websocket.Endpoint;
+import javax.websocket.EndpointConfig;
+import javax.websocket.MessageHandler;
+import javax.websocket.Session;
+import javax.websocket.WebSocketContainer;
+import java.io.IOException;
+import java.io.InterruptedIOException;
+import java.net.URI;
+import java.nio.ByteBuffer;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * The default implementation of a connection transport.
  *
  * @author Kasper Nielsen
  */
-@ClientEndpoint
 public final class ClientTransportJsr356 extends ClientTransport { // Class must be public to be detected
 
     /** The logger. */
@@ -52,6 +54,8 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
 
     /** The WebSocket container. */
     private final WebSocketContainer container;
+
+    private final MmsClientConfiguration conf;
 
     private final MessageFormatType mft;
 
@@ -67,6 +71,7 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
     /**
      * Creates a new ClientTransportJsr356.
      *
+     * @param conf the MMS client configuration
      * @param transportListener
      *            the transport listener
      * @param connectionListener
@@ -74,10 +79,12 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
      * @param container
      *            the web-socket container
      */
-    ClientTransportJsr356(MessageFormatType mft, ClientTransportListener transportListener,
+    ClientTransportJsr356(MmsClientConfiguration conf, ClientTransportListener transportListener,
             MmsConnection.Listener connectionListener, WebSocketContainer container) {
         super(transportListener, connectionListener);
-        this.mft = requireNonNull(mft);
+
+        this.conf = conf;
+        this.mft = conf != null && conf.useBinary() ? MessageFormatType.MACHINE_READABLE : MessageFormatType.HUMAN_READABLE;
         this.container = requireNonNull(container);
     }
 
@@ -111,7 +118,12 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
         });
 
         try {
-            container.connectToServer(this, uri);
+            // Associate a client endpoint configurator
+            ClientEndpointConfig config = ClientEndpointConfig.Builder.create()
+                    .configurator(new ClientTransportConfigurator())
+                    .build();
+
+            container.connectToServer(new ClientTransportEndpoint(), config, uri);
         } catch (DeploymentException e) {
             throw new IllegalStateException("Internal Error", e);
         } catch (IOException e) {
@@ -122,49 +134,6 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
         } finally {
             cf.complete(null);
         }
-    }
-
-    /** {@inheritDoc} */
-    @OnMessage
-    @Override
-    public void onBinaryMessage(byte[] binaryMessage) {
-        super.onBinaryMessage(binaryMessage); // overridden for the @OnMessage annotation
-    }
-
-    /**
-     * Called when a web socket connection is closed
-     *
-     * @param closeReason
-     *            the close reason
-     */
-    @OnClose
-    public void onClose(CloseReason closeReason) {
-        LOGGER.info("Socket closed");
-        wsSession = null;
-        MmsConnectionClosingCode reason = MmsConnectionClosingCode.create(closeReason.getCloseCode().getCode(),
-                closeReason.getReasonPhrase());
-        //Start a new thread to close it. Websocket async is a total mess
-        //Basically there is a deadlock if writing at the same time.
-        Thread t = new Thread(() -> {
-            transportListener.onClose(reason);
-            connectionListener.disconnected(reason);
-        });
-        t.start();
-    }
-
-    /** Called when a new web socket connection is opened */
-    @OnOpen
-    public void onOpen(Session session) {
-        this.wsSession = session; // wait on the server to send a hello message
-        session.setMaxTextMessageBufferSize(10 * 1024 * 1024);
-        transportListener.onOpen();
-    }
-
-    /** {@inheritDoc} */
-    @OnMessage
-    @Override
-    public void onTextMessage(String textMessage) {
-        super.onTextMessage(textMessage); // overridden for the @OnMessage annotation
     }
 
     /** {@inheritDoc} */
@@ -202,6 +171,85 @@ public final class ClientTransportJsr356 extends ClientTransport { // Class must
             }
 
             transportListener.onMessageSent(message);
+        }
+    }
+
+    /**
+     * The websocket endpoint implementation
+     */
+    class ClientTransportEndpoint extends Endpoint {
+
+        /**
+         * Called when a new web socket connection is opened
+         *
+         * @param session the websocket session
+         * @param config the websocket endpoint configuration
+         */
+        @Override
+        @SuppressWarnings("all")
+        public void onOpen(Session session, EndpointConfig config) {
+            wsSession = session; // wait on the server to send a hello message
+            session.setMaxTextMessageBufferSize(10 * 1024 * 1024);
+            transportListener.onOpen();
+
+            // NB: Do not replace with Lambda - it does not work, and I plainly do not understand why that is...
+            //session.addMessageHandler((MessageHandler.Whole<String>) this::onTextMessage);
+            //session.addMessageHandler((MessageHandler.Whole<ByteBuffer>) message -> onBinaryMessage(message.array()));
+
+            session.addMessageHandler(new MessageHandler.Whole<String>() {
+                @Override
+                public void onMessage(String message) {
+                    onTextMessage(message);
+                }
+            });
+            session.addMessageHandler(new MessageHandler.Whole<ByteBuffer>() {
+                @Override
+                public void onMessage(ByteBuffer message) {
+                    onBinaryMessage(message.array());
+                }
+            });
+        }
+
+        /**
+         * Called when a web socket connection is closed
+         *
+         * @param session the websocket session
+         * @param closeReason the close reason
+         */
+        @Override
+        public void onClose(Session session, CloseReason closeReason) {
+            LOGGER.info("Socket closed");
+            wsSession = null;
+            MmsConnectionClosingCode reason = MmsConnectionClosingCode.create(closeReason.getCloseCode().getCode(),
+                    closeReason.getReasonPhrase());
+            //Start a new thread to close it. Websocket async is a total mess
+            //Basically there is a deadlock if writing at the same time.
+            Thread t = new Thread(() -> {
+                transportListener.onClose(reason);
+                connectionListener.disconnected(reason);
+            });
+            t.start();
+        }
+    }
+
+    /**
+     * Custom websocket endpoint configurator class.
+     * <p>
+     * The {@code beforeRequest()} method will be called before the upgrade request
+     * is issued, and may be used for updating the list of request headers,
+     * to e.g. facilitate authentication.
+     */
+    class ClientTransportConfigurator extends ClientEndpointConfig.Configurator {
+
+        /** {@inheritDoc} **/
+        @Override
+        public void beforeRequest(Map<String, List<String>> headers) {
+            if (conf != null) {
+                conf.getHeaders().entrySet()
+                        .forEach(e -> headers.put(e.getKey(), Collections.singletonList(e.getValue())));
+            }
+
+            super.beforeRequest(headers);
         }
     }
 }
