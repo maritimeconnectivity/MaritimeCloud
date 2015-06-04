@@ -1,5 +1,5 @@
 
-LATEST=`ls /archive/mc-mms/distribution/mc-mms-server-standalone/target/mc-mms-server-standalone-*SNAPSHOT.jar`
+LATEST=`ls /archive/mc-mms/distribution/mc-mms-server-standalone/target/mc-mms-server-standalone-*.jar | grep -v sources | grep -v javadoc`
 
 if [ -z "${ACCESS_LOG}" ]; then
 	ACCESS_LOGP=""
