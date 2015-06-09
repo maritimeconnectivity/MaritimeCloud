@@ -16,46 +16,43 @@ package net.maritimecloud.mms.server;
 
 import net.maritimecloud.mms.server.connection.client.DefaultTransportListener;
 import net.maritimecloud.mms.server.connection.transport.ServerTransportJsr356Endpoint;
+import net.maritimecloud.mms.server.rest.*;
 import org.cakeframework.container.ServiceManager;
 import org.cakeframework.container.lifecycle.RunOnStart;
 import org.cakeframework.container.lifecycle.RunOnStop;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.jmx.MBeanContainer;
-import org.eclipse.jetty.server.HttpConfiguration;
-import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.SecureRequestCustomizer;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
+import org.glassfish.jersey.CommonProperties;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.websocket.DeploymentException;
 import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
 import javax.websocket.server.ServerEndpointConfig.Builder;
-import java.io.IOException;
 import java.lang.management.ManagementFactory;
 
 import static java.util.Objects.requireNonNull;
 
 
 /**
- * A factory used to create transports from connections by remote clients.
+ * Configures a web server with a WebSocket interface used for the MMS transport layer
+ * and a REST interface used for management of the MMS server.
  *
  * @author Kasper Nielsen
  */
-public class WebSocketServer {
+public class WebServer {
 
     /** The logger. */
-    static final Logger LOG = LoggerFactory.getLogger(WebSocketServer.class);
+    static final Logger LOG = LoggerFactory.getLogger(WebServer.class);
 
     /** The actual WebSocket server */
     private final Server server;
@@ -66,22 +63,77 @@ public class WebSocketServer {
 
     final ServerEventListener eventListener;
 
-    public WebSocketServer(ServerEventListener listener, DefaultTransportListener defaultTransport,
-            MmsServerConfiguration configuration, MmsServer is) {
+    /**
+     * Constructor
+     *
+     * @param listener the server event listener
+     * @param defaultTransport the transport listener
+     * @param configuration the MMS configuration
+     * @param is the MMS server
+     */
+    public WebServer(ServerEventListener listener, DefaultTransportListener defaultTransport,
+                     MmsServerConfiguration configuration, MmsServer is) {
         this.eventListener = requireNonNull(listener);
         this.defaultTransport = requireNonNull(defaultTransport);
         this.is = requireNonNull(is);
         this.server = new Server();
+
+        // Configure HTTP and HTTPS of the server based on the configuration
+        configureServer(this.server, configuration);
+    }
+
+    /**
+     * Called when the MMS server starts up
+     * @param sm the service manager
+     */
+    @RunOnStart
+    public void start(ServiceManager sm) throws Exception {
+        MBeanContainer mbContainer = new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
+        server.addBean(mbContainer);
+
+        // New handler
+        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        context.setContextPath("/");
+
+        server.setHandler(context);
+
+        // Configure the WebSocket interface
+        configureWebSockets(context);
+
+        // Configure the REST interface
+        configureRest(sm, context);
+
+        server.start();
+        LOG.info("System is ready accept client connections");
+    }
+
+    /**
+     * Called when the MMS server terminates
+     */
+    @RunOnStop
+    public void stop() throws Exception {
+        server.stop();
+    }
+
+    /**
+     * Configures the HTTP (ws) and HTTPS (wss) transport of the server
+     *
+     * @param server the server to configure
+     * @param configuration the configuration to use
+     */
+    private void configureServer(Server server, MmsServerConfiguration configuration) {
+
+        // Configure HTTP
         if (!configuration.isRequireTLS()) {
             ServerConnector connector = new ServerConnector(server);
             connector.setPort(configuration.getServerPort());
             connector.setReuseAddress(true);
             server.addConnector(connector);
         }
+
+        // Configure HTTPS
         if (configuration.getSecurePort() > 0) {
 
-            // ADD HTPS
-            // HTTP Configuration
             HttpConfiguration http_config = new HttpConfiguration();
             http_config.setSecureScheme("https");
             http_config.setSecurePort(configuration.getSecurePort());
@@ -112,22 +164,12 @@ public class WebSocketServer {
         }
     }
 
-    @RunOnStart
-    public void start() throws Exception {
-        MBeanContainer mbContainer = new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
-        server.addBean(mbContainer);
-
-
-        // New handler
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.setContextPath("/");
-
-
-        server.setHandler(context);
-
-        // Jetty needs to have at least 1 servlet, so we add this dummy servlet
-        context.addServlet(new ServletHolder(new DumpServlet()), "/*");
-
+    /**
+     * Configures the WebSocket interface
+     *
+     * @param context the servlet context
+     */
+    private void configureWebSockets(ServletContextHandler context) throws DeploymentException, ServletException {
         // Enable javax.websocket configuration for the context
         ServerContainer wsContainer = WebSocketServerContainerInitializer.configureContext(context);
 
@@ -143,36 +185,33 @@ public class WebSocketServer {
         });
 
         wsContainer.addEndpoint(b.build());
-        server.start();
-        LOG.info("System is ready accept client connections");
+
     }
 
-    @RunOnStop
-    public void stop() throws Exception {
-        server.stop();
-    }
+    /**
+     * Configures the REST interface
+     *
+     * @param sm the service manager
+     * @param context the servlet context
+     */
+    private void configureRest(ServiceManager sm, ServletContextHandler context) {
+        final ResourceConfig config = new ResourceConfig();
 
-    @SuppressWarnings("serial")
-    static class DumpServlet extends HttpServlet {
+        // Register the REST endpoints
+        config.register(sm.inject(JSONMessageBodyWriter.class));
+        config.register(sm.inject(EndpointInvoke.class));
+        config.register(sm.inject(ClientResource.class));
+        config.register(sm.inject(MetricsResource.class));
+        config.register(sm.inject(JSONMetricRegistryBodyWriter.class));
+        config.register(sm.inject(DmaExceptionMapper.class));
 
-        @Override
-        protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-        IOException {
-            response.setContentType("text/html");
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().println("<h1>DumpServlet</h1><pre>");
-            response.getWriter().println("requestURI=" + request.getRequestURI());
-            response.getWriter().println("contextPath=" + request.getContextPath());
-            response.getWriter().println("servletPath=" + request.getServletPath());
-            response.getWriter().println("pathInfo=" + request.getPathInfo());
-            response.getWriter().println("session=" + request.getSession(true).getId());
 
-            String r = request.getParameter("resource");
-            if (r != null) {
-                response.getWriter().println("resource(" + r + ")=" + getServletContext().getResource(r));
-            }
+        ServletHolder sho = new ServletHolder(new ServletContainer(config));
+        // sho.setClassName("org.glassfish.jersey.servlet.ServletContainer");
+        // This flag is set to disable internal buffering in jersey.
+        // this is mainly done to avoid delays from when people request something. To the first output is delivered
+        sho.setInitParameter(CommonProperties.OUTBOUND_CONTENT_LENGTH_BUFFER, "-1");
 
-            response.getWriter().println("</pre>");
-        }
+        context.addServlet(sho, "/*");
     }
 }

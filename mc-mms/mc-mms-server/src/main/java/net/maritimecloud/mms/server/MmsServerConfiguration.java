@@ -14,15 +14,10 @@
  */
 package net.maritimecloud.mms.server;
 
-import static java.util.Objects.requireNonNull;
-import static net.maritimecloud.internal.mms.transport.AccessLogManager.*;
-
-import java.util.Arrays;
-import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
-
 import com.beust.jcommander.IStringConverter;
+import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
+import com.codahale.metrics.MetricRegistry;
 import net.maritimecloud.core.id.ServerId;
 import net.maritimecloud.internal.mms.transport.AccessLogManager;
 import net.maritimecloud.internal.mms.transport.SecurityConfiguration;
@@ -32,16 +27,19 @@ import net.maritimecloud.mms.server.connection.client.ClientReaper;
 import net.maritimecloud.mms.server.connection.client.DefaultTransportListener;
 import net.maritimecloud.mms.server.endpoints.ServerEndpointManager;
 import net.maritimecloud.mms.server.endpoints.ServerServices;
-import net.maritimecloud.mms.server.rest.WebServer;
 import net.maritimecloud.mms.server.tracker.PositionTracker;
-
 import org.cakeframework.container.spi.AbstractContainerConfiguration;
 import org.cakeframework.container.spi.ContainerComposer;
 import org.cakeframework.container.spi.ContainerFactory;
 import org.cakeframework.util.properties.Property;
 
-import com.beust.jcommander.Parameter;
-import com.codahale.metrics.MetricRegistry;
+import java.util.Arrays;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+
+import static java.util.Objects.requireNonNull;
+import static net.maritimecloud.internal.mms.transport.AccessLogManager.AccessLogConfiguration;
+import static net.maritimecloud.internal.mms.transport.AccessLogManager.AccessLogFormat;
 
 /**
  *
@@ -88,9 +86,6 @@ public class MmsServerConfiguration implements AccessLogConfiguration, SecurityC
 
     @Parameter(names = "-securePort", description = "The secure port to listen for MMS connections on")
     int securePort = DEFAULT_SECURE_PORT;
-
-    @Parameter(names = "-rest", description = "The webserver port for the administrative interface")
-    int webserverPort = -1;
 
     /**
      * @return the id
@@ -147,13 +142,6 @@ public class MmsServerConfiguration implements AccessLogConfiguration, SecurityC
      */
     public int getServerPort() {
         return port;
-    }
-
-    /**
-     * @return the webserverPort
-     */
-    public int getWebserverPort() {
-        return webserverPort;
     }
 
     /**
@@ -224,16 +212,6 @@ public class MmsServerConfiguration implements AccessLogConfiguration, SecurityC
     }
 
     /**
-     * @param webserverport
-     *            the webserverPort to set
-     * @return this configuration
-     */
-    public MmsServerConfiguration setWebserverPort(int webserverport) {
-        this.webserverPort = webserverport;
-        return this;
-    }
-
-    /**
      * Creates a new instance of this class.
      */
     public MmsServer build() {
@@ -250,15 +228,12 @@ public class MmsServerConfiguration implements AccessLogConfiguration, SecurityC
         conf.addService(new ServerEventListener() {});
 
         conf.addService(PositionTracker.class);
-        conf.addService(WebSocketServer.class);
+        conf.addService(WebServer.class);
 
         conf.addService(ServerServices.class);
         conf.addService(MmsServerConnectionBus.class);
         conf.addService(ServerBroadcastManager.class);
         conf.addService(ServerEndpointManager.class);
-        if (getWebserverPort() > 0) {
-            conf.addService(WebServer.class);
-        }
         conf.addService(AccessLogManager.class);
         conf.addService(MetricRegistry.class);
         return conf.create();

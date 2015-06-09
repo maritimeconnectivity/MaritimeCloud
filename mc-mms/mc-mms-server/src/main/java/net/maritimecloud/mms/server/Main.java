@@ -62,9 +62,6 @@ public class Main {
         if (configuration.getSecurePort() >= 0) {
             System.out.println("MMS  : Running on port " + configuration.getSecurePort() + " (secure)");
         }
-        if (configuration.getWebserverPort() >= 0) {
-            System.out.println("REST : Running on port " + configuration.getWebserverPort() + " (unsecure)");
-        }
         System.out.println("Use CTRL+C to stop it");
     }
 }

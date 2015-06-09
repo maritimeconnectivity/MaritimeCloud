@@ -44,7 +44,7 @@ else
 fi
 
 java -classpath $LATEST  net.maritimecloud.mms.server.Main \
-   -port 43234 -rest 9090 \
+   -port 43234 \
    $ACCESS_LOGP $ACCESS_LOG_FORMATP $SECURE_PORTP \
    $KEYSTOREP $KEYSTORE_PASSWORDP \
    $TRUSTSTOREP $TRUSTSTORE_PASSWORDP
