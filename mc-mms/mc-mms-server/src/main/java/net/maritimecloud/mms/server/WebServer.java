@@ -17,6 +17,7 @@ package net.maritimecloud.mms.server;
 import net.maritimecloud.mms.server.connection.client.DefaultTransportListener;
 import net.maritimecloud.mms.server.connection.transport.ServerTransportJsr356Endpoint;
 import net.maritimecloud.mms.server.rest.*;
+import net.maritimecloud.mms.server.security.MmsSecurityManager;
 import org.cakeframework.container.ServiceManager;
 import org.cakeframework.container.lifecycle.RunOnStart;
 import org.cakeframework.container.lifecycle.RunOnStop;
@@ -69,17 +70,18 @@ public class WebServer {
      * @param listener the server event listener
      * @param defaultTransport the transport listener
      * @param configuration the MMS configuration
+     * @param securityManager the security manager
      * @param is the MMS server
      */
     public WebServer(ServerEventListener listener, DefaultTransportListener defaultTransport,
-                     MmsServerConfiguration configuration, MmsServer is) {
+                     MmsServerConfiguration configuration, MmsSecurityManager securityManager, MmsServer is) {
         this.eventListener = requireNonNull(listener);
         this.defaultTransport = requireNonNull(defaultTransport);
         this.is = requireNonNull(is);
         this.server = new Server();
 
         // Configure HTTP and HTTPS of the server based on the configuration
-        configureServer(this.server, configuration);
+        configureServer(this.server, configuration, securityManager);
     }
 
     /**
@@ -120,8 +122,9 @@ public class WebServer {
      *
      * @param server the server to configure
      * @param configuration the configuration to use
+     * @param securityManager the security manager
      */
-    private void configureServer(Server server, MmsServerConfiguration configuration) {
+    private void configureServer(Server server, MmsServerConfiguration configuration, MmsSecurityManager securityManager) {
 
         // Configure HTTP
         if (!configuration.isRequireTLS()) {
@@ -140,16 +143,7 @@ public class WebServer {
             http_config.setOutputBufferSize(32768);
 
             // SSL Context Factory for HTTPS
-            SslContextFactory sslContextFactory = new SslContextFactory();
-            if (configuration.useKeystore()) {
-                sslContextFactory.setKeyStorePath(configuration.getKeystore());
-                sslContextFactory.setKeyStorePassword(configuration.getKeystorePassword());
-            }
-            if (configuration.useTruststore()) {
-                sslContextFactory.setNeedClientAuth(true);
-                sslContextFactory.setTrustStorePath(configuration.getTruststore());
-                sslContextFactory.setTrustStorePassword(configuration.getTruststorePassword());
-            }
+            SslContextFactory sslContextFactory = securityManager.getSslContextFactory();
 
             // HTTPS Configuration
             HttpConfiguration https_config = new HttpConfiguration(http_config);

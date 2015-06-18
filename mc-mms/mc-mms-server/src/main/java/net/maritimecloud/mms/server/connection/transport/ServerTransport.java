@@ -14,23 +14,22 @@
  */
 package net.maritimecloud.mms.server.connection.transport;
 
-import static java.util.Objects.requireNonNull;
+import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
+import net.maritimecloud.message.MessageFormatType;
+import net.maritimecloud.mms.server.ServerEventListener;
+import net.maritimecloud.mms.server.connection.client.Client;
+import net.maritimecloud.mms.server.security.*;
+import net.maritimecloud.net.mms.MmsConnectionClosingCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.websocket.CloseReason;
+import javax.websocket.Session;
 import java.nio.ByteBuffer;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.websocket.CloseReason;
-import javax.websocket.CloseReason.CloseCode;
-import javax.websocket.Session;
-
-import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
-import net.maritimecloud.message.MessageFormatType;
-import net.maritimecloud.mms.server.ServerEventListener;
-import net.maritimecloud.net.mms.MmsConnectionClosingCode;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.util.Objects.requireNonNull;
 
 /**
  *
@@ -43,6 +42,9 @@ public final class ServerTransport {
 
     /** An attachment that can be attached to the transport. */
     private final ConcurrentHashMap<String, Object> attachments = new ConcurrentHashMap<>();
+
+    /** The security manager */
+    private final MmsSecurityManager securityManager;
 
     /** A listener of important server side events. */
     private final ServerEventListener eventListener;
@@ -62,10 +64,43 @@ public final class ServerTransport {
     /** Sets the output format of messages. */
     volatile MessageFormatType channelFormatType;
 
-    ServerTransport(Session wsSession, ServerTransportListener listener, ServerEventListener eventListener) {
+    /** The client subject */
+    Subject subject;
+
+    ServerTransport(MmsSecurityManager securityManager, Session wsSession, ServerTransportListener listener, ServerEventListener eventListener) {
+        this.securityManager = requireNonNull(securityManager);
         this.listener = requireNonNull(listener);
         this.wsSession = requireNonNull(wsSession);
         this.eventListener = requireNonNull(eventListener);
+
+        // Initialize the client Subject
+        initializeSubject();
+    }
+
+    /**
+     * Initializes the client subject
+     */
+    private void initializeSubject() {
+        // Instantiate the client subject
+        subject = new Subject.Builder(securityManager)
+                .setSession(wsSession)
+                .build();
+
+        AuthenticationToken token = null;
+        try {
+            // Attempt to resolve an authentication token
+            token = securityManager.resolveAuthenticationToken(wsSession);
+            if (token != null) {
+                // Log in the subject using the authentication token
+                subject.login(token);
+                LOGGER.info("Successfully authenticated " + token.getPrincipal());
+            }
+        } catch (AuthenticationException e) {
+            LOGGER.warn("Client authentication failed for " + token, e);
+            close(MmsConnectionClosingCode.AUTHENTICATION_ERROR.withMessage(e.getMessage()));
+        }
+        // TEST
+        //System.out.println("****** has role mms users: " + subject.hasRole("mms users"));
     }
 
     public void close(MmsConnectionClosingCode reason) {
@@ -215,5 +250,19 @@ public final class ServerTransport {
 
     public MessageFormatType getChannelFormatType() {
         return channelFormatType;
+    }
+
+    /**
+     * Called when the client has been resolved from a Hello message
+     * @param client the client
+     */
+    public void clientResolved(Client client) {
+        try {
+            subject.checkClient(client.getId());
+            LOGGER.info("Verified client " + client.getId() + " for principal " + subject.getPrincipal());
+        } catch (ClientVerificationException e) {
+            LOGGER.warn("Client verification failed for client " + client.getId() + " and principal " + subject.getPrincipal(), e);
+            close(MmsConnectionClosingCode.INVALID_CLIENT.withMessage(e.getMessage()));
+        }
     }
 }

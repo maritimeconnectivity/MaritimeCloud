@@ -15,6 +15,7 @@
 package net.maritimecloud.mms.server.connection.transport;
 
 import net.maritimecloud.mms.server.ServerEventListener;
+import net.maritimecloud.mms.server.security.MmsSecurityManager;
 
 import javax.websocket.CloseReason;
 import javax.websocket.OnClose;
@@ -36,13 +37,17 @@ public class ServerTransportJsr356Endpoint {
     /** The connection is attached to, or null, if it is not attached to one. */
     private volatile ServerTransport transport;
 
+    /** The security manager */
+    private final MmsSecurityManager securityManager;
+
     /** A factory for creating server transport listeners. */
     private final ServerTransportListener transportListener;
 
     /** A listener of events */
     private final ServerEventListener eventListener;
 
-    public ServerTransportJsr356Endpoint(ServerEventListener eventListener, ServerTransportListener transport) {
+    public ServerTransportJsr356Endpoint(MmsSecurityManager securityManager, ServerEventListener eventListener, ServerTransportListener transport) {
+        this.securityManager = requireNonNull(securityManager);
         this.eventListener = requireNonNull(eventListener);
         this.transportListener = requireNonNull(transport);
     }
@@ -59,7 +64,7 @@ public class ServerTransportJsr356Endpoint {
         session.setMaxBinaryMessageBufferSize(5 * 1024 * 1024);
         session.setMaxTextMessageBufferSize(5 * 1024 * 1024);
 
-        transport = new ServerTransport(session, transportListener, eventListener);
+        transport = new ServerTransport(securityManager, session, transportListener, eventListener);
         transport.endpointOnOpen();
     }
 

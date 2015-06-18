@@ -20,19 +20,20 @@ import com.beust.jcommander.ParameterException;
 import com.codahale.metrics.MetricRegistry;
 import net.maritimecloud.core.id.ServerId;
 import net.maritimecloud.internal.mms.transport.AccessLogManager;
-import net.maritimecloud.internal.mms.transport.SecurityConfiguration;
 import net.maritimecloud.mms.server.broadcast.ServerBroadcastManager;
 import net.maritimecloud.mms.server.connection.client.ClientManager;
 import net.maritimecloud.mms.server.connection.client.ClientReaper;
 import net.maritimecloud.mms.server.connection.client.DefaultTransportListener;
 import net.maritimecloud.mms.server.endpoints.ServerEndpointManager;
 import net.maritimecloud.mms.server.endpoints.ServerServices;
+import net.maritimecloud.mms.server.security.MmsSecurityManager;
 import net.maritimecloud.mms.server.tracker.PositionTracker;
 import org.cakeframework.container.spi.AbstractContainerConfiguration;
 import org.cakeframework.container.spi.ContainerComposer;
 import org.cakeframework.container.spi.ContainerFactory;
 import org.cakeframework.util.properties.Property;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -45,7 +46,7 @@ import static net.maritimecloud.internal.mms.transport.AccessLogManager.AccessLo
  *
  * @author Kasper Nielsen
  */
-public class MmsServerConfiguration implements AccessLogConfiguration, SecurityConfiguration {
+public class MmsServerConfiguration implements AccessLogConfiguration {
 
     /** The default port this server is running on. */
     public static final int DEFAULT_PORT = 43234;
@@ -53,23 +54,11 @@ public class MmsServerConfiguration implements AccessLogConfiguration, SecurityC
     /** The default port this server is running on. */
     public static final int DEFAULT_SECURE_PORT = -1;
 
-    /** The default port the web server is running on. */
-    public static final int DEFAULT_WEBSERVER_PORT = 9090;
-
     /** The id of the server, hard coded for now */
     ServerId id = new ServerId(1);
 
-    @Parameter(names = "-keystore", description = "The path to the key-store")
-    String keystore = null;
-
-    @Parameter(names = "-keystorePassword", description = "The password of the key-store")
-    String keystorePassword = null;
-
-    @Parameter(names = "-truststore", description = "The path to the trust-store")
-    String truststore = null;
-
-    @Parameter(names = "-truststorePassword", description = "The password of the trust-store")
-    String truststorePassword = null;
+    @Parameter(names = "-securityConf", description = "Path to security configuration file", converter = FileConverter.class)
+    File securityConfFile = null;
 
     @Parameter(names = "-accessLog", description = "The file to write access logs to. Use 'stdout' for standard out")
     String accessLog;
@@ -94,28 +83,11 @@ public class MmsServerConfiguration implements AccessLogConfiguration, SecurityC
         return id;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public String getKeystore() {
-        return keystore;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getKeystorePassword() {
-        return keystorePassword;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getTruststore() {
-        return truststore;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getTruststorePassword() {
-        return truststorePassword;
+    /**
+     * @return the security configuration file
+     */
+    public File getSecurityConfFile() {
+        return securityConfFile;
     }
 
     /** {@inheritDoc} */
@@ -159,22 +131,6 @@ public class MmsServerConfiguration implements AccessLogConfiguration, SecurityC
     public MmsServerConfiguration setId(ServerId id) {
         this.id = id;
         return this;
-    }
-
-    /**
-     * @param keystore
-     *            the keystore to set
-     */
-    public void setKeystore(String keystore) {
-        this.keystore = keystore;
-    }
-
-    /**
-     * @param keystorePassword
-     *            the keystorePassword to set
-     */
-    public void setKeystorePassword(String keystorePassword) {
-        this.keystorePassword = keystorePassword;
     }
 
     /**
@@ -236,6 +192,7 @@ public class MmsServerConfiguration implements AccessLogConfiguration, SecurityC
         conf.addService(ServerEndpointManager.class);
         conf.addService(AccessLogManager.class);
         conf.addService(MetricRegistry.class);
+        conf.addService(new MmsSecurityManager(securityConfFile));
         return conf.create();
     }
 
@@ -272,6 +229,14 @@ public class MmsServerConfiguration implements AccessLogConfiguration, SecurityC
                         .map(v -> v.toString().toLowerCase())
                         .collect(Collectors.joining(", ")));
             }
+        }
+    }
+
+    /** Converts JCommander argument to a file */
+    public static class FileConverter implements IStringConverter<File> {
+        @Override
+        public File convert(String value) {
+            return value == null ? null : new File(value);
         }
     }
 }
