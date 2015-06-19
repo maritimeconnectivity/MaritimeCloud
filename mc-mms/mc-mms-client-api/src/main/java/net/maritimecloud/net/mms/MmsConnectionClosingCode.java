@@ -62,6 +62,15 @@ public final class MmsConnectionClosingCode implements Serializable {
 
     public static final MmsConnectionClosingCode CLIENT_TIMEOUT = new MmsConnectionClosingCode(4108, "Client Timeout");
 
+    /** Sent in case of an authentication error */
+    public static final MmsConnectionClosingCode AUTHENTICATION_ERROR = new MmsConnectionClosingCode(5001, "Authentication Error");
+
+    /** Sent in case of an authorization error */
+    public static final MmsConnectionClosingCode AUTHORIZATION_ERROR = new MmsConnectionClosingCode(5002, "Authorization Error");
+
+    /** Sent in case the client ID is invalid for the currently authenticated subject */
+    public static final MmsConnectionClosingCode INVALID_CLIENT = new MmsConnectionClosingCode(5003, "Invalid Client");
+
     /** The status code. */
     private final int id;
 

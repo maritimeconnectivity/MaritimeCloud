@@ -100,6 +100,7 @@ public class DefaultTransportListener implements ServerTransportListener {
                     Client newClient = clientManager.onHello(hello, t);
                     if (newClient != null) {
                         t.setAttachment(ATTACHMENT_CLIENT, newClient);
+                        t.clientResolved(newClient);
                     }
                 } else {
                     t.close(MmsConnectionClosingCode.WRONG_MESSAGE
