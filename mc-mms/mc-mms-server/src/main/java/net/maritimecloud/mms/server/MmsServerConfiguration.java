@@ -18,6 +18,8 @@ import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.codahale.metrics.MetricRegistry;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import net.maritimecloud.core.id.ServerId;
 import net.maritimecloud.internal.mms.transport.AccessLogManager;
 import net.maritimecloud.mms.server.broadcast.ServerBroadcastManager;
@@ -43,6 +45,22 @@ import static net.maritimecloud.internal.mms.transport.AccessLogManager.AccessLo
 import static net.maritimecloud.internal.mms.transport.AccessLogManager.AccessLogFormat;
 
 /**
+ * Defines the MMS server configuration.
+ * <p/>
+ * The MMS configuration parameters can either be set directly using the command line or by specifying
+ * a configuration file with the "-conf" parameter.
+ * <p/>
+ * The command line parameters are:
+ * <ul>
+ *     <li>-conf: The configuration file</li>
+ *     <li>-port: The port to listen for REST and MMS connections on</li>
+ *     <li>-securePort: The secure port to listen for REST MMS connections on</li>
+ *     <li>-accessLog: The file to write access logs to. Use 'stdout' for standard out</li>
+ *     <li>-accessLogFormat: The access log message format. One of 'text', 'binary' or 'compact'</li>
+ * </ul>
+ *
+ * The format of the MMS configuration file can be seen from the default {@code src/main/resources/mms.conf}
+ * configuration file.
  *
  * @author Kasper Nielsen
  */
@@ -51,30 +69,24 @@ public class MmsServerConfiguration implements AccessLogConfiguration {
     /** The default port this server is running on. */
     public static final int DEFAULT_PORT = 43234;
 
-    /** The default port this server is running on. */
-    public static final int DEFAULT_SECURE_PORT = -1;
-
     /** The id of the server, hard coded for now */
     ServerId id = new ServerId(1);
 
-    @Parameter(names = "-securityConf", description = "Path to security configuration file", converter = FileConverter.class)
-    File securityConfFile = null;
+    @Parameter(names = "-conf", description = "Path to configuration file", converter = FileConverter.class)
+    File confFile;
+
+    @Parameter(names = "-port", description = "The port to listen for REST and MMS connections on")
+    Integer port;
+
+    @Parameter(names = "-securePort", description = "The secure port to listen for REST MMS connections on")
+    Integer securePort;
 
     @Parameter(names = "-accessLog", description = "The file to write access logs to. Use 'stdout' for standard out")
     String accessLog;
 
     @Parameter(names = "-accessLogFormat", description = "The access log message format. One of 'text', 'binary' or 'compact'",
-                converter = AccessLogFormatConverter.class)
-    AccessLogFormat accessLogFormat = AccessLogFormat.TEXT;
-
-    @Parameter(names = "-port", description = "The port to listen for MMS connections on")
-    int port = DEFAULT_PORT;
-
-    @Parameter(names = "-requireTLS", description = "if true clients will not be able to connect without TLS")
-    boolean requireTLS = false;
-
-    @Parameter(names = "-securePort", description = "The secure port to listen for MMS connections on")
-    int securePort = DEFAULT_SECURE_PORT;
+            converter = AccessLogFormatConverter.class)
+    AccessLogFormat accessLogFormat;
 
     /**
      * @return the id
@@ -86,8 +98,8 @@ public class MmsServerConfiguration implements AccessLogConfiguration {
     /**
      * @return the security configuration file
      */
-    public File getSecurityConfFile() {
-        return securityConfFile;
+    public File getConfFile() {
+        return confFile;
     }
 
     /** {@inheritDoc} */
@@ -105,22 +117,15 @@ public class MmsServerConfiguration implements AccessLogConfiguration {
     /**
      * @return the securePort
      */
-    public int getSecurePort() {
+    public Integer getSecurePort() {
         return securePort;
     }
 
     /**
      * @return the serverPort
      */
-    public int getServerPort() {
+    public Integer getServerPort() {
         return port;
-    }
-
-    /**
-     * @return the requireTLS
-     */
-    public boolean isRequireTLS() {
-        return requireTLS;
     }
 
     /**
@@ -142,14 +147,6 @@ public class MmsServerConfiguration implements AccessLogConfiguration {
     }
 
     /**
-     * @param requireTLS
-     *            the requireTLS to set
-     */
-    public void setRequireTLS(boolean requireTLS) {
-        this.requireTLS = requireTLS;
-    }
-
-    /**
      * @param securePort
      *            the securePort to set
      */
@@ -168,9 +165,51 @@ public class MmsServerConfiguration implements AccessLogConfiguration {
     }
 
     /**
+     * Reads any file configuration specified by a "-conf" parameter
+     * @return the file configuration
+     */
+    private Config readFileConfiguration() {
+        // Load the template mms.conf configuration file
+        Config fileConf = ConfigFactory.load("mms").resolve();
+
+        // If a "-conf" parameter has been specified, load and resolve the file
+        fileConf = confFile != null && confFile.exists()
+                ? ConfigFactory.parseFile(confFile).withFallback(fileConf).resolve()
+                : fileConf;
+
+        // Command line parameters takes precedence over configuration file parameters
+        if (port == null && fileConf.hasPath("port")) {
+            port = fileConf.getInt("port");
+        }
+        if (securePort == null && fileConf.hasPath("secure-port")) {
+            securePort = fileConf.getInt("secure-port");
+        }
+        if (accessLog == null && fileConf.hasPath("access-log")) {
+            accessLog = fileConf.getString("access-log");
+        }
+        if (accessLogFormat == null && fileConf.hasPath("access-log-format")) {
+            accessLogFormat = new AccessLogFormatConverter().convert(fileConf.getString("access-log-format"));
+        }
+
+        return fileConf;
+    }
+
+    /**
      * Creates a new instance of this class.
      */
     public MmsServer build() {
+
+        // Check that either port or securePort is defined
+        if (port == null && securePort == null) {
+            port = DEFAULT_PORT;
+        }
+
+        // Read any specified configuration file
+        Config fileConfig = readFileConfiguration();
+        Config securityConfig = fileConfig.hasPath("security-conf")
+                ? fileConfig.getConfig("security-conf")
+                : ConfigFactory.empty();
+
         MyConfiguration conf = new MyConfiguration();
 
         conf.withThreads().addPool(Executors.newFixedThreadPool(5));
@@ -192,7 +231,7 @@ public class MmsServerConfiguration implements AccessLogConfiguration {
         conf.addService(ServerEndpointManager.class);
         conf.addService(AccessLogManager.class);
         conf.addService(MetricRegistry.class);
-        conf.addService(new MmsSecurityManager(securityConfFile));
+        conf.addService(new MmsSecurityManager(securityConfig));
         return conf.create();
     }
 

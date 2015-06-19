@@ -23,10 +23,8 @@ import net.maritimecloud.mms.server.security.impl.UsernamePasswordToken;
 import org.junit.Test;
 
 import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test of the apache security functionality, i.e. htpasswd passwords and AuthGroupFile-style group files
@@ -36,18 +34,17 @@ import static org.junit.Assert.*;
  */
 public class ApacheSecurityTest {
 
-    public static final Path getResourcePath(String file) throws URISyntaxException {
+    public static String getResourcePath(String file) throws URISyntaxException {
         if (!file.startsWith("/")) {
             file = "/" + file;
         }
-
-        return Paths.get(ApacheSecurityTest.class.getResource(file).toURI());
+        return ApacheSecurityTest.class.getResource(file).toExternalForm().substring("file:".length());
     }
 
     @Test
     public void testHtpasswdAuthentication() throws Exception {
 
-        Config conf = ConfigFactory.parseString("htpasswd-file = " + getResourcePath("htpasswd-users"));
+        Config conf = ConfigFactory.parseString("htpasswd-file = \"" + getResourcePath("htpasswd-users") + "\"");
         ApacheConfSecurityHandler securityHandler = new ApacheConfSecurityHandler();
         securityHandler.init(conf);
 
@@ -69,7 +66,7 @@ public class ApacheSecurityTest {
     @Test
     public void testAuthGroupFileAuthorization() throws Exception {
 
-        Config conf = ConfigFactory.parseString("auth-group-file = " + getResourcePath("groups"));
+        Config conf = ConfigFactory.parseString("auth-group-file = \"" + getResourcePath("groups") + "\"");
         ApacheConfSecurityHandler securityHandler = new ApacheConfSecurityHandler();
         securityHandler.init(conf);
 

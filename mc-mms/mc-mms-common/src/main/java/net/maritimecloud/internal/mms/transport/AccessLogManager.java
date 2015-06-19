@@ -78,7 +78,10 @@ public class AccessLogManager {
 
         if (conf.getAccessLog() != null && conf.getAccessLog().trim().length() > 0) {
             String logFile = conf.getAccessLog().equalsIgnoreCase(LOG_TO_STDOUT) ? null : conf.getAccessLog();
-            addMessageLog(logFile, conf.getAccessLogFormat());
+            AccessLogFormat format = conf.getAccessLogFormat() != null
+                    ? conf.getAccessLogFormat()
+                    : AccessLogFormat.TEXT;
+            addMessageLog(logFile, format);
         }
     }
 

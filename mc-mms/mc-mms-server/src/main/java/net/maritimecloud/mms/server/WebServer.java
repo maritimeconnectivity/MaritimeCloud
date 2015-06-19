@@ -127,7 +127,7 @@ public class WebServer {
     private void configureServer(Server server, MmsServerConfiguration configuration, MmsSecurityManager securityManager) {
 
         // Configure HTTP
-        if (!configuration.isRequireTLS()) {
+        if (configuration.getServerPort() != null) {
             ServerConnector connector = new ServerConnector(server);
             connector.setPort(configuration.getServerPort());
             connector.setReuseAddress(true);
@@ -135,7 +135,7 @@ public class WebServer {
         }
 
         // Configure HTTPS
-        if (configuration.getSecurePort() > 0) {
+        if (configuration.getSecurePort() != null) {
 
             HttpConfiguration http_config = new HttpConfiguration();
             http_config.setSecureScheme("https");

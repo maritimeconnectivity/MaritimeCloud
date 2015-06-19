@@ -15,7 +15,6 @@
 package net.maritimecloud.mms.server.security;
 
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.common.WebSocketSession;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
@@ -23,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.websocket.Session;
-import java.io.File;
 import java.util.Objects;
 
 /**
@@ -63,11 +61,8 @@ public class MmsSecurityManager {
      * Constructor
      * @param securityConf the MMS security configuration file
      */
-    public MmsSecurityManager(File securityConf) {
-        Config defaultConf = ConfigFactory.load("mms-security").resolve();
-        conf = securityConf != null && securityConf.exists()
-                ? ConfigFactory.parseFile(securityConf).withFallback(defaultConf).resolve()
-                : defaultConf;
+    public MmsSecurityManager(Config securityConf) {
+        conf = securityConf;
 
         // Initialize the security handlers from the configuration file
         sslHandler = newSecurityConfHandler(SslHandler.SECURITY_CONF_GROUP);

@@ -53,13 +53,13 @@ public class Main {
 
         System.out.println("Wuhuu Maritime Messing Service started succesfully started in "
                 + DurationFormatter.DEFAULT.format(server.start().getStartupTime()));
-        if (configuration.getServerPort() >= 0 && !configuration.requireTLS) {
+        if (configuration.getServerPort() != null) {
             System.out.println("MMS  : Running on port " + configuration.getServerPort() + " (unsecure)");
         } else {
             System.out.println("MMS  : Unencrypted MMS disabled");
         }
 
-        if (configuration.getSecurePort() >= 0) {
+        if (configuration.getSecurePort() != null) {
             System.out.println("MMS  : Running on port " + configuration.getSecurePort() + " (secure)");
         }
         System.out.println("Use CTRL+C to stop it");
