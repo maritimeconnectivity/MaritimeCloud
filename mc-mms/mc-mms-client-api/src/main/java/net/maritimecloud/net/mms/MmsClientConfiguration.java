@@ -74,21 +74,6 @@ public class MmsClientConfiguration {
      */
     MmsClientConfiguration(MaritimeId id) {
         this.id = id;
-        String p = System.getProperty("maritimecloud.printmessages");
-        if ("true".equalsIgnoreCase(p)) {
-            System.err.println("This setting is deprecated for 0.3 and will be removed in the next release (0.4)");
-            addListener(new MmsConnection.Listener() {
-                @Override
-                public void textMessageReceived(String message) {
-                    System.out.println("Received:" + message);
-                }
-
-                @Override
-                public void textMessageSend(String message) {
-                    System.out.println("Sending :" + message);
-                }
-            });
-        }
         setHost(Environment.SANDBOX_UNENCRYPTED);
     }
 
