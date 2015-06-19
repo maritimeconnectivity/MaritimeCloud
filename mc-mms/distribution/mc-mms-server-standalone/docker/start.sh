@@ -19,33 +19,14 @@ else
 	SECURE_PORTP="-securePort 43235"
 fi
 
-if [ -z "${KEYSTORE}" ]; then
-	KEYSTOREP=""
+if [ -z "${CONF}" ]; then
+	CONFP=""
 else
-	KEYSTOREP="-keystore ${KEYSTORE}"
-fi
-
-if [ -z "${KEYSTORE_PASSWORD}" ]; then
-	KEYSTORE_PASSWORDP=""
-else
-	KEYSTORE_PASSWORDP="-keystorePassword ${KEYSTORE_PASSWORD}"
-fi
-
-if [ -z "${TRUSTSTORE}" ]; then
-	TRUSTSTOREP=""
-else
-	TRUSTSTOREP="-truststore ${TRUSTSTORE}"
-fi
-
-if [ -z "${TRUSTSTORE_PASSWORD}" ]; then
-	TRUSTSTORE_PASSWORDP=""
-else
-	TRUSTSTORE_PASSWORDP="-truststorePassword ${TRUSTSTORE_PASSWORD}"
+	CONFP="-conf ${CONF}"
 fi
 
 java -classpath $LATEST  net.maritimecloud.mms.server.Main \
    -port 43234 \
    $ACCESS_LOGP $ACCESS_LOG_FORMATP $SECURE_PORTP \
-   $KEYSTOREP $KEYSTORE_PASSWORDP \
-   $TRUSTSTOREP $TRUSTSTORE_PASSWORDP
+   $CONFP
 
