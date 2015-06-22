@@ -17,7 +17,6 @@ package net.maritimecloud.server.security;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import net.maritimecloud.mms.server.security.AuthenticationException;
-import net.maritimecloud.mms.server.security.AuthorizationException;
 import net.maritimecloud.mms.server.security.impl.ApacheConfSecurityHandler;
 import net.maritimecloud.mms.server.security.impl.UsernamePasswordToken;
 import org.junit.Test;
@@ -60,23 +59,6 @@ public class ApacheSecurityTest {
             assertTrue("False positive authentication", false);
         } catch (Exception e) {
             assertTrue(e instanceof AuthenticationException);
-        }
-    }
-
-    @Test
-    public void testAuthGroupFileAuthorization() throws Exception {
-
-        Config conf = ConfigFactory.parseString("auth-group-file = \"" + getResourcePath("groups") + "\"");
-        ApacheConfSecurityHandler securityHandler = new ApacheConfSecurityHandler();
-        securityHandler.init(conf);
-
-        securityHandler.checkRoles("mmsuser", true, "mms users");
-
-        try {
-            securityHandler.checkRoles("mmsuser", true, "mms loosers");
-            assertTrue("False positive authorization", false);
-        } catch (Exception e) {
-            assertTrue(e instanceof AuthorizationException);
         }
     }
 

@@ -20,45 +20,24 @@ import java.io.Serializable;
 
 /**
  * <p>The {@code AuthenticationToken} is - up to a point - modelled on the
- * <a href="http://shiro.apache.org/static/latest/apidocs/org/apache/shiro/authc/AuthenticationToken.html">Apache Shiro AuthenticationToken</a>
- * concept.
+ * <a href="http://shiro.apache.org/static/latest/apidocs/org/apache/shiro/authc/AuthenticationToken.html">
+ *     Apache Shiro AuthenticationToken</a> concept.
  * </p>
- *
- * <p>An <tt>AuthenticationToken</tt> is a consolidation of an account's principals and supporting
- * credentials submitted by a user during an authentication attempt.
- * <p/>
+ * <p>An <code>AuthenticationToken</code> the principal and credentials submitted to authenticate a client.<p/>
  */
 public interface AuthenticationToken extends Serializable {
 
     /**
-     * Returns the account identity submitted during the authentication process.
-     * <p/>
-     * <p>Most application authentications are username/password based and have this
-     * object represent a username.  If this is the case for your application,
-     * take a look at the {@link UsernamePasswordToken UsernamePasswordToken}, as it is probably
-     * sufficient for your use.
-     * <p/>
-     * <p>Ultimately, the object returned is application specific and can represent
-     * any account identity (user id, X.509 certificate, etc).
+     * The user principal, e.g. username, password or LDAP DN
      *
-     * @return the account identity submitted during the authentication process.
-     * @see UsernamePasswordToken
+     * @return the user principal.
      */
     Object getPrincipal();
 
     /**
-     * Returns the credentials submitted by the user during the authentication process that verifies
-     * the submitted {@link #getPrincipal() account identity}.
-     * <p/>
-     * <p>Most application authentications are username/password based and have this object
-     * represent a submitted password.  If this is the case for your application,
-     * take a look at the {@link UsernamePasswordToken UsernamePasswordToken}, as it is probably
-     * sufficient for your use.
-     * <p/>
-     * <p>Ultimately, the credentials Object returned is application specific and can represent
-     * any credential mechanism.
+     * Returns the credentials associated with the principal
      *
-     * @return the credential submitted by the user during the authentication process.
+     * @return the credential.
      */
     Object getCredentials();
 

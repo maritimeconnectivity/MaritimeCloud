@@ -19,18 +19,12 @@ import net.maritimecloud.mms.server.security.AuthenticationException;
 import net.maritimecloud.mms.server.security.AuthenticationHandler;
 import net.maritimecloud.mms.server.security.AuthenticationToken;
 import net.maritimecloud.mms.server.security.AuthenticationTokenHandler;
-import net.maritimecloud.mms.server.security.AuthorizationException;
-import net.maritimecloud.mms.server.security.AuthorizationHandler;
 import net.maritimecloud.mms.server.security.ClientVerificationException;
 import net.maritimecloud.mms.server.security.ClientVerificationHandler;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
- * Handles authentication and authorization by static configuration rules.
+ * Handles authentication and client verification according to static configuration rules.
  *
  * <h2>Authentication Token Resolution</h2>
  * Implements the {@code AuthenticationTokenHandler} interface and may be used if a proxy SSL-server
@@ -42,18 +36,13 @@ import java.util.Set;
  * Implements the {@code AuthenticationHandler} interface and will
  * flag a successful authentication attempt if a principal is defined.
  *
- * <h2>Authorization</h2>
- * Implements the {@code AuthorizationHandler} interface and will
- * assign a fixed set of roles to the client, as defined by the mandatory
- * "authenticated-roles" and the optional "unauthenticated-roles" attributes.
- *
  * <h2>Client Verification</h2>
  * Implements the {@code ClientVerificationHandler} interface and will
  * check that the principal is identical to the client ID.
  */
 @SuppressWarnings("unused")
 public class FixedConfSecurityHandler
-        implements AuthenticationTokenHandler, AuthenticationHandler, AuthorizationHandler, ClientVerificationHandler {
+        implements AuthenticationTokenHandler, AuthenticationHandler, ClientVerificationHandler {
 
     private Config conf;
 
@@ -99,41 +88,6 @@ public class FixedConfSecurityHandler
 
         if (token == null || token.getPrincipal() == null) {
             throw new AuthenticationException("No principal defined");
-        }
-    }
-
-    /*************************************************/
-    /** Authorization Support                       **/
-    /*************************************************/
-
-    /** {@inheritDoc} */
-    @Override
-    public void checkRoles(Object principal, boolean matchAll, String... roleIdentifiers) throws AuthorizationException {
-
-        String roleAttr = principal == null ? "unauthenticated-roles" : "authenticated-roles";
-        checkRoles(roleAttr, matchAll, roleIdentifiers);
-    }
-
-    /**
-     * Check if the roles are matched by the roles of the given configuration attribute
-     * @param attr the configuration attribute
-     * @param matchAll whether to match any or all of the roles
-     * @param roleIdentifiers the roles to check
-     */
-    private void checkRoles(String attr, boolean matchAll, String... roleIdentifiers) throws AuthorizationException {
-        // Sanity checks
-        if (roleIdentifiers == null || roleIdentifiers.length == 0) {
-            return;
-        }
-
-        if (!conf.hasPath(attr)) {
-            throw new AuthorizationException("Authorization error: No roles");
-        }
-
-
-        Set<String> roles = new HashSet<>(Arrays.asList(conf.getString(attr).split("\\s+")));
-        if (!matchRoles(roles, matchAll, false, roleIdentifiers)) {
-            throw new AuthorizationException("Authorization error");
         }
     }
 

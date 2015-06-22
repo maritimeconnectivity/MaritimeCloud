@@ -19,15 +19,13 @@ import java.util.Objects;
 
 /**
  * <p>The {@code Subject} is - up to a point - modelled on the
- * <a href="http://shiro.apache.org/static/latest/apidocs/org/apache/shiro/subject/Subject.html">Apache Shiro Subject</a>
- * concept.
+ * <a href="http://shiro.apache.org/static/latest/apidocs/org/apache/shiro/subject/Subject.html">
+ *     Apache Shiro Subject</a> concept.
  * </p>
- *
  * <p>
- * A {@code Subject} represents state and security operations for a <em>single</em> application user.
- * These operations include authentication (login/logout) and authorization (access control).
+ * A {@code Subject} encapsulates the identity and state of the current client. It contains
+ * methods for logging the client in and out.
  * </p>
- * <h3>Acquiring a Subject</h3>
  * The {@code Subject} should be instantiated in the websocket {@code @OnOpen} method using the
  * {@code SecurityManager} class.
  *
@@ -35,10 +33,8 @@ import java.util.Objects;
 public interface Subject {
 
     /**
-     * Returns this Subject's application-wide uniquely identifying principal, or {@code null} if this
-     * Subject is anonymous because it doesn't yet have any associated account data (for example,
-     * if they haven't logged in).
-     * @return the Subject's principal
+     * Returns the Principal associated with the subject
+     * @return the principal
      */
     Object getPrincipal();
 
@@ -47,24 +43,6 @@ public interface Subject {
      * @return whether the subject has been authenticated
      */
     boolean isAuthenticated();
-
-    /**
-     * Returns {@code true} if this Subject has the specified role, {@code false} otherwise.
-     *
-     * @param roleIdentifier the application-specific role identifier (usually a role id or role name).
-     * @return {@code true} if this Subject has the specified role, {@code false} otherwise.
-     */
-    boolean hasRole(String roleIdentifier);
-
-    /**
-     * Asserts this Subject has the specified role by returning quietly if they do or throwing an
-     * {@link AuthorizationException} if they do not.
-     *
-     * @param roleIdentifier the application-specific role identifier (usually a role id or role name ).
-     * @throws AuthorizationException
-     *          if this Subject does not have the role.
-     */
-    void checkRole(String roleIdentifier) throws AuthorizationException;
 
     /**
      * Asserts that the client maritime ID is valid for this Subject by returning quietly if they do or throwing n
@@ -76,31 +54,20 @@ public interface Subject {
     void checkClient(String clientId) throws ClientVerificationException;
 
     /**
-     * Performs a login attempt for this Subject/user.  If unsuccessful,
-     * an {@link AuthenticationException} is thrown.
-     * <p/>
-     * If successful, the account data associated with the submitted principals/credentials will be
-     * associated with this {@code Subject} and the method will return quietly.
-     * <p/>
-     * Upon returning quietly, this {@code Subject} instance can be considered
-     * authenticated and {@link #getPrincipal() getPrincipal()} will be non-null and
-     * {@link #isAuthenticated() isAuthenticated()} will be {@code true}.
+     * Logs in the current subject using the given authentication token.
+     * If the login attempt fails, an exception is thrown.
      *
-     * @param token the token encapsulating the subject's principals and credentials to be passed to the
-     *              Authentication subsystem for verification.
-     * @throws AuthenticationException
-     *          if the authentication attempt fails.
+     * @param token authentication token.
      */
     void login(AuthenticationToken token) throws AuthenticationException;
 
     /**
-     * Logs out this Subject and invalidates and/or removes any associated entities
+     * Logs out the Subject
      */
     void logout();
 
     /**
-     * Builder design pattern implementation for creating {@link Subject} instances in a simplified way without
-     * requiring knowledge of the underlying construction techniques.
+     * Builds a {@link Subject}.
      */
     class Builder {
 

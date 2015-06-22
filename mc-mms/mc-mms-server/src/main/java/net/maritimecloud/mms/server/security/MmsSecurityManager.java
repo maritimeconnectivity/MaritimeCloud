@@ -36,8 +36,8 @@ import java.util.Objects;
  *                   {@code AuthenticationToken} from the websocket upgrade request.</li>
  *     <li>authentication-conf: Configures an {@code AuthenticationHandler} class that will
  *                   authenticate the client using the resolved authentication token.</li>
- *     <li>authorization-conf: Configures an {@code AuthorizationHandler} class that will
- *                   check the roles of an authenticated subject.</li>
+ *     <li>client-verification-conf: Configures a {@code ClientVerificationHandler} class that will
+ *                   check verify that the client is valid for the current user.</li>
  * </ul>
  *
  * The handlers are not used directly in security manager client code. Instead, the security manager
@@ -54,7 +54,6 @@ public class MmsSecurityManager {
     private final SslHandler sslHandler;
     private final AuthenticationTokenHandler authenticationTokenHandler;
     private final AuthenticationHandler authenticationHandler;
-    private final AuthorizationHandler authorizationHandler;
     private final ClientVerificationHandler clientVerificationHandler;
 
     /**
@@ -68,7 +67,6 @@ public class MmsSecurityManager {
         sslHandler = newSecurityConfHandler(SslHandler.SECURITY_CONF_GROUP);
         authenticationTokenHandler = newSecurityConfHandler(AuthenticationTokenHandler.SECURITY_CONF_GROUP);
         authenticationHandler = newSecurityConfHandler(AuthenticationHandler.SECURITY_CONF_GROUP);
-        authorizationHandler = newSecurityConfHandler(AuthorizationHandler.SECURITY_CONF_GROUP);
         clientVerificationHandler = newSecurityConfHandler(ClientVerificationHandler.SECURITY_CONF_GROUP);
     }
 
@@ -189,29 +187,6 @@ public class MmsSecurityManager {
         @Override
         public boolean isAuthenticated() {
             return authenticated;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public boolean hasRole(String roleIdentifier) {
-            try {
-                checkRole(roleIdentifier);
-                return true;
-            } catch (AuthorizationException e) {
-                return false;
-            }
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void checkRole(String roleIdentifier) throws AuthorizationException {
-
-            if (securityManager.authorizationHandler == null) {
-                throw new AuthorizationException("No authorization handler configured");
-            }
-
-            // Authorize - throws an exception if authorization fails
-            securityManager.authorizationHandler.checkRoles(principal, false, roleIdentifier);
         }
 
         /** {@inheritDoc} */

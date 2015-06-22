@@ -99,8 +99,6 @@ public final class ServerTransport {
             LOGGER.warn("Client authentication failed for " + token, e);
             close(MmsConnectionClosingCode.AUTHENTICATION_ERROR.withMessage(e.getMessage()));
         }
-        // TEST
-        //System.out.println("****** has role mms users: " + subject.hasRole("mms users"));
     }
 
     public void close(MmsConnectionClosingCode reason) {
