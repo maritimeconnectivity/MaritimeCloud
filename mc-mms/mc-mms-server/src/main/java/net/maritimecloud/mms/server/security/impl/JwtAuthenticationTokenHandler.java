@@ -20,7 +20,8 @@ import io.jsonwebtoken.Jwts;
 import net.maritimecloud.mms.server.security.AuthenticationException;
 import net.maritimecloud.mms.server.security.AuthenticationToken;
 import net.maritimecloud.mms.server.security.AuthenticationTokenHandler;
-import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Implementation of the {@code AuthenticationTokenHandler} interface that attempts
@@ -62,10 +63,10 @@ public class JwtAuthenticationTokenHandler implements AuthenticationTokenHandler
 
     /** {@inheritDoc} */
     @Override
-    public AuthenticationToken resolveAuthenticationToken(ServletUpgradeRequest upgradeRequest) throws AuthenticationException {
+    public AuthenticationToken resolveAuthenticationToken(HttpServletRequest request) throws AuthenticationException {
 
         String jwtSecret = conf.getString("jwt-secret");
-        String authHeader = upgradeRequest.getHeader("Authorization");
+        String authHeader = request.getHeader("Authorization");
 
         return resolveAuthenticationToken(jwtSecret, authHeader);
     }

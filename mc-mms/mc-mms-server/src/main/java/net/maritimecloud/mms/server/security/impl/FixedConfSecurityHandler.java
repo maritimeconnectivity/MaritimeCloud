@@ -21,7 +21,8 @@ import net.maritimecloud.mms.server.security.AuthenticationToken;
 import net.maritimecloud.mms.server.security.AuthenticationTokenHandler;
 import net.maritimecloud.mms.server.security.ClientVerificationException;
 import net.maritimecloud.mms.server.security.ClientVerificationHandler;
-import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Handles authentication and client verification according to static configuration rules.
@@ -64,7 +65,7 @@ public class FixedConfSecurityHandler
 
     /** {@inheritDoc} */
     @Override
-    public AuthenticationToken resolveAuthenticationToken(ServletUpgradeRequest upgradeRequest) {
+    public AuthenticationToken resolveAuthenticationToken(HttpServletRequest request) {
 
         if (conf.hasPath("principal-header")) {
 

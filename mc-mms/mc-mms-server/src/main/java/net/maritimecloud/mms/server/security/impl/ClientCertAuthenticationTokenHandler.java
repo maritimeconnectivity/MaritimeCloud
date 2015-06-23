@@ -17,9 +17,9 @@ package net.maritimecloud.mms.server.security.impl;
 import com.typesafe.config.Config;
 import net.maritimecloud.mms.server.security.AuthenticationToken;
 import net.maritimecloud.mms.server.security.AuthenticationTokenHandler;
-import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
 
 import javax.naming.ldap.LdapName;
+import javax.servlet.http.HttpServletRequest;
 import java.security.cert.X509Certificate;
 
 /**
@@ -39,7 +39,7 @@ public class ClientCertAuthenticationTokenHandler implements AuthenticationToken
 
     /** {@inheritDoc} */
     @Override
-    public AuthenticationToken resolveAuthenticationToken(ServletUpgradeRequest upgradeRequest) {
+    public AuthenticationToken resolveAuthenticationToken(HttpServletRequest request) {
 
         String rdnAttr = conf.hasPath("principal-rdn-attr") ? conf.getString("principal-rdn-attr") : null;
 
@@ -47,7 +47,7 @@ public class ClientCertAuthenticationTokenHandler implements AuthenticationToken
 
             // Check if the client certificate has already been validated by an SSL proxy (e.g. nginx)
             // and the subject-dn stamped into a request header
-            String subjectDnHeader = upgradeRequest.getHeader(conf.getString("subject-dn-header"));
+            String subjectDnHeader = request.getHeader(conf.getString("subject-dn-header"));
             if (subjectDnHeader != null && subjectDnHeader.trim().length() > 0) {
                 return new SubjectDnAuthenticationToken(subjectDnHeader, rdnAttr);
             }
@@ -55,7 +55,7 @@ public class ClientCertAuthenticationTokenHandler implements AuthenticationToken
         } else {
 
             // Returns the subject-dn principal of the X.509 client certificate
-            X509Certificate[] certs = upgradeRequest.getCertificates();
+            X509Certificate[] certs = getCertificates(request);
             if (certs != null && certs.length > 0) {
                 return new X509CertificateAuthenticationToken(certs[0], rdnAttr);
             }
@@ -64,6 +64,16 @@ public class ClientCertAuthenticationTokenHandler implements AuthenticationToken
         // No principal resolved
         return null;
     }
+
+    /**
+     * Returns the certificates used for client SSL authentication
+     * @param request the servlet request
+     * @return the certificates used for client SSL authentication
+     */
+    public X509Certificate[] getCertificates(HttpServletRequest request) {
+        return (X509Certificate[])request.getAttribute("javax.servlet.request.X509Certificate");
+    }
+
 
     /** {@inheritDoc} */
     @Override

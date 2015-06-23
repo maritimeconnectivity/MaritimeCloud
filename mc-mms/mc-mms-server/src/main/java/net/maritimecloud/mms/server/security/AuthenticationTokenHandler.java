@@ -14,7 +14,7 @@
  */
 package net.maritimecloud.mms.server.security;
 
-import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Interface to be implemented by authentication token handler classes
@@ -24,12 +24,12 @@ public interface AuthenticationTokenHandler extends BaseSecurityHandler {
     String SECURITY_CONF_GROUP = "auth-token-conf";
 
     /**
-     * Resolves an {@code AuthenticationToken} from the websocket upgrade request.
+     * Resolves an {@code AuthenticationToken} from the HTTP servlet request.
      * If none can be resolved, null is returned.
      * If the authentication token is invalid, an AuthenticationException is thrown
      *
-     * @param upgradeRequest the websocket upgrade request
+     * @param request the websocket upgrade request
      * @return the authentication token, or null if none is resolved
      */
-    AuthenticationToken resolveAuthenticationToken(ServletUpgradeRequest upgradeRequest) throws AuthenticationException;
+    AuthenticationToken resolveAuthenticationToken(HttpServletRequest request) throws AuthenticationException;
 }

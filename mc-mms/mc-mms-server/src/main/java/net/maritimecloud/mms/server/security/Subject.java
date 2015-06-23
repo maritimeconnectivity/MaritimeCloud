@@ -14,6 +14,7 @@
  */
 package net.maritimecloud.mms.server.security;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.websocket.Session;
 import java.util.Objects;
 
@@ -67,7 +68,8 @@ public interface Subject {
     void logout();
 
     /**
-     * Builds a {@link Subject}.
+     * Builds a {@link Subject} from either a WebSocket Session or a
+     * from a http servlet request.
      */
     class Builder {
 
@@ -76,6 +78,9 @@ public interface Subject {
 
         /** The websocket session */
         private Session session;
+
+        /** The http servlet request - used for REST security **/
+        private HttpServletRequest request;
 
         /**
          * Instantiates the builder with the MMS security manager
@@ -87,12 +92,29 @@ public interface Subject {
         }
 
         public Builder setSession(Session session) {
+            if (request != null) {
+                throw new IllegalArgumentException("Subject must be built from either a WebSocket session or a servlet request, not both");
+            }
             this.session = session;
             return this;
         }
 
+        public Builder setRequest(HttpServletRequest request) {
+            if (session != null) {
+                throw new IllegalArgumentException("Subject must be built from either a WebSocket session or a servlet request, not both");
+            }
+            this.request = request;
+            return this;
+        }
+
         public Subject build() {
-            return securityManager.instantiateSubject(session);
+            if (request == null && session == null) {
+                throw new IllegalArgumentException("Subject must be built from either a WebSocket session or a servlet request");
+            } else if (request != null) {
+                return securityManager.instantiateSubject(request);
+            } else {
+                return securityManager.instantiateSubject(session);
+            }
         }
     }
 }

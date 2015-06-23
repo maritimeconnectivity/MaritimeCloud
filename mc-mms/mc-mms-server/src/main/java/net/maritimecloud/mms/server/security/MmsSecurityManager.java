@@ -21,6 +21,7 @@ import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.websocket.Session;
 import java.util.Objects;
 
@@ -139,6 +140,17 @@ public class MmsSecurityManager {
     }
 
     /**
+     * Instantiates a new {@code Subject} from the servlet request.
+     *
+     * @param request the servlet request
+     * @return the Subject
+     */
+    synchronized Subject instantiateSubject(HttpServletRequest request) {
+        // Instantiate a new subject
+        return new SubjectImpl(this);
+    }
+
+    /**
      * Resolves an {@code AuthenticationToken} from the websocket session.
      * <p>
      * If none can be resolved, null is returned.
@@ -153,8 +165,23 @@ public class MmsSecurityManager {
         // Check if we can resolve the authentication token from the upgrade request
         WebSocketSession jettySession = (WebSocketSession)session;
         ServletUpgradeRequest upgradeRequest = (ServletUpgradeRequest)jettySession.getUpgradeRequest();
+        return resolveAuthenticationToken(upgradeRequest.getHttpServletRequest());
+    }
+
+    /**
+     * Resolves an {@code AuthenticationToken} from the servlet request.
+     * <p>
+     * If none can be resolved, null is returned.
+     * <p>
+     * If an authentication token has been defined but is invalid (e.g. an expired JWT bearer token),
+     * an {@code AuthenticationException} may be thrown.
+     *
+     * @param request the servlet request
+     * @return the authentication token, or null if none is resolved
+     */
+    public AuthenticationToken resolveAuthenticationToken(HttpServletRequest request) throws AuthenticationException {
         if (authenticationTokenHandler != null) {
-            return authenticationTokenHandler.resolveAuthenticationToken(upgradeRequest);
+            return authenticationTokenHandler.resolveAuthenticationToken(request);
         }
         return null;
     }

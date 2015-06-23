@@ -17,8 +17,8 @@ package net.maritimecloud.mms.server.security.impl;
 import com.typesafe.config.Config;
 import net.maritimecloud.mms.server.security.AuthenticationToken;
 import net.maritimecloud.mms.server.security.AuthenticationTokenHandler;
-import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
 
+import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.Charset;
 import java.util.Base64;
 
@@ -45,8 +45,8 @@ public class BasicAuthAuthenticationTokenHandler implements AuthenticationTokenH
 
     /** {@inheritDoc} */
     @Override
-    public AuthenticationToken resolveAuthenticationToken(ServletUpgradeRequest upgradeRequest) {
-        return resolveAuthenticationToken(upgradeRequest.getHeader("Authorization"));
+    public AuthenticationToken resolveAuthenticationToken(HttpServletRequest request) {
+        return resolveAuthenticationToken(request.getHeader("Authorization"));
     }
 
     /**
