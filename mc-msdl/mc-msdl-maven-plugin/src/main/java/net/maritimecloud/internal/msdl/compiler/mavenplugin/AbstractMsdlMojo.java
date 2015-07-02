@@ -98,6 +98,10 @@ abstract class AbstractMsdlMojo extends AbstractMojo {
     @Parameter(required = false)
     private File[] additionalProtoPathElements = {};
 
+    /** Flag to indicate whether or not to generate EJB classes. */
+    @Parameter(required = false)
+    private boolean generateEJB;
+
     /**
      * Since {@code protoc} cannot access jars, proto files in dependencies are extracted to this location and deleted
      * on exit. This directory is always cleaned during execution.
@@ -244,8 +248,13 @@ abstract class AbstractMsdlMojo extends AbstractMojo {
                         g.addFile(f.toPath());
                     }
                     JavaGenPlugin javaPlugin = JavaGenPlugin.create(outputDirectory.toPath());
+
                     javaPlugin.setImplementsSerializable(implementsSerializable);
                     getLog().debug("Setting implements serialiable = " + implementsSerializable);
+
+                    javaPlugin.setGenerateEJB(generateEJB);
+                    getLog().debug("Setting generate EJB = " + generateEJB);
+
                     g.addPlugin(javaPlugin);
 
                     if (headerLocation != null) {

@@ -48,6 +48,8 @@ public class JavaGenPlugin extends MsdlPlugin {
 
     boolean implementsSerializable;
 
+    boolean generateEJB;
+
     String license;
 
     Path outputPath;
@@ -89,6 +91,14 @@ public class JavaGenPlugin extends MsdlPlugin {
             classes.add(g.cServer); // add server part of endpoint
         }
 
+        // Generate JEE endpoints in the file
+        if (generateEJB) {
+            for (EndpointDefinition ed : file.getEndpoints()) {
+                JavaEEGenEndpointGenerator g = new JavaEEGenEndpointGenerator(this, null, ed).generate();
+                classes.add(g.cEJB);
+            }
+        }
+
         for (CodegenClass cc : classes) {
             if (file.getNamespace() != null) {
                 cc.setPackage(file.getNamespace());
@@ -127,6 +137,12 @@ public class JavaGenPlugin extends MsdlPlugin {
             generateSourceForFile(f);
         }
 
+        if (generateEJB) {
+            Path path = JavaEEGenMmsClientGenerator.writeSource(license, outputPath);
+            if (path != null) {
+                getLogger().info("Wrote " + path);
+            }
+        }
     }
 
     public JavaGenPlugin setHeader(Path path) {
@@ -145,6 +161,17 @@ public class JavaGenPlugin extends MsdlPlugin {
      */
     public JavaGenPlugin setPackagePrefix(String packagePrefix) {
         this.packagePrefix = packagePrefix;
+        return this;
+    }
+
+    /** Returns whether to generate EJB classes or not */
+    public boolean isGenerateEJB() {
+        return generateEJB;
+    }
+
+    /** Sets whether to generate EJB classes or not */
+    public JavaGenPlugin setGenerateEJB(boolean generateEJB) {
+        this.generateEJB = generateEJB;
         return this;
     }
 
