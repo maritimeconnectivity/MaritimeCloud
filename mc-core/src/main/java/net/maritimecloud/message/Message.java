@@ -33,7 +33,7 @@ package net.maritimecloud.message;
 public interface Message {
 
     /**
-     * Returns an immutable copy of this message.
+     * Returns an immutable copy of this message. If this message is already immutable this method should return this.
      *
      * @return an immutable copy of this message
      */
