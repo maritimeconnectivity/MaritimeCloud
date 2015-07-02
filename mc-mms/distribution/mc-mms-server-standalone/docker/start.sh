@@ -13,6 +13,12 @@ else
 	ACCESS_LOG_FORMATP="-accessLogFormat ${ACCESS_LOG_FORMAT}"
 fi
 
+if [ -z "${ACCESS_LOG_FILTER}" ]; then
+	ACCESS_LOG_FILTERP=""
+else
+	ACCESS_LOG_FILTERP="-accessLogFilter \"${ACCESS_LOG_FILTER}\""
+fi
+
 if [ -z "${SECURE_PORT}" ]; then
 	SECURE_PORTP=""
 else
@@ -26,7 +32,7 @@ else
 fi
 
 java -classpath $LATEST  net.maritimecloud.mms.server.Main \
-   -port 43234 \
-   $ACCESS_LOGP $ACCESS_LOG_FORMATP $SECURE_PORTP \
+   -port 43234 $SECURE_PORTP \
+   $ACCESS_LOGP $ACCESS_LOG_FORMATP $ACCESS_LOG_FILTERP \
    $CONFP
 

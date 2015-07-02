@@ -81,7 +81,8 @@ public class AccessLogManager {
             AccessLogFormat format = conf.getAccessLogFormat() != null
                     ? conf.getAccessLogFormat()
                     : AccessLogFormat.TEXT;
-            addMessageLog(logFile, format);
+            String filter = conf.getAccessLogFilter();
+            addMessageLog(logFile, format, filter);
         }
     }
 
@@ -179,6 +180,12 @@ public class AccessLogManager {
          * @return the access log format
          */
         AccessLogFormat getAccessLogFormat();
+
+        /**
+         * Returns the access log filter
+         * @return the access log filter
+         */
+        String getAccessLogFilter();
     }
 
     /**

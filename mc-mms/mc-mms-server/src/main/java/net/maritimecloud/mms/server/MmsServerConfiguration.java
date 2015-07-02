@@ -57,6 +57,8 @@ import static net.maritimecloud.internal.mms.transport.AccessLogManager.AccessLo
  *     <li>-securePort: The secure port to listen for REST MMS connections on</li>
  *     <li>-accessLog: The file to write access logs to. Use 'stdout' for standard out</li>
  *     <li>-accessLogFormat: The access log message format. One of 'text', 'binary' or 'compact'</li>
+ *     <li>-accessLogFilter: The filter to apply to the access log.
+ *                           Example: "inbound && msg.m.class.simpleName != 'PositionReport'"</li>
  * </ul>
  *
  * The format of the MMS configuration file can be seen from the default {@code src/main/resources/mms.conf}
@@ -88,6 +90,10 @@ public class MmsServerConfiguration implements AccessLogConfiguration {
             converter = AccessLogFormatConverter.class)
     AccessLogFormat accessLogFormat;
 
+    @Parameter(names = "-accessLogFilter", description = "The filter to apply to the access log, " +
+            "e.g. \"inbound && msg.m.class.simpleName != 'PositionReport'\"")
+    String accessLogFilter;
+
     /**
      * @return the id
      */
@@ -112,6 +118,12 @@ public class MmsServerConfiguration implements AccessLogConfiguration {
     @Override
     public AccessLogFormat getAccessLogFormat() {
         return accessLogFormat;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getAccessLogFilter() {
+        return accessLogFilter;
     }
 
     /**
@@ -189,6 +201,9 @@ public class MmsServerConfiguration implements AccessLogConfiguration {
         }
         if (accessLogFormat == null && fileConf.hasPath("access-log-format")) {
             accessLogFormat = new AccessLogFormatConverter().convert(fileConf.getString("access-log-format"));
+        }
+        if (accessLogFilter == null && fileConf.hasPath("access-log-filter")) {
+            accessLogFilter = fileConf.getString("access-log-filter");
         }
 
         return fileConf;
