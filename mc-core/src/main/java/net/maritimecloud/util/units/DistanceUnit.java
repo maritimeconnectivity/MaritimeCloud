@@ -105,6 +105,6 @@ public enum DistanceUnit {
      * @return the converted distance
      */
     public double toNauticalMiles(double distance) {
-        return toMeters(distance) * METERS_TO_NAUTICAL_MILES;
+        return toMeters(distance) / METERS_TO_NAUTICAL_MILES;
     }
 }
