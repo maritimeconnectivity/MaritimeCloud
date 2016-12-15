@@ -92,7 +92,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <dependencies.guava.version>18.0</dependencies.guava.version>
     <dependencies.slf4j.version>1.7.12</dependencies.slf4j.version>
-    <dependencies.jetty.version>9.2.11.v20150529</dependencies.jetty.version>
+    <!--<dependencies.jetty.version>  9.2.19.v201609089.2.11.v20150529</dependencies.jetty.version>-->
+    <dependencies.jetty.version>9.2.19.v20160908</dependencies.jetty.version>
     <dependencies.servlet.version>3.1.0</dependencies.servlet.version>
     <dependencies.jersey.version>2.17</dependencies.jersey.version>
     <dependencies.metrics.version>3.1.2</dependencies.metrics.version>

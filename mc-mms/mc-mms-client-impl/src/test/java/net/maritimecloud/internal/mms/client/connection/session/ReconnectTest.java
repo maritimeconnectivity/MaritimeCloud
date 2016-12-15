@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Test;
+
 import net.maritimecloud.internal.mms.messages.Connected;
 import net.maritimecloud.internal.mms.messages.Hello;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
@@ -32,14 +34,11 @@ import net.maritimecloud.net.mms.MmsConnection;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 import net.maritimecloud.util.Binary;
 
-import org.junit.Test;
-
 /**
  *
  * @author Kasper Nielsen
  */
 public class ReconnectTest extends AbstractSessionTest {
-
 
     /** Tests that we will reconnect if the connection is dropped. */
     @Test
@@ -47,7 +46,7 @@ public class ReconnectTest extends AbstractSessionTest {
         CountDownLatch connectCount = new CountDownLatch(2);
         Session s = connect(new SessionListener() {}, new MmsConnection.Listener() {
             @Override
-            public void connected(URI host) {
+            public void connected(URI host, boolean isReconnect) {
                 connectCount.countDown();
             }
         });
@@ -79,13 +78,13 @@ public class ReconnectTest extends AbstractSessionTest {
         CountDownLatch connectCount = new CountDownLatch(10);
         Session s = connect(new SessionListener() {}, new MmsConnection.Listener() {
             @Override
-            public void connected(URI host) {
+            public void connected(URI host, boolean isReconnect) {
                 connectCount.countDown();
             }
         });
 
         Binary sessionId = s.sessionId;
-
+        System.out.println(sessionId);
         for (int i = 0; i < 9; i++) {
             t.disconnect();
 
@@ -105,15 +104,14 @@ public class ReconnectTest extends AbstractSessionTest {
         s.closeSession(MmsConnectionClosingCode.NORMAL);
     }
 
-
     @Test
     public void reconnectWithMessage() throws Exception {
         CountDownLatch connectCount = new CountDownLatch(2);
-        Session s = connectNormally(e -> {}, new MmsConnection.Listener() {
+        Session s = connectNormally(e -> {} , new MmsConnection.Listener() {
 
             /** {@inheritDoc} */
             @Override
-            public void connected(URI host) {
+            public void connected(URI host, boolean isReconnect) {
                 connectCount.countDown();
             }
         });
@@ -149,11 +147,11 @@ public class ReconnectTest extends AbstractSessionTest {
     @Test
     public void reconnectResend() throws Exception {
         CountDownLatch connectCount = new CountDownLatch(2);
-        Session s = connectNormally(e -> {}, new MmsConnection.Listener() {
+        Session s = connectNormally(e -> {} , new MmsConnection.Listener() {
 
             /** {@inheritDoc} */
             @Override
-            public void connected(URI host) {
+            public void connected(URI host, boolean isReconnect) {
                 connectCount.countDown();
             }
         });
@@ -190,11 +188,11 @@ public class ReconnectTest extends AbstractSessionTest {
     @Test
     public void reconnectResendMany() throws Exception {
         CountDownLatch connectCount = new CountDownLatch(2);
-        Session s = connectNormally(e -> {}, new MmsConnection.Listener() {
+        Session s = connectNormally(e -> {} , new MmsConnection.Listener() {
 
             /** {@inheritDoc} */
             @Override
-            public void connected(URI host) {
+            public void connected(URI host, boolean isReconnect) {
                 connectCount.countDown();
             }
         });

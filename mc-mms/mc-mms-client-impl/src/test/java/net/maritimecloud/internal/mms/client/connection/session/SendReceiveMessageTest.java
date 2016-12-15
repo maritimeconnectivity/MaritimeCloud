@@ -20,12 +20,12 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Test;
+
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.internal.net.messages.Broadcast;
 import net.maritimecloud.internal.util.concurrent.CompletableFuture;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
-
-import org.junit.Test;
 
 /**
  *
@@ -44,7 +44,6 @@ public class SendReceiveMessageTest extends AbstractSessionTest {
         assertEquals(1, mm.getMessageId());
         assertEquals(0, mm.getLatestReceivedId());
         assertEquals("abc", mm.cast(Broadcast.class).getSenderId());
-
 
         // next messages
         for (int i = 1; i < 100; i++) {
@@ -97,8 +96,8 @@ public class SendReceiveMessageTest extends AbstractSessionTest {
         assertEquals("abc", mm.cast(Broadcast.class).getSenderId());
 
         // We need to acquire this lock to make sure we are out of the receiving loop (last ack adjusted
-        s.receiveLock.lock();
-        s.receiveLock.unlock();
+        s.lock.lock();
+        s.lock.unlock();
 
         CompletableFuture<Void> cf = new CompletableFuture<>();
         s.sendMessage(new Broadcast().setSenderId("cba"), cf);
@@ -107,7 +106,6 @@ public class SendReceiveMessageTest extends AbstractSessionTest {
         assertEquals(1, mm.getMessageId());
         assertEquals(1, mm.getLatestReceivedId());
         assertEquals("cba", mm.cast(Broadcast.class).getSenderId());
-
 
         s.closeSession(MmsConnectionClosingCode.NORMAL);
     }
@@ -127,8 +125,8 @@ public class SendReceiveMessageTest extends AbstractSessionTest {
             assertEquals("abc", mm.cast(Broadcast.class).getSenderId());
 
             // We need to acquire this lock to make sure we are out of the receiving loop (last ack adjusted
-            s.receiveLock.lock();
-            s.receiveLock.unlock();
+            s.lock.lock();
+            s.lock.unlock();
 
             CompletableFuture<Void> cf = new CompletableFuture<>();
             s.sendMessage(new Broadcast().setSenderId("cba"), cf);

@@ -89,8 +89,7 @@ final class SessionStateConnecting extends SessionState {
     void run0() {
         // To avoid a situation where we constantly reconnect
         // we make sure that there is at lease 2000 milliseconds
-        long awaitMillis = Math.max(
-                ClientInfo.RECONNECT_TIME_DELAY - (System.currentTimeMillis() - info.getLatestConnectionAttempt()), 0);
+        long awaitMillis = Math.max(ClientInfo.RECONNECT_TIME_DELAY - (System.currentTimeMillis() - info.getLatestConnectionAttempt()), 0);
         awaitMillis = 0;
         if (awaitMillis > 0) {
             LOG.info("Sleeping for " + awaitMillis + " ms before connecting again.");
@@ -143,8 +142,7 @@ final class SessionStateConnecting extends SessionState {
 
     private void onConnected(Connected cm) {
         Binary b = session.sessionId;
-        SessionStateConnected.connected(this, b, cm.getSessionId(),
-                cm.getLastReceivedMessageId() == null ? 0 : cm.getLastReceivedMessageId());
+        SessionStateConnected.connected(this, b, cm.getSessionId(), cm.getLastReceivedMessageId() == null ? 0 : cm.getLastReceivedMessageId());
     }
 
     private void onWelcome(Welcome w) {

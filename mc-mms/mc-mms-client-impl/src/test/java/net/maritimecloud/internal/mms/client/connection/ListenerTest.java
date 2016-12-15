@@ -22,15 +22,15 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.Ignore;
+import org.junit.Test;
+
 import net.maritimecloud.internal.mms.client.ClientInfo;
 import net.maritimecloud.internal.mms.messages.Connected;
 import net.maritimecloud.internal.mms.messages.Hello;
 import net.maritimecloud.net.mms.MmsConnection;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 import net.maritimecloud.util.Binary;
-
-import org.junit.Ignore;
-import org.junit.Test;
 
 /**
  *
@@ -51,7 +51,7 @@ public class ListenerTest extends AbstractConnectionTest {
             }
 
             @Override
-            public void connected(URI host) {
+            public void connected(URI host, boolean isReconnect) {
                 state.compareAndSet("connecting", "connected");
                 connected.countDown();
             }
@@ -73,7 +73,6 @@ public class ListenerTest extends AbstractConnectionTest {
         assertTrue(connected.await(2, TimeUnit.SECONDS));
 
         cc.setEnabled(false);
-
 
     }
 }

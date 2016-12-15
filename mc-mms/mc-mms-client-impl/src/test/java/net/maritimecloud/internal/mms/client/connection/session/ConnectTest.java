@@ -25,14 +25,14 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.Test;
+
 import net.maritimecloud.internal.mms.client.ClientInfo;
 import net.maritimecloud.internal.mms.messages.Connected;
 import net.maritimecloud.internal.mms.messages.Hello;
 import net.maritimecloud.net.mms.MmsConnection;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 import net.maritimecloud.util.Binary;
-
-import org.junit.Test;
 
 /**
  *
@@ -47,11 +47,11 @@ public class ConnectTest extends AbstractSessionTest {
 
         Session s = Session.createNewSessionAndConnect(ctm, ci, new SessionListener() {}, new MmsConnection.Listener() {
             @Override
-            public void connected(URI host) {
+            public void connected(URI host, boolean isNewSession) {
+                assertTrue(isNewSession);
                 connected.countDown();
             }
         });
-
 
         assertFalse(s.isConnected());
         Hello h = t.take(Hello.class);
@@ -89,12 +89,19 @@ public class ConnectTest extends AbstractSessionTest {
                 createdSession.set(closingCode);
                 closed.countDown();
             }
-        }, new MmsConnection.Listener() {});
+        }, new MmsConnection.Listener() {
+
+            /** {@inheritDoc} */
+            @Override
+            public void connected(URI host, boolean isNewSession) {
+                System.out.println(isNewSession);
+            }
+
+        });
         assertFalse(s.isConnected());
 
         SessionStateConnecting ssc = (SessionStateConnecting) s.state;
         assertFalse(ssc.cancel.getCount() == 0);
-
 
         t.take(Hello.class);
         assertFalse(s.isClosed);
@@ -113,6 +120,5 @@ public class ConnectTest extends AbstractSessionTest {
 
         s.closeSession(MmsConnectionClosingCode.NORMAL);
     }
-
 
 }

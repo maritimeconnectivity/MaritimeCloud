@@ -40,8 +40,6 @@ import net.maritimecloud.message.Message;
  */
 class SessionSender extends Thread {
 
-    final ReentrantLock lock = new ReentrantLock();
-
     final Session session;
 
     volatile long nextMsgId = 1L;
@@ -51,7 +49,7 @@ class SessionSender extends Thread {
     final LinkedList<Msg> messages = new LinkedList<>();
 
     /** Signaled when the state of the connection manager changes. */
-    final Condition stateChange = lock.newCondition();
+    final Condition stateChange;
 
     final Writer writer = new Writer();
 
@@ -71,6 +69,7 @@ class SessionSender extends Thread {
 
     SessionSender(Session session) {
         this.session = requireNonNull(session);
+        stateChange = session.lock.newCondition();
         setDaemon(true);
         setName("MMSClient-SessionSender");
 
@@ -83,7 +82,7 @@ class SessionSender extends Thread {
     }
 
     void onAck(long id) {
-        lock.lock();
+        session.lock.lock();
         try {
             Entry<Long, SessionSender.UnAcked> e = futures.firstEntry();
             while (e != null && e.getKey() <= id) {
@@ -92,7 +91,7 @@ class SessionSender extends Thread {
                 e = futures.firstEntry();
             }
         } finally {
-            lock.unlock();
+            session.lock.unlock();
         }
     }
 
@@ -108,7 +107,7 @@ class SessionSender extends Thread {
 
     public void run() {
         while (!session.isClosed) {
-            lock.lock();
+            session.lock.lock();
             try {
                 SessionState s = session.state;
 
@@ -137,28 +136,28 @@ class SessionSender extends Thread {
                     } catch (InterruptedException probablyShutdown) {}
                 }
             } finally {
-                lock.unlock();
+                session.lock.unlock();
             }
         }
     }
 
     void send(Message message, CompletableFuture<Void> onAck) {
-        lock.lock();
+        session.lock.lock();
         try {
             messages.add(new Msg(message, onAck));
             stateChange.signalAll();
         } finally {
-            lock.unlock();
+            session.lock.unlock();
         }
     }
 
     void sup() {
-        lock.lock();
+        session.lock.lock();
         try {
             messages.add(null);
             stateChange.signalAll();
         } finally {
-            lock.unlock();
+            session.lock.unlock();
         }
     }
 

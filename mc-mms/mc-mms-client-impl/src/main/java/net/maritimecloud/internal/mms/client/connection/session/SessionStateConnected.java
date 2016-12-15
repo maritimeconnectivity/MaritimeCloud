@@ -14,6 +14,8 @@
  */
 package net.maritimecloud.internal.mms.client.connection.session;
 
+import java.util.Objects;
+
 import net.maritimecloud.internal.mms.client.connection.transport.ClientTransport;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.internal.util.logging.Logger;
@@ -41,13 +43,13 @@ final class SessionStateConnected extends SessionState {
     /** {@inheritDoc} */
     @Override
     public void onMessage(MmsMessage message) {
-        session.receiveLock.lock();
+        session.lock.lock();
         try {
             session.latestReceivedId = message.getMessageId();
             session.sender.onAck(message.getLatestReceivedId());
             session.listener.onMessage(message);
         } finally {
-            session.receiveLock.unlock();
+            session.lock.unlock();
         }
     }
 
@@ -63,8 +65,7 @@ final class SessionStateConnected extends SessionState {
      * @param lastReceivedMessage
      *            the id of the last received message id
      */
-    static void connected(SessionStateConnecting connectingState, Binary existingSessionId, Binary newSessionId,
-            long lastReceivedMessage) {
+    static void connected(SessionStateConnecting connectingState, Binary existingSessionId, Binary newSessionId, long lastReceivedMessage) {
         Session session = connectingState.session;
         session.fullyLock();
         try {
@@ -74,9 +75,8 @@ final class SessionStateConnected extends SessionState {
 
                 if (existingSessionId == null) { // New session
                     LOGGER.debug("Created new session with id " + newSessionId);
-                    session.sessionId = newSessionId;
                 }
-
+                session.sessionId = newSessionId;
                 session.state = new SessionStateConnected(session, connectingState.transport);
 
                 // If we are reconnecting make sure we resend messages that have not been acknowledged
@@ -86,7 +86,9 @@ final class SessionStateConnected extends SessionState {
                 }
 
                 // invoke user specified connection listeners.
-                session.connectionListener.connected(connectingState.uri);
+                System.out.println(existingSessionId + " " + newSessionId);
+
+                session.connectionListener.connected(connectingState.uri, !Objects.equals(existingSessionId, newSessionId));
             }
         } finally {
             session.fullyUnlock();

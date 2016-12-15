@@ -71,11 +71,11 @@ class MmsConnectionListenerInvoker implements MmsConnection.Listener {
 
     /** {@inheritDoc} */
     @Override
-    public void connected(URI host) {
+    public void connected(URI host, boolean sessionId) {
         clientConnection.disconnectedOrConnected();
         for (MmsConnection.Listener l : listeners) {
             try {
-                l.connected(host);
+                l.connected(host, sessionId);
             } catch (Exception e) {
                 LOGGER.error("Failure", e);
             }

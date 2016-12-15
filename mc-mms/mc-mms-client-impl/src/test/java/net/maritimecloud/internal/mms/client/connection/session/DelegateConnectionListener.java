@@ -44,8 +44,8 @@ public class DelegateConnectionListener implements MmsConnection.Listener {
     }
 
     /** {@inheritDoc} */
-    public void connected(URI host) {
-        l.connected(host);
+    public void connected(URI host, boolean sessionId) {
+        l.connected(host, sessionId);
     }
 
     /** {@inheritDoc} */

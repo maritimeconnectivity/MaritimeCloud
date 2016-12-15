@@ -21,6 +21,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import org.junit.After;
+import org.junit.Before;
+
 import net.maritimecloud.internal.mms.client.AbstractClientConnectionTest;
 import net.maritimecloud.internal.mms.client.ClientInfo;
 import net.maritimecloud.internal.mms.client.connection.transport.ClientTransportFactoryJetty;
@@ -30,9 +33,6 @@ import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.net.mms.MmsConnection;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 import net.maritimecloud.util.Binary;
-
-import org.junit.After;
-import org.junit.Before;
 
 /**
  *
@@ -69,9 +69,9 @@ public class AbstractSessionTest extends AbstractClientConnectionTest {
 
             /** {@inheritDoc} */
             @Override
-            public void connected(URI host) {
+            public void connected(URI host, boolean isReconnect) {
                 connected.countDown();
-                super.connected(host);
+                super.connected(host, isReconnect);
             }
 
         });
@@ -88,14 +88,13 @@ public class AbstractSessionTest extends AbstractClientConnectionTest {
     Session connect(SessionListener sessionListener, MmsConnection.Listener listener) throws Exception {
         ClientInfo ci = new ClientInfo(conf);
         CountDownLatch connected = new CountDownLatch(1);
-        Session s = Session.createNewSessionAndConnect(ctm, ci, sessionListener, new DelegateConnectionListener(
-                listener) {
+        Session s = Session.createNewSessionAndConnect(ctm, ci, sessionListener, new DelegateConnectionListener(listener) {
 
             /** {@inheritDoc} */
             @Override
-            public void connected(URI host) {
+            public void connected(URI host, boolean isReconnect) {
                 connected.countDown();
-                super.connected(host);
+                super.connected(host, isReconnect);
             }
 
         });
@@ -107,7 +106,6 @@ public class AbstractSessionTest extends AbstractClientConnectionTest {
         assertTrue(connected.await(2, TimeUnit.SECONDS));
         return s;
     }
-
 
     @Before
     public void setup() throws Exception {

@@ -21,12 +21,12 @@ import java.net.URI;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Test;
+
 import net.maritimecloud.internal.mms.messages.Hello;
 import net.maritimecloud.net.mms.MmsConnection;
 import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 import net.maritimecloud.util.Binary;
-
-import org.junit.Test;
 
 /**
  *
@@ -49,7 +49,8 @@ public class ReconnectNewSessionTest extends AbstractSessionTest {
             }
         }, new MmsConnection.Listener() {
             @Override
-            public void connected(URI host) {
+            public void connected(URI host, boolean isNewSession) {
+                assertTrue(isNewSession);
                 connectCount.countDown();
             }
         });

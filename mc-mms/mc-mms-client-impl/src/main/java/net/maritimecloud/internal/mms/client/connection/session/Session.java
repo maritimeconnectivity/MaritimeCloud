@@ -52,8 +52,6 @@ public class Session {
 
     final ReentrantLock lock = new ReentrantLock();
 
-    final ReentrantLock receiveLock = new ReentrantLock();
-
     final SessionSender sender;
 
     volatile Binary sessionId;
@@ -63,8 +61,7 @@ public class Session {
 
     final ClientTransportListener tl;
 
-    Session(ClientTransportFactory ctm, ClientInfo info, SessionListener listener,
-            MmsConnection.Listener connectionListener) {
+    Session(ClientTransportFactory ctm, ClientInfo info, SessionListener listener, MmsConnection.Listener connectionListener) {
         this.ctm = requireNonNull(ctm);
         this.info = requireNonNull(info);
         this.sender = new SessionSender(this);
@@ -107,18 +104,20 @@ public class Session {
     void fullyLock() {
         // must be reverse order of fullyUnlock
         lock.lock();
-        receiveLock.lock();
-        sender.lock.lock();
+        // receiveLock.lock();
+        // sender.lock.lock();
     }
 
     void fullyUnlock() {
         // must be reverse order of fullyLock
-        sender.lock.unlock();
-        receiveLock.unlock();
+        // sender.lock.unlock();
+        // receiveLock.unlock();
         lock.unlock();
     }
 
-    /** @return whether or not this session is currently connected */
+    /**
+     * @return whether or not this session is currently connected
+     */
     public boolean isConnected() {
         return state instanceof SessionStateConnected;
     }
@@ -150,14 +149,14 @@ public class Session {
     }
 
     void listenerOnMessage(MmsMessage message) {
-        receiveLock.lock();
+        lock.lock();
         try {
             SessionState state = this.state;
             if (state != null) {
                 state.onMessage(message);
             }
         } finally {
-            receiveLock.unlock();
+            lock.unlock();
         }
     }
 
@@ -165,8 +164,8 @@ public class Session {
         sender.send(message, onAck);
     }
 
-    public static Session createNewSessionAndConnect(ClientTransportFactory ctm, ClientInfo info,
-            SessionListener listener, MmsConnection.Listener connectionListener) {
+    public static Session createNewSessionAndConnect(ClientTransportFactory ctm, ClientInfo info, SessionListener listener,
+            MmsConnection.Listener connectionListener) {
         LOGGER.debug("Creating new session");
         Session session = new Session(ctm, info, listener, connectionListener);
         session.fullyLock();

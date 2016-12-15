@@ -113,14 +113,16 @@ public abstract class ClientTransport {
             msg = MmsMessage.parseTextMessage(textMessage);
             msg.setInbound(true);
         } catch (Exception e) {
-            LOGGER.error("Failed to parse incoming text message", e);
+            LOGGER.error("Failed to parse incoming text message, closing transport", e);
             closeTransport(MmsConnectionClosingCode.WRONG_MESSAGE.withMessage(e.getMessage()));
             return;
         }
         try {
             transportListener.onMessageReceived(msg);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to parse incoming text message, closing transport", e);
+            closeTransport(MmsConnectionClosingCode.BAD_DATA.withMessage(e.getMessage()));
+            return;
         }
     }
 
