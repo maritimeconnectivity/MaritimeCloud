@@ -142,7 +142,8 @@ final class SessionStateConnecting extends SessionState {
 
     private void onConnected(Connected cm) {
         Binary b = session.sessionId;
-        SessionStateConnected.connected(this, b, cm.getSessionId(), cm.getLastReceivedMessageId() == null ? 0 : cm.getLastReceivedMessageId());
+        SessionStateConnected.connected(this, b, cm.getSessionId(), cm.getLastReceivedMessageId() == null ? 0 : cm.getLastReceivedMessageId(),
+                cm.getIsCleanConnect() == null ? true : cm.getIsCleanConnect());
     }
 
     private void onWelcome(Welcome w) {

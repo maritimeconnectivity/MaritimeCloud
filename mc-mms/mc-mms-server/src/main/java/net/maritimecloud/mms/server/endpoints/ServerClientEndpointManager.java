@@ -18,10 +18,10 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.maritimecloud.mms.server.connection.client.Client;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import net.maritimecloud.mms.server.connection.client.Client;
 
 /**
  * Manages services for a single connected client.
@@ -41,6 +41,10 @@ public class ServerClientEndpointManager {
 
     public ServerClientEndpointManager(Client client) {
         this.client = requireNonNull(client);
+    }
+
+    public int getServiceCount() {
+        return endpoints.size();
     }
 
     public boolean hasService(String name) {

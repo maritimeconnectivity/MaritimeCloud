@@ -32,25 +32,16 @@ public class Connected implements Message {
     /** A message serializer that can read and write instances of this class. */
     public static final MessageSerializer<Connected> SERIALIZER = new Serializer();
 
-    /** Field definition. */
-    private Binary sessionId;
+    private Boolean isCleanConnect;
 
     /** Field definition. */
     private Long lastReceivedMessageId;
 
+    /** Field definition. */
+    private Binary sessionId;
+
     /** Creates a new Connected. */
     public Connected() {}
-
-    /**
-     * Creates a new Connected by reading from a message reader.
-     *
-     * @param reader
-     *            the message reader
-     */
-    Connected(MessageReader reader) throws IOException {
-        this.sessionId = reader.readBinary(1, "sessionId", null);
-        this.lastReceivedMessageId = reader.readInt64(2, "lastReceivedMessageId", null);
-    }
 
     /**
      * Creates a new Connected by copying an existing.
@@ -61,66 +52,19 @@ public class Connected implements Message {
     Connected(Connected instance) {
         this.sessionId = instance.sessionId;
         this.lastReceivedMessageId = instance.lastReceivedMessageId;
-    }
-
-    void writeTo(MessageWriter w) throws IOException {
-        w.writeBinary(1, "sessionId", sessionId);
-        w.writeInt64(2, "lastReceivedMessageId", lastReceivedMessageId);
-    }
-
-    /** Returns the session id, if successfully reconnected identical to Hello.sessionId. */
-    public Binary getSessionId() {
-        return sessionId;
-    }
-
-    public boolean hasSessionId() {
-        return sessionId != null;
-    }
-
-    public Connected setSessionId(Binary sessionId) {
-        this.sessionId = sessionId;
-        return this;
+        this.isCleanConnect = instance.isCleanConnect;
     }
 
     /**
-     * Returns if successfully reconnected, the latest message id that was succesfully received by server (Optional).
+     * Creates a new Connected by reading from a message reader.
+     *
+     * @param reader
+     *            the message reader
      */
-    public Long getLastReceivedMessageId() {
-        return lastReceivedMessageId;
-    }
-
-    public boolean hasLastReceivedMessageId() {
-        return lastReceivedMessageId != null;
-    }
-
-    public Connected setLastReceivedMessageId(Long lastReceivedMessageId) {
-        this.lastReceivedMessageId = lastReceivedMessageId;
-        return this;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Connected immutable() {
-        return new Immutable(this);
-    }
-
-    /** Returns a JSON representation of this message */
-    public String toJSON() {
-        return MessageSerializer.writeToJSON(this, SERIALIZER);
-    }
-
-    /**
-     * Creates a message of this type from a JSON throwing a runtime exception if the format of the message does not match
-     */
-    public static Connected fromJSON(CharSequence c) {
-        return MessageSerializer.readFromJSON(SERIALIZER, c);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public int hashCode() {
-        int result = 31 + Hashing.hashcode(this.sessionId);
-        return 31 * result + Hashing.hashcode(this.lastReceivedMessageId);
+    Connected(MessageReader reader) throws IOException {
+        this.sessionId = reader.readBinary(1, "sessionId", null);
+        this.lastReceivedMessageId = reader.readInt64(2, "lastReceivedMessageId", null);
+        this.isCleanConnect = reader.readBoolean(3, "isCleanConnect", null);
     }
 
     /** {@inheritDoc} */
@@ -130,26 +74,90 @@ public class Connected implements Message {
             return true;
         } else if (other instanceof Connected) {
             Connected o = (Connected) other;
-            return Objects.equals(sessionId, o.sessionId) &&
-                   Objects.equals(lastReceivedMessageId, o.lastReceivedMessageId);
+            return Objects.equals(sessionId, o.sessionId) && Objects.equals(lastReceivedMessageId, o.lastReceivedMessageId)
+                    && Objects.equals(isCleanConnect, o.isCleanConnect);
         }
         return false;
     }
 
-    /** A serializer for reading and writing instances of Connected. */
-    static class Serializer extends MessageSerializer<Connected> {
+    /**
+     * @return the isCleanConnect
+     */
+    public Boolean getIsCleanConnect() {
+        return isCleanConnect;
+    }
 
-        /** {@inheritDoc} */
-        @Override
-        public Connected read(MessageReader reader) throws IOException {
-            return new Connected(reader);
-        }
+    /**
+     * Returns if successfully reconnected, the latest message id that was succesfully received by server (Optional).
+     */
+    public Long getLastReceivedMessageId() {
+        return lastReceivedMessageId;
+    }
 
-        /** {@inheritDoc} */
-        @Override
-        public void write(Connected message, MessageWriter writer) throws IOException {
-            message.writeTo(writer);
-        }
+    /** Returns the session id, if successfully reconnected identical to Hello.sessionId. */
+    public Binary getSessionId() {
+        return sessionId;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int hashCode() {
+        int result = 31 + Hashing.hashcode(this.sessionId);
+        result = 31 * result + Hashing.hashcode(this.lastReceivedMessageId);
+        return 31 * result + Hashing.hashcode(this.isCleanConnect);
+    }
+
+    public boolean hasLastReceivedMessageId() {
+        return lastReceivedMessageId != null;
+    }
+
+    public boolean hasSessionId() {
+        return sessionId != null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Connected immutable() {
+        return new Immutable(this);
+    }
+
+    /**
+     * @param isCleanConnect
+     *            the isCleanConnect to set
+     * @return
+     */
+    public Connected setIsCleanConnect(Boolean isCleanConnect) {
+        this.isCleanConnect = isCleanConnect;
+        return this;
+    }
+
+    public Connected setLastReceivedMessageId(Long lastReceivedMessageId) {
+        this.lastReceivedMessageId = lastReceivedMessageId;
+        return this;
+    }
+
+    public Connected setSessionId(Binary sessionId) {
+        this.sessionId = sessionId;
+        return this;
+    }
+
+    /** Returns a JSON representation of this message */
+    public String toJSON() {
+        return MessageSerializer.writeToJSON(this, SERIALIZER);
+    }
+
+    void writeTo(MessageWriter w) throws IOException {
+        w.writeBinary(1, "sessionId", sessionId);
+        w.writeInt64(2, "lastReceivedMessageId", lastReceivedMessageId);
+        w.writeBoolean(3, "isCleanConnect", isCleanConnect);
+    }
+
+    /**
+     * Creates a message of this type from a JSON throwing a runtime exception if the format of the message does not
+     * match
+     */
+    public static Connected fromJSON(CharSequence c) {
+        return MessageSerializer.readFromJSON(SERIALIZER, c);
     }
 
     /** An immutable version of Connected. */
@@ -173,14 +181,36 @@ public class Connected implements Message {
 
         /** {@inheritDoc} */
         @Override
+        public Connected setLastReceivedMessageId(Long lastReceivedMessageId) {
+            throw new UnsupportedOperationException("Instance is immutable");
+        }
+
+        /** {@inheritDoc} */
+        @Override
         public Connected setSessionId(Binary sessionId) {
             throw new UnsupportedOperationException("Instance is immutable");
         }
 
         /** {@inheritDoc} */
         @Override
-        public Connected setLastReceivedMessageId(Long lastReceivedMessageId) {
+        public Connected setIsCleanConnect(Boolean isCleanConnect) {
             throw new UnsupportedOperationException("Instance is immutable");
+        }
+    }
+
+    /** A serializer for reading and writing instances of Connected. */
+    static class Serializer extends MessageSerializer<Connected> {
+
+        /** {@inheritDoc} */
+        @Override
+        public Connected read(MessageReader reader) throws IOException {
+            return new Connected(reader);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void write(Connected message, MessageWriter writer) throws IOException {
+            message.writeTo(writer);
         }
     }
 }

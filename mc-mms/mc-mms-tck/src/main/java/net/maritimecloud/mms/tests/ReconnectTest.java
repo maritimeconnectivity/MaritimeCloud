@@ -16,6 +16,7 @@ package net.maritimecloud.mms.tests;
 
 import static org.junit.Assert.assertTrue;
 
+import java.net.URI;
 import java.util.BitSet;
 import java.util.HashSet;
 import java.util.Set;
@@ -24,6 +25,9 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.junit.Ignore;
+import org.junit.Test;
+
 import net.maritimecloud.mms.stubs.AbstractHelloWorldEndpoint;
 import net.maritimecloud.mms.stubs.BroadcastTestMessage;
 import net.maritimecloud.mms.stubs.HelloWorldEndpoint;
@@ -31,9 +35,7 @@ import net.maritimecloud.net.DispatchedMessage;
 import net.maritimecloud.net.EndpointInvocationFuture;
 import net.maritimecloud.net.MessageHeader;
 import net.maritimecloud.net.mms.MmsClient;
-
-import org.junit.Ignore;
-import org.junit.Test;
+import net.maritimecloud.net.mms.MmsConnection;
 
 /**
  *
@@ -46,7 +48,7 @@ public class ReconnectTest extends AbstractNetworkTest {
     }
 
     @Test
-    @Ignore
+    // @Ignore
     public void randomKilling() throws Exception {
         final AtomicInteger ai = new AtomicInteger();
         MmsClient c1 = newClient(ID1);
@@ -187,6 +189,19 @@ public class ReconnectTest extends AbstractNetworkTest {
             // assertEquals(ti.getId(), c6.serviceInvoke(ID1, ti).get(5, TimeUnit.SECONDS).getTestInit().getId());
         }
         System.out.println(ai);
+    }
+
+    @Test
+    public void listener() throws Exception {
+        MmsClient c2 = newClient(newBuilder(ID1).addListener(new MmsConnection.Listener() {
+            public void connected(URI host, boolean isNewSession) {
+                System.out.println(isNewSession);
+            }
+        }));
+
+        Thread.sleep(200);
+        pt.killRandom(100, TimeUnit.MILLISECONDS);
+        Thread.sleep(200);
     }
 
     @Test

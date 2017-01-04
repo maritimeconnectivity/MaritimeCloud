@@ -137,7 +137,7 @@ public class ClientManager implements Iterable<Client> {
                         } else {
                             c.state = new ClientInternalState(State.CONNECTED, transport, existingSession);
                             MmsMessage mm = new MmsMessage(new Connected().setSessionId(existingSession.getSessionId())
-                                    .setLastReceivedMessageId(existingSession.latestMessageIdReceivedByRemote));
+                                    .setLastReceivedMessageId(existingSession.latestMessageIdReceivedByRemote).setIsCleanConnect(false));
                             transport.sendMessage(mm); // Send connected message
 
                             existingSession.onConnectWithWriteLock(transport, hello.getLastReceivedMessageId());

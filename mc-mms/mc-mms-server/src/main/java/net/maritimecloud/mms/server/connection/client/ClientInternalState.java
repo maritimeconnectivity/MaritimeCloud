@@ -15,6 +15,7 @@
 package net.maritimecloud.mms.server.connection.client;
 
 import static java.util.Objects.requireNonNull;
+
 import net.maritimecloud.mms.server.connection.client.Client.State;
 import net.maritimecloud.mms.server.connection.transport.ServerTransport;
 

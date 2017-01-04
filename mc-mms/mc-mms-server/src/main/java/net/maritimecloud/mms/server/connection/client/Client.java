@@ -75,13 +75,12 @@ public class Client {
     Client connectWithWriteLock(ServerTransport transport) {
         Session session = new Session(this);
         state = new ClientInternalState(State.CONNECTED, transport, session);
-        MmsMessage mm = new MmsMessage(new Connected().setSessionId(session.getSessionId())
-                .setLastReceivedMessageId(0L));
+        MmsMessage mm = new MmsMessage(
+                new Connected().setSessionId(session.getSessionId()).setLastReceivedMessageId(0L).setIsCleanConnect(endpointManager.getServiceCount() == 0));
         transport.sendMessage(mm); // Send connected message
         session.onConnectWithWriteLock(transport, 0);
         return this;
     }
-
 
     SessionMessageFuture sendMessage(Session requireSession, Message m) {
         lock.readLock().lock();
@@ -99,7 +98,6 @@ public class Client {
             lock.readLock().unlock();
         }
     }
-
 
     /**
      * @return the clientProperties

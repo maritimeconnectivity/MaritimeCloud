@@ -21,11 +21,11 @@ import java.net.URI;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import net.maritimecloud.net.mms.MmsConnection;
-import net.maritimecloud.net.mms.MmsConnectionClosingCode;
-
 import org.junit.Ignore;
 import org.junit.Test;
+
+import net.maritimecloud.net.mms.MmsConnection;
+import net.maritimecloud.net.mms.MmsConnectionClosingCode;
 
 /**
  *
@@ -37,7 +37,8 @@ public class ConnectionStateListenerTest extends AbstractNetworkTest {
     public void connected() throws Exception {
         final CountDownLatch cdl = new CountDownLatch(1);
         newClient(newBuilder(ID1).addListener(new MmsConnection.Listener() {
-            public void connected(URI host) {
+            public void connected(URI host, boolean isNewSession) {
+                assertTrue(isNewSession);
                 assertEquals(1, cdl.getCount());
                 cdl.countDown();
             }
@@ -49,11 +50,13 @@ public class ConnectionStateListenerTest extends AbstractNetworkTest {
     public void connectedTwoListeners() throws Exception {
         final CountDownLatch cdl = new CountDownLatch(2);
         newClient(newBuilder(ID1).addListener(new MmsConnection.Listener() {
-            public void connected(URI host) {
+            public void connected(URI host, boolean isNewSession) {
+                assertTrue(isNewSession);
                 cdl.countDown();
             }
         }).addListener(new MmsConnection.Listener() {
-            public void connected(URI host) {
+            public void connected(URI host, boolean isNewSession) {
+                assertTrue(isNewSession);
                 cdl.countDown();
             }
         }));

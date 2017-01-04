@@ -14,8 +14,6 @@
  */
 package net.maritimecloud.internal.mms.client.connection.session;
 
-import java.util.Objects;
-
 import net.maritimecloud.internal.mms.client.connection.transport.ClientTransport;
 import net.maritimecloud.internal.mms.messages.spi.MmsMessage;
 import net.maritimecloud.internal.util.logging.Logger;
@@ -65,7 +63,8 @@ final class SessionStateConnected extends SessionState {
      * @param lastReceivedMessage
      *            the id of the last received message id
      */
-    static void connected(SessionStateConnecting connectingState, Binary existingSessionId, Binary newSessionId, long lastReceivedMessage) {
+    static void connected(SessionStateConnecting connectingState, Binary existingSessionId, Binary newSessionId, long lastReceivedMessage,
+            boolean isCleanConnect) {
         Session session = connectingState.session;
         session.fullyLock();
         try {
@@ -86,9 +85,7 @@ final class SessionStateConnected extends SessionState {
                 }
 
                 // invoke user specified connection listeners.
-                System.out.println(existingSessionId + " " + newSessionId);
-
-                session.connectionListener.connected(connectingState.uri, !Objects.equals(existingSessionId, newSessionId));
+                session.connectionListener.connected(connectingState.uri, isCleanConnect);
             }
         } finally {
             session.fullyUnlock();

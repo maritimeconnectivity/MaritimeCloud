@@ -22,14 +22,14 @@ import java.lang.management.ThreadMXBean;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.After;
+import org.junit.Before;
+
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.internal.mms.messages.Connected;
 import net.maritimecloud.net.mms.MmsClient;
 import net.maritimecloud.net.mms.MmsClientConfiguration;
 import net.maritimecloud.util.Binary;
-
-import org.junit.After;
-import org.junit.Before;
 
 /**
  *
@@ -86,7 +86,7 @@ public class AbstractClientConnectionTest {
     protected MmsClient createAndConnect() throws InterruptedException {
         MmsClient c = conf.build();
         t.m.take();
-        t.send(new Connected().setSessionId(BIN1).setLastReceivedMessageId(0L));
+        t.send(new Connected().setSessionId(BIN1).setLastReceivedMessageId(0L).setIsCleanConnect(true));
         assertTrue(c.connection().awaitConnected(1, TimeUnit.SECONDS));
         assertTrue(c.connection().isConnected());
         return client = c;
@@ -106,25 +106,21 @@ public class AbstractClientConnectionTest {
     public void after() throws Exception {
         if (client != null) {
             client.shutdown();
-//            if (!client.awaitTermination(5, TimeUnit.SECONDS)) {
-//               System.out.println(crunchifyGenerateThreadDump());
-//                
-//            }
-//            System.out.println(client.isTerminated());
+            // if (!client.awaitTermination(5, TimeUnit.SECONDS)) {
+            // System.out.println(crunchifyGenerateThreadDump());
+            //
+            // }
+            // System.out.println(client.isTerminated());
             assertTrue(client.awaitTermination(5, TimeUnit.SECONDS));
         }
         ws.stop();
     }
-    
+
     public static String crunchifyGenerateThreadDump() {
         final StringBuilder dump = new StringBuilder();
         final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
-//        
+        //
 
-        
-        
-        
-        
         final ThreadInfo[] threadInfos = threadMXBean.getThreadInfo(threadMXBean.getAllThreadIds(), 100);
         for (ThreadInfo threadInfo : threadInfos) {
             dump.append('"');
